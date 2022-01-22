@@ -30,6 +30,10 @@ pub enum Direction {
 
 impl Hex {
     pub const ZERO: Self = Self::new(0, 0);
+    pub const ONE: Self = Self::new(1, 1);
+    pub const X: Self = Self::new(1, 0);
+    pub const Y: Self = Self::new(0, 1);
+
     pub const NEIGHBORS_COORDS: [Self; 6] = [
         Self::new(0, 1),
         Self::new(1, 0),

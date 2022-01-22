@@ -11,7 +11,7 @@ pub struct MeshInfo<const LEN: usize> {
     /// UV coordinates of each vertex
     pub uvs: [[f32; 2]; LEN],
     /// Vertex indices for triangles
-    pub indices: Vec<i32>,
+    pub indices: Vec<u16>,
 }
 
 impl MeshInfo<7> {
