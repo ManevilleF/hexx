@@ -21,11 +21,11 @@
 )]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
 mod hex;
-mod hex_layout;
-mod hex_mesh;
-mod hex_orientation;
+mod layout;
+mod mesh;
+mod orientation;
 
-pub use {hex::*, hex_layout::*, hex_mesh::*, hex_orientation::*};
+pub use {hex::*, layout::*, mesh::*, orientation::*};
 
 pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {
     (min.x()..=max.x()).flat_map(move |x| (min.y()..=max.y()).map(move |y| Hex::new(x, y)))

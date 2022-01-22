@@ -6,11 +6,11 @@ use std::f32::consts::PI;
 #[derive(Debug, Clone)]
 pub struct HexLayout {
     /// The hexagonal orientation of the layout (usually "flat" or "pointy")
-    orientation: HexOrientation,
+    pub orientation: HexOrientation,
     /// The origin of the hexagonal representation, usually [`Hex::ZERO`]
-    origin: Vec2,
+    pub origin: Vec2,
     /// The size of the hexagons in world/pixel space. The size can be irregular
-    hex_size: Vec2,
+    pub hex_size: Vec2,
 }
 
 impl HexLayout {

@@ -120,6 +120,7 @@ impl MeshInfo<31> {
             vertices,
             uvs: [[0., 1.]; 31], // TODO: Find correct UV mapping
             normals: [
+                // Top face
                 [0., 1., 0.],
                 [0., 1., 0.],
                 [0., 1., 0.],
@@ -127,26 +128,32 @@ impl MeshInfo<31> {
                 [0., 1., 0.],
                 [0., 1., 0.],
                 [0., 1., 0.],
+                // Quad 0
                 quad_normals[0],
                 quad_normals[0],
                 quad_normals[0],
                 quad_normals[0],
+                // Quad 1
                 quad_normals[1],
                 quad_normals[1],
                 quad_normals[1],
                 quad_normals[1],
+                // Quad 2
                 quad_normals[2],
                 quad_normals[2],
                 quad_normals[2],
                 quad_normals[2],
+                // Quad 3
                 quad_normals[3],
                 quad_normals[3],
                 quad_normals[3],
                 quad_normals[3],
+                // Quad 4
                 quad_normals[4],
                 quad_normals[4],
                 quad_normals[4],
                 quad_normals[4],
+                // Quad 5
                 quad_normals[5],
                 quad_normals[5],
                 quad_normals[5],
