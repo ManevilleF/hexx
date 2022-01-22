@@ -2,7 +2,6 @@ use crate::{Hex, HexLayout};
 use glam::Vec3;
 
 #[derive(Debug, Clone)]
-/// Mesh data
 pub struct MeshInfo<const LEN: usize> {
     /// All vertices information
     pub vertices: [[f32; 3]; LEN],
@@ -15,7 +14,7 @@ pub struct MeshInfo<const LEN: usize> {
 }
 
 impl MeshInfo<7> {
-    /// Gets mesh data for an hexagonal plane facing `Vec3::Y`
+    /// Computes mesh data for an hexagonal plane facing `Vec3::Y`
     #[must_use]
     pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
         let center = layout.hex_to_world_pos(hex);
@@ -40,7 +39,7 @@ impl MeshInfo<7> {
 }
 
 impl MeshInfo<31> {
-    /// Gets mesh data for an hexagonal column facing `Vec3::Y` without the bottom face
+    /// Computes mesh data for an hexagonal column facing `Vec3::Y` without the bottom face
     #[must_use]
     pub fn partial_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
         let center = layout.hex_to_world_pos(hex);
@@ -159,7 +158,7 @@ impl MeshInfo<31> {
 }
 
 impl MeshInfo<13> {
-    /// Gets cheap mesh data for an hexagonal column facing `Vec3::Y` without the bottom face.
+    /// Copmputes cheap mesh data for an hexagonal column facing `Vec3::Y` without the bottom face.
     ///
     /// This mesh has only 13 vertices, as no vertex is duplicated. As a consequence the normals will behave strangely.
     ///
