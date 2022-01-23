@@ -56,16 +56,7 @@
 //!```
 
 #![forbid(unsafe_code)]
-#![warn(
-    clippy::all,
-    clippy::style,
-    clippy::complexity,
-    clippy::suspicious,
-    clippy::perf,
-    clippy::nursery,
-    clippy::pedantic,
-    clippy::cargo
-)]
+#![warn(clippy::nursery, clippy::pedantic, clippy::cargo)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
 mod hex;
 mod layout;
