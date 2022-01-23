@@ -40,6 +40,7 @@
 
 ```rust
  use bevy::prelude::Mesh;
+ use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
  use hexalib::{HexLayout, Hex, MeshInfo};
 
 pub fn hexagonal_plane(hex: Hex, hex_layout: &HexLayout) -> Mesh {

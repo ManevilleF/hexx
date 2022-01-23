@@ -14,3 +14,8 @@ repository = "https://github.com/ManevilleF/hexalib"
 [dependencies]
 lazy_static = "1.4"
 glam = "0.20"
+
+[dev-dependencies.bevy]
+version = "0.6"
+features = ["render"]
+default-features = false
