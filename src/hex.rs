@@ -92,6 +92,13 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    /// Instantiates a new hexagon with all coordinates set to `v`
+    pub const fn splat(v: i32) -> Self {
+        Self { x: v, y: v }
+    }
+
+    #[inline]
+    #[must_use]
     /// Instantiates new hexagonal coordinates in cubic space
     ///
     /// # Panics
@@ -137,7 +144,7 @@ impl Hex {
     #[must_use]
     /// `z` coordinate (sometimes called `s` or `k`).
     ///
-    /// This axis is computed as `-x - y`
+    /// This cubic space coordinate is computed as `-x - y`
     pub const fn z(self) -> i32 {
         -self.x - self.y
     }
@@ -145,7 +152,7 @@ impl Hex {
     #[inline]
     #[must_use]
     pub const fn length(self) -> i32 {
-        self.x.abs() + self.y.abs() + self.z().abs()
+        (self.x.abs() + self.y.abs() + self.z().abs()) / 2
     }
 
     #[inline]
@@ -416,5 +423,121 @@ impl From<IVec2> for Hex {
 impl Display for Hex {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}, {}", self.x, self.y)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hex_addition() {
+        assert_eq!(Hex::ZERO + Hex::ZERO, Hex::ZERO);
+        assert_eq!(Hex::ZERO + Hex::ONE, Hex::ONE);
+        assert_eq!(Hex::ONE + Hex::ONE, Hex::new(2, 2));
+        assert_eq!(Hex::ONE + Hex::new(3, 4), Hex::new(4, 5));
+    }
+
+    #[test]
+    fn int_addition() {
+        assert_eq!(Hex::ZERO + 1, Hex::ONE);
+        assert_eq!(Hex::ONE + 1, Hex::new(2, 2));
+    }
+
+    #[test]
+    fn hex_subtraction() {
+        assert_eq!(Hex::ZERO - Hex::ZERO, Hex::ZERO);
+        assert_eq!(Hex::ONE - Hex::ZERO, Hex::ONE);
+        assert_eq!(Hex::ONE - Hex::ONE, Hex::ZERO);
+        assert_eq!(Hex::ONE - Hex::new(2, 2), Hex::new(-1, -1));
+        assert_eq!(Hex::ONE - Hex::new(4, 5), Hex::new(-3, -4));
+    }
+
+    #[test]
+    fn int_subtraction() {
+        assert_eq!(Hex::ONE - 1, Hex::ZERO);
+        assert_eq!(Hex::ONE - 2, Hex::splat(-1));
+        assert_eq!(Hex::ZERO - 10, Hex::splat(-10));
+    }
+
+    #[test]
+    fn hex_multiplication() {
+        assert_eq!(Hex::ONE * Hex::ZERO, Hex::ZERO);
+        assert_eq!(Hex::ONE * Hex::ONE, Hex::ONE);
+        assert_eq!(Hex::ONE * Hex::new(2, 2), Hex::new(2, 2));
+        assert_eq!(Hex::ONE * Hex::new(5, 6), Hex::new(5, 6));
+        assert_eq!(Hex::new(2, 3) * Hex::new(5, 10), Hex::new(10, 30));
+    }
+
+    #[test]
+    fn int_multiplication() {
+        assert_eq!(Hex::ONE * 5, Hex::splat(5));
+    }
+
+    #[test]
+    fn hex_division() {
+        assert_eq!(Hex::ONE / Hex::ONE, Hex::ONE);
+        assert_eq!(Hex::new(2, 2) / Hex::new(2, 2), Hex::ONE);
+        assert_eq!(Hex::new(10, 30) / Hex::new(2, 6), Hex::new(5, 5));
+        assert_eq!(Hex::new(11, 31) / Hex::new(2, 6), Hex::new(5, 5));
+    }
+
+    #[test]
+    fn int_division() {
+        assert_eq!(Hex::new(2, 2) / 2, Hex::ONE);
+        assert_eq!(Hex::new(10, 30) / 2, Hex::new(5, 15));
+        assert_eq!(Hex::new(11, 31) / 2, Hex::new(5, 15));
+    }
+
+    #[test]
+    fn neighbors() {
+        assert_eq!(
+            Hex::ZERO.all_neighbors(),
+            [
+                Hex::new(1, 0),
+                Hex::new(1, -1),
+                Hex::new(0, -1),
+                Hex::new(-1, 0),
+                Hex::new(-1, 1),
+                Hex::new(0, 1),
+            ]
+        );
+        assert_eq!(
+            Hex::new(-2, 5).all_neighbors(),
+            [
+                Hex::new(-1, 5),
+                Hex::new(-1, 4),
+                Hex::new(-2, 4),
+                Hex::new(-3, 5),
+                Hex::new(-3, 6),
+                Hex::new(-2, 6),
+            ]
+        );
+    }
+
+    #[test]
+    fn distance_to() {
+        assert_eq!(Hex::ZERO.distance_to(Hex::ZERO), 0);
+        assert_eq!(Hex::ZERO.distance_to(Hex::ONE), 2);
+        assert_eq!(Hex::ZERO.distance_to(Hex::new(2, 2)), 4);
+        assert_eq!(Hex::ZERO.distance_to(Hex::new(-2, -2)), 4);
+        assert_eq!(Hex::new(-2, -2).distance_to(Hex::new(-4, -4)), 4);
+    }
+
+    #[test]
+    fn rotation() {
+        let hex = Hex::new(5, 0);
+        let new = hex.rotate_right();
+        assert_eq!(new, Hex::new(0, 5));
+        let new = new.rotate_right();
+        assert_eq!(new, Hex::new(-5, 5));
+        let new = new.rotate_right();
+        assert_eq!(new, Hex::new(-5, 0));
+        let new = new.rotate_right();
+        assert_eq!(new, Hex::new(0, -5));
+        let new = new.rotate_right();
+        assert_eq!(new, Hex::new(5, -5));
+        let new = new.rotate_right();
+        assert_eq!(new, hex);
     }
 }
