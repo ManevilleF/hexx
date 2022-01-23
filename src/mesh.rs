@@ -3,11 +3,11 @@ use glam::Vec3;
 
 #[derive(Debug, Clone)]
 pub struct MeshInfo<const LEN: usize> {
-    /// All vertices information
+    /// All vertices information (`Vertex_Position` attribute)
     pub vertices: [[f32; 3]; LEN],
-    /// Normals for each vertex (You might need to swap `y` and `z`)
+    /// Normals for each vertex (You might need to swap `y` and `z`) (`Vertex_Normal` attribute)
     pub normals: [[f32; 3]; LEN],
-    /// UV coordinates of each vertex
+    /// UV coordinates of each vertex (`Vertex_Uv` attribute)
     pub uvs: [[f32; 2]; LEN],
     /// Vertex indices for triangles
     pub indices: Vec<u16>,

@@ -15,27 +15,31 @@ pub struct Hex {
 /// All 6 possible directions in hexagonal space
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Direction {
-    /// 1, 0
+    /// (1, 0)
     BottomRight = 0,
-    /// 1, -1
+    /// (1, -1)
     TopRight = 1,
-    /// 0, -1
+    /// (0, -1)
     Top = 2,
-    /// -1, 0
+    /// (-1, 0)
     TopLeft = 3,
-    /// -1, 1
+    /// (-1, 1)
     BottomLeft = 4,
-    /// 0, 1
+    /// (0, 1)
     Bottom = 5,
 }
 
 impl Hex {
+    /// (0, 0)
     pub const ZERO: Self = Self::new(0, 0);
+    /// (1, 1)
     pub const ONE: Self = Self::new(1, 1);
+    /// (1, 0)
     pub const X: Self = Self::new(1, 0);
+    /// (0, 1)
     pub const Y: Self = Self::new(0, 1);
 
-    /// ```svgbob
+    /// ```txt
     ///            x Axis
     ///            ___
     ///           /   \
@@ -46,7 +50,7 @@ impl Hex {
     ///      /    \___/    \
     ///      \ 4  /   \  0 /
     ///       +--+  5  +--+   y Axis
-    /// z Axis    \___/
+    ///           \___/
     /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
         Self::new(1, 0),
@@ -57,18 +61,18 @@ impl Hex {
         Self::new(0, 1),
     ];
 
-    /// ```svgbob
+    /// ```txt
     ///            x Axis
-    ///            ___
-    ///        2  /   \ 1
+    ///           \___/
+    ///      \ 2  /   \ 1  /
     ///       +--+     +--+
-    ///      /    \___/    \
+    ///    __/    \___/    \__
     ///      \    /   \    /
     ///    3  +--+     +--+  0
-    ///      /    \___/    \
+    ///    __/    \___/    \__
     ///      \    /   \    /
     ///       +--+     +--+   y Axis
-    ///        4  \___/  5
+    ///      / 4  \___/  5 \
     /// ```
     pub const DIAGONAL_COORDS: [Self; 6] = [
         Self::new(2, -1),
