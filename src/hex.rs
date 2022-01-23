@@ -107,10 +107,10 @@ impl Hex {
         x -= x.round(); // remainder
         y -= y.round(); // remainder
         if x * x >= y * y {
-            x_r += 0.5f32.mul_add(y, x).round();
+            x_r += 0.5_f32.mul_add(y, x).round();
         }
         if x * x < y * y {
-            y_r += 0.5f32.mul_add(x, y).round();
+            y_r += 0.5_f32.mul_add(x, y).round();
         }
         Self::new(x_r as i32, y_r as i32)
     }
