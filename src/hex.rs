@@ -1,4 +1,4 @@
-use glam::{IVec2, IVec3};
+use glam::{IVec2, IVec3, Vec2};
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
@@ -14,18 +14,18 @@ pub struct Hex {
 /// All 6 possible directions in hexagonal space
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Direction {
-    /// 0, 1
-    Top = 0,
-    /// 1, 0
-    TopLeft = 1,
-    /// 1, -1
-    BottomLeft = 2,
-    /// 0, -1
-    Bottom = 3,
     /// -1, 0
-    BottomRight = 4,
+    BottomRight = 0,
     /// -1, 1
-    TopRight = 5,
+    TopRight = 1,
+    /// 0, 1
+    Top = 2,
+    /// 1, 0
+    TopLeft = 3,
+    /// 1, -1
+    BottomLeft = 4,
+    /// 0, -1
+    Bottom = 5,
 }
 
 impl Hex {
@@ -34,13 +34,48 @@ impl Hex {
     pub const X: Self = Self::new(1, 0);
     pub const Y: Self = Self::new(0, 1);
 
+    /// ```svgbob
+    ///            x Axis
+    ///            ___
+    ///           /   \
+    ///       +--+  2  +--+
+    ///      / 3  \___/  1 \
+    ///      \    /   \    /
+    ///       +--+     +--+
+    ///      /    \___/    \
+    ///      \ 4  /   \  0 /
+    ///       +--+  5  +--+   y Axis
+    /// z Axis    \___/
+    /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
         Self::new(0, 1),
-        Self::new(1, 0),
         Self::new(1, -1),
         Self::new(0, -1),
         Self::new(-1, 0),
         Self::new(-1, 1),
+        Self::new(1, 0),
+    ];
+
+    /// ```svgbob
+    ///            x Axis
+    ///            ___
+    ///        2  /   \ 1
+    ///       +--+     +--+
+    ///      /    \___/    \
+    ///      \    /   \    /
+    ///    3  +--+     +--+  0
+    ///      /    \___/    \
+    ///      \    /   \    /
+    ///       +--+     +--+   y Axis
+    ///        4  \___/  5
+    /// ```
+    pub const DIAGONAL_COORDS: [Self; 6] = [
+        Self::new(2, -1),
+        Self::new(1, -2),
+        Self::new(-1, -1),
+        Self::new(-2, 1),
+        Self::new(-1, 2),
+        Self::new(1, 1),
     ];
 
     #[inline]
@@ -61,6 +96,22 @@ impl Hex {
     pub const fn new_cubic(x: i32, y: i32, z: i32) -> Self {
         assert!(x + y + z == 0);
         Self { x, y }
+    }
+
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    pub fn round((mut x, mut y): (f32, f32)) -> Self {
+        let (mut x_r, mut y_r) = (x.round(), y.round());
+        x -= x.round(); // remainder
+        y -= y.round(); // remainder
+        if x * x >= y * y {
+            x_r += 0.5f32.mul_add(y, x).round();
+        }
+        if x * x < y * y {
+            y_r += 0.5f32.mul_add(x, y).round();
+        }
+        Self::new(x_r as i32, y_r as i32)
     }
 
     #[inline]
@@ -138,6 +189,45 @@ impl Hex {
     #[must_use]
     pub fn rotate_right_around(self, center: Self) -> Self {
         (self - center).rotate_right() + center
+    }
+
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    pub fn line_to(self, other: Self) -> Vec<Self> {
+        let distance = self.distance_to(other);
+        let (a, b) = (
+            Vec2::new(self.x as f32, self.y as f32),
+            Vec2::new(other.x as f32, other.y as f32),
+        );
+        (0..=distance)
+            .map(|step| a.lerp(b, step as f32 / distance as f32))
+            .map(|v| Self::round((v.x, v.y)))
+            .collect()
+    }
+
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    pub fn in_range(self, distance: i32) -> Vec<Self> {
+        (-distance..=distance)
+            .flat_map(|x| (-distance..=distance).map(move |y| self + Self::new(x, y)))
+            .collect()
+    }
+
+    #[must_use]
+    #[allow(clippy::cast_sign_loss)]
+    pub fn ring(self, distance: i32) -> Vec<Self> {
+        if distance <= 0 {
+            return vec![self];
+        }
+        let mut hex = self.neighbor(Direction::BottomLeft) * distance;
+        let mut res = Vec::with_capacity((6 * distance) as usize);
+        for dir in Self::NEIGHBORS_COORDS {
+            (0..distance).for_each(|_| {
+                res.push(hex);
+                hex += dir;
+            });
+        }
+        res
     }
 }
 
@@ -306,6 +396,12 @@ impl From<Hex> for IVec2 {
 impl From<Hex> for IVec3 {
     fn from(hex: Hex) -> Self {
         Self::new(hex.x, hex.y, hex.z())
+    }
+}
+
+impl From<IVec2> for Hex {
+    fn from(v: IVec2) -> Self {
+        Self::new(v.x, v.y)
     }
 }
 

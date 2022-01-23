@@ -32,10 +32,10 @@ impl HexLayout {
     pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
         let matrix = self.orientation.inverse_matrix;
         let point = (pos - self.origin) / self.hex_size;
-        Hex::new(
-            matrix[0].mul_add(point.x, matrix[1] * point.y).round() as i32, // TODO: check if the round works
-            matrix[2].mul_add(point.x, matrix[3] * point.y).round() as i32, // TODO: check if the round works
-        )
+        Hex::round((
+            matrix[0].mul_add(point.x, matrix[1] * point.y),
+            matrix[2].mul_add(point.x, matrix[3] * point.y),
+        ))
     }
 
     #[allow(clippy::cast_precision_loss)]
