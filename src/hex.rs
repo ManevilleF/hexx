@@ -1,4 +1,5 @@
 use glam::{IVec2, IVec3, Vec2};
+use std::cmp::{max, min};
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
@@ -14,17 +15,17 @@ pub struct Hex {
 /// All 6 possible directions in hexagonal space
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Direction {
-    /// -1, 0
-    BottomRight = 0,
-    /// -1, 1
-    TopRight = 1,
-    /// 0, 1
-    Top = 2,
     /// 1, 0
-    TopLeft = 3,
+    BottomRight = 0,
     /// 1, -1
-    BottomLeft = 4,
+    TopRight = 1,
     /// 0, -1
+    Top = 2,
+    /// -1, 0
+    TopLeft = 3,
+    /// -1, 1
+    BottomLeft = 4,
+    /// 0, 1
     Bottom = 5,
 }
 
@@ -48,12 +49,12 @@ impl Hex {
     /// z Axis    \___/
     /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
-        Self::new(0, 1),
+        Self::new(1, 0),
         Self::new(1, -1),
         Self::new(0, -1),
         Self::new(-1, 0),
         Self::new(-1, 1),
-        Self::new(1, 0),
+        Self::new(0, 1),
     ];
 
     /// ```svgbob
@@ -207,9 +208,12 @@ impl Hex {
 
     #[must_use]
     #[allow(clippy::cast_precision_loss)]
-    pub fn in_range(self, distance: i32) -> Vec<Self> {
+    pub fn range(self, distance: i32) -> Vec<Self> {
         (-distance..=distance)
-            .flat_map(|x| (-distance..=distance).map(move |y| self + Self::new(x, y)))
+            .flat_map(|x| {
+                (max(-distance, -x - distance)..=min(distance, distance - x))
+                    .map(move |y| self + Self::new(x, y))
+            })
             .collect()
     }
 
@@ -219,7 +223,7 @@ impl Hex {
         if distance <= 0 {
             return vec![self];
         }
-        let mut hex = self.neighbor(Direction::BottomLeft) * distance;
+        let mut hex = self + (Self::neighbor_coord(Direction::BottomLeft) * distance);
         let mut res = Vec::with_capacity((6 * distance) as usize);
         for dir in Self::NEIGHBORS_COORDS {
             (0..distance).for_each(|_| {
