@@ -181,6 +181,12 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    pub fn all_diagonals(self) -> [Self; 6] {
+        Self::DIAGONAL_COORDS.map(|n| self + n)
+    }
+
+    #[inline]
+    #[must_use]
     pub const fn rotate_left(self) -> Self {
         Self::new(-self.z(), -self.x)
     }
@@ -517,6 +523,32 @@ mod tests {
     }
 
     #[test]
+    fn diagonals() {
+        assert_eq!(
+            Hex::ZERO.all_diagonals(),
+            [
+                Hex::new(2, -1),
+                Hex::new(1, -2),
+                Hex::new(-1, -1),
+                Hex::new(-2, 1),
+                Hex::new(-1, 2),
+                Hex::new(1, 1),
+            ]
+        );
+        assert_eq!(
+            Hex::new(-2, 5).all_diagonals(),
+            [
+                Hex::new(0, 4),
+                Hex::new(-1, 3),
+                Hex::new(-3, 4),
+                Hex::new(-4, 6),
+                Hex::new(-3, 7),
+                Hex::new(-1, 6),
+            ]
+        );
+    }
+
+    #[test]
     fn distance_to() {
         assert_eq!(Hex::ZERO.distance_to(Hex::ZERO), 0);
         assert_eq!(Hex::ZERO.distance_to(Hex::ONE), 2);
@@ -526,7 +558,7 @@ mod tests {
     }
 
     #[test]
-    fn rotation() {
+    fn rotate_right() {
         let hex = Hex::new(5, 0);
         let new = hex.rotate_right();
         assert_eq!(new, Hex::new(0, 5));
@@ -540,5 +572,65 @@ mod tests {
         assert_eq!(new, Hex::new(5, -5));
         let new = new.rotate_right();
         assert_eq!(new, hex);
+    }
+
+    #[test]
+    fn rotate_left() {
+        let hex = Hex::new(5, 0);
+        let new = hex.rotate_left();
+        assert_eq!(new, Hex::new(5, -5));
+        let new = new.rotate_left();
+        assert_eq!(new, Hex::new(0, -5));
+        let new = new.rotate_left();
+        assert_eq!(new, Hex::new(-5, 0));
+        let new = new.rotate_left();
+        assert_eq!(new, Hex::new(-5, 5));
+        let new = new.rotate_left();
+        assert_eq!(new, Hex::new(0, 5));
+        let new = new.rotate_left();
+        assert_eq!(new, hex);
+    }
+
+    #[test]
+    fn line_to() {
+        let a = Hex::new(0, 0);
+        let b = Hex::new(5, 0);
+        assert_eq!(
+            a.line_to(b),
+            vec![
+                a,
+                Hex::new(1, 0),
+                Hex::new(2, 0),
+                Hex::new(3, 0),
+                Hex::new(4, 0),
+                b
+            ]
+        );
+        let b = Hex::new(5, 5);
+        assert_eq!(
+            a.line_to(b),
+            vec![
+                a,
+                Hex::new(0, 1),
+                Hex::new(1, 1),
+                Hex::new(1, 2),
+                Hex::new(2, 2),
+                Hex::new(2, 3),
+                Hex::new(3, 3),
+                Hex::new(3, 4),
+                Hex::new(4, 4),
+                Hex::new(4, 5),
+                b
+            ]
+        );
+    }
+
+    #[test]
+    fn ring() {
+        let hex = Hex::ZERO;
+        assert_eq!(hex.ring(0), vec![hex]);
+        let mut expected = hex.all_neighbors().to_vec();
+        expected.rotate_left(4);
+        assert_eq!(hex.ring(1), expected);
     }
 }
