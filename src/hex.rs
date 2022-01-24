@@ -427,6 +427,7 @@ impl Display for Hex {
 }
 
 #[cfg(test)]
+#[allow(clippy::eq_op)]
 mod tests {
     use super::*;
 
