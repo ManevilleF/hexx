@@ -1,5 +1,5 @@
 use crate::{Hex, HexLayout};
-use glam::Vec3;
+use glam::{Vec2, Vec3};
 
 #[derive(Debug, Clone)]
 /// Mesh information. The `const LEN` attribute ensures that there is the same number of vertices, normals and uvs
@@ -42,6 +42,7 @@ impl MeshInfo<7> {
 impl MeshInfo<31> {
     /// Computes mesh data for an hexagonal column facing `Vec3::Y` without the bottom face
     #[must_use]
+    #[allow(clippy::too_many_lines)]
     pub fn partial_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
         let center = layout.hex_to_world_pos(hex);
         let center_top = Vec3::new(center.x, column_height, center.y);
@@ -50,7 +51,6 @@ impl MeshInfo<31> {
             corners.map(|p| Vec3::new(p.x, column_height, p.y)),
             corners.map(|p| Vec3::new(p.x, 0., p.y)),
         );
-
         let quad_normals = [
             ((top_corners[0] - center_top) + (top_corners[1] - center_top)).to_array(),
             ((top_corners[1] - center_top) + (top_corners[2] - center_top)).to_array(),
@@ -58,48 +58,6 @@ impl MeshInfo<31> {
             ((top_corners[3] - center_top) + (top_corners[4] - center_top)).to_array(),
             ((top_corners[4] - center_top) + (top_corners[5] - center_top)).to_array(),
             ((top_corners[5] - center_top) + (top_corners[0] - center_top)).to_array(),
-        ];
-
-        let vertices = [
-            // Top face
-            center_top.to_array(),     // 0
-            top_corners[0].to_array(), // 1
-            top_corners[1].to_array(), // 2
-            top_corners[2].to_array(), // 3
-            top_corners[3].to_array(), // 4
-            top_corners[4].to_array(), // 5
-            top_corners[5].to_array(), // 6
-            // Sides
-            // Quad 1
-            top_corners[0].to_array(), // 7
-            top_corners[1].to_array(), // 8
-            bot_corners[0].to_array(), // 9
-            bot_corners[1].to_array(), // 10
-            // Quad 2
-            top_corners[1].to_array(), // 11
-            top_corners[2].to_array(), // 12
-            bot_corners[1].to_array(), // 13
-            bot_corners[2].to_array(), // 14
-            // Quad 3
-            top_corners[2].to_array(), // 15
-            top_corners[3].to_array(), // 16
-            bot_corners[2].to_array(), // 17
-            bot_corners[3].to_array(), // 18
-            // Quad 4
-            top_corners[3].to_array(), // 19
-            top_corners[4].to_array(), // 20
-            bot_corners[3].to_array(), // 21
-            bot_corners[4].to_array(), // 22
-            // Quad 5
-            top_corners[4].to_array(), // 23
-            top_corners[5].to_array(), // 24
-            bot_corners[4].to_array(), // 25
-            bot_corners[5].to_array(), // 26
-            // Quad 6
-            top_corners[5].to_array(), // 27
-            top_corners[0].to_array(), // 28
-            bot_corners[5].to_array(), // 29
-            bot_corners[0].to_array(), // 30
         ];
         let indices = vec![
             // Top Face triangles
@@ -117,9 +75,88 @@ impl MeshInfo<31> {
             23, 24, 26, 26, 25, 23, // Quad 5
             27, 28, 30, 30, 29, 27, // Quad 6
         ];
+        let uv_delta = Vec2::splat(0.5);
         Self {
-            vertices,
-            uvs: [[0., 1.]; 31], // TODO: Find correct UV mapping
+            vertices: [
+                // Top face
+                center_top.to_array(),     // 0
+                top_corners[0].to_array(), // 1
+                top_corners[1].to_array(), // 2
+                top_corners[2].to_array(), // 3
+                top_corners[3].to_array(), // 4
+                top_corners[4].to_array(), // 5
+                top_corners[5].to_array(), // 6
+                // Quad 0
+                top_corners[0].to_array(), // 7
+                top_corners[1].to_array(), // 8
+                bot_corners[0].to_array(), // 9
+                bot_corners[1].to_array(), // 10
+                // Quad 1
+                top_corners[1].to_array(), // 11
+                top_corners[2].to_array(), // 12
+                bot_corners[1].to_array(), // 13
+                bot_corners[2].to_array(), // 14
+                // Quad 2
+                top_corners[2].to_array(), // 15
+                top_corners[3].to_array(), // 16
+                bot_corners[2].to_array(), // 17
+                bot_corners[3].to_array(), // 18
+                // Quad 3
+                top_corners[3].to_array(), // 19
+                top_corners[4].to_array(), // 20
+                bot_corners[3].to_array(), // 21
+                bot_corners[4].to_array(), // 22
+                // Quad 4
+                top_corners[4].to_array(), // 23
+                top_corners[5].to_array(), // 24
+                bot_corners[4].to_array(), // 25
+                bot_corners[5].to_array(), // 26
+                // Quad 5
+                top_corners[5].to_array(), // 27
+                top_corners[0].to_array(), // 28
+                bot_corners[5].to_array(), // 29
+                bot_corners[0].to_array(), // 30
+            ],
+            uvs: [
+                // Top face
+                uv_delta.to_array(),
+                (corners[0] + uv_delta).to_array(),
+                (corners[1] + uv_delta).to_array(),
+                (corners[2] + uv_delta).to_array(),
+                (corners[3] + uv_delta).to_array(),
+                (corners[4] + uv_delta).to_array(),
+                (corners[5] + uv_delta).to_array(),
+                // Quad 0
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 1
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 2
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 3
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 4
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 5
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+            ],
             normals: [
                 // Top face
                 [0., 1., 0.],

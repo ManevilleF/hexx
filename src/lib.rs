@@ -1,6 +1,6 @@
-//! # hexalib
+//! # Hexx
 //!
-//! [![workflow](https://github.com/ManevilleF/hexalib/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexalib/actions/workflows/rust.yml)
+//! [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
 //! [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 //! [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 //!
@@ -39,7 +39,7 @@
 //!```rust
 //! use bevy::prelude::Mesh;
 //! use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
-//! use hexalib::{HexLayout, Hex, MeshInfo};
+//! use hexx::{HexLayout, Hex, MeshInfo};
 //!
 //!pub fn hexagonal_plane(hex: Hex, hex_layout: &HexLayout) -> Mesh {
 //!    let mesh_info = MeshInfo::hexagonal_plane(
@@ -65,15 +65,18 @@ mod orientation;
 
 pub use {hex::*, layout::*, mesh::*, orientation::*};
 
+/// Generates a parallelogram layout from `min` to `max`
 pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {
     (min.x()..=max.x()).flat_map(move |x| (min.y()..=max.y()).map(move |y| Hex::new(x, y)))
 }
 
+/// Generates a triangle layout from `pox` with a custom `size`
 pub fn triangle(pos: Hex, size: i32) -> impl Iterator<Item = Hex> {
     (pos.x()..=(pos.x() + size))
         .flat_map(move |x| ((pos.y() - x)..=(pos.y() + size)).map(move |y| Hex::new(x, y)))
 }
 
+/// Generates an hexagonal layout arout `pos` with a custom `radius`
 pub fn hexagon(pos: Hex, radius: i32) -> impl Iterator<Item = Hex> {
     ((pos.x() - radius)..=(pos.x() + radius)).flat_map(move |x| {
         (((pos.y() - radius).max(pos.y() - x - radius))

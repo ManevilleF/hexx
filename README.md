@@ -1,8 +1,8 @@
 <!-- cargo-sync-readme start -->
 
- # hexalib
+ # Hexx
 
- [![workflow](https://github.com/ManevilleF/hexalib/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexalib/actions/workflows/rust.yml)
+ [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
  [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
  [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
@@ -41,7 +41,7 @@
 ```rust
  use bevy::prelude::Mesh;
  use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
- use hexalib::{HexLayout, Hex, MeshInfo};
+ use hexx::{HexLayout, Hex, MeshInfo};
 
 pub fn hexagonal_plane(hex: Hex, hex_layout: &HexLayout) -> Mesh {
     let mesh_info = MeshInfo::hexagonal_plane(

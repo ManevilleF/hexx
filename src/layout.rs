@@ -55,7 +55,7 @@ impl Default for HexLayout {
         Self {
             orientation: HexOrientation::flat(),
             origin: Vec2::ZERO,
-            hex_size: Vec2::new(2., 2.),
+            hex_size: Vec2::ONE,
         }
     }
 }

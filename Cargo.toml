@@ -1,5 +1,5 @@
 [package]
-name = "hexalib"
+name = "hexx"
 version = "0.1.0"
 edition = "2021"
 authors = ["Felix de Maneville <felix.maneville@gmail.com>"]
