@@ -27,10 +27,10 @@
 //! ## TODO list:
 //!
 //! - [ ] Complete test coverage (Required for `v0.1.0` release)
-//! - [ ] Complete documentation (Required for `v0.1.0` release)
+//! - [X] Complete documentation (Required for `v0.1.0` release)
 //! - [ ] Hexagonal symmetry
 //! - [ ] Obstacles and pathfinding
-//! - [ ] Decent UV mapping
+//! - [X] Decent UV mapping
 //!
 //! ## Usage in bevy
 //!
@@ -54,8 +54,7 @@
 //!    mesh
 //!}
 //!```
-
-#![forbid(unsafe_code)]
+#![forbid(unsafe_code, missing_docs)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
 mod hex;

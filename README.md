@@ -32,7 +32,7 @@
  - [ ] Complete documentation (Required for `v0.1.0` release)
  - [ ] Hexagonal symmetry
  - [ ] Obstacles and pathfinding
- - [ ] Decent UV mapping
+ - [X] Decent UV mapping
 
  ## Usage in bevy
 

@@ -20,12 +20,28 @@ impl MeshInfo<7> {
     pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
         let center = layout.hex_to_world_pos(hex);
         let center = [center.x, 0., center.y];
-        let corners = layout.hex_corners(hex).map(|p| [p.x, 0., p.y]);
+        let corners = layout.hex_corners(hex);
+        let corners_arr = corners.map(|p| [p.x, 0., p.y]);
+        let uv_delta = Vec2::splat(0.5);
         Self {
             vertices: [
-                center, corners[0], corners[1], corners[2], corners[3], corners[4], corners[5],
+                center,
+                corners_arr[0],
+                corners_arr[1],
+                corners_arr[2],
+                corners_arr[3],
+                corners_arr[4],
+                corners_arr[5],
             ],
-            uvs: [[0., 1.]; 7], // TODO: Find correct UV mapping
+            uvs: [
+                uv_delta.to_array(),
+                (corners[0] + uv_delta).to_array(),
+                (corners[1] + uv_delta).to_array(),
+                (corners[2] + uv_delta).to_array(),
+                (corners[3] + uv_delta).to_array(),
+                (corners[4] + uv_delta).to_array(),
+                (corners[5] + uv_delta).to_array(),
+            ],
             normals: [[0., 1., 0.]; 7],
             indices: vec![
                 1, 0, 2, // 1
@@ -206,8 +222,9 @@ impl MeshInfo<13> {
     /// Copmputes cheap mesh data for an hexagonal column facing `Vec3::Y` without the bottom face.
     ///
     /// This mesh has only 13 vertices, as no vertex is duplicated. As a consequence the normals will behave strangely.
+    /// The UV mapping will be incorrect
     ///
-    /// Use this mesh if you don't care about lighting.
+    /// Use this mesh if you don't care about lighting and texturing.
     #[must_use]
     pub fn cheap_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
         let center = layout.hex_to_world_pos(hex);
@@ -277,7 +294,7 @@ impl MeshInfo<13> {
                 quad_normals[4],
                 quad_normals[5],
             ],
-            uvs: [[0., 1.]; 13], // TODO: Find correct UV mapping
+            uvs: [[0., 1.]; 13], // TODO: Find decent UV mapping
             indices,
         }
     }
@@ -296,7 +313,6 @@ impl MeshInfo<38> {
             corners.map(|p| Vec3::new(p.x, column_height, p.y)),
             corners.map(|p| Vec3::new(p.x, 0., p.y)),
         );
-
         let quad_normals = [
             ((top_corners[0] - center_top) + (top_corners[1] - center_top)).to_array(),
             ((top_corners[1] - center_top) + (top_corners[2] - center_top)).to_array(),
@@ -304,56 +320,6 @@ impl MeshInfo<38> {
             ((top_corners[3] - center_top) + (top_corners[4] - center_top)).to_array(),
             ((top_corners[4] - center_top) + (top_corners[5] - center_top)).to_array(),
             ((top_corners[5] - center_top) + (top_corners[0] - center_top)).to_array(),
-        ];
-
-        let vertices = [
-            // Top face
-            center_top.to_array(),     // 0
-            top_corners[0].to_array(), // 1
-            top_corners[1].to_array(), // 2
-            top_corners[2].to_array(), // 3
-            top_corners[3].to_array(), // 4
-            top_corners[4].to_array(), // 5
-            top_corners[5].to_array(), // 6
-            // Sides
-            // Quad 1
-            top_corners[0].to_array(), // 7
-            top_corners[1].to_array(), // 8
-            bot_corners[0].to_array(), // 9
-            bot_corners[1].to_array(), // 10
-            // Quad 2
-            top_corners[1].to_array(), // 11
-            top_corners[2].to_array(), // 12
-            bot_corners[1].to_array(), // 13
-            bot_corners[2].to_array(), // 14
-            // Quad 3
-            top_corners[2].to_array(), // 15
-            top_corners[3].to_array(), // 16
-            bot_corners[2].to_array(), // 17
-            bot_corners[3].to_array(), // 18
-            // Quad 4
-            top_corners[3].to_array(), // 19
-            top_corners[4].to_array(), // 20
-            bot_corners[3].to_array(), // 21
-            bot_corners[4].to_array(), // 22
-            // Quad 5
-            top_corners[4].to_array(), // 23
-            top_corners[5].to_array(), // 24
-            bot_corners[4].to_array(), // 25
-            bot_corners[5].to_array(), // 26
-            // Quad 6
-            top_corners[5].to_array(), // 27
-            top_corners[0].to_array(), // 28
-            bot_corners[5].to_array(), // 29
-            bot_corners[0].to_array(), // 30
-            // Bottom face
-            center_bot.to_array(),     // 31
-            bot_corners[0].to_array(), // 32
-            bot_corners[1].to_array(), // 33
-            bot_corners[2].to_array(), // 34
-            bot_corners[3].to_array(), // 35
-            bot_corners[4].to_array(), // 36
-            bot_corners[5].to_array(), // 37
         ];
         let indices = vec![
             // Top Face triangles
@@ -378,9 +344,105 @@ impl MeshInfo<38> {
             31, 36, 37, // 5
             31, 37, 32, // 6
         ];
+        let uv_delta = Vec2::splat(0.5);
         Self {
-            vertices,
-            uvs: [[0., 1.]; 38], // TODO: Find correct UV mapping
+            vertices: [
+                // Top face
+                center_top.to_array(),     // 0
+                top_corners[0].to_array(), // 1
+                top_corners[1].to_array(), // 2
+                top_corners[2].to_array(), // 3
+                top_corners[3].to_array(), // 4
+                top_corners[4].to_array(), // 5
+                top_corners[5].to_array(), // 6
+                // Sides
+                // Quad 1
+                top_corners[0].to_array(), // 7
+                top_corners[1].to_array(), // 8
+                bot_corners[0].to_array(), // 9
+                bot_corners[1].to_array(), // 10
+                // Quad 2
+                top_corners[1].to_array(), // 11
+                top_corners[2].to_array(), // 12
+                bot_corners[1].to_array(), // 13
+                bot_corners[2].to_array(), // 14
+                // Quad 3
+                top_corners[2].to_array(), // 15
+                top_corners[3].to_array(), // 16
+                bot_corners[2].to_array(), // 17
+                bot_corners[3].to_array(), // 18
+                // Quad 4
+                top_corners[3].to_array(), // 19
+                top_corners[4].to_array(), // 20
+                bot_corners[3].to_array(), // 21
+                bot_corners[4].to_array(), // 22
+                // Quad 5
+                top_corners[4].to_array(), // 23
+                top_corners[5].to_array(), // 24
+                bot_corners[4].to_array(), // 25
+                bot_corners[5].to_array(), // 26
+                // Quad 6
+                top_corners[5].to_array(), // 27
+                top_corners[0].to_array(), // 28
+                bot_corners[5].to_array(), // 29
+                bot_corners[0].to_array(), // 30
+                // Bottom face
+                center_bot.to_array(),     // 31
+                bot_corners[0].to_array(), // 32
+                bot_corners[1].to_array(), // 33
+                bot_corners[2].to_array(), // 34
+                bot_corners[3].to_array(), // 35
+                bot_corners[4].to_array(), // 36
+                bot_corners[5].to_array(), // 37
+            ],
+            uvs: [
+                // Top face
+                uv_delta.to_array(),
+                (corners[0] + uv_delta).to_array(),
+                (corners[1] + uv_delta).to_array(),
+                (corners[2] + uv_delta).to_array(),
+                (corners[3] + uv_delta).to_array(),
+                (corners[4] + uv_delta).to_array(),
+                (corners[5] + uv_delta).to_array(),
+                // Quad 0
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 1
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 2
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 3
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 4
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Quad 5
+                [0., column_height],
+                [1., column_height],
+                [0., 1.],
+                [1., 1.],
+                // Bottom face
+                uv_delta.to_array(),
+                (corners[0] + uv_delta).to_array(),
+                (corners[1] + uv_delta).to_array(),
+                (corners[2] + uv_delta).to_array(),
+                (corners[3] + uv_delta).to_array(),
+                (corners[4] + uv_delta).to_array(),
+                (corners[5] + uv_delta).to_array(),
+            ],
             normals: [
                 // Top face
                 [0., 1., 0.],

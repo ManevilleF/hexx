@@ -113,6 +113,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
+    /// Rounds floating point coordinates to [`Hex`]
     pub fn round((mut x, mut y): (f32, f32)) -> Self {
         let (mut x_r, mut y_r) = (x.round(), y.round());
         x -= x.round(); // remainder
@@ -151,66 +152,77 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    /// Computes coordinates length
     pub const fn length(self) -> i32 {
         (self.x.abs() + self.y.abs() + self.z().abs()) / 2
     }
 
     #[inline]
     #[must_use]
+    /// Computes the distance from `self` to `other` in hexagonal space
     pub fn distance_to(self, other: Self) -> i32 {
         (self - other).length()
     }
 
     #[inline]
     #[must_use]
+    /// Retrieves the hexagonal neighbor coordinates matching the given `direction`
     pub const fn neighbor_coord(direction: Direction) -> Self {
         Self::NEIGHBORS_COORDS[direction as usize]
     }
 
     #[inline]
     #[must_use]
+    /// Retrieves the neighbor coordinates matching the given `direction`
     pub fn neighbor(self, direction: Direction) -> Self {
         self + Self::neighbor_coord(direction)
     }
 
     #[inline]
     #[must_use]
+    /// Retrieves all 6 neighbor coordinates around `self`
     pub fn all_neighbors(self) -> [Self; 6] {
         Self::NEIGHBORS_COORDS.map(|n| self + n)
     }
 
     #[inline]
     #[must_use]
+    /// Retrieves all 6 neighbor diagonal coordinates around `self`
     pub fn all_diagonals(self) -> [Self; 6] {
         Self::DIAGONAL_COORDS.map(|n| self + n)
     }
 
     #[inline]
     #[must_use]
+    /// Rotates `self` around [`Hex::ZERO`] to the left
     pub const fn rotate_left(self) -> Self {
         Self::new(-self.z(), -self.x)
     }
 
     #[inline]
     #[must_use]
+    /// Rotates `self` around `center` to the left
     pub fn rotate_left_around(self, center: Self) -> Self {
         (self - center).rotate_left() + center
     }
 
     #[inline]
     #[must_use]
+    /// Rotates `self` around [`Hex::ZERO`] to the right
     pub const fn rotate_right(self) -> Self {
         Self::new(-self.y, -self.z())
     }
 
     #[inline]
     #[must_use]
+    /// Rotates `self` around `center` to the right
     pub fn rotate_right_around(self, center: Self) -> Self {
         (self - center).rotate_right() + center
     }
 
     #[must_use]
     #[allow(clippy::cast_precision_loss)]
+    /// Computes a line from `self` to `other` as a vector of points
     pub fn line_to(self, other: Self) -> Vec<Self> {
         let distance = self.distance_to(other);
         let (a, b) = (
@@ -225,10 +237,11 @@ impl Hex {
 
     #[must_use]
     #[allow(clippy::cast_precision_loss)]
-    pub fn range(self, distance: i32) -> Vec<Self> {
-        (-distance..=distance)
+    /// Retrieves all [`Hex`] around `self` in a given `range`
+    pub fn range(self, range: i32) -> Vec<Self> {
+        (-range..=range)
             .flat_map(|x| {
-                (max(-distance, -x - distance)..=min(distance, distance - x))
+                (max(-range, -x - range)..=min(range, range - x))
                     .map(move |y| self + Self::new(x, y))
             })
             .collect()
@@ -236,14 +249,16 @@ impl Hex {
 
     #[must_use]
     #[allow(clippy::cast_sign_loss)]
-    pub fn ring(self, distance: i32) -> Vec<Self> {
-        if distance <= 0 {
+    // TODO: benchmark this alogrithm vs range - range n-1
+    /// Retrieves one [`Hex`] ring around `self` in a given `range`
+    pub fn ring(self, range: i32) -> Vec<Self> {
+        if range <= 0 {
             return vec![self];
         }
-        let mut hex = self + (Self::neighbor_coord(Direction::BottomLeft) * distance);
-        let mut res = Vec::with_capacity((6 * distance) as usize);
+        let mut hex = self + (Self::neighbor_coord(Direction::BottomLeft) * range);
+        let mut res = Vec::with_capacity((6 * range) as usize);
         for dir in Self::NEIGHBORS_COORDS {
-            (0..distance).for_each(|_| {
+            (0..range).for_each(|_| {
                 res.push(hex);
                 hex += dir;
             });
