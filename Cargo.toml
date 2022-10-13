@@ -14,6 +14,7 @@ repository = "https://github.com/ManevilleF/hexx"
 [dependencies]
 lazy_static = "1.4"
 glam = "0.21"
+itertools = "0.10"
 
 # For lib.rs doctests
 [dev-dependencies.bevy]

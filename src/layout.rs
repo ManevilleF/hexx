@@ -7,7 +7,7 @@ use std::f32::consts::PI;
 pub struct HexLayout {
     /// The hexagonal orientation of the layout (usually "flat" or "pointy")
     pub orientation: HexOrientation,
-    /// The origin of the hexagonal representation, usually [`Hex::ZERO`]
+    /// The origin of the hexagonal representation, usually [`Vec2::ZERO`]
     pub origin: Vec2,
     /// The size of the hexagons in world/pixel space. The size can be irregular
     pub hex_size: Vec2,

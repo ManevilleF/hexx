@@ -57,12 +57,13 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
+mod direction;
 mod hex;
 mod layout;
 mod mesh;
 mod orientation;
 
-pub use {hex::*, layout::*, mesh::*, orientation::*};
+pub use {direction::*, hex::*, layout::*, mesh::*, orientation::*};
 
 /// Generates a parallelogram layout from `min` to `max`
 pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {

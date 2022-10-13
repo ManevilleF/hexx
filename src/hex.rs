@@ -1,4 +1,6 @@
+use crate::Direction;
 use glam::{IVec2, IVec3, Vec2};
+use itertools::Itertools;
 use std::cmp::{max, min};
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
@@ -10,23 +12,6 @@ pub struct Hex {
     x: i32,
     /// `y` axial coordinate (sometimes called `r` or `j`)
     y: i32,
-}
-
-/// All 6 possible directions in hexagonal space
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
-pub enum Direction {
-    /// (1, 0)
-    BottomRight = 0,
-    /// (1, -1)
-    TopRight = 1,
-    /// (0, -1)
-    Top = 2,
-    /// (-1, 0)
-    TopLeft = 3,
-    /// (-1, 1)
-    BottomLeft = 4,
-    /// (0, 1)
-    Bottom = 5,
 }
 
 impl Hex {
@@ -180,6 +165,22 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    /// Retrieves the direction of the given neighbor. Will return `None` if `other` is not a neighbor
+    /// of `self`
+    pub fn neighbor_direction(self, other: Self) -> Option<Direction> {
+        Direction::iter().find(|&dir| self.neighbor(dir) == other)
+    }
+
+    #[inline]
+    /// Retrieves all directions in the line betzeen `self` and `other`
+    pub fn directions_to(self, other: Self) -> impl Iterator<Item = Direction> {
+        self.line_to(other)
+            .tuple_windows::<(_, _)>()
+            .filter_map(|(a, b)| a.neighbor_direction(b))
+    }
+
+    #[inline]
+    #[must_use]
     /// Retrieves all 6 neighbor coordinates around `self`
     pub fn all_neighbors(self) -> [Self; 6] {
         Self::NEIGHBORS_COORDS.map(|n| self + n)
@@ -220,31 +221,25 @@ impl Hex {
         (self - center).rotate_right() + center
     }
 
-    #[must_use]
     #[allow(clippy::cast_precision_loss)]
     /// Computes a line from `self` to `other` as a vector of points
-    pub fn line_to(self, other: Self) -> Vec<Self> {
+    pub fn line_to(self, other: Self) -> impl Iterator<Item = Self> {
         let distance = self.distance_to(other);
         let (a, b) = (
             Vec2::new(self.x as f32, self.y as f32),
             Vec2::new(other.x as f32, other.y as f32),
         );
         (0..=distance)
-            .map(|step| a.lerp(b, step as f32 / distance as f32))
+            .map(move |step| a.lerp(b, step as f32 / distance as f32))
             .map(|v| Self::round((v.x, v.y)))
-            .collect()
     }
 
-    #[must_use]
     #[allow(clippy::cast_precision_loss)]
     /// Retrieves all [`Hex`] around `self` in a given `range`
-    pub fn range(self, range: i32) -> Vec<Self> {
-        (-range..=range)
-            .flat_map(|x| {
-                (max(-range, -x - range)..=min(range, range - x))
-                    .map(move |y| self + Self::new(x, y))
-            })
-            .collect()
+    pub fn range(self, range: i32) -> impl Iterator<Item = Self> {
+        (-range..=range).flat_map(move |x| {
+            (max(-range, -x - range)..=min(range, range - x)).map(move |y| self + Self::new(x, y))
+        })
     }
 
     #[must_use]
@@ -611,7 +606,7 @@ mod tests {
         let a = Hex::new(0, 0);
         let b = Hex::new(5, 0);
         assert_eq!(
-            a.line_to(b),
+            a.line_to(b).collect::<Vec<_>>(),
             vec![
                 a,
                 Hex::new(1, 0),
@@ -623,7 +618,7 @@ mod tests {
         );
         let b = Hex::new(5, 5);
         assert_eq!(
-            a.line_to(b),
+            a.line_to(b).collect::<Vec<_>>(),
             vec![
                 a,
                 Hex::new(0, 1),
@@ -636,6 +631,27 @@ mod tests {
                 Hex::new(4, 4),
                 Hex::new(4, 5),
                 b
+            ]
+        );
+    }
+
+    #[test]
+    fn directions_to() {
+        let a = Hex::new(0, 0);
+        let b = Hex::new(5, 5);
+        assert_eq!(
+            a.directions_to(b).collect::<Vec<_>>(),
+            vec![
+                Direction::Bottom,
+                Direction::BottomRight,
+                Direction::Bottom,
+                Direction::BottomRight,
+                Direction::Bottom,
+                Direction::BottomRight,
+                Direction::Bottom,
+                Direction::BottomRight,
+                Direction::Bottom,
+                Direction::BottomRight
             ]
         );
     }
