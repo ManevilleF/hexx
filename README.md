@@ -10,7 +10,7 @@
 
  > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html).
 
- This lib allow you to:
+ This lib allows you to:
  - Manipulate hexagon coordinates
  - Generate hexagonal maps with custom layouts and orientation
  - Generate hexagon meshes (planes or columns)
@@ -29,7 +29,7 @@
  ## TODO list:
 
  - [ ] Complete test coverage (Required for `v0.1.0` release)
- - [ ] Complete documentation (Required for `v0.1.0` release)
+ - [X] Complete documentation (Required for `v0.1.0` release)
  - [ ] Hexagonal symmetry
  - [ ] Obstacles and pathfinding
  - [X] Decent UV mapping
@@ -49,9 +49,9 @@ pub fn hexagonal_plane(hex: Hex, hex_layout: &HexLayout) -> Mesh {
         hex,
     );
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
-    mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
-    mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs.to_vec());
+    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
+    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
+    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs.to_vec());
     mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
     mesh
 }

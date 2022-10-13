@@ -7,15 +7,16 @@ description = "Hexagonal utilities"
 license = "Apache License 2.0"
 keywords = ["hexagon", "bestagon", "bevy", "geometry"]
 categories = ["game-development", "mathematics"]
-repository = "https://github.com/ManevilleF/hexalib"
+repository = "https://github.com/ManevilleF/hexx"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 lazy_static = "1.4"
-glam = "0.20"
+glam = "0.21"
 
+# For lib.rs doctests
 [dev-dependencies.bevy]
-version = "0.6"
+version = "0.8"
 features = ["render"]
 default-features = false

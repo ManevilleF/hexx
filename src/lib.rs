@@ -8,7 +8,7 @@
 //!
 //! > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html).
 //!
-//! This lib allow you to:
+//! This lib allows you to:
 //! - Manipulate hexagon coordinates
 //! - Generate hexagonal maps with custom layouts and orientation
 //! - Generate hexagon meshes (planes or columns)
@@ -47,15 +47,15 @@
 //!        hex,
 //!    );
 //!    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-//!    mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
-//!    mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
-//!    mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs.to_vec());
+//!    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
+//!    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
+//!    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs.to_vec());
 //!    mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
 //!    mesh
 //!}
 //!```
-#![forbid(unsafe_code, missing_docs)]
-#![warn(clippy::nursery, clippy::pedantic, clippy::cargo)]
+#![forbid(unsafe_code)]
+#![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
 mod hex;
 mod layout;
