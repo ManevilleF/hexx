@@ -1,7 +1,4 @@
-lazy_static::lazy_static! {
-    // TODO: This should be const when `sqrt` can be `const`evaluated
-    static ref SQRT_3: f32 = 3_f32.sqrt();
-}
+const SQRT_3: f32 = 1.73205080757;
 
 /// Hexagonal orientation
 #[derive(Debug, Copy, Clone)]
@@ -20,8 +17,8 @@ impl HexOrientation {
     /// "Pointy top" hexagonal orientation
     pub fn pointy() -> Self {
         Self {
-            forward_matrix: [*SQRT_3, *SQRT_3 / 2.0, 0.0, 3.0 / 2.0],
-            inverse_matrix: [*SQRT_3 / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0],
+            forward_matrix: [SQRT_3, SQRT_3 / 2.0, 0.0, 3.0 / 2.0],
+            inverse_matrix: [SQRT_3 / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0],
             start_rotation: 0.5, // 30 degrees
         }
     }
@@ -31,8 +28,8 @@ impl HexOrientation {
     /// "Flat top" hexagonal orientation
     pub fn flat() -> Self {
         Self {
-            forward_matrix: [3.0 / 2.0, 0.0, *SQRT_3 / 2.0, *SQRT_3],
-            inverse_matrix: [2.0 / 3.0, 0.0, -1.0 / 3.0, *SQRT_3 / 3.0],
+            forward_matrix: [3.0 / 2.0, 0.0, SQRT_3 / 2.0, SQRT_3],
+            inverse_matrix: [2.0 / 3.0, 0.0, -1.0 / 3.0, SQRT_3 / 3.0],
             start_rotation: 0.0, // 0 degrees
         }
     }

@@ -12,12 +12,11 @@ repository = "https://github.com/ManevilleF/hexx"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-lazy_static = "1.4"
-glam = "0.21"
+glam = "0.22"
 itertools = "0.10"
 
 # For lib.rs doctests
 [dev-dependencies.bevy]
-version = "0.8"
+version = "0.9"
 features = ["render"]
 default-features = false
