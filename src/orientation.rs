@@ -1,4 +1,4 @@
-const SQRT_3: f32 = 1.73205080757;
+const SQRT_3: f32 = 1.732_050_8;
 
 /// Hexagonal orientation
 #[derive(Debug, Copy, Clone)]
