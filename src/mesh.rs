@@ -2,6 +2,7 @@ use crate::{Hex, HexLayout};
 use glam::{Vec2, Vec3};
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 /// Mesh information. The `const LEN` attribute ensures that there is the same number of vertices, normals and uvs
 pub struct MeshInfo<const LEN: usize> {
     /// All vertices information (`Vertex_Position` attribute)

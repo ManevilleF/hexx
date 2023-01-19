@@ -7,6 +7,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 /// Hexagonal coordinates
 #[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct Hex {
     /// `x` axial coordinate (sometimes called `q` or `i`)
     x: i32,
