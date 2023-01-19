@@ -1,6 +1,7 @@
 /// All 6 possible directions in hexagonal space
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub enum Direction {
     /// (1, 0)
     BottomRight = 0,

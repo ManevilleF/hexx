@@ -49,7 +49,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Cargo clippy installation
         run: rustup component add clippy
-      - name: Cargo clippy check
+      - name: clippy default check
+        run: cargo clippy --all --tests -- -D warnings
+      - name: clippy all features check
         run: cargo clippy --all-features --all --tests -- -D warnings
 
   rustdoc:

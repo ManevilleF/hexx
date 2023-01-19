@@ -4,12 +4,13 @@ use std::f32::consts::PI;
 
 /// Hexagonal layout
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexLayout {
     /// The hexagonal orientation of the layout (usually "flat" or "pointy")
     pub orientation: HexOrientation,
-    /// The origin of the hexagonal representation, usually [`Vec2::ZERO`]
+    /// The origin of the hexagonal representation in world/pixel space, usually [`Vec2::ZERO`]
     pub origin: Vec2,
-    /// The size of the hexagons in world/pixel space. The size can be irregular
+    /// The size of individual hexagons in world/pixel space. The size can be irregular
     pub hex_size: Vec2,
 }
 

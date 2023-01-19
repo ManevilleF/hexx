@@ -9,11 +9,20 @@ keywords = ["hexagon", "bestagon", "bevy", "geometry"]
 categories = ["game-development", "mathematics"]
 repository = "https://github.com/ManevilleF/hexx"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+default = []
+# serde compatibility
+ser_de = ["serde", "glam/serde"]
 
 [dependencies]
 glam = "0.22"
 itertools = "0.10"
+
+[dependencies.serde]
+version = "1"
+default-features = false
+features = ["derive"]
+optional = true
 
 # For lib.rs doctests
 [dev-dependencies.bevy]

@@ -2,6 +2,7 @@ const SQRT_3: f32 = 1.732_050_8;
 
 /// Hexagonal orientation
 #[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexOrientation {
     /// Matrix used to compute hexagonal coordinates to world/pixel coordinates
     pub forward_matrix: [f32; 4],
