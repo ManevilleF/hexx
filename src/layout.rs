@@ -10,7 +10,7 @@ pub struct HexLayout {
     pub orientation: HexOrientation,
     /// The origin of the hexagonal representation in world/pixel space, usually [`Vec2::ZERO`]
     pub origin: Vec2,
-    /// The size of the hexagons in world/pixel space. The size can be irregular
+    /// The size of individual hexagons in world/pixel space. The size can be irregular
     pub hex_size: Vec2,
 }
 
