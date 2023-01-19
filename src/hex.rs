@@ -10,9 +10,9 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct Hex {
     /// `x` axial coordinate (sometimes called `q` or `i`)
-    x: i32,
+    pub x: i32,
     /// `y` axial coordinate (sometimes called `r` or `j`)
-    y: i32,
+    pub y: i32,
 }
 
 impl Hex {
