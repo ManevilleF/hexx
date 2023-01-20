@@ -84,3 +84,19 @@ pub fn hexagon(pos: Hex, radius: i32) -> impl Iterator<Item = Hex> {
             .map(move |y| Hex::new(x, y))
     })
 }
+
+/// Generates a rectangle with the given bounds for "pointy topped" hexagons
+pub fn pointy_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
+    (top..=bottom).flat_map(move |y| {
+        let y_offset = y >> 1;
+        ((left - y_offset)..=(right - y_offset)).map(move |x| Hex::new(x, y))
+    })
+}
+
+/// Generates a rectangle with the given bounds for "flat topped" hexagons
+pub fn flat_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
+    (left..=right).flat_map(move |x| {
+        let x_offset = x >> 1;
+        ((top - x_offset)..=(bottom - x_offset)).map(move |y| Hex::new(x, y))
+    })
+}
