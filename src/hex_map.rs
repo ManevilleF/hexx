@@ -65,11 +65,35 @@ impl HexMap {
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     #[must_use]
     pub fn wrapped_hex(&self, hex: Hex) -> Hex {
-        hex.wrap_with(self.radius, &self.mirrors)
+        let pos = hex - self.center;
+        let pos = pos.wrap_with(self.radius, &self.mirrors);
+        pos + self.center
+    }
+
+    /// Computes the neighbors of `hex` wrapped in the map bounds.
+    /// See [`Self::wrapped_hex`]
+    #[must_use]
+    #[inline]
+    pub fn wrapped_neighbors(&self, hex: Hex) -> [Hex; 6] {
+        hex.all_neighbors().map(|h| self.wrapped_hex(h))
     }
 
     /// Returns an iterator with all the coordinates in the map bounds
     pub fn all_coords(&self) -> impl Iterator<Item = Hex> + '_ {
         hexagon(self.radius).map(|h| h + self.center)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wrapping_works() {
+        let map = HexMap::new(3);
+
+        assert_eq!(map.wrapped_hex(Hex::new(0, 4)), Hex::new(-3, 0));
+        assert_eq!(map.wrapped_hex(Hex::new(4, 0)), Hex::new(-3, 3));
+        assert_eq!(map.wrapped_hex(Hex::new(4, -4)), Hex::new(0, 3));
     }
 }

@@ -338,7 +338,7 @@ impl Hex {
     #[inline]
     #[must_use]
     pub const fn wraparound_mirrors(radius: i32) -> [Self; 6] {
-        let mirror = Self::new(2 * radius - 1, -radius);
+        let mirror = Self::new(2 * radius + 1, -radius);
         let [center, left, right] = [mirror, mirror.rotate_left(), mirror.rotate_right()];
         [
             left,
