@@ -3,7 +3,7 @@ use glam::{IVec2, IVec3, Vec2};
 use itertools::Itertools;
 use std::cmp::{max, min};
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// Hexagonal coordinates
 #[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
@@ -138,6 +138,42 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    /// Negates the coordinate, giving its reflection (symmetry) around the origin.
+    ///
+    /// [`Hex`] implements [`Neg`] (`-` operator) but this method is `const`.
+    pub const fn const_neg(self) -> Self {
+        Self {
+            x: -self.x,
+            y: -self.y,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// adds `self` and `other`.
+    ///
+    /// [`Hex`] implements [`Add`] (`+` operator) but this method is `const`.
+    pub const fn const_add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// substracts `self` and `other`.
+    ///
+    /// [`Hex`] implements [`Sub`] (`-` operator) but this method is `const`.
+    pub const fn const_sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+
+    #[inline]
+    #[must_use]
     /// Computes coordinates length
     pub const fn length(self) -> i32 {
         (self.x.abs() + self.y.abs() + self.z().abs()) / 2
@@ -196,28 +232,28 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] to the left
+    /// Rotates `self` around [`Hex::ZERO`] counter clockwise (by -60 degrees)
     pub const fn rotate_left(self) -> Self {
         Self::new(-self.z(), -self.x)
     }
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around `center` to the left
+    /// Rotates `self` around `center`  counter clockwise (by -60 degrees)
     pub fn rotate_left_around(self, center: Self) -> Self {
         (self - center).rotate_left() + center
     }
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] to the right
+    /// Rotates `self` around [`Hex::ZERO`] clockwise (by 60 degrees)
     pub const fn rotate_right(self) -> Self {
         Self::new(-self.y, -self.z())
     }
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around `center` to the right
+    /// Rotates `self` around `center` clockwise (by 60 degrees)
     pub fn rotate_right_around(self, center: Self) -> Self {
         (self - center).rotate_right() + center
     }
@@ -261,16 +297,59 @@ impl Hex {
         }
         res
     }
+
+    #[must_use]
+    /// Wraps `self` in an hex range around the origin ([`Hex::ZERO`]).
+    /// this allows for seamless *wraparound* hexagonal maps.
+    /// See this [article] for more information.
+    ///
+    /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
+    pub fn wrap_in_range(self, radius: i32) -> Self {
+        self.wrap_with(radius, &Self::wraparound_mirrors(radius))
+    }
+
+    pub(crate) fn wrap_with(self, radius: i32, mirrors: &[Self; 6]) -> Self {
+        if self.length() <= radius {
+            return self;
+        }
+        mirrors
+            .iter()
+            .find_map(|m| {
+                let p = *m + self;
+                (p.length() <= radius).then_some(p)
+            })
+            // Note: Should never happen
+            .unwrap_or(self)
+    }
+
+    /// Computes the 6 mirror centers of the origin for hexagonal *wraparound* maps
+    /// of given `radius`.
+    ///
+    /// See [`Self::wrap_in_range`] for a usage
+    /// See this [article] for more information.
+    ///
+    /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
+    #[inline]
+    #[must_use]
+    pub const fn wraparound_mirrors(radius: i32) -> [Self; 6] {
+        let mirror = Self::new(2 * radius - 1, -radius);
+        let [center, left, right] = [mirror, mirror.rotate_left(), mirror.rotate_right()];
+        [
+            left,
+            center,
+            right,
+            left.const_neg(),   // -left
+            center.const_neg(), // -center
+            right.const_neg(),  // -right
+        ]
+    }
 }
 
 impl Add<Self> for Hex {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        }
+        self.const_add(rhs)
     }
 }
 
@@ -303,10 +382,7 @@ impl Sub<Self> for Hex {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-        }
+        self.const_sub(rhs)
     }
 }
 
@@ -404,6 +480,14 @@ impl DivAssign<i32> for Hex {
     fn div_assign(&mut self, rhs: i32) {
         self.x /= rhs;
         self.y /= rhs;
+    }
+}
+
+impl Neg for Hex {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        self.const_neg()
     }
 }
 

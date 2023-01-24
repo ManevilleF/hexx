@@ -59,11 +59,12 @@
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
 mod direction;
 mod hex;
+mod hex_map;
 mod layout;
 mod mesh;
 mod orientation;
 
-pub use {direction::*, hex::*, layout::*, mesh::*, orientation::*};
+pub use {direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*};
 
 /// Generates a parallelogram layout from `min` to `max`
 pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {
@@ -76,12 +77,14 @@ pub fn triangle(pos: Hex, size: i32) -> impl Iterator<Item = Hex> {
         .flat_map(move |x| ((pos.y() - x)..=(pos.y() + size)).map(move |y| Hex::new(x, y)))
 }
 
-/// Generates an hexagonal layout arout `pos` with a custom `radius`
-pub fn hexagon(pos: Hex, radius: i32) -> impl Iterator<Item = Hex> {
-    ((pos.x() - radius)..=(pos.x() + radius)).flat_map(move |x| {
-        (((pos.y() - radius).max(pos.y() - x - radius))
-            ..=((pos.y() + radius).min(pos.y() - x + radius)))
-            .map(move |y| Hex::new(x, y))
+/// Generates an hexagonal layout around [`Hex::ZERO`] with a custom `radius`.
+///
+/// # Note
+///
+/// To offset the map, apply the offset to each `Item` of the returned iterator
+pub fn hexagon(radius: i32) -> impl Iterator<Item = Hex> {
+    (-radius..=radius).flat_map(move |x| {
+        (radius.max(-x - radius)..=radius.min(-x + radius)).map(move |y| Hex::new(x, y))
     })
 }
 
