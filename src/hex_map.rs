@@ -33,7 +33,7 @@ impl HexMap {
     /// # Usage
     ///
     /// ```rust
-    /// # use hex::*;
+    /// # use hexx::*;
     /// let map = HexMap::new(10).with_center(Hex::new(5, -5));
     /// ```
     pub fn with_center(self, center: Hex) -> Self {
