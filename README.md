@@ -33,6 +33,7 @@
  - [ ] Hexagonal symmetry
  - [ ] Obstacles and pathfinding
  - [X] Decent UV mapping
+ - [X] [*Wraparound maps*](https://www.redblobgames.com/grids/hexagons/#wraparound)
 
  ## Usage in bevy
 

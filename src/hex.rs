@@ -303,6 +303,9 @@ impl Hex {
     /// this allows for seamless *wraparound* hexagonal maps.
     /// See this [article] for more information.
     ///
+    /// Use [`HexMap`] for improved wrapping
+    ///
+    /// [`HexMap`]: crate::HexMap
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     pub fn wrap_in_range(self, radius: i32) -> Self {
         self.wrap_with(radius, &Self::wraparound_mirrors(radius))
@@ -325,9 +328,12 @@ impl Hex {
     /// Computes the 6 mirror centers of the origin for hexagonal *wraparound* maps
     /// of given `radius`.
     ///
-    /// See [`Self::wrap_in_range`] for a usage
-    /// See this [article] for more information.
+    /// # Notes
+    /// * See [`Self::wrap_in_range`] for a usage
+    /// * Use [`HexMap`] for improved wrapping
+    /// * See this [article] for more information.
     ///
+    /// [`HexMap`]: crate::HexMap
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     #[inline]
     #[must_use]
