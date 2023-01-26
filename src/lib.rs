@@ -85,7 +85,7 @@ pub fn triangle(pos: Hex, size: i32) -> impl Iterator<Item = Hex> {
 /// To offset the map, apply the offset to each `Item` of the returned iterator
 pub fn hexagon(radius: i32) -> impl Iterator<Item = Hex> {
     (-radius..=radius).flat_map(move |x| {
-        (radius.max(-x - radius)..=radius.min(-x + radius)).map(move |y| Hex::new(x, y))
+        ((-radius).max(-x - radius)..=radius.min(-x + radius)).map(move |y| Hex::new(x, y))
     })
 }
 
