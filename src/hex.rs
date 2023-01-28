@@ -20,10 +20,12 @@ impl Hex {
     pub const ZERO: Self = Self::new(0, 0);
     /// (1, 1)
     pub const ONE: Self = Self::new(1, 1);
-    /// (1, 0)
+    /// X (Q) axis (1, 0)
     pub const X: Self = Self::new(1, 0);
-    /// (0, 1)
+    /// Y (R) axis (0, 1)
     pub const Y: Self = Self::new(0, 1);
+    /// Z (S) axis (-1, 0)
+    pub const Z: Self = Self::new(-1, 0);
 
     /// ```txt
     ///            x Axis
@@ -259,6 +261,30 @@ impl Hex {
     /// Rotates `self` around `center` clockwise (by 60 degrees)
     pub fn rotate_right_around(self, center: Self) -> Self {
         (self - center).rotate_right() + center
+    }
+
+    #[inline]
+    #[must_use]
+    #[doc(alias = "reflect_q")]
+    /// Computes the reflection of `self` accross[`Hex::X`]
+    pub const fn reflect_x(self) -> Self {
+        Self::new(self.x, self.z())
+    }
+
+    #[inline]
+    #[must_use]
+    #[doc(alias = "reflect_r")]
+    /// Computes the reflection of `self` accross [`Hex::Y`]
+    pub const fn reflect_y(self) -> Self {
+        Self::new(self.z(), self.y)
+    }
+
+    #[inline]
+    #[must_use]
+    #[doc(alias = "reflect_s")]
+    /// Computes the reflection of `self` accross [`Hex::Z`]
+    pub const fn reflect_z(self) -> Self {
+        Self::new(self.y, self.x)
     }
 
     #[allow(clippy::cast_precision_loss)]

@@ -28,7 +28,7 @@
 //!
 //! - [ ] Complete test coverage (Required for `v0.1.0` release)
 //! - [X] Complete documentation (Required for `v0.1.0` release)
-//! - [ ] Hexagonal symmetry
+//! - [X] Hexagonal symmetry
 //! - [X] Decent UV mapping
 //! - [X] [*Wraparound maps*](https://www.redblobgames.com/grids/hexagons/#wraparound)
 //!
