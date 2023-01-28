@@ -1,4 +1,4 @@
-use crate::{hexagon, Hex};
+use crate::Hex;
 
 /// Hexagon shaped map with [wraparound] utils.
 ///
@@ -79,8 +79,8 @@ impl HexMap {
     }
 
     /// Returns an iterator with all the coordinates in the map bounds
-    pub fn all_coords(&self) -> impl Iterator<Item = Hex> + '_ {
-        hexagon(self.radius).map(|h| h + self.center)
+    pub fn all_coords(&self) -> impl Iterator<Item = Hex> {
+        self.center.range(self.radius)
     }
 }
 

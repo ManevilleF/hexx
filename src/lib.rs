@@ -29,7 +29,6 @@
 //! - [ ] Complete test coverage (Required for `v0.1.0` release)
 //! - [X] Complete documentation (Required for `v0.1.0` release)
 //! - [ ] Hexagonal symmetry
-//! - [ ] Obstacles and pathfinding
 //! - [X] Decent UV mapping
 //! - [X] [*Wraparound maps*](https://www.redblobgames.com/grids/hexagons/#wraparound)
 //!
@@ -67,43 +66,42 @@ mod orientation;
 
 pub use {direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*};
 
-/// Generates a parallelogram layout from `min` to `max`
-pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {
-    (min.x()..=max.x()).flat_map(move |x| (min.y()..=max.y()).map(move |y| Hex::new(x, y)))
-}
+/// Map shapes generation functions
+pub mod shapes {
+    use super::Hex;
 
-/// Generates a triangle with a custom `size`
-///
-/// # Note
-///
-/// To offset the map, apply the offset to each `Item` of the returned iterator
-pub fn triangle(size: i32) -> impl Iterator<Item = Hex> {
-    (0..=size).flat_map(move |x| (0..=(size - x)).map(move |y| Hex::new(x, y)))
-}
+    /// Generates a parallelogram layout from `min` to `max`
+    pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {
+        (min.x()..=max.x()).flat_map(move |x| (min.y()..=max.y()).map(move |y| Hex::new(x, y)))
+    }
 
-/// Generates an hexagonal layout around [`Hex::ZERO`] with a custom `radius`.
-///
-/// # Note
-///
-/// To offset the map, apply the offset to each `Item` of the returned iterator
-pub fn hexagon(radius: i32) -> impl Iterator<Item = Hex> {
-    (-radius..=radius).flat_map(move |x| {
-        ((-radius).max(-x - radius)..=radius.min(-x + radius)).map(move |y| Hex::new(x, y))
-    })
-}
+    /// Generates a triangle with a custom `size`
+    ///
+    /// # Note
+    ///
+    /// To offset the map, apply the offset to each `Item` of the returned iterator
+    pub fn triangle(size: i32) -> impl Iterator<Item = Hex> {
+        (0..=size).flat_map(move |x| (0..=(size - x)).map(move |y| Hex::new(x, y)))
+    }
 
-/// Generates a rectangle with the given bounds for "pointy topped" hexagons
-pub fn pointy_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
-    (top..=bottom).flat_map(move |y| {
-        let y_offset = y >> 1;
-        ((left - y_offset)..=(right - y_offset)).map(move |x| Hex::new(x, y))
-    })
-}
+    /// Generates an hexagonal layout around `center` with a custom `radius`.
+    pub fn hexagon(center: Hex, radius: i32) -> impl Iterator<Item = Hex> {
+        center.range(radius)
+    }
 
-/// Generates a rectangle with the given bounds for "flat topped" hexagons
-pub fn flat_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
-    (left..=right).flat_map(move |x| {
-        let x_offset = x >> 1;
-        ((top - x_offset)..=(bottom - x_offset)).map(move |y| Hex::new(x, y))
-    })
+    /// Generates a rectangle with the given bounds for "pointy topped" hexagons
+    pub fn pointy_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
+        (top..=bottom).flat_map(move |y| {
+            let y_offset = y >> 1;
+            ((left - y_offset)..=(right - y_offset)).map(move |x| Hex::new(x, y))
+        })
+    }
+
+    /// Generates a rectangle with the given bounds for "flat topped" hexagons
+    pub fn flat_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
+        (left..=right).flat_map(move |x| {
+            let x_offset = x >> 1;
+            ((top - x_offset)..=(bottom - x_offset)).map(move |y| Hex::new(x, y))
+        })
+    }
 }

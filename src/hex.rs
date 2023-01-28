@@ -115,6 +115,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    #[doc(alias = "q")]
     /// `x` coordinate (sometimes called `q` or `i`)
     pub const fn x(self) -> i32 {
         self.x
@@ -122,6 +123,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    #[doc(alias = "r")]
     /// `y` coordinate (sometimes called `r` or `j`)
     pub const fn y(self) -> i32 {
         self.y
@@ -129,6 +131,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    #[doc(alias = "s")]
     /// `z` coordinate (sometimes called `s` or `k`).
     ///
     /// This cubic space coordinate is computed as `-x - y`
@@ -259,7 +262,17 @@ impl Hex {
     }
 
     #[allow(clippy::cast_precision_loss)]
-    /// Computes a line from `self` to `other` as a vector of points
+    /// Computes all coordinates in a line from `self` to `other`.
+    ///
+    /// # Example
+    /// ```rust
+    /// # use hexx::*;
+    /// let start = Hex::ZERO;
+    /// let end = Hex::new(5, 0);
+    ///
+    /// let line: Vec<Hex> = start.line_to(end).collect();
+    /// assert_eq!(line.len(), 6);
+    /// ````
     pub fn line_to(self, other: Self) -> impl Iterator<Item = Self> {
         let distance = self.distance_to(other);
         let (a, b) = (
