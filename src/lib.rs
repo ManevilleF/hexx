@@ -72,10 +72,13 @@ pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {
     (min.x()..=max.x()).flat_map(move |x| (min.y()..=max.y()).map(move |y| Hex::new(x, y)))
 }
 
-/// Generates a triangle layout from `pox` with a custom `size`
-pub fn triangle(pos: Hex, size: i32) -> impl Iterator<Item = Hex> {
-    (pos.x()..=(pos.x() + size))
-        .flat_map(move |x| ((pos.y() - x)..=(pos.y() + size)).map(move |y| Hex::new(x, y)))
+/// Generates a triangle with a custom `size`
+///
+/// # Note
+///
+/// To offset the map, apply the offset to each `Item` of the returned iterator
+pub fn triangle(size: i32) -> impl Iterator<Item = Hex> {
+    (0..=size).flat_map(move |x| (0..=(size - x)).map(move |y| Hex::new(x, y)))
 }
 
 /// Generates an hexagonal layout around [`Hex::ZERO`] with a custom `radius`.
