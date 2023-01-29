@@ -24,8 +24,8 @@ impl Hex {
     pub const X: Self = Self::new(1, 0);
     /// Y (R) axis (0, 1)
     pub const Y: Self = Self::new(0, 1);
-    /// Z (S) axis (-1, 0)
-    pub const Z: Self = Self::new(-1, 0);
+    /// Z (S) axis (0, -1)
+    pub const Z: Self = Self::new(0, -1);
 
     /// ```txt
     ///            x Axis
