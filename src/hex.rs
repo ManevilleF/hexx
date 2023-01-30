@@ -344,6 +344,24 @@ impl Hex {
         res
     }
 
+    #[must_use]
+    #[allow(clippy::cast_sign_loss)]
+    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
+    /// forming a spiral
+    ///
+    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
+    /// information
+    pub fn spiral_range(self, range: i32) -> Vec<Self> {
+        if range <= 0 {
+            return vec![self];
+        }
+        let mut res = Vec::with_capacity(Self::range_count(range) as usize);
+        for i in 0..=range {
+            res.extend(self.ring(i));
+        }
+        res
+    }
+
     #[inline]
     #[must_use]
     /// Counts how many coordinates there are in a ring at the given `range`
@@ -818,5 +836,15 @@ mod tests {
         let mut expected = hex.all_neighbors().to_vec();
         expected.rotate_left(4);
         assert_eq!(hex.ring(1), expected);
+    }
+
+    #[test]
+    fn spiral_range() {
+        let expected: Vec<_> = Hex::ZERO.range(10).collect();
+        let spiral = Hex::ZERO.spiral_range(10);
+        assert_eq!(spiral.len(), expected.len());
+        for hex in &expected {
+            assert!(spiral.contains(hex));
+        }
     }
 }
