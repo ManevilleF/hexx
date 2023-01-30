@@ -354,14 +354,17 @@ impl Hex {
         if self.length() <= radius {
             return self;
         }
-        mirrors
-            .iter()
-            .find_map(|m| {
-                let p = *m + self;
-                (p.length() <= radius).then_some(p)
-            })
-            // Note: Should never happen
-            .unwrap_or(self)
+        let mut res = self;
+        while res.length() > radius {
+            let mirror = mirrors
+                .iter()
+                .copied()
+                .sorted_unstable_by_key(|m| res.distance_to(*m))
+                .next()
+                .unwrap(); // Safe
+            res -= mirror;
+        }
+        res
     }
 
     /// Computes the 6 mirror centers of the origin for hexagonal *wraparound* maps

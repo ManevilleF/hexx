@@ -96,4 +96,16 @@ mod tests {
         assert_eq!(map.wrapped_hex(Hex::new(4, 0)), Hex::new(-3, 3));
         assert_eq!(map.wrapped_hex(Hex::new(4, -4)), Hex::new(0, 3));
     }
+
+    #[test]
+    fn wrapping_outside_works() {
+        let map = HexMap::new(2);
+
+        assert_eq!(map.wrapped_hex(Hex::new(3, 0)), Hex::new(-2, 2));
+        assert_eq!(map.wrapped_hex(Hex::new(5, 0)), Hex::new(0, 2));
+        assert_eq!(map.wrapped_hex(Hex::new(6, 0)), Hex::new(-1, -1));
+
+        assert_eq!(map.wrapped_hex(Hex::new(2, 3)), Hex::new(0, 0)); // mirror
+        assert_eq!(map.wrapped_hex(Hex::new(4, 6)), Hex::new(0, 0));
+    }
 }
