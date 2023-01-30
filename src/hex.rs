@@ -318,6 +318,13 @@ impl Hex {
         })
     }
 
+    #[inline]
+    #[must_use]
+    /// Counts how many coordinates there are in the given `range`
+    pub const fn range_count(range: i32) -> i32 {
+        3 * range * (range + 1) + 1
+    }
+
     #[must_use]
     #[allow(clippy::cast_sign_loss)]
     // TODO: benchmark this alogrithm vs range - range n-1
@@ -327,7 +334,7 @@ impl Hex {
             return vec![self];
         }
         let mut hex = self + (Self::neighbor_coord(Direction::BottomLeft) * range);
-        let mut res = Vec::with_capacity((6 * range) as usize);
+        let mut res = Vec::with_capacity(Self::ring_count(range) as usize);
         for dir in Self::NEIGHBORS_COORDS {
             (0..range).for_each(|_| {
                 res.push(hex);
@@ -335,6 +342,13 @@ impl Hex {
             });
         }
         res
+    }
+
+    #[inline]
+    #[must_use]
+    /// Counts how many coordinates there are in a ring at the given `range`
+    pub const fn ring_count(range: i32) -> i32 {
+        6 * range
     }
 
     #[must_use]
@@ -787,6 +801,14 @@ mod tests {
                 Direction::BottomRight
             ]
         );
+    }
+
+    #[test]
+    fn range_count() {
+        assert_eq!(Hex::range_count(0), 1);
+        assert_eq!(Hex::range_count(1), 7);
+        assert_eq!(Hex::range_count(10), 331);
+        assert_eq!(Hex::range_count(15), 721);
     }
 
     #[test]

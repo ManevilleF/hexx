@@ -78,6 +78,13 @@ impl HexMap {
         hex.all_neighbors().map(|h| self.wrapped_hex(h))
     }
 
+    #[must_use]
+    #[inline]
+    /// Returns the number of hexagons in the map
+    pub const fn hex_count(&self) -> i32 {
+        Hex::range_count(self.radius)
+    }
+
     /// Returns an iterator with all the coordinates in the map bounds
     pub fn all_coords(&self) -> impl Iterator<Item = Hex> {
         self.center.range(self.radius)
