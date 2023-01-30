@@ -179,16 +179,39 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes coordinates length
+    /// Computes coordinates length as a signed integer
+    ///
+    /// See [`Self::ulength`] for the unsigned version
     pub const fn length(self) -> i32 {
         (self.x.abs() + self.y.abs() + self.z().abs()) / 2
     }
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `other` in hexagonal space
+    #[doc(alias = "unsigned_length")]
+    /// Computes coordinates length as an unsigned integer
+    ///
+    /// See [`Self::length`] for the signed version
+    pub const fn ulength(self) -> u32 {
+        (self.x.unsigned_abs() + self.y.unsigned_abs() + self.z().unsigned_abs()) / 2
+    }
+
+    #[inline]
+    #[must_use]
+    /// Computes the distance from `self` to `other` in hexagonal space as a signed integer
+    ///
+    /// See [`Self::unsigned_distance_to`] for the unsigned version
     pub fn distance_to(self, other: Self) -> i32 {
         (self - other).length()
+    }
+
+    #[inline]
+    #[must_use]
+    /// Computes the distance from `self` to `other` in hexagonal space as an unsigned integer
+    ///
+    /// See [`Self::distance_to`] for the signed version
+    pub fn unsigned_distance_to(self, other: Self) -> u32 {
+        (self - other).ulength()
     }
 
     #[inline]
