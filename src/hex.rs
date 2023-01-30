@@ -333,9 +333,10 @@ impl Hex {
             .map(|v| Self::round((v.x, v.y)))
     }
 
-    #[allow(clippy::cast_precision_loss)]
+    #[allow(clippy::cast_possible_wrap)]
     /// Retrieves all [`Hex`] around `self` in a given `range`
-    pub fn range(self, range: i32) -> impl Iterator<Item = Self> {
+    pub fn range(self, range: u32) -> impl Iterator<Item = Self> {
+        let range = range as i32;
         (-range..=range).flat_map(move |x| {
             (max(-range, -x - range)..=min(range, range - x)).map(move |y| self + Self::new(x, y))
         })
@@ -344,20 +345,19 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Counts how many coordinates there are in the given `range`
-    pub const fn range_count(range: i32) -> i32 {
-        3 * range * (range + 1) + 1
+    pub const fn range_count(range: u32) -> usize {
+        (3 * range * (range + 1) + 1) as usize
     }
 
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
-    // TODO: benchmark this alogrithm vs range - range n-1
+    #[allow(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`
-    pub fn ring(self, range: i32) -> Vec<Self> {
-        if range <= 0 {
+    pub fn ring(self, range: u32) -> Vec<Self> {
+        if range == 0 {
             return vec![self];
         }
-        let mut hex = self + (Self::neighbor_coord(Direction::BottomLeft) * range);
-        let mut res = Vec::with_capacity(Self::ring_count(range) as usize);
+        let mut hex = self + (Self::neighbor_coord(Direction::BottomLeft) * range as i32);
+        let mut res = Vec::with_capacity(Self::ring_count(range));
         for dir in Self::NEIGHBORS_COORDS {
             (0..range).for_each(|_| {
                 res.push(hex);
@@ -374,11 +374,8 @@ impl Hex {
     ///
     /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
     /// information
-    pub fn spiral_range(self, range: i32) -> Vec<Self> {
-        if range <= 0 {
-            return vec![self];
-        }
-        let mut res = Vec::with_capacity(Self::range_count(range) as usize);
+    pub fn spiral_range(self, range: u32) -> Vec<Self> {
+        let mut res = Vec::with_capacity(Self::range_count(range));
         for i in 0..=range {
             res.extend(self.ring(i));
         }
@@ -388,8 +385,8 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Counts how many coordinates there are in a ring at the given `range`
-    pub const fn ring_count(range: i32) -> i32 {
-        6 * range
+    pub const fn ring_count(range: u32) -> usize {
+        6 * range as usize
     }
 
     #[must_use]
@@ -401,16 +398,16 @@ impl Hex {
     ///
     /// [`HexMap`]: crate::HexMap
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
-    pub fn wrap_in_range(self, radius: i32) -> Self {
+    pub fn wrap_in_range(self, radius: u32) -> Self {
         self.wrap_with(radius, &Self::wraparound_mirrors(radius))
     }
 
-    pub(crate) fn wrap_with(self, radius: i32, mirrors: &[Self; 6]) -> Self {
-        if self.length() <= radius {
+    pub(crate) fn wrap_with(self, radius: u32, mirrors: &[Self; 6]) -> Self {
+        if self.ulength() <= radius {
             return self;
         }
         let mut res = self;
-        while res.length() > radius {
+        while res.ulength() > radius {
             let mirror = mirrors
                 .iter()
                 .copied()
@@ -434,7 +431,9 @@ impl Hex {
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     #[inline]
     #[must_use]
-    pub const fn wraparound_mirrors(radius: i32) -> [Self; 6] {
+    #[allow(clippy::cast_possible_wrap)]
+    pub const fn wraparound_mirrors(radius: u32) -> [Self; 6] {
+        let radius = radius as i32;
         let mirror = Self::new(2 * radius + 1, -radius);
         let [center, left, right] = [mirror, mirror.rotate_left(), mirror.rotate_right()];
         [

@@ -81,12 +81,13 @@ pub mod shapes {
     /// # Note
     ///
     /// To offset the map, apply the offset to each `Item` of the returned iterator
-    pub fn triangle(size: i32) -> impl Iterator<Item = Hex> {
-        (0..=size).flat_map(move |x| (0..=(size - x)).map(move |y| Hex::new(x, y)))
+    #[allow(clippy::cast_possible_wrap)]
+    pub fn triangle(size: u32) -> impl Iterator<Item = Hex> {
+        (0..=size).flat_map(move |x| (0..=(size - x)).map(move |y| Hex::new(x as i32, y as i32)))
     }
 
     /// Generates an hexagonal layout around `center` with a custom `radius`.
-    pub fn hexagon(center: Hex, radius: i32) -> impl Iterator<Item = Hex> {
+    pub fn hexagon(center: Hex, radius: u32) -> impl Iterator<Item = Hex> {
         center.range(radius)
     }
 

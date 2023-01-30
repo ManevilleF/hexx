@@ -7,7 +7,7 @@ use crate::Hex;
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexMap {
     /// The map radius
-    radius: i32,
+    radius: u32,
     /// The map center
     center: Hex,
     /// The 6 mirror centers, used to wrap coordinates
@@ -18,7 +18,7 @@ impl HexMap {
     #[inline]
     #[must_use]
     /// Creates a new hexagonal map of the given `radius` with [`Hex::ZERO`] as its center
-    pub const fn new(radius: i32) -> Self {
+    pub const fn new(radius: u32) -> Self {
         Self {
             radius,
             center: Hex::ZERO,
@@ -54,7 +54,7 @@ impl HexMap {
     #[inline]
     #[must_use]
     /// Returns the map radius
-    pub const fn radius(&self) -> i32 {
+    pub const fn radius(&self) -> u32 {
         self.radius
     }
 
@@ -81,7 +81,7 @@ impl HexMap {
     #[must_use]
     #[inline]
     /// Returns the number of hexagons in the map
-    pub const fn hex_count(&self) -> i32 {
+    pub const fn hex_count(&self) -> usize {
         Hex::range_count(self.radius)
     }
 
