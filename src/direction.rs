@@ -14,7 +14,7 @@
 ///           \___/
 /// ```
 ///
-/// See [`Hex::NEIGHBORS_COORDS`]
+/// See [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
 #[repr(u8)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
@@ -112,7 +112,7 @@ pub enum Direction {
 }
 
 impl Direction {
-    /// All 6 hexagonal directions matching [`Hex::NEIGHBORS_COORDS`]
+    /// All 6 hexagonal directions matching [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
     /// ```txt
     ///            x Axis
     ///            ___
