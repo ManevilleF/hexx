@@ -24,8 +24,12 @@ default-features = false
 features = ["derive"]
 optional = true
 
-# For lib.rs doctests
+# For lib.rs doctests and examples
 [dev-dependencies.bevy]
 version = "0.9"
-features = ["render"]
+features = ["render", "bevy_asset", "bevy_winit"]
 default-features = false
+
+[[examples]]
+name = "hex_grid"
+path = "examples/hex_grid"
