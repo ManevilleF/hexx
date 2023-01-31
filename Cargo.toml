@@ -28,7 +28,7 @@ optional = true
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
 version = "0.9"
-features = ["render", "bevy_asset", "bevy_winit"]
+features = ["render", "bevy_asset", "bevy_winit", "x11"]
 default-features = false
 
 [[examples]]
