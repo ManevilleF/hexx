@@ -8,6 +8,7 @@ license = "Apache License 2.0"
 keywords = ["hexagon", "bestagon", "bevy", "geometry"]
 categories = ["game-development", "mathematics"]
 repository = "https://github.com/ManevilleF/hexx"
+exclude = [".github"]
 
 [features]
 default = []
