@@ -27,6 +27,8 @@ impl Hex {
     /// Z (S) axis (0, -1)
     pub const Z: Self = Self::new(0, -1);
 
+    /// Hexagon neighbor coordinates array, following [`Direction`] order
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
@@ -351,14 +353,29 @@ impl Hex {
 
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
-    /// Retrieves one [`Hex`] ring around `self` in a given `range`
-    pub fn ring(self, range: u32) -> Vec<Self> {
+    /// Retrieves one [`Hex`] ring around `self` in a given `range`.
+    /// The returned coordinates start from `start_dir` and loop counter clockwise around `self`
+    /// unless `clockwise` is set to `true`.
+    ///
+    /// If you only need the coordinates see [`Self::ring`].
+    ///
+    /// # Note
+    /// The returned vector will be of `6 * radius` ([`Self::ring_count`])
+    pub fn custom_ring(self, range: u32, start_dir: Direction, clockwise: bool) -> Vec<Self> {
         if range == 0 {
             return vec![self];
         }
-        let mut hex = self + (Self::neighbor_coord(Direction::BottomLeft) * range as i32);
+        let mut neighbors = Self::NEIGHBORS_COORDS;
+        neighbors.rotate_left(start_dir as usize);
+        if clockwise {
+            neighbors.reverse();
+            neighbors.rotate_left(1);
+        } else {
+            neighbors.rotate_left(2);
+        }
+        let mut hex = self.neighbor(start_dir) * range as i32;
         let mut res = Vec::with_capacity(Self::ring_count(range));
-        for dir in Self::NEIGHBORS_COORDS {
+        for dir in neighbors {
             (0..range).for_each(|_| {
                 res.push(hex);
                 hex += dir;
@@ -368,18 +385,51 @@ impl Hex {
     }
 
     #[must_use]
+    #[allow(clippy::cast_possible_wrap)]
+    /// Retrieves one [`Hex`] ring around `self` in a given `range`.
+    /// The returned coordinates start from [`Direction::BottomRight`] and loop around `self` counter clockwise.
+    ///
+    /// See [`Self::custom_ring`] for more options.
+    ///
+    /// # Note
+    /// The returned vector will be of `6 * radius` ([`Self::ring_count`])
+    pub fn ring(self, range: u32) -> Vec<Self> {
+        self.custom_ring(range, Direction::BottomRight, false)
+    }
+
+    #[must_use]
     #[allow(clippy::cast_sign_loss)]
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
-    /// forming a spiral
+    /// starting from `start_dir` and looping counter clockwise unless `clockwise` is set to `true`, forming a spiral
+    ///
+    /// If you only need the coordinates see [`Self::spiral_range`].
+    ///
+    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
+    /// information
+    pub fn custom_spiral_range(
+        self,
+        range: u32,
+        start_dir: Direction,
+        clockwise: bool,
+    ) -> Vec<Self> {
+        let mut res = Vec::with_capacity(Self::range_count(range));
+        for i in 0..=range {
+            res.extend(self.custom_ring(i, start_dir, clockwise));
+        }
+        res
+    }
+
+    #[must_use]
+    #[allow(clippy::cast_sign_loss)]
+    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
+    /// starting from [`Direction::BottomRight`] and looping counter clockwise, forming a spiral.
+    ///
+    /// See [`Self::custom_spiral_range`] for more options
     ///
     /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
     /// information
     pub fn spiral_range(self, range: u32) -> Vec<Self> {
-        let mut res = Vec::with_capacity(Self::range_count(range));
-        for i in 0..=range {
-            res.extend(self.ring(i));
-        }
-        res
+        self.custom_spiral_range(range, Direction::BottomRight, false)
     }
 
     #[inline]
@@ -855,9 +905,37 @@ mod tests {
     fn ring() {
         let hex = Hex::ZERO;
         assert_eq!(hex.ring(0), vec![hex]);
-        let mut expected = hex.all_neighbors().to_vec();
-        expected.rotate_left(4);
+        let expected = hex.all_neighbors().to_vec();
         assert_eq!(hex.ring(1), expected);
+
+        let radius = 5;
+        let mut range: Vec<_> = hex.range(radius).collect();
+        let removed: Vec<_> = hex.range(radius - 1).collect();
+        range.retain(|h| !removed.contains(h));
+        let ring = hex.ring(5);
+        assert_eq!(ring.len(), range.len());
+        for h in &ring {
+            assert!(range.contains(h));
+        }
+    }
+
+    #[test]
+    fn custom_ring() {
+        let hex = Hex::ZERO;
+        assert_eq!(hex.custom_ring(0, Direction::Top, true), vec![hex]);
+
+        // clockwise
+        let mut expected = hex.ring(5);
+        expected.reverse();
+        expected.rotate_right(1);
+        assert_eq!(hex.custom_ring(5, Direction::BottomRight, true), expected);
+        // offsetted
+        let expected = hex.ring(5);
+        let ring = hex.custom_ring(5, Direction::Top, false);
+        assert_eq!(expected.len(), ring.len());
+        for h in &ring {
+            assert!(expected.contains(h));
+        }
     }
 
     #[test]
