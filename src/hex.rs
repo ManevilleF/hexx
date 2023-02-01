@@ -5,7 +5,31 @@ use std::cmp::{max, min};
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-/// Hexagonal coordinates
+/// Hexagonal [axial] coordinates
+///
+/// # Why Axial ?
+///
+/// Axial coordinates allow to compute and use *cubic* coordinates with less storage,
+/// and allow:
+/// - Vector operations
+/// - Rotations
+/// - Symmetry
+/// - simple algorithms
+///
+/// when *offset* and *doubled* coordinates don't. Furthermore, it makes the [`Hex`] behave like
+/// classic 2D coordinates ([`IVec2`]) and therefore more user friendly.
+///
+/// Check out this [comparison] article for more information.
+///
+/// # Conversions
+///
+///  * Cubic: Use the [`z`] method to compute the third axis
+///  * Offset: Use the [`OffsetHex`] type
+///  * Doubled: Use the [`DoubledHex`] type
+///
+/// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
+/// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
+///
 #[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct Hex {
@@ -473,7 +497,7 @@ impl Hex {
     /// of given `radius`.
     ///
     /// # Notes
-    /// * See [`Self::wrap_in_range`] for a usage
+    /// * See [`Self::wrap_with`] for a usage
     /// * Use [`HexMap`] for improved wrapping
     /// * See this [article] for more information.
     ///

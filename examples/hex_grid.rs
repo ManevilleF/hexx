@@ -53,7 +53,7 @@ fn setup_grid(
     let selected_material = materials.add(Color::RED.into());
     let default_material = materials.add(Color::WHITE.into());
     // mesh
-    let mesh = hexagonal_plane(Hex::ZERO, &layout);
+    let mesh = hexagonal_plane(&layout);
     let mesh = meshes.add(mesh);
 
     let entities = shapes::hexagon(Hex::ZERO, 30)
@@ -103,8 +103,8 @@ fn handle_input(
     }
 }
 
-fn hexagonal_plane(hex: Hex, hex_layout: &HexLayout) -> Mesh {
-    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, hex);
+fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
+    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO);
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
