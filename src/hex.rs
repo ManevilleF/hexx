@@ -23,9 +23,9 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 ///
 /// # Conversions
 ///
-///  * Cubic: Use the [`z`] method to compute the third axis
-///  * Offset: Use the [`OffsetHex`] type
-///  * Doubled: Use the [`DoubledHex`] type
+///  * Cubic: use [`Self::z`] to compute the third axis
+///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::from_offset_coordinates`]
+///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::from_doubled_coordinates`]
 ///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
@@ -476,7 +476,13 @@ impl Hex {
         self.wrap_with(radius, &Self::wraparound_mirrors(radius))
     }
 
-    pub(crate) fn wrap_with(self, radius: u32, mirrors: &[Self; 6]) -> Self {
+    #[must_use]
+    /// Wraps `self` in an hex range around the origin ([`Hex::ZERO`]) using custom mirrors.
+    ///
+    /// Prefer using [`Self::wrap_in_range`] or [`HexMap`] for correct wrapping.
+    ///
+    /// [`HexMap`]: crate::HexMap
+    pub fn wrap_with(self, radius: u32, mirrors: &[Self; 6]) -> Self {
         if self.ulength() <= radius {
             return self;
         }

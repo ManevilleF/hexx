@@ -35,7 +35,7 @@ pub enum OffsetHexMode {
 impl Hex {
     /// Converts `self` to [doubled] coordinates according to the given `mode`.
     ///
-    /// The coordinates is returned as `[COLUMN, ROW]`
+    /// The coordinates are returned as `[COLUMN, ROW]`
     ///
     /// [doubled]: https://www.redblobgames.com/grids/hexagons/#coordinates-doubled
     #[inline]
@@ -49,7 +49,7 @@ impl Hex {
 
     /// Converts `self` to [offset] coordinates according to the given `mode`.
     ///
-    /// The coordinates is returned as `[COLUMN, ROW]`
+    /// The coordinates are returned as `[COLUMN, ROW]`
     ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     #[inline]

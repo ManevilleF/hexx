@@ -19,13 +19,14 @@
 //! I made the choice to use *Axial Coordinates* for performance and utility reasons,
 //! but the `Hex` type allows you to use computes *Cubic coordinates*. (See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates))
 //!
-//! The `Hex` type gives you access to most hexagonal arithmetics like:
+//! The [`Hex`] type gives you access to most hexagonal arithmetics like:
 //! - Distances
 //! - Neighbors and directions
 //! - Lines
 //! - Ranges
 //! - Rings
 //! - Rotation
+//! - Vector operations
 //!
 //! ## Example
 //!
