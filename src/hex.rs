@@ -5,7 +5,31 @@ use std::cmp::{max, min};
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-/// Hexagonal coordinates
+/// Hexagonal [axial] coordinates
+///
+/// # Why Axial ?
+///
+/// Axial coordinates allow to compute and use *cubic* coordinates with less storage,
+/// and allow:
+/// - Vector operations
+/// - Rotations
+/// - Symmetry
+/// - simple algorithms
+///
+/// when *offset* and *doubled* coordinates don't. Furthermore, it makes the [`Hex`] behave like
+/// classic 2D coordinates ([`IVec2`]) and therefore more user friendly.
+///
+/// Check out this [comparison] article for more information.
+///
+/// # Conversions
+///
+///  * Cubic: use [`Self::z`] to compute the third axis
+///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::from_offset_coordinates`]
+///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::from_doubled_coordinates`]
+///
+/// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
+/// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
+///
 #[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct Hex {
@@ -452,7 +476,16 @@ impl Hex {
         self.wrap_with(radius, &Self::wraparound_mirrors(radius))
     }
 
-    pub(crate) fn wrap_with(self, radius: u32, mirrors: &[Self; 6]) -> Self {
+    #[must_use]
+    /// Wraps `self` in an hex range around the origin ([`Hex::ZERO`]) using custom mirrors.
+    ///
+    /// # Panics
+    ///
+    /// Will panic with invalid `mirrors`
+    /// Prefer using [`Self::wrap_in_range`] or [`HexMap`] for safe wrapping.
+    ///
+    /// [`HexMap`]: crate::HexMap
+    pub fn wrap_with(self, radius: u32, mirrors: &[Self; 6]) -> Self {
         if self.ulength() <= radius {
             return self;
         }
@@ -473,7 +506,7 @@ impl Hex {
     /// of given `radius`.
     ///
     /// # Notes
-    /// * See [`Self::wrap_in_range`] for a usage
+    /// * See [`Self::wrap_with`] for a usage
     /// * Use [`HexMap`] for improved wrapping
     /// * See this [article] for more information.
     ///

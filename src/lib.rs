@@ -19,13 +19,14 @@
 //! I made the choice to use *Axial Coordinates* for performance and utility reasons,
 //! but the `Hex` type allows you to use computes *Cubic coordinates*. (See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates))
 //!
-//! The `Hex` type gives you access to most hexagonal arithmetics like:
+//! The [`Hex`] type gives you access to most hexagonal arithmetics like:
 //! - Distances
 //! - Neighbors and directions
 //! - Lines
 //! - Ranges
 //! - Rings
 //! - Rotation
+//! - Vector operations
 //!
 //! ## Example
 //!
@@ -42,11 +43,10 @@
 //! use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
 //! use hexx::{HexLayout, Hex, MeshInfo};
 //!
-//!pub fn hexagonal_plane(hex: Hex, hex_layout: &HexLayout) -> Mesh {
-//!    let mesh_info = MeshInfo::hexagonal_plane(
-//!        hex_layout,
-//!        hex,
-//!    );
+//!pub fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
+//!    // Compute hex plane data for at the origin
+//!    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO);
+//!    // Compute the bevy mesh
 //!    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
 //!    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
 //!    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
@@ -55,9 +55,19 @@
 //!    mesh
 //!}
 //!```
+//!
+//! > See the [example](examples/hex_grid.rs) for complete bevy usage.
+//!
+//! The [`MeshInfo`] type provides the following mesh generations:
+//! - [`MeshInfo::hexagonal_plane`] (7 vertices) useful for 2D games
+//! - [`MeshInfo::cheap_hexagonal_column`] (13 vertices) with merged vertices and useful only for
+//! unlit games
+//! - [`MeshInfo::partial_hexagonal_column`] (31 vertices) without the bottom face
+//! - [`MeshInfo::hexagonal_column`] (38 vertices) with the bottom face
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
+mod conversions;
 mod direction;
 mod hex;
 mod hex_map;
