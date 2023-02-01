@@ -479,7 +479,10 @@ impl Hex {
     #[must_use]
     /// Wraps `self` in an hex range around the origin ([`Hex::ZERO`]) using custom mirrors.
     ///
-    /// Prefer using [`Self::wrap_in_range`] or [`HexMap`] for correct wrapping.
+    /// # Panics
+    ///
+    /// Will panic with invalid `mirrors`
+    /// Prefer using [`Self::wrap_in_range`] or [`HexMap`] for safe wrapping.
     ///
     /// [`HexMap`]: crate::HexMap
     pub fn wrap_with(self, radius: u32, mirrors: &[Self; 6]) -> Self {

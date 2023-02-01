@@ -56,10 +56,10 @@ impl Hex {
     #[must_use]
     pub const fn to_offset_coordinates(self, mode: OffsetHexMode) -> [i32; 2] {
         match mode {
-            OffsetHexMode::EvenColumns => [self.x, self.y + (self.x + (self.x & 1) / 2)],
-            OffsetHexMode::OddColumns => [self.x, self.y + (self.x - (self.x & 1) / 2)],
-            OffsetHexMode::EvenRows => [self.x + (self.y + (self.x & 1)) / 2, self.y],
-            OffsetHexMode::OddRows => [self.x + (self.y - (self.x & 1)) / 2, self.y],
+            OffsetHexMode::EvenColumns => [self.x, self.y + (self.x + (self.x & 1)) / 2],
+            OffsetHexMode::OddColumns => [self.x, self.y + (self.x - (self.x & 1)) / 2],
+            OffsetHexMode::EvenRows => [self.x + (self.y + (self.y & 1)) / 2, self.y],
+            OffsetHexMode::OddRows => [self.x + (self.y - (self.y & 1)) / 2, self.y],
         }
     }
 
@@ -88,6 +88,38 @@ impl Hex {
             OffsetHexMode::OddColumns => Self::new(col, row - (col - (col & 1)) / 2),
             OffsetHexMode::EvenRows => Self::new(col - (row + (row & 1)) / 2, row),
             OffsetHexMode::OddRows => Self::new(col - (row - (row & 1)) / 2, row),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn doubled_coordinates() {
+        for hex in Hex::ZERO.range(10) {
+            for mode in [DoubledHexMode::DoubledWidth, DoubledHexMode::DoubledHeight] {
+                let doubled = hex.to_doubled_coordinates(mode);
+                let converted = Hex::from_doubled_coordinates(doubled, mode);
+                assert_eq!(converted, hex);
+            }
+        }
+    }
+
+    #[test]
+    fn offset_coordinates() {
+        for hex in Hex::ZERO.range(10) {
+            for mode in [
+                OffsetHexMode::OddRows,
+                OffsetHexMode::OddColumns,
+                OffsetHexMode::EvenColumns,
+                OffsetHexMode::EvenRows,
+            ] {
+                let offset = hex.to_offset_coordinates(mode);
+                let converted = Hex::from_offset_coordinates(offset, mode);
+                assert_eq!(converted, hex);
+            }
         }
     }
 }
