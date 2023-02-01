@@ -6,7 +6,7 @@ use bevy::render::render_resource::PrimitiveTopology;
 use hexx::shapes;
 use hexx::*;
 
-const HEX_SIZE: Vec2 = Vec2::splat(20.0);
+const HEX_SIZE: Vec2 = Vec2::splat(15.0);
 
 pub fn main() {
     App::new()
@@ -22,13 +22,17 @@ pub fn main() {
 }
 
 #[derive(Debug, Default, Resource)]
-struct SelectedHEx(Hex);
+struct SelectedHex(Hex);
+
+#[derive(Debug, Default, Resource)]
+struct HighlightedHexes(Vec<Hex>);
 
 #[derive(Debug, Resource)]
 struct Map {
     layout: HexLayout,
     entities: HashMap<Hex, Entity>,
     selected_material: Handle<StandardMaterial>,
+    highlighted_material: Handle<StandardMaterial>,
     default_material: Handle<StandardMaterial>,
 }
 
@@ -51,6 +55,7 @@ fn setup_grid(
     };
     // materials
     let selected_material = materials.add(Color::RED.into());
+    let highlighted_material = materials.add(Color::YELLOW.into());
     let default_material = materials.add(Color::WHITE.into());
     // mesh
     let mesh = hexagonal_plane(&layout);
@@ -74,6 +79,7 @@ fn setup_grid(
         layout,
         entities,
         selected_material,
+        highlighted_material,
         default_material,
     });
 }
@@ -82,7 +88,8 @@ fn handle_input(
     mut commands: Commands,
     windows: Res<Windows>,
     map: Res<Map>,
-    mut selected_hex: Local<SelectedHEx>,
+    mut selected_hex: Local<SelectedHex>,
+    mut highlighted_hexes: Local<HighlightedHexes>,
 ) {
     let window = windows.primary();
     if let Some(pos) = window.cursor_position() {
@@ -90,15 +97,36 @@ fn handle_input(
             - Vec2::new(window.width(), window.height()) / 2.0;
         let hex = map.layout.world_pos_to_hex(pos);
         if let Some(entity) = map.entities.get(&hex).copied() {
-            if hex != selected_hex.0 {
-                commands
-                    .entity(entity)
-                    .insert(map.selected_material.clone());
-                commands
-                    .entity(map.entities[&selected_hex.0])
-                    .insert(map.default_material.clone());
-                selected_hex.0 = hex;
+            if hex == selected_hex.0 {
+                return;
             }
+            // Clear highlighted hexes materials
+            for entity in highlighted_hexes
+                .0
+                .iter()
+                .filter_map(|h| map.entities.get(h))
+            {
+                commands
+                    .entity(*entity)
+                    .insert(map.default_material.clone());
+            }
+            commands
+                .entity(map.entities[&selected_hex.0])
+                .insert(map.default_material.clone());
+            // Draw a  line
+            highlighted_hexes.0 = Hex::ZERO.line_to(hex).collect();
+            // Draw a ring
+            highlighted_hexes.0.extend(Hex::ZERO.ring(hex.ulength()));
+            for h in &highlighted_hexes.0 {
+                if let Some(e) = map.entities.get(h) {
+                    commands.entity(*e).insert(map.highlighted_material.clone());
+                }
+            }
+            // Make the selected tile red
+            commands
+                .entity(entity)
+                .insert(map.selected_material.clone());
+            selected_hex.0 = hex;
         }
     }
 }
