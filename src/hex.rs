@@ -14,7 +14,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 /// - Vector operations
 /// - Rotations
 /// - Symmetry
-/// - simple algorithms
+/// - Simple algorithms
 ///
 /// when *offset* and *doubled* coordinates don't. Furthermore, it makes the [`Hex`] behave like
 /// classic 2D coordinates ([`IVec2`]) and therefore more user friendly.

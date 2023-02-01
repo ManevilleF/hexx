@@ -7,7 +7,7 @@
  [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
  [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
  [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
- [![dependency status](https://deps.rs/crate/hexx/0.1.1/status.svg)](https://deps.rs/crate/hexx)
+ [![dependency status](https://deps.rs/crate/hexx/0.2.0/status.svg)](https://deps.rs/crate/hexx)
 
  Hexagonal tools lib in rust.
 
@@ -19,16 +19,25 @@
  - Generate hexagon meshes (planes or columns)
 
  I made the choice to use *Axial Coordinates* for performance and utility reasons,
- but the `Hex` type allows you to use computes *Cubic coordinates*. (See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates))
+ but the [`Hex`] type has conversion utilities with *cubic*, *doubled* and offset* coordinates.
 
- The [`Hex`] type gives you access to most hexagonal arithmetics like:
+ > See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates)
+
+ ## Features
+
+ `hexx` provides the [`Hex`] coordinates with:
  - Distances
  - Neighbors and directions
  - Lines
  - Ranges
  - Rings
+ - Spirals
  - Rotation
+ - Symmetry
  - Vector operations
+ - Conversions to other coordinate systems
+
+ And the [`HexMap`] utility, for *wraparound* (seamless) hexagonal maps
 
  ## Example
 
