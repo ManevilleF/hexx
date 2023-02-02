@@ -3,7 +3,9 @@ use glam::{IVec2, IVec3, Vec2};
 use itertools::Itertools;
 use std::cmp::{max, min};
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
 
 /// Hexagonal [axial] coordinates
 ///
@@ -551,15 +553,13 @@ impl Add<i32> for Hex {
 
 impl AddAssign for Hex {
     fn add_assign(&mut self, rhs: Self) {
-        self.x += rhs.x;
-        self.y += rhs.y;
+        *self = *self + rhs;
     }
 }
 
 impl AddAssign<i32> for Hex {
     fn add_assign(&mut self, rhs: i32) {
-        self.x += rhs;
-        self.y += rhs;
+        *self = *self + rhs;
     }
 }
 
@@ -584,15 +584,13 @@ impl Sub<i32> for Hex {
 
 impl SubAssign for Hex {
     fn sub_assign(&mut self, rhs: Self) {
-        self.x -= rhs.x;
-        self.y -= rhs.y;
+        *self = *self - rhs;
     }
 }
 
 impl SubAssign<i32> for Hex {
     fn sub_assign(&mut self, rhs: i32) {
-        self.x -= rhs;
-        self.y -= rhs;
+        *self = *self - rhs;
     }
 }
 
@@ -620,15 +618,13 @@ impl Mul<i32> for Hex {
 
 impl MulAssign for Hex {
     fn mul_assign(&mut self, rhs: Self) {
-        self.x *= rhs.x;
-        self.y *= rhs.y;
+        *self = *self * rhs;
     }
 }
 
 impl MulAssign<i32> for Hex {
     fn mul_assign(&mut self, rhs: i32) {
-        self.x *= rhs;
-        self.y *= rhs;
+        *self = *self * rhs;
     }
 }
 
@@ -656,15 +652,47 @@ impl Div<i32> for Hex {
 
 impl DivAssign for Hex {
     fn div_assign(&mut self, rhs: Self) {
-        self.x /= rhs.x;
-        self.y /= rhs.y;
+        *self = *self / rhs;
     }
 }
 
 impl DivAssign<i32> for Hex {
     fn div_assign(&mut self, rhs: i32) {
-        self.x /= rhs;
-        self.y /= rhs;
+        *self = *self / rhs;
+    }
+}
+
+impl Rem<Self> for Hex {
+    type Output = Self;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x % rhs.x,
+            y: self.y % rhs.y,
+        }
+    }
+}
+
+impl Rem<i32> for Hex {
+    type Output = Self;
+
+    fn rem(self, rhs: i32) -> Self::Output {
+        Self {
+            x: self.x % rhs,
+            y: self.y % rhs,
+        }
+    }
+}
+
+impl RemAssign for Hex {
+    fn rem_assign(&mut self, rhs: Self) {
+        *self = *self % rhs;
+    }
+}
+
+impl RemAssign<i32> for Hex {
+    fn rem_assign(&mut self, rhs: i32) {
+        *self = *self % rhs;
     }
 }
 
@@ -767,6 +795,30 @@ mod tests {
         assert_eq!(Hex::new(2, 2) / Hex::new(2, 2), Hex::ONE);
         assert_eq!(Hex::new(10, 30) / Hex::new(2, 6), Hex::new(5, 5));
         assert_eq!(Hex::new(11, 31) / Hex::new(2, 6), Hex::new(5, 5));
+    }
+
+    #[test]
+    fn hex_rem() {
+        for x in 1..30 {
+            for y in 1..30 {
+                let hex = Hex::new(x, y);
+                println!("{hex}");
+                for x2 in 1..30 {
+                    for y2 in 1..30 {
+                        // Int
+                        let rhs = x2;
+                        let div = hex / rhs;
+                        let rem = hex % rhs;
+                        assert_eq!(div * rhs + rem, hex);
+                        // Hex
+                        let rhs = Hex::new(x2, y2);
+                        let div = hex / rhs;
+                        let rem = hex % rhs;
+                        assert_eq!(div * rhs + rem, hex);
+                    }
+                }
+            }
+        }
     }
 
     #[test]

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Unreleased
+
+* Added `3d_columns` example
+* Implemented `Rem<Hex>` for `Hex`
+* Implemented `RemAssign<Hex>` for `Hex`
+* Implemented `Rem<i32>` for `Hex`
+* Implemented `RemAssign<i32>` for `Hex`
+
 ## 0.2.0
 
 * Improved docs
