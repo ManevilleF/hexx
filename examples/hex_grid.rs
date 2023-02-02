@@ -6,6 +6,7 @@ use bevy::render::render_resource::PrimitiveTopology;
 use hexx::shapes;
 use hexx::*;
 
+/// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(15.0);
 
 pub fn main() {
@@ -36,6 +37,7 @@ struct Map {
     default_material: Handle<StandardMaterial>,
 }
 
+/// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(0.0, 10.0, 0.0).looking_at(Vec3::ZERO, -Vec3::Z),
@@ -44,6 +46,7 @@ fn setup_camera(mut commands: Commands) {
     });
 }
 
+/// Hex grid setup
 fn setup_grid(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -59,7 +62,7 @@ fn setup_grid(
     let default_material = materials.add(Color::WHITE.into());
     // mesh
     let mesh = hexagonal_plane(&layout);
-    let mesh = meshes.add(mesh);
+    let mesh_handle = meshes.add(mesh);
 
     let entities = shapes::hexagon(Hex::ZERO, 30)
         .map(|hex| {
@@ -67,7 +70,7 @@ fn setup_grid(
             let id = commands
                 .spawn(PbrBundle {
                     transform: Transform::from_xyz(pos.x, 0.0, pos.y).with_scale(Vec3::splat(0.9)),
-                    mesh: mesh.clone(),
+                    mesh: mesh_handle.clone(),
                     material: default_material.clone(),
                     ..default()
                 })
@@ -84,6 +87,7 @@ fn setup_grid(
     });
 }
 
+/// Input interaction
 fn handle_input(
     mut commands: Commands,
     windows: Res<Windows>,
@@ -131,6 +135,7 @@ fn handle_input(
     }
 }
 
+/// Compute a bevy mesh from the layout
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO);
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);

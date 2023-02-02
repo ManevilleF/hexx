@@ -39,12 +39,6 @@
 
  And the [`HexMap`] utility, for *wraparound* (seamless) hexagonal maps
 
- ## Example
-
- ![example](docs/example.png)
-
- > `cargo run --example hex_grid`
-
  ## Usage in bevy
 
  If you want to generate 3D hexagonal mesh and use it in [bevy](bevyengine.org) you may do it this way:
@@ -67,8 +61,6 @@ pub fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
 }
 ```
 
- > See the [example](examples/hex_grid.rs) for complete bevy usage.
-
  The [`MeshInfo`] type provides the following mesh generations:
  - [`MeshInfo::hexagonal_plane`] (7 vertices) useful for 2D games
  - [`MeshInfo::cheap_hexagonal_column`] (13 vertices) with merged vertices and useful only for
@@ -77,3 +69,15 @@ pub fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
  - [`MeshInfo::hexagonal_column`] (38 vertices) with the bottom face
 
 <!-- cargo-sync-readme end -->
+
+> See the [examples](examples) for bevy usage
+
+ ## Example
+
+ ![example](docs/hex_grid.png)
+
+ > `cargo run --example hex_grid`
+
+ ![example](docs/3d_columns.png)
+
+ > `cargo run --example 3d_columns`

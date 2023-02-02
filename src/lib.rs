@@ -37,12 +37,6 @@
 //!
 //! And the [`HexMap`] utility, for *wraparound* (seamless) hexagonal maps
 //!
-//! ## Example
-//!
-//! ![example](docs/example.png)
-//!
-//! > `cargo run --example hex_grid`
-//!
 //! ## Usage in bevy
 //!
 //! If you want to generate 3D hexagonal mesh and use it in [bevy](bevyengine.org) you may do it this way:
@@ -64,8 +58,6 @@
 //!    mesh
 //!}
 //!```
-//!
-//! > See the [example](examples/hex_grid.rs) for complete bevy usage.
 //!
 //! The [`MeshInfo`] type provides the following mesh generations:
 //! - [`MeshInfo::hexagonal_plane`] (7 vertices) useful for 2D games
