@@ -45,7 +45,7 @@ impl HexLayout {
     pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
         let center = self.hex_to_world_pos(hex);
         [0, 1, 2, 3, 4, 5].map(|corner| {
-            let angle = PI * 2.0 * (self.orientation.start_rotation + corner as f32) / 6.;
+            let angle = PI * 2.0 * corner as f32 / 6. + self.orientation.start_rotation;
             center + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
         })
     }
