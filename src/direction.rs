@@ -30,7 +30,15 @@ pub const DIRECTION_ANGLE_DEGREES: f32 = 60.0;
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub enum Direction {
-    /// (1, 0)
+    /// Drection to (1, 0)
+    ///
+    /// Angles:
+    ///
+    /// |orientation |radians|degrees|
+    /// |------------|-------|-------|
+    /// | Flat Top   | 11π/6 | 330   |   
+    /// | Pointy Top | 5π/3  | 300   |   
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
@@ -45,7 +53,15 @@ pub enum Direction {
     ///           \___/
     /// ```
     BottomRight = 0,
-    /// (1, -1)
+    /// Direction to (1, -1)
+    ///
+    /// Angles:
+    ///
+    /// |orientation |radians|degrees|
+    /// |------------|-------|-------|
+    /// | Flat Top   | π/6   |  30   |   
+    /// | Pointy Top |   0   |   0   |   
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
@@ -60,7 +76,15 @@ pub enum Direction {
     ///           \___/
     /// ```
     TopRight = 1,
-    /// (0, -1)
+    /// Direction to (0, -1)
+    ///
+    /// Angles:
+    ///
+    /// |orientation |radians|degrees|
+    /// |------------|-------|-------|
+    /// | Flat Top   |  π/2  |  90   |   
+    /// | Pointy Top |  π/3  |  60   |   
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
@@ -75,7 +99,15 @@ pub enum Direction {
     ///           \___/
     /// ```
     Top = 2,
-    /// (-1, 0)
+    /// Direction to (-1, 0)
+    ///
+    /// Angles:
+    ///
+    /// |orientation |radians|degrees|
+    /// |------------|-------|-------|
+    /// | Flat Top   | 5π/6  |  150  |   
+    /// | Pointy Top | 2π/3  |  120  |   
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
@@ -90,7 +122,15 @@ pub enum Direction {
     ///           \___/
     /// ```
     TopLeft = 3,
-    /// (-1, 1)
+    /// Direction to (-1, 1)
+    ///
+    /// Angles:
+    ///
+    /// |orientation |radians|degrees|
+    /// |------------|-------|-------|
+    /// | Flat Top   | 7π/6  |  210  |   
+    /// | Pointy Top |   π   |  180  |   
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
@@ -105,7 +145,15 @@ pub enum Direction {
     ///           \___/
     /// ```
     BottomLeft = 4,
-    /// (0, 1)
+    /// Direction to (0, 1)
+    ///
+    /// Angles:
+    ///
+    /// |orientation |radians|degrees|
+    /// |------------|-------|-------|
+    /// | Flat Top   | 3π/2  |  270  |   
+    /// | Pointy Top | 4π/3  |  240  |   
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
