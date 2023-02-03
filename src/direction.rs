@@ -200,6 +200,73 @@ impl Direction {
         Self::BottomRight,
     ];
 
+    /// Iterates through all enum variant in order
+    pub fn iter() -> impl Iterator<Item = Self> {
+        Self::ALL_DIRECTIONS.into_iter()
+    }
+
+    #[inline]
+    #[must_use]
+    #[doc(alias = "clockwise")]
+    /// Returns the next direction in clockwise order
+    pub const fn right(self) -> Self {
+        match self {
+            Self::TopRight => Self::BottomRight,
+            Self::Top => Self::TopRight,
+            Self::TopLeft => Self::Top,
+            Self::BottomLeft => Self::TopLeft,
+            Self::Bottom => Self::BottomLeft,
+            Self::BottomRight => Self::Bottom,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    #[doc(alias = "counterclockwise")]
+    /// Returns the next direction in counter clockwise order
+    pub const fn left(self) -> Self {
+        match self {
+            Self::TopRight => Self::Top,
+            Self::Top => Self::TopLeft,
+            Self::TopLeft => Self::BottomLeft,
+            Self::BottomLeft => Self::Bottom,
+            Self::Bottom => Self::BottomRight,
+            Self::BottomRight => Self::TopRight,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Rotates `self` counter clockwise by `offset` amount.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// assert_eq!(Direction::Top, Direction::Top.rotate_left(6));
+    /// ```
+    pub fn rotate_left(self, offset: usize) -> Self {
+        let mut dirs = Self::ALL_DIRECTIONS;
+        dirs.rotate_left(offset % 6);
+        dirs[self as usize]
+    }
+
+    #[inline]
+    #[must_use]
+    /// Rotates `self` clockwise by `offset` amount.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// assert_eq!(Direction::Top, Direction::Top.rotate_right(6));
+    /// ```
+    pub fn rotate_right(self, offset: usize) -> Self {
+        let mut dirs = Self::ALL_DIRECTIONS;
+        dirs.rotate_right(offset % 6);
+        dirs[self as usize]
+    }
+
     const POINTY_ANGLES_DEGREES: [f32; 6] = [
         0.0,
         DIRECTION_ANGLE_DEGREES,
@@ -217,11 +284,6 @@ impl Direction {
         DIRECTION_ANGLE_RAD * 4.0,
         DIRECTION_ANGLE_RAD * 5.0,
     ];
-
-    /// Iterates through all enum variant in order
-    pub fn iter() -> impl Iterator<Item = Self> {
-        Self::ALL_DIRECTIONS.into_iter()
-    }
 
     #[inline]
     #[must_use]
@@ -270,10 +332,47 @@ impl Direction {
 #[cfg(test)]
 #[allow(clippy::enum_glob_use)]
 mod test {
-    use std::f32::EPSILON;
-
     use super::Direction::*;
     use super::*;
+    use std::f32::EPSILON;
+
+    #[test]
+    fn rotate_left_right() {
+        for direction in Direction::ALL_DIRECTIONS {
+            assert_eq!(direction, direction.rotate_right(6));
+            assert_eq!(direction, direction.rotate_right(12));
+            assert_eq!(direction, direction.rotate_right(1).rotate_left(1));
+            assert_eq!(direction, direction.rotate_left(1).rotate_right(1));
+            assert_eq!(direction.left(), direction.rotate_left(1));
+            assert_eq!(direction.left().left(), direction.rotate_left(2));
+            assert_eq!(direction.right(), direction.rotate_right(1));
+            assert_eq!(direction.right().right(), direction.rotate_right(2));
+        }
+    }
+
+    #[test]
+    fn rotations_reverse_each_other() {
+        for direction in Direction::ALL_DIRECTIONS {
+            assert_eq!(direction, direction.left().right());
+            assert_eq!(direction, direction.right().left());
+        }
+    }
+
+    #[test]
+    fn six_rotations_comes_home() {
+        for direction in Direction::ALL_DIRECTIONS {
+            let mut clockwise_dir = direction;
+            let mut counter_clockwise_dir = direction;
+
+            for _ in 0..6 {
+                clockwise_dir = clockwise_dir.left();
+                counter_clockwise_dir = counter_clockwise_dir.right();
+            }
+
+            assert_eq!(direction, clockwise_dir);
+            assert_eq!(direction, counter_clockwise_dir);
+        }
+    }
 
     #[test]
     fn flat_angles_degrees() {
