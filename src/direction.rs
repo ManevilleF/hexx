@@ -237,7 +237,7 @@ impl Direction {
 
     #[inline]
     #[must_use]
-    /// Rotates `self` counter clockwise by `mid` amount.
+    /// Rotates `self` counter clockwise by `offset` amount.
     ///
     /// # Example
     ///
@@ -245,15 +245,15 @@ impl Direction {
     /// # use hexx::*;
     /// assert_eq!(Direction::Top, Direction::Top.rotate_left(6));
     /// ```
-    pub fn rotate_left(self, mid: usize) -> Self {
+    pub fn rotate_left(self, offset: usize) -> Self {
         let mut dirs = Self::ALL_DIRECTIONS;
-        dirs.rotate_left(mid % 6);
+        dirs.rotate_left(offset % 6);
         dirs[self as usize]
     }
 
     #[inline]
     #[must_use]
-    /// Rotates `self` clockwise by `mid` amount.
+    /// Rotates `self` clockwise by `offset` amount.
     ///
     /// # Example
     ///
@@ -261,9 +261,9 @@ impl Direction {
     /// # use hexx::*;
     /// assert_eq!(Direction::Top, Direction::Top.rotate_right(6));
     /// ```
-    pub fn rotate_right(self, mid: usize) -> Self {
+    pub fn rotate_right(self, offset: usize) -> Self {
         let mut dirs = Self::ALL_DIRECTIONS;
-        dirs.rotate_right(mid % 6);
+        dirs.rotate_right(offset % 6);
         dirs[self as usize]
     }
 
@@ -361,16 +361,16 @@ mod test {
     #[test]
     fn six_rotations_comes_home() {
         for direction in Direction::ALL_DIRECTIONS {
-            let mut cw_direction = direction;
-            let mut ccw_direction = direction;
+            let mut clockwise_dir = direction;
+            let mut counter_clockwise_dir = direction;
 
             for _ in 0..6 {
-                cw_direction = cw_direction.left();
-                ccw_direction = ccw_direction.right();
+                clockwise_dir = clockwise_dir.left();
+                counter_clockwise_dir = counter_clockwise_dir.right();
             }
 
-            assert_eq!(direction, cw_direction);
-            assert_eq!(direction, ccw_direction);
+            assert_eq!(direction, clockwise_dir);
+            assert_eq!(direction, counter_clockwise_dir);
         }
     }
 
