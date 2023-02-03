@@ -18,6 +18,13 @@ jobs:
       - name: build
         run: cargo build --verbose
 
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - name: build examples
+        run: cargo build --examples --verbose
   test:
     runs-on: ubuntu-latest
     steps:

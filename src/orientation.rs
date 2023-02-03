@@ -1,6 +1,4 @@
-use std::f32::consts::PI;
-
-use crate::Direction;
+use crate::{Direction, DIRECTION_ANGLE_OFFSET};
 
 const SQRT_3: f32 = 1.732_050_8;
 
@@ -12,8 +10,8 @@ pub struct HexOrientation {
     pub(crate) forward_matrix: [f32; 4],
     /// Matrix used to compute world/pixel coordinates to hexagonal coordinates
     pub(crate) inverse_matrix: [f32; 4],
-    /// Start rotation in radians
-    pub(crate) start_rotation: f32,
+    /// orientation offset in radians
+    pub(crate) angle_offset: f32,
 }
 
 impl HexOrientation {
@@ -25,7 +23,7 @@ impl HexOrientation {
         Self {
             forward_matrix: [SQRT_3, SQRT_3 / 2.0, 0.0, 3.0 / 2.0],
             inverse_matrix: [SQRT_3 / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0],
-            start_rotation: PI / 6.0, // 30 degrees
+            angle_offset: DIRECTION_ANGLE_OFFSET, // 30 degrees
         }
     }
 
@@ -37,7 +35,7 @@ impl HexOrientation {
         Self {
             forward_matrix: [3.0 / 2.0, 0.0, SQRT_3 / 2.0, SQRT_3],
             inverse_matrix: [2.0 / 3.0, 0.0, -1.0 / 3.0, SQRT_3 / 3.0],
-            start_rotation: 0.0, // 0 degrees
+            angle_offset: 0.0, // 0 degrees
         }
     }
 

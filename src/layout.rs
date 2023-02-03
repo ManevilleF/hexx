@@ -1,6 +1,5 @@
-use crate::{Hex, HexOrientation};
+use crate::{Direction, Hex, HexOrientation};
 use glam::Vec2;
-use std::f32::consts::PI;
 
 /// Hexagonal layout
 #[derive(Debug, Clone)]
@@ -44,8 +43,8 @@ impl HexLayout {
     /// Retrieves all 6 corner coordinates of the given hexagonal coordinates `hex`
     pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
         let center = self.hex_to_world_pos(hex);
-        [0, 1, 2, 3, 4, 5].map(|corner| {
-            let angle = PI * 2.0 * corner as f32 / 6. + self.orientation.start_rotation;
+        Direction::ALL_DIRECTIONS.map(|dir| {
+            let angle = dir.angle_pointy() + self.orientation.angle_offset;
             center + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
         })
     }
@@ -66,7 +65,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn corners() {
+    fn flat_corners() {
         let hex = Hex::new(0, 0);
         let layout = HexLayout {
             orientation: HexOrientation::flat(),
@@ -85,7 +84,11 @@ mod tests {
                 Vec2::new(5.0, -9.0)
             ]
         );
+    }
 
+    #[test]
+    fn pointy_corners() {
+        let hex = Hex::new(0, 0);
         let layout = HexLayout {
             orientation: HexOrientation::pointy(),
             origin: Vec2::ZERO,

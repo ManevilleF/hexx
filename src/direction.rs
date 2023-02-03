@@ -2,6 +2,12 @@ use std::f32::consts::PI;
 
 use crate::HexOrientation;
 
+/// Angle in radian between *flat* and *pointy* top orientations.
+/// Equivalent to 30 degrees
+pub const DIRECTION_ANGLE_OFFSET: f32 = PI / 6.0;
+/// Angle in radian between *flat* and *pointy* top orientations.
+/// Equivalent to π / 6 in radians
+pub const DIRECTION_ANGLE_OFFSET_DEGREES: f32 = 30.0;
 /// Angle in radian between two adjacent directions counter clockwise.
 /// Equivalent to 60 degrees
 pub const DIRECTION_ANGLE_RAD: f32 = PI / 3.0;
@@ -15,13 +21,13 @@ pub const DIRECTION_ANGLE_DEGREES: f32 = 60.0;
 ///            x Axis
 ///            ___
 ///           /   \
-///       +--+  2  +--+
-///      / 3  \___/  1 \
+///       +--+  1  +--+
+///      / 2  \___/  0 \
 ///      \    /   \    /
 ///       +--+     +--+
 ///      /    \___/    \
-///      \ 4  /   \  0 /
-///       +--+  5  +--+   y Axis
+///      \ 3  /   \  5 /
+///       +--+  4  +--+   y Axis
 ///           \___/
 /// ```
 ///
@@ -30,29 +36,6 @@ pub const DIRECTION_ANGLE_DEGREES: f32 = 60.0;
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub enum Direction {
-    /// Drection to (1, 0)
-    ///
-    /// Angles:
-    ///
-    /// |orientation |radians|degrees|
-    /// |------------|-------|-------|
-    /// | Flat Top   | 11π/6 | 330   |   
-    /// | Pointy Top | 5π/3  | 300   |   
-    ///
-    /// ```txt
-    ///            x Axis
-    ///            ___
-    ///           /   \
-    ///       +--+     +--+
-    ///      /    \___/    \
-    ///      \    /   \    /
-    ///       +--+     +--+
-    ///      /    \___/    \
-    ///      \    /   \  X /
-    ///       +--+     +--+   y Axis
-    ///           \___/
-    /// ```
-    BottomRight = 0,
     /// Direction to (1, -1)
     ///
     /// Angles:
@@ -75,7 +58,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
-    TopRight = 1,
+    TopRight = 0,
     /// Direction to (0, -1)
     ///
     /// Angles:
@@ -98,7 +81,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
-    Top = 2,
+    Top = 1,
     /// Direction to (-1, 0)
     ///
     /// Angles:
@@ -121,7 +104,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
-    TopLeft = 3,
+    TopLeft = 2,
     /// Direction to (-1, 1)
     ///
     /// Angles:
@@ -144,7 +127,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
-    BottomLeft = 4,
+    BottomLeft = 3,
     /// Direction to (0, 1)
     ///
     /// Angles:
@@ -167,7 +150,30 @@ pub enum Direction {
     ///       +--+  X  +--+   y Axis
     ///           \___/
     /// ```
-    Bottom = 5,
+    Bottom = 4,
+    /// Drection to (1, 0)
+    ///
+    /// Angles:
+    ///
+    /// |orientation |radians|degrees|
+    /// |------------|-------|-------|
+    /// | Flat Top   | 11π/6 | 330   |
+    /// | Pointy Top | 5π/3  | 300   |
+    ///
+    /// ```txt
+    ///            x Axis
+    ///            ___
+    ///           /   \
+    ///       +--+     +--+
+    ///      /    \___/    \
+    ///      \    /   \    /
+    ///       +--+     +--+
+    ///      /    \___/    \
+    ///      \    /   \  X /
+    ///       +--+     +--+   y Axis
+    ///           \___/
+    /// ```
+    BottomRight = 5,
 }
 
 impl Direction {
@@ -186,12 +192,30 @@ impl Direction {
     ///           \___/
     /// ```
     pub const ALL_DIRECTIONS: [Self; 6] = [
-        Self::BottomRight,
         Self::TopRight,
         Self::Top,
         Self::TopLeft,
         Self::BottomLeft,
         Self::Bottom,
+        Self::BottomRight,
+    ];
+
+    const POINTY_ANGLES_DEGREES: [f32; 6] = [
+        0.0,
+        DIRECTION_ANGLE_DEGREES,
+        DIRECTION_ANGLE_DEGREES * 2.0,
+        DIRECTION_ANGLE_DEGREES * 3.0,
+        DIRECTION_ANGLE_DEGREES * 4.0,
+        DIRECTION_ANGLE_DEGREES * 5.0,
+    ];
+
+    const POINTY_ANGLES: [f32; 6] = [
+        0.0,
+        DIRECTION_ANGLE_RAD,
+        DIRECTION_ANGLE_RAD * 2.0,
+        DIRECTION_ANGLE_RAD * 3.0,
+        DIRECTION_ANGLE_RAD * 4.0,
+        DIRECTION_ANGLE_RAD * 5.0,
     ];
 
     /// Iterates through all enum variant in order
@@ -205,7 +229,7 @@ impl Direction {
     ///
     /// See [`Self::angle_pointy`] for *pointy* hexagons
     pub fn angle_flat(self) -> f32 {
-        self.angle_pointy() + DIRECTION_ANGLE_RAD / 2.0
+        self.angle_pointy() + DIRECTION_ANGLE_OFFSET
     }
 
     #[inline]
@@ -213,16 +237,8 @@ impl Direction {
     /// Returns the angle in radians of the given direction for *pointy* hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
-    pub fn angle_pointy(self) -> f32 {
-        DIRECTION_ANGLE_RAD
-            * match self {
-                Self::BottomRight => 5.0,
-                Self::TopRight => 0.0,
-                Self::Top => 1.0,
-                Self::TopLeft => 2.0,
-                Self::BottomLeft => 3.0,
-                Self::Bottom => 4.0,
-            }
+    pub const fn angle_pointy(self) -> f32 {
+        Self::POINTY_ANGLES[self as usize]
     }
 
     #[inline]
@@ -231,7 +247,7 @@ impl Direction {
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_flat_degrees(self) -> f32 {
-        self.angle_pointy_degrees() + DIRECTION_ANGLE_DEGREES / 2.0
+        self.angle_pointy_degrees() + DIRECTION_ANGLE_OFFSET_DEGREES
     }
 
     #[inline]
@@ -239,23 +255,15 @@ impl Direction {
     /// Returns the angle in degrees of the given direction for *pointy* hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
-    pub fn angle_pointy_degrees(self) -> f32 {
-        DIRECTION_ANGLE_DEGREES
-            * match self {
-                Self::BottomRight => 5.0,
-                Self::TopRight => 0.0,
-                Self::Top => 1.0,
-                Self::TopLeft => 2.0,
-                Self::BottomLeft => 3.0,
-                Self::Bottom => 4.0,
-            }
+    pub const fn angle_pointy_degrees(self) -> f32 {
+        Self::POINTY_ANGLES_DEGREES[self as usize]
     }
 
     #[inline]
     #[must_use]
     /// Returns the angle in radians of the given direction in the given `orientation`
     pub fn angle(self, orientation: &HexOrientation) -> f32 {
-        self.angle_pointy() - orientation.start_rotation
+        self.angle_pointy() - orientation.angle_offset
     }
 }
 
