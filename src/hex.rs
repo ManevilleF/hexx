@@ -59,22 +59,22 @@ impl Hex {
     ///            x Axis
     ///            ___
     ///           /   \
-    ///       +--+  2  +--+
-    ///      / 3  \___/  1 \
+    ///       +--+  1  +--+
+    ///      / 2  \___/  0 \
     ///      \    /   \    /
     ///       +--+     +--+
     ///      /    \___/    \
-    ///      \ 4  /   \  0 /
-    ///       +--+  5  +--+   y Axis
+    ///      \ 3  /   \  5 /
+    ///       +--+  4  +--+   y Axis
     ///           \___/
     /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
-        Self::new(1, 0),
         Self::new(1, -1),
         Self::new(0, -1),
         Self::new(-1, 0),
         Self::new(-1, 1),
         Self::new(0, 1),
+        Self::new(1, 0),
     ];
 
     /// ```txt
@@ -413,14 +413,14 @@ impl Hex {
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::BottomRight`] and loop around `self` counter clockwise.
+    /// The returned coordinates start from [`Direction::TopRight`] and loop around `self` counter clockwise.
     ///
     /// See [`Self::custom_ring`] for more options.
     ///
     /// # Note
     /// The returned vector will be of `6 * radius` ([`Self::ring_count`])
     pub fn ring(self, range: u32) -> Vec<Self> {
-        self.custom_ring(range, Direction::BottomRight, false)
+        self.custom_ring(range, Direction::TopRight, false)
     }
 
     #[must_use]
@@ -448,14 +448,14 @@ impl Hex {
     #[must_use]
     #[allow(clippy::cast_sign_loss)]
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
-    /// starting from [`Direction::BottomRight`] and looping counter clockwise, forming a spiral.
+    /// starting from [`Direction::TopRight`] and looping counter clockwise, forming a spiral.
     ///
     /// See [`Self::custom_spiral_range`] for more options
     ///
     /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
     /// information
     pub fn spiral_range(self, range: u32) -> Vec<Self> {
-        self.custom_spiral_range(range, Direction::BottomRight, false)
+        self.custom_spiral_range(range, Direction::TopRight, false)
     }
 
     #[inline]
@@ -833,23 +833,23 @@ mod tests {
         assert_eq!(
             Hex::ZERO.all_neighbors(),
             [
-                Hex::new(1, 0),
                 Hex::new(1, -1),
                 Hex::new(0, -1),
                 Hex::new(-1, 0),
                 Hex::new(-1, 1),
                 Hex::new(0, 1),
+                Hex::new(1, 0),
             ]
         );
         assert_eq!(
             Hex::new(-2, 5).all_neighbors(),
             [
-                Hex::new(-1, 5),
                 Hex::new(-1, 4),
                 Hex::new(-2, 4),
                 Hex::new(-3, 5),
                 Hex::new(-3, 6),
                 Hex::new(-2, 6),
+                Hex::new(-1, 5),
             ]
         );
     }
@@ -1007,16 +1007,16 @@ mod tests {
     #[test]
     fn custom_ring() {
         let hex = Hex::ZERO;
-        assert_eq!(hex.custom_ring(0, Direction::Top, true), vec![hex]);
+        assert_eq!(hex.custom_ring(0, Direction::TopLeft, true), vec![hex]);
 
         // clockwise
         let mut expected = hex.ring(5);
         expected.reverse();
         expected.rotate_right(1);
-        assert_eq!(hex.custom_ring(5, Direction::BottomRight, true), expected);
+        assert_eq!(hex.custom_ring(5, Direction::TopRight, true), expected);
         // offsetted
         let expected = hex.ring(5);
-        let ring = hex.custom_ring(5, Direction::Top, false);
+        let ring = hex.custom_ring(5, Direction::BottomLeft, false);
         assert_eq!(expected.len(), ring.len());
         for h in &ring {
             assert!(expected.contains(h));

@@ -31,6 +31,10 @@ version = "0.9"
 features = ["render", "bevy_asset", "bevy_winit", "x11"]
 default-features = false
 
-[[examples]]
+[[example]]
 name = "hex_grid"
-path = "examples/hex_grid"
+path = "examples/hex_grid.rs"
+
+[[example]]
+name = "3d_columns"
+path = "examples/3d_columns.rs"
