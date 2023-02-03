@@ -14,6 +14,8 @@
   - `angle_pointy_degrees` for degrees angle in pointy orientation
   - `angle` for radian angle in a given orientation
 * (**BREAKING**) rotated order of `Direction` enum and `Hex::ALL_NEIGHBORS` by 1 to the left, `TopRight` is now the first as `BottomRight` is now last
+* Added `left` and `right` methods to `Direction` to get the next direction clockwise and counter clockwise
+* Added `rotate_left` and `rotate_right` methods to `Direction` to rotate the direction clockwise and counter clockwise by a custom amount
 
 ## 0.2.0
 
