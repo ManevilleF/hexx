@@ -163,6 +163,50 @@ impl Hex {
         -self.x - self.y
     }
 
+    #[must_use]
+    #[inline]
+    /// Converts `self` to an [`IVec2`].
+    /// This operation is a direct mapping of coordinates, no hex to square coordinates are
+    /// performed. To convert hex coordinates to world space use [`HexLayout`]
+    ///
+    /// [`HexLayout`]: crate::HexLayout
+    pub const fn as_ivec2(self) -> IVec2 {
+        IVec2 {
+            x: self.x,
+            y: self.y,
+        }
+    }
+
+    #[must_use]
+    #[inline]
+    /// Converts `self` to an [`IVec3`] using cubic coordinates.
+    /// This operation is a direct mapping of coordinates.
+    /// To convert hex coordinates to world space use [`HexLayout`]
+    ///
+    /// [`HexLayout`]: crate::HexLayout
+    pub const fn as_ivec3(self) -> IVec3 {
+        IVec3 {
+            x: self.x,
+            y: self.y,
+            z: self.z(),
+        }
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    #[must_use]
+    #[inline]
+    /// Converts `self` to a [`Vec2`].
+    /// This operation is a direct mapping of coordinates.
+    /// To convert hex coordinates to world space use [`HexLayout`]
+    ///
+    /// [`HexLayout`]: crate::HexLayout
+    pub const fn as_vec2(self) -> Vec2 {
+        Vec2 {
+            x: self.x as f32,
+            y: self.y as f32,
+        }
+    }
+
     #[inline]
     #[must_use]
     /// Negates the coordinate, giving its reflection (symmetry) around the origin.
@@ -379,7 +423,7 @@ impl Hex {
     /// ````
     pub fn line_to(self, other: Self) -> impl Iterator<Item = Self> {
         let distance = self.distance_to(other);
-        let [a, b]: [Vec2; 2] = [self.into(), other.into()];
+        let [a, b]: [Vec2; 2] = [self.as_vec2(), other.as_vec2()];
         (0..=distance).map(move |step| a.lerp(b, step as f32 / distance as f32).into())
     }
 
@@ -392,7 +436,7 @@ impl Hex {
     #[inline]
     #[must_use]
     pub fn lerp(self, rhs: Self, s: f32) -> Self {
-        let [start, end]: [Vec2; 2] = [self.into(), rhs.into()];
+        let [start, end]: [Vec2; 2] = [self.as_vec2(), rhs.as_vec2()];
         start.lerp(end, s).into()
     }
 
@@ -823,15 +867,7 @@ impl From<[f32; 2]> for Hex {
 impl From<Hex> for IVec2 {
     #[inline]
     fn from(hex: Hex) -> Self {
-        Self::new(hex.x, hex.y)
-    }
-}
-
-impl From<Hex> for Vec2 {
-    #[allow(clippy::cast_precision_loss)]
-    #[inline]
-    fn from(value: Hex) -> Self {
-        Self::new(value.x as f32, value.y as f32)
+        hex.as_ivec2()
     }
 }
 
@@ -845,7 +881,7 @@ impl From<Vec2> for Hex {
 impl From<Hex> for IVec3 {
     #[inline]
     fn from(hex: Hex) -> Self {
-        Self::new(hex.x, hex.y, hex.z())
+        hex.as_ivec3()
     }
 }
 
@@ -1036,6 +1072,47 @@ mod tests {
         assert_eq!(new, Hex::new(0, 5));
         let new = new.rotate_left();
         assert_eq!(new, hex);
+    }
+
+    #[test]
+    fn lerp() {
+        let a = Hex::new(0, 0);
+        let b = Hex::new(5, 0);
+
+        assert_eq!(a.lerp(b, 0.0), a);
+        assert_eq!(a.lerp(b, 1.0), b);
+        assert_eq!(a.lerp(b, 2.0), b * 2);
+        assert_eq!(a.lerp(b, -1.0), -b);
+        assert_eq!(a.lerp(b, -2.0), -b * 2);
+
+        let line = [
+            a,
+            Hex::new(1, 0),
+            Hex::new(2, 0),
+            Hex::new(3, 0),
+            Hex::new(4, 0),
+            b,
+        ];
+        assert_eq!(a.lerp(b, 0.1), line[0]);
+        assert_eq!(a.lerp(b, 0.2), line[1]);
+        assert_eq!(a.lerp(b, 0.3), line[1]);
+        assert_eq!(a.lerp(b, 0.4), line[2]);
+        assert_eq!(a.lerp(b, 0.5), line[2]);
+        assert_eq!(a.lerp(b, 0.6), line[3]);
+        assert_eq!(a.lerp(b, 0.7), line[3]);
+        assert_eq!(a.lerp(b, 0.8), line[4]);
+        assert_eq!(a.lerp(b, 0.9), line[4]);
+        assert_eq!(a.lerp(b, 0.95), line[5]);
+        assert_eq!(a.lerp(b, 1.0), line[5]);
+    }
+
+    #[test]
+    fn rounded_div() {
+        let a = Hex::new(0, 0);
+        let b = Hex::new(-5, 7);
+        assert_eq!(b / 2, Hex::new(-2, 3)); // Naive
+        assert_eq!(b / 2.0, Hex::new(-3, 4)); // Rounded
+        assert_eq!(b / 2.0, a.lerp(b, 0.5)); // Lerp
     }
 
     #[test]
