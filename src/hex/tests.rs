@@ -1,0 +1,338 @@
+use super::*;
+
+#[test]
+fn hex_addition() {
+    assert_eq!(Hex::ZERO + Hex::ZERO, Hex::ZERO);
+    assert_eq!(Hex::ZERO + Hex::ONE, Hex::ONE);
+    assert_eq!(Hex::ONE + Hex::ONE, Hex::new(2, 2));
+    assert_eq!(Hex::ONE + Hex::new(3, 4), Hex::new(4, 5));
+}
+
+#[test]
+fn int_addition() {
+    assert_eq!(Hex::ZERO + 1, Hex::ONE);
+    assert_eq!(Hex::ONE + 1, Hex::new(2, 2));
+}
+
+#[test]
+fn hex_subtraction() {
+    assert_eq!(Hex::ZERO - Hex::ZERO, Hex::ZERO);
+    assert_eq!(Hex::ONE - Hex::ZERO, Hex::ONE);
+    assert_eq!(Hex::ONE - Hex::ONE, Hex::ZERO);
+    assert_eq!(Hex::ONE - Hex::new(2, 2), Hex::new(-1, -1));
+    assert_eq!(Hex::ONE - Hex::new(4, 5), Hex::new(-3, -4));
+}
+
+#[test]
+fn int_subtraction() {
+    assert_eq!(Hex::ONE - 1, Hex::ZERO);
+    assert_eq!(Hex::ONE - 2, Hex::splat(-1));
+    assert_eq!(Hex::ZERO - 10, Hex::splat(-10));
+}
+
+#[test]
+fn hex_multiplication() {
+    assert_eq!(Hex::ONE * Hex::ZERO, Hex::ZERO);
+    assert_eq!(Hex::ONE * Hex::ONE, Hex::ONE);
+    assert_eq!(Hex::ONE * Hex::new(2, 2), Hex::new(2, 2));
+    assert_eq!(Hex::ONE * Hex::new(5, 6), Hex::new(5, 6));
+    assert_eq!(Hex::new(2, 3) * Hex::new(5, 10), Hex::new(10, 30));
+}
+
+#[test]
+fn int_multiplication() {
+    assert_eq!(Hex::ONE * 5, Hex::splat(5));
+}
+
+#[test]
+fn hex_division() {
+    assert_eq!(Hex::ONE / Hex::ONE, Hex::ONE);
+    assert_eq!(Hex::new(2, 2) / Hex::new(2, 2), Hex::ONE);
+    assert_eq!(Hex::new(10, 30) / Hex::new(2, 6), Hex::new(5, 5));
+    assert_eq!(Hex::new(11, 31) / Hex::new(2, 6), Hex::new(5, 5));
+}
+
+#[test]
+fn hex_rem() {
+    for x in 1..30 {
+        for y in 1..30 {
+            let hex = Hex::new(x, y);
+            for x2 in 1..30 {
+                for y2 in 1..30 {
+                    // Int
+                    let rhs = x2;
+                    let div = hex / rhs;
+                    let rem = hex % rhs;
+                    assert_eq!(div * rhs + rem, hex);
+                    // Hex
+                    let rhs = Hex::new(x2, y2);
+                    let div = hex / rhs;
+                    let rem = hex % rhs;
+                    assert_eq!(div * rhs + rem, hex);
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn int_division() {
+    assert_eq!(Hex::new(2, 2) / 2, Hex::ONE);
+    assert_eq!(Hex::new(10, 30) / 2, Hex::new(5, 15));
+    assert_eq!(Hex::new(11, 31) / 2, Hex::new(5, 15));
+}
+
+#[test]
+fn neighbors() {
+    assert_eq!(
+        Hex::ZERO.all_neighbors(),
+        [
+            Hex::new(1, -1),
+            Hex::new(0, -1),
+            Hex::new(-1, 0),
+            Hex::new(-1, 1),
+            Hex::new(0, 1),
+            Hex::new(1, 0),
+        ]
+    );
+    assert_eq!(
+        Hex::new(-2, 5).all_neighbors(),
+        [
+            Hex::new(-1, 4),
+            Hex::new(-2, 4),
+            Hex::new(-3, 5),
+            Hex::new(-3, 6),
+            Hex::new(-2, 6),
+            Hex::new(-1, 5),
+        ]
+    );
+}
+
+#[test]
+fn diagonals() {
+    assert_eq!(
+        Hex::ZERO.all_diagonals(),
+        [
+            Hex::new(2, -1),
+            Hex::new(1, -2),
+            Hex::new(-1, -1),
+            Hex::new(-2, 1),
+            Hex::new(-1, 2),
+            Hex::new(1, 1),
+        ]
+    );
+    assert_eq!(
+        Hex::new(-2, 5).all_diagonals(),
+        [
+            Hex::new(0, 4),
+            Hex::new(-1, 3),
+            Hex::new(-3, 4),
+            Hex::new(-4, 6),
+            Hex::new(-3, 7),
+            Hex::new(-1, 6),
+        ]
+    );
+}
+
+#[test]
+fn distance_to() {
+    assert_eq!(Hex::ZERO.distance_to(Hex::ZERO), 0);
+    assert_eq!(Hex::ZERO.distance_to(Hex::ONE), 2);
+    assert_eq!(Hex::ZERO.distance_to(Hex::new(2, 2)), 4);
+    assert_eq!(Hex::ZERO.distance_to(Hex::new(-2, -2)), 4);
+    assert_eq!(Hex::new(-2, -2).distance_to(Hex::new(-4, -4)), 4);
+}
+
+#[test]
+fn rotate_right() {
+    let hex = Hex::new(5, 0);
+    let new = hex.rotate_right();
+    assert_eq!(new, Hex::new(0, 5));
+    let new = new.rotate_right();
+    assert_eq!(new, Hex::new(-5, 5));
+    let new = new.rotate_right();
+    assert_eq!(new, Hex::new(-5, 0));
+    let new = new.rotate_right();
+    assert_eq!(new, Hex::new(0, -5));
+    let new = new.rotate_right();
+    assert_eq!(new, Hex::new(5, -5));
+    let new = new.rotate_right();
+    assert_eq!(new, hex);
+}
+
+#[test]
+fn rotate_left() {
+    let hex = Hex::new(5, 0);
+    let new = hex.rotate_left();
+    assert_eq!(new, Hex::new(5, -5));
+    let new = new.rotate_left();
+    assert_eq!(new, Hex::new(0, -5));
+    let new = new.rotate_left();
+    assert_eq!(new, Hex::new(-5, 0));
+    let new = new.rotate_left();
+    assert_eq!(new, Hex::new(-5, 5));
+    let new = new.rotate_left();
+    assert_eq!(new, Hex::new(0, 5));
+    let new = new.rotate_left();
+    assert_eq!(new, hex);
+}
+
+#[test]
+fn lerp() {
+    let a = Hex::new(0, 0);
+    let b = Hex::new(5, 0);
+
+    assert_eq!(a.lerp(b, 0.0), a);
+    assert_eq!(a.lerp(b, 1.0), b);
+    assert_eq!(a.lerp(b, 2.0), b * 2);
+    assert_eq!(a.lerp(b, -1.0), -b);
+    assert_eq!(a.lerp(b, -2.0), -b * 2);
+
+    let line = [
+        a,
+        Hex::new(1, 0),
+        Hex::new(2, 0),
+        Hex::new(3, 0),
+        Hex::new(4, 0),
+        b,
+    ];
+    assert_eq!(a.lerp(b, 0.1), line[0]);
+    assert_eq!(a.lerp(b, 0.2), line[1]);
+    assert_eq!(a.lerp(b, 0.3), line[1]);
+    assert_eq!(a.lerp(b, 0.4), line[2]);
+    assert_eq!(a.lerp(b, 0.5), line[2]);
+    assert_eq!(a.lerp(b, 0.6), line[3]);
+    assert_eq!(a.lerp(b, 0.7), line[3]);
+    assert_eq!(a.lerp(b, 0.8), line[4]);
+    assert_eq!(a.lerp(b, 0.9), line[4]);
+    assert_eq!(a.lerp(b, 0.95), line[5]);
+    assert_eq!(a.lerp(b, 1.0), line[5]);
+}
+
+#[test]
+fn rounded_div() {
+    let a = Hex::new(0, 0);
+    let b = Hex::new(-5, 7);
+    assert_eq!(b / 2, Hex::new(-2, 3)); // Naive
+    assert_eq!(b / 2.0, Hex::new(-3, 4)); // Rounded
+    assert_eq!(b / 2.0, a.lerp(b, 0.5)); // Lerp
+}
+
+#[test]
+fn line_to() {
+    let a = Hex::new(0, 0);
+    let b = Hex::new(5, 0);
+    assert_eq!(
+        a.line_to(b).collect::<Vec<_>>(),
+        vec![
+            a,
+            Hex::new(1, 0),
+            Hex::new(2, 0),
+            Hex::new(3, 0),
+            Hex::new(4, 0),
+            b
+        ]
+    );
+    let b = Hex::new(5, 5);
+    assert_eq!(
+        a.line_to(b).collect::<Vec<_>>(),
+        vec![
+            a,
+            Hex::new(0, 1),
+            Hex::new(1, 1),
+            Hex::new(1, 2),
+            Hex::new(2, 2),
+            Hex::new(2, 3),
+            Hex::new(3, 3),
+            Hex::new(3, 4),
+            Hex::new(4, 4),
+            Hex::new(4, 5),
+            b
+        ]
+    );
+}
+
+#[test]
+fn directions_to() {
+    let a = Hex::new(0, 0);
+    let b = Hex::new(5, 5);
+    assert_eq!(
+        a.directions_to(b).collect::<Vec<_>>(),
+        vec![
+            Direction::Bottom,
+            Direction::BottomRight,
+            Direction::Bottom,
+            Direction::BottomRight,
+            Direction::Bottom,
+            Direction::BottomRight,
+            Direction::Bottom,
+            Direction::BottomRight,
+            Direction::Bottom,
+            Direction::BottomRight
+        ]
+    );
+}
+
+#[test]
+fn range_count() {
+    assert_eq!(Hex::range_count(0), 1);
+    assert_eq!(Hex::range_count(1), 7);
+    assert_eq!(Hex::range_count(10), 331);
+    assert_eq!(Hex::range_count(15), 721);
+}
+
+#[test]
+fn ring() {
+    let hex = Hex::ZERO;
+    assert_eq!(hex.ring(0), vec![hex]);
+    let expected = hex.all_neighbors().to_vec();
+    assert_eq!(hex.ring(1), expected);
+
+    let radius = 5;
+    let mut range: Vec<_> = hex.range(radius).collect();
+    let removed: Vec<_> = hex.range(radius - 1).collect();
+    range.retain(|h| !removed.contains(h));
+    let ring = hex.ring(5);
+    assert_eq!(ring.len(), range.len());
+    for h in &ring {
+        assert!(range.contains(h));
+    }
+}
+
+#[test]
+fn ring_offset() {
+    let zero = Hex::ZERO;
+    let target = Hex::new(14, 7);
+
+    let expected: Vec<_> = zero.ring(10).into_iter().map(|h| h + target).collect();
+    assert_eq!(target.ring(10), expected);
+}
+
+#[test]
+fn custom_ring() {
+    let hex = Hex::ZERO;
+    assert_eq!(hex.custom_ring(0, Direction::TopLeft, true), vec![hex]);
+
+    // clockwise
+    let mut expected = hex.ring(5);
+    expected.reverse();
+    expected.rotate_right(1);
+    assert_eq!(hex.custom_ring(5, Direction::TopRight, true), expected);
+    // offsetted
+    let expected = hex.ring(5);
+    let ring = hex.custom_ring(5, Direction::BottomLeft, false);
+    assert_eq!(expected.len(), ring.len());
+    for h in &ring {
+        assert!(expected.contains(h));
+    }
+}
+
+#[test]
+fn spiral_range() {
+    let expected: Vec<_> = Hex::ZERO.range(10).collect();
+    let spiral = Hex::ZERO.spiral_range(10);
+    assert_eq!(spiral.len(), expected.len());
+    for hex in &expected {
+        assert!(spiral.contains(hex));
+    }
+}
