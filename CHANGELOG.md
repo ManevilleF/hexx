@@ -17,6 +17,8 @@
 * Added `left` and `right` methods to `Direction` to get the next direction clockwise and counter clockwise
 * Added `rotate_left` and `rotate_right` methods to `Direction` to rotate the direction clockwise and counter clockwise by a custom amount
 
+* (**BREAKING**) Removed arbitraty `Display` impl for `Hex`
+
 ## 0.2.0
 
 * Improved docs
