@@ -29,6 +29,18 @@ use std::ops::{
 ///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::from_offset_coordinates`]
 ///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::from_doubled_coordinates`]
 ///
+/// # Floating point operations
+///
+/// `Hex` is a primitive type, therefore dividing it by an other integer might not return the
+/// expected value, correctly rounded to the correct `Hex`, in various cases like lerping
+/// ([`Self::lerp`]).
+///
+/// In such cases, prefer using the following methods:
+/// - [`Self::rounded_div`]
+/// - [`Self::rounded_mul`]
+///
+/// or the [`Div<f32>`] and [`Mul<f32>`] for operations using the [`Hex::round`] method.
+///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
 ///
@@ -128,23 +140,6 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
-    /// Rounds floating point coordinates to [`Hex`]
-    pub fn round((mut x, mut y): (f32, f32)) -> Self {
-        let (mut x_r, mut y_r) = (x.round(), y.round());
-        x -= x.round(); // remainder
-        y -= y.round(); // remainder
-        if x * x >= y * y {
-            x_r += 0.5_f32.mul_add(y, x).round();
-        }
-        if x * x < y * y {
-            y_r += 0.5_f32.mul_add(x, y).round();
-        }
-        Self::new(x_r as i32, y_r as i32)
-    }
-
-    #[inline]
-    #[must_use]
     #[doc(alias = "q")]
     /// `x` coordinate (sometimes called `q` or `i`)
     pub const fn x(self) -> i32 {
@@ -203,6 +198,39 @@ impl Hex {
             x: self.x - other.x,
             y: self.y - other.y,
         }
+    }
+
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    /// Rounds floating point coordinates to [`Hex`]
+    pub fn round((mut x, mut y): (f32, f32)) -> Self {
+        let (mut x_r, mut y_r) = (x.round(), y.round());
+        x -= x.round(); // remainder
+        y -= y.round(); // remainder
+        if x * x >= y * y {
+            x_r += 0.5_f32.mul_add(y, x).round();
+        }
+        if x * x < y * y {
+            y_r += 0.5_f32.mul_add(x, y).round();
+        }
+        Self::new(x_r as i32, y_r as i32)
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    #[inline]
+    #[must_use]
+    /// Divides `self` by `rhs`, rounding up to the closest `Hex`
+    pub fn rounded_div(self, rhs: f32) -> Self {
+        Self::round((self.x as f32 / rhs, self.y as f32 / rhs))
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    #[inline]
+    #[must_use]
+    /// Multiplies `self` by `rhs`, rounding up to the closest `Hex`
+    pub fn rounded_mul(self, rhs: f32) -> Self {
+        Self::round((self.x as f32 * rhs, self.y as f32 * rhs))
     }
 
     #[inline]
@@ -352,13 +380,21 @@ impl Hex {
     /// ````
     pub fn line_to(self, other: Self) -> impl Iterator<Item = Self> {
         let distance = self.distance_to(other);
-        let (a, b) = (
-            Vec2::new(self.x as f32, self.y as f32),
-            Vec2::new(other.x as f32, other.y as f32),
-        );
-        (0..=distance)
-            .map(move |step| a.lerp(b, step as f32 / distance as f32))
-            .map(|v| Self::round((v.x, v.y)))
+        let [a, b]: [Vec2; 2] = [self.into(), other.into()];
+        (0..=distance).map(move |step| a.lerp(b, step as f32 / distance as f32).into())
+    }
+
+    /// Performs a linear interpolation between `self` and `rhs` based on the value `s`.
+    ///
+    /// When `s` is `0.0`, the result will be equal to `self`.  When `s` is `1.0`, the result
+    /// will be equal to `rhs`. When `s` is outside of range `[0, 1]`, the result is linearly
+    /// extrapolated.
+    #[doc(alias = "mix")]
+    #[inline]
+    #[must_use]
+    pub fn lerp(self, rhs: Self, s: f32) -> Self {
+        let [start, end]: [Vec2; 2] = [self.into(), rhs.into()];
+        start.lerp(end, s).into()
     }
 
     #[allow(clippy::cast_possible_wrap)]
@@ -535,6 +571,7 @@ impl Hex {
 impl Add<Self> for Hex {
     type Output = Self;
 
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         self.const_add(rhs)
     }
@@ -543,6 +580,7 @@ impl Add<Self> for Hex {
 impl Add<i32> for Hex {
     type Output = Self;
 
+    #[inline]
     fn add(self, rhs: i32) -> Self::Output {
         Self {
             x: self.x + rhs,
@@ -552,12 +590,14 @@ impl Add<i32> for Hex {
 }
 
 impl AddAssign for Hex {
+    #[inline]
     fn add_assign(&mut self, rhs: Self) {
         *self = *self + rhs;
     }
 }
 
 impl AddAssign<i32> for Hex {
+    #[inline]
     fn add_assign(&mut self, rhs: i32) {
         *self = *self + rhs;
     }
@@ -566,6 +606,7 @@ impl AddAssign<i32> for Hex {
 impl Sub<Self> for Hex {
     type Output = Self;
 
+    #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         self.const_sub(rhs)
     }
@@ -574,6 +615,7 @@ impl Sub<Self> for Hex {
 impl Sub<i32> for Hex {
     type Output = Self;
 
+    #[inline]
     fn sub(self, rhs: i32) -> Self::Output {
         Self {
             x: self.x - rhs,
@@ -583,12 +625,14 @@ impl Sub<i32> for Hex {
 }
 
 impl SubAssign for Hex {
+    #[inline]
     fn sub_assign(&mut self, rhs: Self) {
         *self = *self - rhs;
     }
 }
 
 impl SubAssign<i32> for Hex {
+    #[inline]
     fn sub_assign(&mut self, rhs: i32) {
         *self = *self - rhs;
     }
@@ -597,6 +641,7 @@ impl SubAssign<i32> for Hex {
 impl Mul<Self> for Hex {
     type Output = Self;
 
+    #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x * rhs.x,
@@ -608,6 +653,7 @@ impl Mul<Self> for Hex {
 impl Mul<i32> for Hex {
     type Output = Self;
 
+    #[inline]
     fn mul(self, rhs: i32) -> Self::Output {
         Self {
             x: self.x * rhs,
@@ -616,14 +662,32 @@ impl Mul<i32> for Hex {
     }
 }
 
+impl Mul<f32> for Hex {
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, rhs: f32) -> Self::Output {
+        self.rounded_mul(rhs)
+    }
+}
+
 impl MulAssign for Hex {
+    #[inline]
     fn mul_assign(&mut self, rhs: Self) {
         *self = *self * rhs;
     }
 }
 
 impl MulAssign<i32> for Hex {
+    #[inline]
     fn mul_assign(&mut self, rhs: i32) {
+        *self = *self * rhs;
+    }
+}
+
+impl MulAssign<f32> for Hex {
+    #[inline]
+    fn mul_assign(&mut self, rhs: f32) {
         *self = *self * rhs;
     }
 }
@@ -631,6 +695,7 @@ impl MulAssign<i32> for Hex {
 impl Div<Self> for Hex {
     type Output = Self;
 
+    #[inline]
     fn div(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x / rhs.x,
@@ -642,6 +707,7 @@ impl Div<Self> for Hex {
 impl Div<i32> for Hex {
     type Output = Self;
 
+    #[inline]
     fn div(self, rhs: i32) -> Self::Output {
         Self {
             x: self.x / rhs,
@@ -650,14 +716,32 @@ impl Div<i32> for Hex {
     }
 }
 
+impl Div<f32> for Hex {
+    type Output = Self;
+
+    #[inline]
+    fn div(self, rhs: f32) -> Self::Output {
+        self.rounded_div(rhs)
+    }
+}
+
 impl DivAssign for Hex {
+    #[inline]
     fn div_assign(&mut self, rhs: Self) {
         *self = *self / rhs;
     }
 }
 
 impl DivAssign<i32> for Hex {
+    #[inline]
     fn div_assign(&mut self, rhs: i32) {
+        *self = *self / rhs;
+    }
+}
+
+impl DivAssign<f32> for Hex {
+    #[inline]
+    fn div_assign(&mut self, rhs: f32) {
         *self = *self / rhs;
     }
 }
@@ -665,6 +749,7 @@ impl DivAssign<i32> for Hex {
 impl Rem<Self> for Hex {
     type Output = Self;
 
+    #[inline]
     fn rem(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x % rhs.x,
@@ -676,6 +761,7 @@ impl Rem<Self> for Hex {
 impl Rem<i32> for Hex {
     type Output = Self;
 
+    #[inline]
     fn rem(self, rhs: i32) -> Self::Output {
         Self {
             x: self.x % rhs,
@@ -685,12 +771,14 @@ impl Rem<i32> for Hex {
 }
 
 impl RemAssign for Hex {
+    #[inline]
     fn rem_assign(&mut self, rhs: Self) {
         *self = *self % rhs;
     }
 }
 
 impl RemAssign<i32> for Hex {
+    #[inline]
     fn rem_assign(&mut self, rhs: i32) {
         *self = *self % rhs;
     }
@@ -699,36 +787,71 @@ impl RemAssign<i32> for Hex {
 impl Neg for Hex {
     type Output = Self;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         self.const_neg()
     }
 }
 
 impl From<(i32, i32)> for Hex {
+    #[inline]
     fn from((x, y): (i32, i32)) -> Self {
         Self { x, y }
     }
 }
 
 impl From<[i32; 2]> for Hex {
+    #[inline]
     fn from([x, y]: [i32; 2]) -> Self {
         Self { x, y }
     }
 }
 
+impl From<(f32, f32)> for Hex {
+    #[inline]
+    fn from(v: (f32, f32)) -> Self {
+        Self::round(v)
+    }
+}
+
+impl From<[f32; 2]> for Hex {
+    #[inline]
+    fn from([x, y]: [f32; 2]) -> Self {
+        Self::round((x, y))
+    }
+}
+
 impl From<Hex> for IVec2 {
+    #[inline]
     fn from(hex: Hex) -> Self {
         Self::new(hex.x, hex.y)
     }
 }
 
+impl From<Hex> for Vec2 {
+    #[allow(clippy::cast_precision_loss)]
+    #[inline]
+    fn from(value: Hex) -> Self {
+        Self::new(value.x as f32, value.y as f32)
+    }
+}
+
+impl From<Vec2> for Hex {
+    #[inline]
+    fn from(value: Vec2) -> Self {
+        Self::round((value.x, value.y))
+    }
+}
+
 impl From<Hex> for IVec3 {
+    #[inline]
     fn from(hex: Hex) -> Self {
         Self::new(hex.x, hex.y, hex.z())
     }
 }
 
 impl From<IVec2> for Hex {
+    #[inline]
     fn from(v: IVec2) -> Self {
         Self::new(v.x, v.y)
     }
@@ -802,7 +925,6 @@ mod tests {
         for x in 1..30 {
             for y in 1..30 {
                 let hex = Hex::new(x, y);
-                println!("{hex}");
                 for x2 in 1..30 {
                     for y2 in 1..30 {
                         // Int
