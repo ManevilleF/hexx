@@ -2,7 +2,6 @@ use crate::Direction;
 use glam::{IVec2, IVec3, Vec2};
 use itertools::Itertools;
 use std::cmp::{max, min};
-use std::fmt::{Display, Formatter};
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
 };
@@ -854,12 +853,6 @@ impl From<IVec2> for Hex {
     #[inline]
     fn from(v: IVec2) -> Self {
         Self::new(v.x, v.y)
-    }
-}
-
-impl Display for Hex {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}, {}", self.x, self.y)
     }
 }
 
