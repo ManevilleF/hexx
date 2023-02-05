@@ -478,11 +478,11 @@ impl Hex {
         } else {
             neighbors.rotate_left(2);
         }
-        let mut hex = self.neighbor(start_dir) * range as i32;
+        let mut hex = Hex::ZERO.neighbor(start_dir) * range as i32;
         let mut res = Vec::with_capacity(Self::ring_count(range));
         for dir in neighbors {
             (0..range).for_each(|_| {
-                res.push(hex);
+                res.push(self + hex);
                 hex += dir;
             });
         }
@@ -1194,6 +1194,15 @@ mod tests {
         for h in &ring {
             assert!(range.contains(h));
         }
+    }
+
+    #[test]
+    fn ring_offset() {
+        let zero = Hex::ZERO;
+        let target = Hex::new(14, 7);
+
+        let expected: Vec<_> = zero.ring(10).into_iter().map(|h| h + target).collect();
+        assert_eq!(target.ring(10), expected);
     }
 
     #[test]
