@@ -323,8 +323,8 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Retrieves the neighbor coordinates matching the given `direction`
-    pub fn neighbor(self, direction: Direction) -> Self {
-        self + Self::neighbor_coord(direction)
+    pub const fn neighbor(self, direction: Direction) -> Self {
+        self.const_add(Self::neighbor_coord(direction))
     }
 
     #[inline]
@@ -470,19 +470,21 @@ impl Hex {
         if range == 0 {
             return vec![self];
         }
-        let mut neighbors = Self::NEIGHBORS_COORDS;
-        neighbors.rotate_left(start_dir as usize);
+        let mut directions = Self::NEIGHBORS_COORDS;
+        // TODO: improve code clarity
+        directions.rotate_left(start_dir as usize);
         if clockwise {
-            neighbors.reverse();
-            neighbors.rotate_left(1);
+            directions.reverse();
+            directions.rotate_left(1);
         } else {
-            neighbors.rotate_left(2);
+            directions.rotate_left(2);
         }
-        let mut hex = Hex::ZERO.neighbor(start_dir) * range as i32;
+
+        let mut hex = self + Self::neighbor_coord(start_dir) * range as i32;
         let mut res = Vec::with_capacity(Self::ring_count(range));
-        for dir in neighbors {
+        for dir in directions {
             (0..range).for_each(|_| {
-                res.push(self + hex);
+                res.push(hex);
                 hex += dir;
             });
         }
