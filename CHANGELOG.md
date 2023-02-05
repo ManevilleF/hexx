@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fix
+
+* `Hex::ring` did not work properly with offset coordinates
+
 ### Examples
 
 * Added `3d_columns` example
@@ -39,6 +43,7 @@
 * Implemented `RemAssign<Hex>` for `Hex`
 * Implemented `Rem<i32>` for `Hex`
 * Implemented `RemAssign<i32>` for `Hex`
+* `Hex::neighbor` is now `const`
 
 ## 0.2.0
 
