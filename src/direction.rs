@@ -1,6 +1,5 @@
-use std::f32::consts::PI;
-
 use crate::HexOrientation;
+use std::f32::consts::PI;
 
 /// Angle in radian between *flat* and *pointy* top orientations.
 /// Equivalent to 30 degrees

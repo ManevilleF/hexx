@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+### Examples
+
 * Added `3d_columns` example
-* Implemented `Rem<Hex>` for `Hex`
-* Implemented `RemAssign<Hex>` for `Hex`
-* Implemented `Rem<i32>` for `Hex`
-* Implemented `RemAssign<i32>` for `Hex`
+
+### Impls
+
+### Direction
+
 * Added angle methods to `Direction`:
   - `angle_flat` for radian angle in flat orientation
   - `angle_flat_degrees` for degrees angle in flat orientation
@@ -17,7 +20,25 @@
 * Added `left` and `right` methods to `Direction` to get the next direction clockwise and counter clockwise
 * Added `rotate_left` and `rotate_right` methods to `Direction` to rotate the direction clockwise and counter clockwise by a custom amount
 
+### New features
+
+* Added `lerp` method to `Hex`
+* Added `rounding_div` method to `Hex` to perform floating point division rounded to the closest coordinate
+* Added `rounding_mul` method to `Hex` to perform floating point multiplication rounded to the closest coordinate
+
+### Conversions
+
+* Added `as_ivec2` method to `Hex`
+* Added `as_ivec3` method to `Hex`
+* Added `as_vec2` method to `Hex`
+
+### Misc
+
 * (**BREAKING**) Removed arbitraty `Display` impl for `Hex`
+* Implemented `Rem<Hex>` for `Hex`
+* Implemented `RemAssign<Hex>` for `Hex`
+* Implemented `Rem<i32>` for `Hex`
+* Implemented `RemAssign<i32>` for `Hex`
 
 ## 0.2.0
 
