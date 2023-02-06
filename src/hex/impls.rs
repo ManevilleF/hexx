@@ -253,53 +253,23 @@ impl Neg for Hex {
     }
 }
 
-/// Trait to represent types that can be created by summing up an iterator and dividing by its
-/// length.
-pub trait Mean<A = Self>: Sized {
-    /// Method which takes an iterator and generates `Self` from the elements by finding the mean
-    /// value.
-    fn mean<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = A>;
-}
-
 /// Extension trait for iterators to implement [`Mean`]
 pub trait MeanExt: Iterator {
     /// Method which takes an iterator and generates `Self` from the elements by finding the mean
     /// value.
-    fn mean<M>(self) -> M
-    where
-        M: Mean<Self::Item>,
-        Self: Sized,
-    {
-        M::mean(self)
-    }
+    fn mean(self) -> Hex;
 }
 
-impl<I: Iterator> MeanExt for I {}
-
-impl Mean for Hex {
-    fn mean<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = Self>,
-    {
-        let mut sum = Self::ZERO;
+impl<I: Iterator<Item = Hex>> MeanExt for I {
+    fn mean(self) -> Hex {
+        let mut sum = Hex::ZERO;
         let mut count = 0;
 
-        for hex in iter {
+        for hex in self {
             count += 1;
             sum += hex;
         }
         // Avoid division by zero
         sum / count.max(1)
-    }
-}
-
-impl<'a> Mean<&'a Self> for Hex {
-    fn mean<I>(iter: I) -> Self
-    where
-        I: Iterator<Item = &'a Self>,
-    {
-        iter.copied().mean()
     }
 }

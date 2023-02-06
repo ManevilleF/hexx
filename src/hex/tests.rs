@@ -29,6 +29,8 @@ fn hex_sum() {
 }
 
 #[test]
+#[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::cast_possible_wrap)]
 fn hex_mean() {
     let hexes = [
         Hex::ONE,
@@ -38,7 +40,11 @@ fn hex_mean() {
         Hex::new(-1, 17),
     ];
     let mean = hexes.iter().sum::<Hex>() / hexes.len() as i32;
-    assert_eq!(hexes.into_iter().mean::<Hex>(), mean);
+    assert_eq!(hexes.into_iter().mean(), mean);
+
+    for r in 0..30 {
+        assert_eq!(Hex::ZERO.range(r).mean(), Hex::ZERO);
+    }
 }
 
 #[test]

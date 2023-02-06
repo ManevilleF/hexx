@@ -5,7 +5,7 @@ mod impls;
 #[cfg(test)]
 mod tests;
 
-pub use impls::{Mean, MeanExt};
+pub use impls::MeanExt;
 
 use crate::Direction;
 use glam::{IVec2, IVec3, Vec2};
