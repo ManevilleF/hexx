@@ -55,6 +55,8 @@ pub struct Hex {
 
 impl Hex {
     /// (0, 0)
+    pub const ORIGIN: Self = Self::ZERO;
+    /// (0, 0)
     pub const ZERO: Self = Self::new(0, 0);
     /// (1, 1)
     pub const ONE: Self = Self::new(1, 1);
@@ -493,7 +495,6 @@ impl Hex {
     }
 
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
     /// The returned coordinates start from [`Direction::TopRight`] and loop around `self` counter clockwise.
     ///
@@ -505,8 +506,77 @@ impl Hex {
         self.custom_ring(range, Direction::TopRight, false)
     }
 
+    #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
+    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
+    /// rings.
+    /// The returned rings start from [`Direction::TopRight`] and loop around `self` counter clockwise.
+    ///
+    /// If you only need the coordinates see [`Self::range`] or [`Self::spiral_range`].
+    ///
+    /// # Usage
+    ///
+    /// This function's objective is to pre-compute rings around a coordinate, the returned array
+    /// can be used as a cache to avoid extra computation.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// // We cache 10 rings around the origin
+    /// let cache = Hex::ORIGIN.cached_rings::<10>();
+    /// // We have our target center
+    /// let target = Hex::new(11, 24);
+    /// // We retrieve the ring of range 5 and offset it to match the target
+    /// let five_ring = cache[5].iter().map(|h| *h + target);
+    /// ```
+    ///
+    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
+    /// information
+    pub fn cached_rings<const RANGE: usize>(self) -> [Vec<Self>; RANGE] {
+        std::array::from_fn(|r| self.ring(r as u32))
+    }
+
+    #[allow(clippy::cast_possible_truncation)]
+    #[must_use]
+    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
+    /// rings.
+    /// The returned rings start from `start_dir`] and loop around `self` counter clockwise unless
+    /// `clockwise` is set to `true`.
+    ///
+    /// See also [`Self::cached_rings`]
+    /// If you only need the coordinates see [`Self::range`] or [`Self::custom_spiral_range`].
+    ///
+    /// # Usage
+    ///
+    /// This function's objective is to pre-compute rings around a coordinate, the returned array
+    /// can be used as a cache to avoid extra computation.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// // We cache 10 rings around the origin
+    /// let cache = Hex::ORIGIN.cached_custom_rings::<10>(Direction::Top, true);
+    /// // We have our target center
+    /// let target = Hex::new(11, 24);
+    /// // We retrieve the ring of range 5 and offset it to match the target
+    /// let five_ring = cache[5].iter().map(|h| *h + target);
+    /// ```
+    ///
+    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
+    /// information
+    pub fn cached_custom_rings<const RANGE: usize>(
+        self,
+        start_dir: Direction,
+        clockwise: bool,
+    ) -> [Vec<Self>; RANGE] {
+        std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise))
+    }
+
+    #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
     /// starting from `start_dir` and looping counter clockwise unless `clockwise` is set to `true`, forming a spiral
     ///

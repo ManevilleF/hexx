@@ -29,6 +29,7 @@
 * Added `lerp` method to `Hex`
 * Added `rounding_div` method to `Hex` to perform floating point division rounded to the closest coordinate
 * Added `rounding_mul` method to `Hex` to perform floating point multiplication rounded to the closest coordinate
+* Added `cached_rings` and `cached_custom_rings` to `Hex` for rings pre-computation
 
 ### Conversions
 
@@ -44,6 +45,7 @@
 * Implemented `Rem<i32>` for `Hex`
 * Implemented `RemAssign<i32>` for `Hex`
 * `Hex::neighbor` is now `const`
+* Implemented `Sum` for `Hex`
 
 ## 0.2.0
 

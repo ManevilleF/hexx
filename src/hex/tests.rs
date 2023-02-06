@@ -300,6 +300,16 @@ fn ring() {
 }
 
 #[test]
+#[allow(clippy::cast_possible_truncation)]
+fn cached_rings() {
+    let hex = Hex::ZERO;
+    let cache = hex.cached_rings::<10>();
+    for (r, ring) in cache.into_iter().enumerate() {
+        assert_eq!(ring, hex.ring(r as u32));
+    }
+}
+
+#[test]
 fn ring_offset() {
     let zero = Hex::ZERO;
     let target = Hex::new(14, 7);

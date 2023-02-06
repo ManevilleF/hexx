@@ -1,7 +1,8 @@
 use super::Hex;
 use glam::{IVec2, IVec3, Vec2};
-use std::ops::{
-    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+use std::{
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign},
 };
 
 impl Add<Self> for Hex {
@@ -36,6 +37,12 @@ impl AddAssign<i32> for Hex {
     #[inline]
     fn add_assign(&mut self, rhs: i32) {
         *self = *self + rhs;
+    }
+}
+
+impl Sum for Hex {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::ZERO, |a, b| a + b)
     }
 }
 
