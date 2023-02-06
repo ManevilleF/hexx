@@ -1,6 +1,6 @@
 use super::Hex;
 use std::{
-    iter::Sum,
+    iter::{Product, Sum},
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign},
 };
 
@@ -42,6 +42,12 @@ impl AddAssign<i32> for Hex {
 impl Sum for Hex {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(Self::ZERO, |a, b| a + b)
+    }
+}
+
+impl<'a> Sum<&'a Self> for Hex {
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
+        iter.copied().sum()
     }
 }
 
@@ -131,6 +137,18 @@ impl MulAssign<f32> for Hex {
     #[inline]
     fn mul_assign(&mut self, rhs: f32) {
         *self = *self * rhs;
+    }
+}
+
+impl Product for Hex {
+    fn product<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::ZERO, |a, b| a * b)
+    }
+}
+
+impl<'a> Product<&'a Self> for Hex {
+    fn product<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
+        iter.copied().product()
     }
 }
 
@@ -232,5 +250,56 @@ impl Neg for Hex {
     #[inline]
     fn neg(self) -> Self::Output {
         self.const_neg()
+    }
+}
+
+/// Trait to represent types that can be created by summing up an iterator and dividing by its
+/// length.
+pub trait Mean<A = Self>: Sized {
+    /// Method which takes an iterator and generates `Self` from the elements by finding the mean
+    /// value.
+    fn mean<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = A>;
+}
+
+/// Extension trait for iterators to implement [`Mean`]
+pub trait MeanExt: Iterator {
+    /// Method which takes an iterator and generates `Self` from the elements by finding the mean
+    /// value.
+    fn mean<M>(self) -> M
+    where
+        M: Mean<Self::Item>,
+        Self: Sized,
+    {
+        M::mean(self)
+    }
+}
+
+impl<I: Iterator> MeanExt for I {}
+
+impl Mean for Hex {
+    fn mean<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        let mut sum = Self::ZERO;
+        let mut count = 0;
+
+        for hex in iter {
+            count += 1;
+            sum += hex;
+        }
+        // Avoid division by zero
+        sum / count.max(1)
+    }
+}
+
+impl<'a> Mean<&'a Self> for Hex {
+    fn mean<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = &'a Self>,
+    {
+        iter.copied().mean()
     }
 }

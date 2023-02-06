@@ -15,6 +15,33 @@ fn int_addition() {
 }
 
 #[test]
+fn hex_sum() {
+    // zero sum
+    assert_eq!(Hex::ZERO.line_to(Hex::ZERO).sum::<Hex>(), Hex::ZERO);
+    // correct sum
+    assert_eq!(Hex::ZERO.line_to(Hex::X).sum::<Hex>(), Hex::X);
+    assert_eq!(Hex::ZERO.line_to(Hex::Y).sum::<Hex>(), Hex::Y);
+    assert_eq!(Hex::ZERO.line_to(Hex::ONE).sum::<Hex>(), Hex::new(1, 2));
+    assert_eq!(
+        Hex::ZERO.line_to(Hex::new(5, 0)).sum::<Hex>(),
+        Hex::new(15, 0)
+    );
+}
+
+#[test]
+fn hex_mean() {
+    let hexes = [
+        Hex::ONE,
+        Hex::new(5, -12),
+        Hex::new(15, 2),
+        Hex::new(-5, 24),
+        Hex::new(-1, 17),
+    ];
+    let mean = hexes.iter().sum::<Hex>() / hexes.len() as i32;
+    assert_eq!(hexes.into_iter().mean::<Hex>(), mean);
+}
+
+#[test]
 fn hex_subtraction() {
     assert_eq!(Hex::ZERO - Hex::ZERO, Hex::ZERO);
     assert_eq!(Hex::ONE - Hex::ZERO, Hex::ONE);

@@ -5,6 +5,8 @@ mod impls;
 #[cfg(test)]
 mod tests;
 
+pub use impls::{Mean, MeanExt};
+
 use crate::Direction;
 use glam::{IVec2, IVec3, Vec2};
 use itertools::Itertools;
@@ -41,8 +43,6 @@ use std::cmp::{max, min};
 /// In such cases, prefer using the following methods:
 /// - [`Self::rounded_div`]
 /// - [`Self::rounded_mul`]
-///
-/// or the [`Div<f32>`] and [`Mul<f32>`] for operations using the [`Hex::round`] method.
 ///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
@@ -218,6 +218,8 @@ impl Hex {
     /// Negates the coordinate, giving its reflection (symmetry) around the origin.
     ///
     /// [`Hex`] implements [`Neg`] (`-` operator) but this method is `const`.
+    ///
+    /// [`Neg`]: std::ops::Neg
     pub const fn const_neg(self) -> Self {
         Self {
             x: -self.x,
@@ -230,6 +232,8 @@ impl Hex {
     /// adds `self` and `other`.
     ///
     /// [`Hex`] implements [`Add`] (`+` operator) but this method is `const`.
+    ///
+    /// [`Add`]: std::ops::Add
     pub const fn const_add(self, other: Self) -> Self {
         Self {
             x: self.x + other.x,
@@ -242,6 +246,8 @@ impl Hex {
     /// substracts `self` and `other`.
     ///
     /// [`Hex`] implements [`Sub`] (`-` operator) but this method is `const`.
+    ///
+    /// [`Sub`]: std::ops::Sub
     pub const fn const_sub(self, other: Self) -> Self {
         Self {
             x: self.x - other.x,
