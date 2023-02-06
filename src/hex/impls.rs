@@ -253,11 +253,22 @@ impl Neg for Hex {
     }
 }
 
-/// Extension trait for iterators to implement [`Mean`]
+/// Extension trait for iterators of [`Hex`] to compute a mean value
 pub trait MeanExt: Iterator {
     /// Method which takes an iterator and generates `Self` from the elements by finding the mean
     /// value.
+    ///
+    /// This method will return [`Hex::ZERO`] on an empty iterator
     fn mean(self) -> Hex;
+}
+
+/// Extension trait for iterators to [`Hex`] to compute a center value
+pub trait CenterExt: Iterator {
+    /// Method which takes an iterator and generates `Self` from the elements by finding the center
+    /// value.
+    ///
+    /// This method will return [`Hex::ZERO`] on an empty iterator
+    fn center(self) -> Hex;
 }
 
 impl<I: Iterator<Item = Hex>> MeanExt for I {
@@ -271,5 +282,26 @@ impl<I: Iterator<Item = Hex>> MeanExt for I {
         }
         // Avoid division by zero
         sum / count.max(1)
+    }
+}
+
+impl<I: Iterator<Item = Hex>> CenterExt for I {
+    fn center(self) -> Hex {
+        let mut x_min = 0;
+        let mut x_max = 0;
+        let mut y_min = 0;
+        let mut y_max = 0;
+
+        for hex in self {
+            x_min = x_min.min(hex.x);
+            x_max = x_max.max(hex.x);
+            y_min = y_min.min(hex.y);
+            y_max = y_max.max(hex.y);
+        }
+
+        let x = (x_min + x_max) / 2;
+        let y = (y_min + y_max) / 2;
+
+        Hex::new(x, y)
     }
 }
