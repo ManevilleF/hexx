@@ -1,3 +1,6 @@
+/// Type conversions
+mod convert;
+/// Traits implementations
 mod impls;
 #[cfg(test)]
 mod tests;
