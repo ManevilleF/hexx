@@ -15,6 +15,44 @@ fn int_addition() {
 }
 
 #[test]
+fn hex_sum() {
+    // zero sum
+    assert_eq!(Hex::ZERO.line_to(Hex::ZERO).sum::<Hex>(), Hex::ZERO);
+    // correct sum
+    assert_eq!(Hex::ZERO.line_to(Hex::X).sum::<Hex>(), Hex::X);
+    assert_eq!(Hex::ZERO.line_to(Hex::Y).sum::<Hex>(), Hex::Y);
+    assert_eq!(Hex::ZERO.line_to(Hex::ONE).sum::<Hex>(), Hex::new(1, 2));
+    assert_eq!(
+        Hex::ZERO.line_to(Hex::new(5, 0)).sum::<Hex>(),
+        Hex::new(15, 0)
+    );
+}
+
+#[test]
+#[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::cast_possible_wrap)]
+fn hex_avg_center() {
+    let hexes = [
+        Hex::ONE,
+        Hex::new(5, -12),
+        Hex::new(15, 2),
+        Hex::new(-5, 24),
+        Hex::new(-1, 17),
+    ];
+    let mean = hexes.iter().sum::<Hex>() / hexes.len() as i32;
+    let center = Hex::new(10, 12) / 2;
+
+    assert_eq!(hexes.into_iter().average(), mean);
+    assert_eq!(hexes.into_iter().center(), center);
+    assert_ne!(center, mean);
+
+    for r in 0..30 {
+        assert_eq!(Hex::ZERO.range(r).average(), Hex::ZERO);
+        assert_eq!(Hex::ZERO.range(r).center(), Hex::ZERO);
+    }
+}
+
+#[test]
 fn hex_subtraction() {
     assert_eq!(Hex::ZERO - Hex::ZERO, Hex::ZERO);
     assert_eq!(Hex::ONE - Hex::ZERO, Hex::ONE);
@@ -296,6 +334,16 @@ fn ring() {
     assert_eq!(ring.len(), range.len());
     for h in &ring {
         assert!(range.contains(h));
+    }
+}
+
+#[test]
+#[allow(clippy::cast_possible_truncation)]
+fn cached_rings() {
+    let hex = Hex::ZERO;
+    let cache = hex.cached_rings::<10>();
+    for (r, ring) in cache.into_iter().enumerate() {
+        assert_eq!(ring, hex.ring(r as u32));
     }
 }
 

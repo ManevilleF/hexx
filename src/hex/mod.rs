@@ -1,6 +1,11 @@
+/// Type conversions
+mod convert;
+/// Traits implementations
 mod impls;
 #[cfg(test)]
 mod tests;
+
+pub use impls::{CenterExt, MeanExt};
 
 use crate::Direction;
 use glam::{IVec2, IVec3, Vec2};
@@ -39,8 +44,6 @@ use std::cmp::{max, min};
 /// - [`Self::rounded_div`]
 /// - [`Self::rounded_mul`]
 ///
-/// or the [`Div<f32>`] and [`Mul<f32>`] for operations using the [`Hex::round`] method.
-///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
 ///
@@ -54,6 +57,8 @@ pub struct Hex {
 }
 
 impl Hex {
+    /// (0, 0)
+    pub const ORIGIN: Self = Self::ZERO;
     /// (0, 0)
     pub const ZERO: Self = Self::new(0, 0);
     /// (1, 1)
@@ -213,6 +218,8 @@ impl Hex {
     /// Negates the coordinate, giving its reflection (symmetry) around the origin.
     ///
     /// [`Hex`] implements [`Neg`] (`-` operator) but this method is `const`.
+    ///
+    /// [`Neg`]: std::ops::Neg
     pub const fn const_neg(self) -> Self {
         Self {
             x: -self.x,
@@ -225,6 +232,8 @@ impl Hex {
     /// adds `self` and `other`.
     ///
     /// [`Hex`] implements [`Add`] (`+` operator) but this method is `const`.
+    ///
+    /// [`Add`]: std::ops::Add
     pub const fn const_add(self, other: Self) -> Self {
         Self {
             x: self.x + other.x,
@@ -234,13 +243,15 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// substracts `self` and `other`.
+    /// substracts `self` and `rhs`.
     ///
     /// [`Hex`] implements [`Sub`] (`-` operator) but this method is `const`.
-    pub const fn const_sub(self, other: Self) -> Self {
+    ///
+    /// [`Sub`]: std::ops::Sub
+    pub const fn const_sub(self, rhs: Self) -> Self {
         Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
         }
     }
 
@@ -298,20 +309,20 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `other` in hexagonal space as a signed integer
+    /// Computes the distance from `self` to `rhs` in hexagonal space as a signed integer
     ///
     /// See [`Self::unsigned_distance_to`] for the unsigned version
-    pub fn distance_to(self, other: Self) -> i32 {
-        (self - other).length()
+    pub const fn distance_to(self, rhs: Self) -> i32 {
+        self.const_sub(rhs).length()
     }
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `other` in hexagonal space as an unsigned integer
+    /// Computes the distance from `self` to `rhs` in hexagonal space as an unsigned integer
     ///
     /// See [`Self::distance_to`] for the signed version
-    pub fn unsigned_distance_to(self, other: Self) -> u32 {
-        (self - other).ulength()
+    pub const fn unsigned_distance_to(self, rhs: Self) -> u32 {
+        self.const_sub(rhs).ulength()
     }
 
     #[inline]
@@ -493,7 +504,6 @@ impl Hex {
     }
 
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
     /// The returned coordinates start from [`Direction::TopRight`] and loop around `self` counter clockwise.
     ///
@@ -505,8 +515,77 @@ impl Hex {
         self.custom_ring(range, Direction::TopRight, false)
     }
 
+    #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
+    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
+    /// rings.
+    /// The returned rings start from [`Direction::TopRight`] and loop around `self` counter clockwise.
+    ///
+    /// If you only need the coordinates see [`Self::range`] or [`Self::spiral_range`].
+    ///
+    /// # Usage
+    ///
+    /// This function's objective is to pre-compute rings around a coordinate, the returned array
+    /// can be used as a cache to avoid extra computation.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// // We cache 10 rings around the origin
+    /// let cache = Hex::ORIGIN.cached_rings::<10>();
+    /// // We have our target center
+    /// let target = Hex::new(11, 24);
+    /// // We retrieve the ring of range 5 and offset it to match the target
+    /// let five_ring = cache[5].iter().map(|h| *h + target);
+    /// ```
+    ///
+    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
+    /// information
+    pub fn cached_rings<const RANGE: usize>(self) -> [Vec<Self>; RANGE] {
+        std::array::from_fn(|r| self.ring(r as u32))
+    }
+
+    #[allow(clippy::cast_possible_truncation)]
+    #[must_use]
+    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
+    /// rings.
+    /// The returned rings start from `start_dir`] and loop around `self` counter clockwise unless
+    /// `clockwise` is set to `true`.
+    ///
+    /// See also [`Self::cached_rings`]
+    /// If you only need the coordinates see [`Self::range`] or [`Self::custom_spiral_range`].
+    ///
+    /// # Usage
+    ///
+    /// This function's objective is to pre-compute rings around a coordinate, the returned array
+    /// can be used as a cache to avoid extra computation.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// // We cache 10 rings around the origin
+    /// let cache = Hex::ORIGIN.cached_custom_rings::<10>(Direction::Top, true);
+    /// // We have our target center
+    /// let target = Hex::new(11, 24);
+    /// // We retrieve the ring of range 5 and offset it to match the target
+    /// let five_ring = cache[5].iter().map(|h| *h + target);
+    /// ```
+    ///
+    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
+    /// information
+    pub fn cached_custom_rings<const RANGE: usize>(
+        self,
+        start_dir: Direction,
+        clockwise: bool,
+    ) -> [Vec<Self>; RANGE] {
+        std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise))
+    }
+
+    #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
     /// starting from `start_dir` and looping counter clockwise unless `clockwise` is set to `true`, forming a spiral
     ///

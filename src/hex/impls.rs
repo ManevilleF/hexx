@@ -1,7 +1,7 @@
 use super::Hex;
-use glam::{IVec2, IVec3, Vec2};
-use std::ops::{
-    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+use std::{
+    iter::{Product, Sum},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign},
 };
 
 impl Add<Self> for Hex {
@@ -36,6 +36,18 @@ impl AddAssign<i32> for Hex {
     #[inline]
     fn add_assign(&mut self, rhs: i32) {
         *self = *self + rhs;
+    }
+}
+
+impl Sum for Hex {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::ZERO, |a, b| a + b)
+    }
+}
+
+impl<'a> Sum<&'a Self> for Hex {
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
+        iter.copied().sum()
     }
 }
 
@@ -125,6 +137,18 @@ impl MulAssign<f32> for Hex {
     #[inline]
     fn mul_assign(&mut self, rhs: f32) {
         *self = *self * rhs;
+    }
+}
+
+impl Product for Hex {
+    fn product<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::ZERO, |a, b| a * b)
+    }
+}
+
+impl<'a> Product<&'a Self> for Hex {
+    fn product<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
+        iter.copied().product()
     }
 }
 
@@ -229,58 +253,70 @@ impl Neg for Hex {
     }
 }
 
-impl From<(i32, i32)> for Hex {
-    #[inline]
-    fn from((x, y): (i32, i32)) -> Self {
-        Self { x, y }
+/// Extension trait for iterators of [`Hex`] to compute a mean (average) value
+pub trait MeanExt: Iterator {
+    /// Method which takes an iterator and generates `Self` from the elements by finding the mean
+    /// (average) value.
+    ///
+    /// This method will return [`Hex::ZERO`] on an empty iterator
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let mean = Hex::ZERO.range(10).average();
+    /// ```
+    #[doc(alias = "mean")]
+    fn average(self) -> Hex;
+}
+
+/// Extension trait for iterators to [`Hex`] to compute a center value
+pub trait CenterExt: Iterator {
+    /// Method which takes an iterator and generates `Self` from the elements by finding the center
+    /// value.
+    ///
+    /// This method will return [`Hex::ZERO`] on an empty iterator
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let center = Hex::ZERO.range(10).center();
+    /// ```
+    fn center(self) -> Hex;
+}
+
+impl<I: Iterator<Item = Hex>> MeanExt for I {
+    fn average(self) -> Hex {
+        let mut sum = Hex::ZERO;
+        let mut count = 0;
+
+        for hex in self {
+            count += 1;
+            sum += hex;
+        }
+        // Avoid division by zero
+        sum / count.max(1)
     }
 }
 
-impl From<[i32; 2]> for Hex {
-    #[inline]
-    fn from([x, y]: [i32; 2]) -> Self {
-        Self { x, y }
-    }
-}
+impl<I: Iterator<Item = Hex>> CenterExt for I {
+    fn center(self) -> Hex {
+        let mut x_min = 0;
+        let mut x_max = 0;
+        let mut y_min = 0;
+        let mut y_max = 0;
 
-impl From<(f32, f32)> for Hex {
-    #[inline]
-    fn from(v: (f32, f32)) -> Self {
-        Self::round(v)
-    }
-}
+        for hex in self {
+            x_min = x_min.min(hex.x);
+            x_max = x_max.max(hex.x);
+            y_min = y_min.min(hex.y);
+            y_max = y_max.max(hex.y);
+        }
 
-impl From<[f32; 2]> for Hex {
-    #[inline]
-    fn from([x, y]: [f32; 2]) -> Self {
-        Self::round((x, y))
-    }
-}
+        let x = (x_min + x_max) / 2;
+        let y = (y_min + y_max) / 2;
 
-impl From<Hex> for IVec2 {
-    #[inline]
-    fn from(hex: Hex) -> Self {
-        hex.as_ivec2()
-    }
-}
-
-impl From<Vec2> for Hex {
-    #[inline]
-    fn from(value: Vec2) -> Self {
-        Self::round((value.x, value.y))
-    }
-}
-
-impl From<Hex> for IVec3 {
-    #[inline]
-    fn from(hex: Hex) -> Self {
-        hex.as_ivec3()
-    }
-}
-
-impl From<IVec2> for Hex {
-    #[inline]
-    fn from(v: IVec2) -> Self {
-        Self::new(v.x, v.y)
+        Hex::new(x, y)
     }
 }
