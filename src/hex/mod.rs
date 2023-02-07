@@ -243,15 +243,15 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// substracts `self` and `other`.
+    /// substracts `self` and `rhs`.
     ///
     /// [`Hex`] implements [`Sub`] (`-` operator) but this method is `const`.
     ///
     /// [`Sub`]: std::ops::Sub
-    pub const fn const_sub(self, other: Self) -> Self {
+    pub const fn const_sub(self, rhs: Self) -> Self {
         Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
         }
     }
 
@@ -309,20 +309,20 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `other` in hexagonal space as a signed integer
+    /// Computes the distance from `self` to `rhs` in hexagonal space as a signed integer
     ///
     /// See [`Self::unsigned_distance_to`] for the unsigned version
-    pub fn distance_to(self, other: Self) -> i32 {
-        (self - other).length()
+    pub const fn distance_to(self, rhs: Self) -> i32 {
+        self.const_sub(rhs).length()
     }
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `other` in hexagonal space as an unsigned integer
+    /// Computes the distance from `self` to `rhs` in hexagonal space as an unsigned integer
     ///
     /// See [`Self::distance_to`] for the signed version
-    pub fn unsigned_distance_to(self, other: Self) -> u32 {
-        (self - other).ulength()
+    pub const fn unsigned_distance_to(self, rhs: Self) -> u32 {
+        self.const_sub(rhs).ulength()
     }
 
     #[inline]

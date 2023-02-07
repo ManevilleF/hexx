@@ -49,8 +49,10 @@
 * Implemented `RemAssign<Hex>` for `Hex`
 * Implemented `Rem<i32>` for `Hex`
 * Implemented `RemAssign<i32>` for `Hex`
-* `Hex::neighbor` is now `const`
 * Implemented `Sum` for `Hex`
+* `Hex::neighbor` is now `const`
+* `Hex::distance_to` is now `const`
+* `Hex::unsigned_distance_to` is now `const`
 
 ## 0.2.0
 
