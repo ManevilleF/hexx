@@ -7,7 +7,8 @@ use hexx::shapes;
 use hexx::*;
 
 /// World size of the hexagons (outer radius)
-const HEX_SIZE: Vec2 = Vec2::splat(15.0);
+const HEX_SIZE: Vec2 = Vec2::splat(10.0);
+const MAP_SIZE: u32 = 50;
 
 pub fn main() {
     App::new()
@@ -64,7 +65,7 @@ fn setup_grid(
     let mesh = hexagonal_plane(&layout);
     let mesh_handle = meshes.add(mesh);
 
-    let entities = shapes::hexagon(Hex::ZERO, 30)
+    let entities = shapes::hexagon(Hex::ZERO, MAP_SIZE)
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands

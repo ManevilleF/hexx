@@ -211,10 +211,7 @@ impl Rem<Self> for Hex {
 
     #[inline]
     fn rem(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x % rhs.x,
-            y: self.y % rhs.y,
-        }
+        self - (self / rhs) * rhs
     }
 }
 
@@ -223,10 +220,7 @@ impl Rem<i32> for Hex {
 
     #[inline]
     fn rem(self, rhs: i32) -> Self::Output {
-        Self {
-            x: self.x % rhs,
-            y: self.y % rhs,
-        }
+        self - (self / rhs) * rhs
     }
 }
 
