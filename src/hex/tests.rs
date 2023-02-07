@@ -31,7 +31,7 @@ fn hex_sum() {
 #[test]
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]
-fn hex_mean() {
+fn hex_avg_center() {
     let hexes = [
         Hex::ONE,
         Hex::new(5, -12),
@@ -40,10 +40,15 @@ fn hex_mean() {
         Hex::new(-1, 17),
     ];
     let mean = hexes.iter().sum::<Hex>() / hexes.len() as i32;
-    assert_eq!(hexes.into_iter().mean(), mean);
+    let center = Hex::new(10, 12) / 2;
+
+    assert_eq!(hexes.into_iter().average(), mean);
+    assert_eq!(hexes.into_iter().center(), center);
+    assert_ne!(center, mean);
 
     for r in 0..30 {
-        assert_eq!(Hex::ZERO.range(r).mean(), Hex::ZERO);
+        assert_eq!(Hex::ZERO.range(r).average(), Hex::ZERO);
+        assert_eq!(Hex::ZERO.range(r).center(), Hex::ZERO);
     }
 }
 

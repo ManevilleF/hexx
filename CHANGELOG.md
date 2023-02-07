@@ -31,6 +31,11 @@
 * Added `rounding_mul` method to `Hex` to perform floating point multiplication rounded to the closest coordinate
 * Added `cached_rings` and `cached_custom_rings` to `Hex` for rings pre-computation
 
+### Iterator extensions
+
+* Added `average` method for `Hex` iterators to compute their mean value
+* Added `center` method for `Hex` iterators to compute their centroid value
+
 ### Conversions
 
 * Added `as_ivec2` method to `Hex`
