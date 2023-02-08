@@ -290,11 +290,28 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    /// Computes the absolute value of `self`
+    pub const fn abs(self) -> Self {
+        Self {
+            x: self.x.abs(),
+            y: self.y.abs(),
+        }
+    }
+
+    #[inline]
+    #[must_use]
     /// Computes coordinates length as a signed integer
     ///
     /// See [`Self::ulength`] for the unsigned version
     pub const fn length(self) -> i32 {
-        (self.x.abs() + self.y.abs() + self.z().abs()) / 2
+        let [x, y, z] = [self.x.abs(), self.y.abs(), self.z().abs()];
+        if x >= y && x >= z {
+            x
+        } else if y >= x && y >= z {
+            y
+        } else {
+            z
+        }
     }
 
     #[inline]
@@ -304,7 +321,18 @@ impl Hex {
     ///
     /// See [`Self::length`] for the signed version
     pub const fn ulength(self) -> u32 {
-        (self.x.unsigned_abs() + self.y.unsigned_abs() + self.z().unsigned_abs()) / 2
+        let [x, y, z] = [
+            self.x.unsigned_abs(),
+            self.y.unsigned_abs(),
+            self.z().unsigned_abs(),
+        ];
+        if x >= y && x >= z {
+            x
+        } else if y >= x && y >= z {
+            y
+        } else {
+            z
+        }
     }
 
     #[inline]

@@ -61,6 +61,7 @@
 * `Hex::neighbor` is now `const`
 * `Hex::distance_to` is now `const`
 * `Hex::unsigned_distance_to` is now `const`
+* Improved length/distance computation to avoid overflow
 
 ## 0.2.0
 

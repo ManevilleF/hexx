@@ -29,6 +29,21 @@ fn hex_sum() {
 }
 
 #[test]
+fn hex_length() {
+    assert_eq!(Hex::ZERO.length(), 0);
+    assert_eq!(Hex::ZERO.ulength(), 0);
+    assert_eq!(Hex::ONE.length(), 2);
+    assert_eq!(Hex::ONE.ulength(), 2);
+    assert_eq!((Hex::ONE * 100).length(), 200);
+    assert_eq!((Hex::ONE * 100).ulength(), 200);
+
+    assert_eq!(Hex::new(i32::MAX, 0).length(), i32::MAX);
+    assert_eq!(Hex::new(i32::MAX, 0).ulength(), u32::MAX / 2);
+    assert_eq!(Hex::new(i32::MIN + 1, 0).length(), i32::MAX);
+    assert_eq!(Hex::new(i32::MIN + 1, 0).ulength(), u32::MAX / 2);
+}
+
+#[test]
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]
 fn hex_avg_center() {
