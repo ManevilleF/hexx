@@ -34,19 +34,8 @@ use std::cmp::{max, min};
 ///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::from_offset_coordinates`]
 ///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::from_doubled_coordinates`]
 ///
-/// # Floating point operations
-///
-/// `Hex` is a primitive type, therefore dividing it by an other integer might not return the
-/// expected value, correctly rounded to the correct `Hex`, in various cases like lerping
-/// ([`Self::lerp`]).
-///
-/// In such cases, prefer using the following methods:
-/// - [`Self::rounded_div`]
-/// - [`Self::rounded_mul`]
-///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
-///
 #[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct Hex {
@@ -272,20 +261,14 @@ impl Hex {
         Self::new(x_r as i32, y_r as i32)
     }
 
-    #[allow(clippy::cast_precision_loss)]
     #[inline]
     #[must_use]
-    /// Divides `self` by `rhs`, rounding up to the closest `Hex`
-    pub fn rounded_div(self, rhs: f32) -> Self {
-        Self::round((self.x as f32 / rhs, self.y as f32 / rhs))
-    }
-
-    #[allow(clippy::cast_precision_loss)]
-    #[inline]
-    #[must_use]
-    /// Multiplies `self` by `rhs`, rounding up to the closest `Hex`
-    pub fn rounded_mul(self, rhs: f32) -> Self {
-        Self::round((self.x as f32 * rhs, self.y as f32 * rhs))
+    /// Computes the absolute value of `self`
+    pub const fn abs(self) -> Self {
+        Self {
+            x: self.x.abs(),
+            y: self.y.abs(),
+        }
     }
 
     #[inline]
@@ -294,7 +277,14 @@ impl Hex {
     ///
     /// See [`Self::ulength`] for the unsigned version
     pub const fn length(self) -> i32 {
-        (self.x.abs() + self.y.abs() + self.z().abs()) / 2
+        let [x, y, z] = [self.x.abs(), self.y.abs(), self.z().abs()];
+        if x >= y && x >= z {
+            x
+        } else if y >= x && y >= z {
+            y
+        } else {
+            z
+        }
     }
 
     #[inline]
@@ -304,7 +294,18 @@ impl Hex {
     ///
     /// See [`Self::length`] for the signed version
     pub const fn ulength(self) -> u32 {
-        (self.x.unsigned_abs() + self.y.unsigned_abs() + self.z().unsigned_abs()) / 2
+        let [x, y, z] = [
+            self.x.unsigned_abs(),
+            self.y.unsigned_abs(),
+            self.z().unsigned_abs(),
+        ];
+        if x >= y && x >= z {
+            x
+        } else if y >= x && y >= z {
+            y
+        } else {
+            z
+        }
     }
 
     #[inline]

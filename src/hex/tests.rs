@@ -29,6 +29,21 @@ fn hex_sum() {
 }
 
 #[test]
+fn hex_length() {
+    assert_eq!(Hex::ZERO.length(), 0);
+    assert_eq!(Hex::ZERO.ulength(), 0);
+    assert_eq!(Hex::ONE.length(), 2);
+    assert_eq!(Hex::ONE.ulength(), 2);
+    assert_eq!((Hex::ONE * 100).length(), 200);
+    assert_eq!((Hex::ONE * 100).ulength(), 200);
+
+    assert_eq!(Hex::new(i32::MAX, 0).length(), i32::MAX);
+    assert_eq!(Hex::new(i32::MAX, 0).ulength(), u32::MAX / 2);
+    assert_eq!(Hex::new(i32::MIN + 1, 0).length(), i32::MAX);
+    assert_eq!(Hex::new(i32::MIN + 1, 0).ulength(), u32::MAX / 2);
+}
+
+#[test]
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]
 fn hex_avg_center() {
@@ -91,6 +106,30 @@ fn hex_division() {
 }
 
 #[test]
+#[allow(clippy::cast_precision_loss)]
+fn int_division() {
+    assert_eq!(Hex::new(2, 2) / 2, Hex::ONE);
+    assert_eq!(Hex::new(10, 30) / 2, Hex::new(5, 15));
+    assert_eq!(Hex::new(11, 31) / 2, Hex::new(5, 16));
+
+    for x in 0..30 {
+        for y in 0..30 {
+            let hex = Hex { x, y };
+            for d in 1..30 {
+                let expected_len = hex.length() / d;
+                let res_int = hex / d;
+                let res_float = hex / d as f32;
+                let res_lerp = Hex::ZERO.lerp(hex, expected_len as f32 / hex.length() as f32);
+
+                assert_eq!(res_int.length(), expected_len);
+                assert_eq!(res_int, res_float);
+                assert_eq!(res_int, res_lerp);
+            }
+        }
+    }
+}
+
+#[test]
 fn hex_rem() {
     for x in 1..30 {
         for y in 1..30 {
@@ -111,13 +150,6 @@ fn hex_rem() {
             }
         }
     }
-}
-
-#[test]
-fn int_division() {
-    assert_eq!(Hex::new(2, 2) / 2, Hex::ONE);
-    assert_eq!(Hex::new(10, 30) / 2, Hex::new(5, 15));
-    assert_eq!(Hex::new(11, 31) / 2, Hex::new(5, 15));
 }
 
 #[test]
@@ -261,15 +293,6 @@ fn lerp() {
     assert_eq!(a.lerp(b, 0.9), line[4]);
     assert_eq!(a.lerp(b, 0.95), line[5]);
     assert_eq!(a.lerp(b, 1.0), line[5]);
-}
-
-#[test]
-fn rounded_div() {
-    let a = Hex::new(0, 0);
-    let b = Hex::new(-5, 7);
-    assert_eq!(b / 2, Hex::new(-2, 3)); // Naive
-    assert_eq!(b / 2.0, Hex::new(-3, 4)); // Rounded
-    assert_eq!(b / 2.0, a.lerp(b, 0.5)); // Lerp
 }
 
 #[test]

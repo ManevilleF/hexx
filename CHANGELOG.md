@@ -10,7 +10,9 @@
 
 * Added `3d_columns` example
 
-### Impls
+### Division
+
+* (**BREAKING**) Rework `Hex` `Div` impls to respect expected `length`
 
 ### Direction
 
@@ -27,8 +29,6 @@
 ### New features
 
 * Added `lerp` method to `Hex`
-* Added `rounding_div` method to `Hex` to perform floating point division rounded to the closest coordinate
-* Added `rounding_mul` method to `Hex` to perform floating point multiplication rounded to the closest coordinate
 * Added `cached_rings` and `cached_custom_rings` to `Hex` for rings pre-computation
 * (**BREAKING**) renamed `Hex::rotate_left` to `Hex::left` and made it `const`
 * (**BREAKING**) renamed `Hex::rotate_right` to `Hex::right` and made it `const`
@@ -61,6 +61,8 @@
 * `Hex::neighbor` is now `const`
 * `Hex::distance_to` is now `const`
 * `Hex::unsigned_distance_to` is now `const`
+* Improved length/distance computation to avoid overflow
+* Added `Hex::abs` method
 
 ## 0.2.0
 
