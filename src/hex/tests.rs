@@ -184,35 +184,51 @@ fn distance_to() {
 #[test]
 fn rotate_right() {
     let hex = Hex::new(5, 0);
-    let new = hex.rotate_right();
+    let new = hex.right();
     assert_eq!(new, Hex::new(0, 5));
-    let new = new.rotate_right();
+    assert_eq!(hex.rotate_right(1), new);
+    let new = new.right();
     assert_eq!(new, Hex::new(-5, 5));
-    let new = new.rotate_right();
+    assert_eq!(hex.rotate_right(2), new);
+    let new = new.right();
     assert_eq!(new, Hex::new(-5, 0));
-    let new = new.rotate_right();
+    assert_eq!(hex.rotate_right(3), new);
+    let new = new.right();
     assert_eq!(new, Hex::new(0, -5));
-    let new = new.rotate_right();
+    assert_eq!(hex.rotate_right(4), new);
+    let new = new.right();
     assert_eq!(new, Hex::new(5, -5));
-    let new = new.rotate_right();
+    assert_eq!(hex.rotate_right(5), new);
+    let new = new.right();
     assert_eq!(new, hex);
+    assert_eq!(hex.rotate_right(6), new);
+    assert_eq!(hex.rotate_right(7), hex.rotate_right(1));
+    assert_eq!(hex.rotate_right(10), hex.rotate_right(4));
 }
 
 #[test]
 fn rotate_left() {
     let hex = Hex::new(5, 0);
-    let new = hex.rotate_left();
+    let new = hex.left();
     assert_eq!(new, Hex::new(5, -5));
-    let new = new.rotate_left();
+    assert_eq!(hex.rotate_left(1), new);
+    let new = new.left();
     assert_eq!(new, Hex::new(0, -5));
-    let new = new.rotate_left();
+    assert_eq!(hex.rotate_left(2), new);
+    let new = new.left();
     assert_eq!(new, Hex::new(-5, 0));
-    let new = new.rotate_left();
+    assert_eq!(hex.rotate_left(3), new);
+    let new = new.left();
     assert_eq!(new, Hex::new(-5, 5));
-    let new = new.rotate_left();
+    assert_eq!(hex.rotate_left(4), new);
+    let new = new.left();
     assert_eq!(new, Hex::new(0, 5));
-    let new = new.rotate_left();
+    assert_eq!(hex.rotate_left(5), new);
+    let new = new.left();
     assert_eq!(new, hex);
+    assert_eq!(hex.rotate_left(6), new);
+    assert_eq!(hex.rotate_left(7), hex.rotate_left(1));
+    assert_eq!(hex.rotate_left(10), hex.rotate_left(4));
 }
 
 #[test]

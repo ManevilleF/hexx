@@ -30,6 +30,14 @@
 * Added `rounding_div` method to `Hex` to perform floating point division rounded to the closest coordinate
 * Added `rounding_mul` method to `Hex` to perform floating point multiplication rounded to the closest coordinate
 * Added `cached_rings` and `cached_custom_rings` to `Hex` for rings pre-computation
+* (**BREAKING**) renamed `Hex::rotate_left` to `Hex::left` and made it `const`
+* (**BREAKING**) renamed `Hex::rotate_right` to `Hex::right` and made it `const`
+* (**BREAKING**) renamed `Hex::rotate_left_around` to `Hex::left_around` and made it `const`
+* (**BREAKING**) renamed `Hex::rotate_right_around` to `Hex::right_around` and made it `const`
+* Added `Hex::rotate_left` to rotate counter clockwise by a custom amount
+* Added `Hex::rotate_left_around` to rotate counter clockwise by a custom amount and center
+* Added `Hex::rotate_right` to rotate clockwise by a custom amount
+* Added `Hex::rotate_right_around` to rotate clockwise by a custom amount and center
 
 ### Iterator extensions
 

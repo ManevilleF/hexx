@@ -372,29 +372,71 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] counter clockwise (by -60 degrees)
-    pub const fn rotate_left(self) -> Self {
+    pub const fn left(self) -> Self {
         Self::new(-self.z(), -self.x)
     }
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around `center`  counter clockwise (by -60 degrees)
-    pub fn rotate_left_around(self, center: Self) -> Self {
-        (self - center).rotate_left() + center
+    /// Rotates `self` around `center` counter clockwise (by -60 degrees)
+    pub const fn left_around(self, center: Self) -> Self {
+        self.const_sub(center).left().const_add(center)
+    }
+
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around [`Hex::ZERO`] counter clockwise by `m` (by `-60 * m` degrees)
+    pub const fn rotate_left(self, m: u32) -> Self {
+        match m % 6 {
+            1 => self.left(),
+            2 => self.left().left(),
+            3 => self.const_neg(),
+            4 => self.right().right(),
+            5 => self.right(),
+            _ => self,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m` degrees)
+    pub const fn rotate_left_around(self, center: Self, m: u32) -> Self {
+        self.const_sub(center).rotate_left(m).const_add(center)
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] clockwise (by 60 degrees)
-    pub const fn rotate_right(self) -> Self {
+    pub const fn right(self) -> Self {
         Self::new(-self.y, -self.z())
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` clockwise (by 60 degrees)
-    pub fn rotate_right_around(self, center: Self) -> Self {
-        (self - center).rotate_right() + center
+    pub const fn right_around(self, center: Self) -> Self {
+        self.const_sub(center).right().const_add(center)
+    }
+
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around [`Hex::ZERO`] clockwise by `m` (by `60 * m` degrees)
+    pub const fn rotate_right(self, m: u32) -> Self {
+        match m % 6 {
+            1 => self.right(),
+            2 => self.right().right(),
+            3 => self.const_neg(),
+            4 => self.left().left(),
+            5 => self.left(),
+            _ => self,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around `center` clockwise by `m` (by `60 * m` degrees)
+    pub const fn rotate_right_around(self, center: Self, m: u32) -> Self {
+        self.const_sub(center).rotate_right(m).const_add(center)
     }
 
     #[inline]
@@ -681,7 +723,7 @@ impl Hex {
     pub const fn wraparound_mirrors(radius: u32) -> [Self; 6] {
         let radius = radius as i32;
         let mirror = Self::new(2 * radius + 1, -radius);
-        let [center, left, right] = [mirror, mirror.rotate_left(), mirror.rotate_right()];
+        let [center, left, right] = [mirror, mirror.left(), mirror.right()];
         [
             left,
             center,
