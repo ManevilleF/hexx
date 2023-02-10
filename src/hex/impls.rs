@@ -114,8 +114,9 @@ impl Mul<f32> for Hex {
     type Output = Self;
 
     #[inline]
+    #[allow(clippy::cast_precision_loss)]
     fn mul(self, rhs: f32) -> Self::Output {
-        self.rounded_mul(rhs)
+        Self::round((self.x as f32 * rhs, self.y as f32 * rhs))
     }
 }
 
@@ -168,11 +169,12 @@ impl Div<i32> for Hex {
     type Output = Self;
 
     #[inline]
+    #[allow(clippy::cast_precision_loss)]
     fn div(self, rhs: i32) -> Self::Output {
-        Self {
-            x: self.x / rhs,
-            y: self.y / rhs,
-        }
+        let length = self.length();
+        let new_length = length / rhs;
+        let lerp = new_length as f32 / length as f32;
+        Self::ZERO.lerp(self, lerp)
     }
 }
 
@@ -180,8 +182,13 @@ impl Div<f32> for Hex {
     type Output = Self;
 
     #[inline]
+    #[allow(clippy::cast_precision_loss)]
+    #[allow(clippy::cast_possible_truncation)]
     fn div(self, rhs: f32) -> Self::Output {
-        self.rounded_div(rhs)
+        let length = self.length();
+        let new_length = (length as f32 / rhs) as i32;
+        let lerp = new_length as f32 / length as f32;
+        Self::ZERO.lerp(self, lerp)
     }
 }
 

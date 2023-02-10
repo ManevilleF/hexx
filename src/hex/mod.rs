@@ -34,19 +34,8 @@ use std::cmp::{max, min};
 ///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::from_offset_coordinates`]
 ///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::from_doubled_coordinates`]
 ///
-/// # Floating point operations
-///
-/// `Hex` is a primitive type, therefore dividing it by an other integer might not return the
-/// expected value, correctly rounded to the correct `Hex`, in various cases like lerping
-/// ([`Self::lerp`]).
-///
-/// In such cases, prefer using the following methods:
-/// - [`Self::rounded_div`]
-/// - [`Self::rounded_mul`]
-///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
-///
 #[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct Hex {
@@ -270,22 +259,6 @@ impl Hex {
             y_r += 0.5_f32.mul_add(x, y).round();
         }
         Self::new(x_r as i32, y_r as i32)
-    }
-
-    #[allow(clippy::cast_precision_loss)]
-    #[inline]
-    #[must_use]
-    /// Divides `self` by `rhs`, rounding up to the closest `Hex`
-    pub fn rounded_div(self, rhs: f32) -> Self {
-        Self::round((self.x as f32 / rhs, self.y as f32 / rhs))
-    }
-
-    #[allow(clippy::cast_precision_loss)]
-    #[inline]
-    #[must_use]
-    /// Multiplies `self` by `rhs`, rounding up to the closest `Hex`
-    pub fn rounded_mul(self, rhs: f32) -> Self {
-        Self::round((self.x as f32 * rhs, self.y as f32 * rhs))
     }
 
     #[inline]
