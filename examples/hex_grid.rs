@@ -7,8 +7,7 @@ use hexx::shapes;
 use hexx::*;
 
 /// World size of the hexagons (outer radius)
-const HEX_SIZE: Vec2 = Vec2::splat(10.0);
-const MAP_SIZE: u32 = 50;
+const HEX_SIZE: Vec2 = Vec2::splat(8.0);
 
 pub fn main() {
     App::new()
@@ -16,7 +15,14 @@ pub fn main() {
             brightness: 1.0,
             ..default()
         })
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            window: WindowDescriptor {
+                width: 1_000.0,
+                height: 1_000.0,
+                ..default()
+            },
+            ..default()
+        }))
         .add_startup_system(setup_camera)
         .add_startup_system(setup_grid)
         .add_system(handle_input)
@@ -24,17 +30,23 @@ pub fn main() {
 }
 
 #[derive(Debug, Default, Resource)]
-struct SelectedHex(Hex);
-
-#[derive(Debug, Default, Resource)]
-struct HighlightedHexes(Vec<Hex>);
+struct HighlightedHexes {
+    pub selected: Hex,
+    pub halfway: Hex,
+    pub ring: Vec<Hex>,
+    pub line: Vec<Hex>,
+    pub half_ring: Vec<Hex>,
+    pub rotated: Vec<Hex>,
+}
 
 #[derive(Debug, Resource)]
 struct Map {
     layout: HexLayout,
     entities: HashMap<Hex, Entity>,
     selected_material: Handle<StandardMaterial>,
-    highlighted_material: Handle<StandardMaterial>,
+    ring_material: Handle<StandardMaterial>,
+    line_material: Handle<StandardMaterial>,
+    half_ring_material: Handle<StandardMaterial>,
     default_material: Handle<StandardMaterial>,
 }
 
@@ -59,13 +71,15 @@ fn setup_grid(
     };
     // materials
     let selected_material = materials.add(Color::RED.into());
-    let highlighted_material = materials.add(Color::YELLOW.into());
+    let ring_material = materials.add(Color::YELLOW.into());
+    let line_material = materials.add(Color::ORANGE.into());
+    let half_ring_material = materials.add(Color::LIME_GREEN.into());
     let default_material = materials.add(Color::WHITE.into());
     // mesh
     let mesh = hexagonal_plane(&layout);
     let mesh_handle = meshes.add(mesh);
 
-    let entities = shapes::hexagon(Hex::ZERO, MAP_SIZE)
+    let entities = shapes::flat_rectangle([-40, 40, -35, 35])
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
@@ -83,8 +97,10 @@ fn setup_grid(
         layout,
         entities,
         selected_material,
-        highlighted_material,
+        ring_material,
         default_material,
+        line_material,
+        half_ring_material,
     });
 }
 
@@ -93,7 +109,6 @@ fn handle_input(
     mut commands: Commands,
     windows: Res<Windows>,
     map: Res<Map>,
-    mut selected_hex: Local<SelectedHex>,
     mut highlighted_hexes: Local<HighlightedHexes>,
 ) {
     let window = windows.primary();
@@ -102,36 +117,58 @@ fn handle_input(
             - Vec2::new(window.width(), window.height()) / 2.0;
         let hex = map.layout.world_pos_to_hex(pos);
         if let Some(entity) = map.entities.get(&hex).copied() {
-            if hex == selected_hex.0 {
+            if hex == highlighted_hexes.selected {
                 return;
             }
             // Clear highlighted hexes materials
-            for entity in highlighted_hexes
-                .0
-                .iter()
-                .filter_map(|h| map.entities.get(h))
-            {
-                commands
-                    .entity(*entity)
-                    .insert(map.default_material.clone());
-            }
-            commands
-                .entity(map.entities[&selected_hex.0])
-                .insert(map.default_material.clone());
-            // Draw a  line
-            highlighted_hexes.0 = Hex::ZERO.line_to(hex).collect();
-            // Draw a ring
-            highlighted_hexes.0.extend(Hex::ZERO.ring(hex.ulength()));
-            for h in &highlighted_hexes.0 {
-                if let Some(e) = map.entities.get(h) {
-                    commands.entity(*e).insert(map.highlighted_material.clone());
+            for vec in [
+                &highlighted_hexes.ring,
+                &highlighted_hexes.line,
+                &highlighted_hexes.half_ring,
+                &highlighted_hexes.rotated,
+            ] {
+                for entity in vec.iter().filter_map(|h| map.entities.get(h)) {
+                    commands
+                        .entity(*entity)
+                        .insert(map.default_material.clone());
                 }
             }
+            commands
+                .entity(map.entities[&highlighted_hexes.selected])
+                .insert(map.default_material.clone());
+            commands
+                .entity(map.entities[&highlighted_hexes.halfway])
+                .insert(map.default_material.clone());
+            // Draw a  line
+            highlighted_hexes.line = Hex::ZERO.line_to(hex).collect();
+            // Draw a ring
+            highlighted_hexes.ring = Hex::ZERO.ring(hex.ulength());
+            // Draw a half ring
+            highlighted_hexes.half_ring = Hex::ZERO.ring(hex.ulength() / 2);
+            // Draw rotations
+            highlighted_hexes.rotated = (1..6).map(|i| hex.rotate_right(i)).collect();
+            for (vec, mat) in [
+                (&highlighted_hexes.ring, &map.ring_material),
+                (&highlighted_hexes.line, &map.line_material),
+                (&highlighted_hexes.half_ring, &map.half_ring_material),
+                (&highlighted_hexes.rotated, &map.selected_material),
+            ] {
+                for h in vec {
+                    if let Some(e) = map.entities.get(h) {
+                        commands.entity(*e).insert(mat.clone());
+                    }
+                }
+            }
+            // Make the half selction red
+            highlighted_hexes.halfway = hex / 2;
+            commands
+                .entity(map.entities[&highlighted_hexes.halfway])
+                .insert(map.selected_material.clone());
             // Make the selected tile red
             commands
                 .entity(entity)
                 .insert(map.selected_material.clone());
-            selected_hex.0 = hex;
+            highlighted_hexes.selected = hex;
         }
     }
 }
