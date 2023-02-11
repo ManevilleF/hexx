@@ -138,6 +138,30 @@ impl Hex {
         (0..=range).map(move |r| self.custom_ring_edge(r, start_dir, clockwise))
     }
 
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range`.
+    /// The returned edges start from [`start_dir`] and move counter clockwise around `self` unless
+    /// `clockwise` is set to `true`.
+    ///
+    /// See also [`Self::custom_ring_edges`]
+    /// If you only need the coordinates see [`Self::wedge`]
+    pub fn custom_wedge(
+        self,
+        range: u32,
+        start_dir: Direction,
+        clockwise: bool,
+    ) -> impl Iterator<Item = Self> {
+        self.custom_ring_edges(range, start_dir, clockwise)
+            .flatten()
+    }
+
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range`.
+    /// The returned edges start from [`start_dir`] and move counter clockwise around `self`.
+    ///
+    /// See also [`Self::custom_ring_edges`] and [`Self::custom_wedge`]
+    pub fn wedge(self, range: u32, start_dir: Direction) -> impl Iterator<Item = Self> {
+        self.ring_edges(range, start_dir).flatten()
+    }
+
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
     /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` as an array of
