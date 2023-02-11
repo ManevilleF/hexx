@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Directions
+
+* Added `DiagonalDirection` enum with identical features as `Direction`
+* Implement `Neg` for `Direction` to compute the opposite direction
+* Implement `Neg` for `DiagonalDirection` to compute the opposite direction
+
 ### Rings
 
 * Added new ring methods:
@@ -17,6 +23,13 @@
   * `Hex::custom_wedge`
 * (**BREAKING**) `Hex::custom_spiral_range` now returns an iterator
 * (**BREAKING**) `Hex::spiral_range` now returns an iterator
+
+### Misc
+
+* Added `Hexx:to_array` method
+* Added `Hexx:to_array3` method
+* Added `From<Direction>` impl for `Hex`
+* Added `From<DiagonalDirection>` impl for `Hex`
 
 ## 0.3.0
 

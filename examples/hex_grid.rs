@@ -149,7 +149,9 @@ fn handle_input(
             // Draw a ring
             highlighted_hexes.ring = Hex::ZERO.ring(hex.ulength());
             // Draw an edge
-            highlighted_hexes.wedge = Hex::ZERO.wedge(hex.ulength(), Default::default()).collect();
+            highlighted_hexes.wedge = Hex::ZERO
+                .wedge(hex.ulength(), Hex::ZERO.wedge_direction(hex))
+                .collect();
             // Draw a half ring
             highlighted_hexes.half_ring = Hex::ZERO.ring(hex.ulength() / 2);
             // Draw rotations

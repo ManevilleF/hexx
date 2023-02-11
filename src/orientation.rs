@@ -1,4 +1,5 @@
-use crate::{Direction, DIRECTION_ANGLE_OFFSET};
+use crate::direction::angles::DIRECTION_ANGLE_OFFSET;
+use crate::Direction;
 
 const SQRT_3: f32 = 1.732_050_8;
 

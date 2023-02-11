@@ -160,6 +160,20 @@ impl Hex {
         -self.x - self.y
     }
 
+    #[inline]
+    #[must_use]
+    /// Converts `self` to an array as `[x, y]`
+    pub const fn to_array(self) -> [i32; 2] {
+        [self.x, self.y]
+    }
+
+    #[inline]
+    #[must_use]
+    /// Converts `self` to an array as `[x, y, z]`
+    pub const fn to_array3(self) -> [i32; 3] {
+        [self.x, self.y, self.z()]
+    }
+
     #[must_use]
     #[inline]
     /// Converts `self` to an [`IVec2`].
