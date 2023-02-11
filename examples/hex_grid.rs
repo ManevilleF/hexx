@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy::render::mesh::Indices;
 use bevy::render::render_resource::PrimitiveTopology;
 use hexx::shapes;
-use hexx::*;
+use hexx::{Direction, *};
 
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(8.0);
@@ -150,7 +150,7 @@ fn handle_input(
             highlighted_hexes.ring = Hex::ZERO.ring(hex.ulength());
             // Draw an edge
             highlighted_hexes.wedge = Hex::ZERO
-                .wedge(hex.ulength(), Hex::ZERO.wedge_direction(hex))
+                .wedge(hex.ulength(), Direction::TopRight)
                 .collect();
             // Draw a half ring
             highlighted_hexes.half_ring = Hex::ZERO.ring(hex.ulength() / 2);

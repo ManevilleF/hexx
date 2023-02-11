@@ -7,6 +7,8 @@
 * Added `DiagonalDirection` enum with identical features as `Direction`
 * Implement `Neg` for `Direction` to compute the opposite direction
 * Implement `Neg` for `DiagonalDirection` to compute the opposite direction
+* Added `Direction::diagonal_neighbors` to retrieve the neighboring `DiagonalDirection`s
+* Added `DiagonalDirection::direction_neighbors` to retrieve the neighboring `Direction`s
 
 ### Rings
 

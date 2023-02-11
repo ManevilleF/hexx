@@ -47,12 +47,12 @@ fn six_rotations_comes_home() {
 #[test]
 fn flat_angles_degrees() {
     let expected = [
-        (BottomRight, 330.0),
         (TopRight, 30.0),
         (Top, 90.0),
         (TopLeft, 150.0),
         (BottomLeft, 210.0),
         (Bottom, 270.0),
+        (BottomRight, 330.0),
     ];
     for (dir, angle) in expected {
         assert!(dir.angle_flat_degrees() - angle <= EPSILON);
@@ -62,12 +62,12 @@ fn flat_angles_degrees() {
 #[test]
 fn flat_angles_rad() {
     let expected = [
-        (BottomRight, 11.0 * PI / 6.0),
         (TopRight, PI / 6.0),
         (Top, PI / 2.0),
         (TopLeft, 5.0 * PI / 6.0),
         (BottomLeft, 7.0 * PI / 6.0),
         (Bottom, 3.0 * PI / 2.0),
+        (BottomRight, 11.0 * PI / 6.0),
     ];
     let orientation = HexOrientation::flat();
     for (dir, angle) in expected {
@@ -79,12 +79,12 @@ fn flat_angles_rad() {
 #[test]
 fn pointy_angles_degrees() {
     let expected = [
-        (BottomRight, 300.0),
         (TopRight, 0.0),
         (Top, 60.0),
         (TopLeft, 120.0),
         (BottomLeft, 180.0),
         (Bottom, 240.0),
+        (BottomRight, 300.0),
     ];
     for (dir, angle) in expected {
         assert!(dir.angle_pointy_degrees() - angle <= EPSILON);
@@ -94,12 +94,12 @@ fn pointy_angles_degrees() {
 #[test]
 fn pointy_angles_rad() {
     let expected = [
-        (BottomRight, 5.0 * PI / 3.0),
         (TopRight, 0.0),
         (Top, PI / 3.0),
         (TopLeft, 2.0 * PI / 3.0),
         (BottomLeft, PI),
         (Bottom, 4.0 * PI / 3.0),
+        (BottomRight, 5.0 * PI / 3.0),
     ];
     let orientation = HexOrientation::pointy();
     for (dir, angle) in expected {

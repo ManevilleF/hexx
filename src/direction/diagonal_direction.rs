@@ -1,6 +1,6 @@
 #[allow(clippy::wildcard_imports)]
 use super::angles::*;
-use crate::{Hex, HexOrientation};
+use crate::{Direction, Hex, HexOrientation};
 
 /// All 6 possible diagonal directions in hexagonal space.
 /// ```txt
@@ -326,6 +326,31 @@ impl DiagonalDirection {
     /// Returns the angle in radians of the given direction in the given `orientation`
     pub fn angle(self, orientation: &HexOrientation) -> f32 {
         self.angle_pointy() - orientation.angle_offset
+    }
+
+    #[inline]
+    #[must_use]
+    /// Computes the two neighboring [`Direction`] as `[left, right]`.
+    /// - `right` is the clockwise neighbor
+    /// - `left` is the counter clockwise neighbor
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let [left, right] = DiagonalDirection::Right.direction_neighbors();
+    /// assert_eq!(left, Direction::TopRight);
+    /// assert_eq!(right, Direction::BottomRight);
+    /// ```
+    pub fn direction_neighbors(self) -> [Direction; 2] {
+        match self {
+            Self::Right => [Direction::TopRight, Direction::BottomRight],
+            Self::TopRight => [Direction::Top, Direction::TopRight],
+            Self::TopLeft => [Direction::TopLeft, Direction::Top],
+            Self::Left => [Direction::BottomLeft, Direction::TopLeft],
+            Self::BottomLeft => [Direction::Bottom, Direction::BottomLeft],
+            Self::BottomRight => [Direction::BottomRight, Direction::Bottom],
+        }
     }
 }
 
