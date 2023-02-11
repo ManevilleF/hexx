@@ -94,9 +94,9 @@ impl Hex {
             return vec![self];
         }
         let end_dir = Self::neighbor_coord(if clockwise {
-            start_dir.rotate_right(2)
+            start_dir + 2
         } else {
-            start_dir.rotate_left(2)
+            start_dir - 2
         });
         let hex = self + Self::neighbor_coord(start_dir) * range as i32;
         (0..=range).map(|i| hex + end_dir * i as i32).collect()

@@ -5,10 +5,14 @@
 ### Directions
 
 * Added `DiagonalDirection` enum with identical features as `Direction`
-* Implement `Neg` for `Direction` to compute the opposite direction
-* Implement `Neg` for `DiagonalDirection` to compute the opposite direction
 * Added `Direction::diagonal_neighbors` to retrieve the neighboring `DiagonalDirection`s
 * Added `DiagonalDirection::direction_neighbors` to retrieve the neighboring `Direction`s
+* Implement `Neg` for `Direction` to compute the opposite direction
+* Implement `Neg` for `DiagonalDirection` to compute the opposite direction
+* Implement `Add<usize>` for `Direction` to rotate the direction clockwise
+* Implement `Add<usize>` for `DiagonalDirection` to rotate the direction clockwise
+* Implement `Sub<usize>` for `Direction` to rotate the direction counter clockwise
+* Implement `Sub<usize>` for `DiagonalDirection` to rotate the direction counter clockwise
 
 ### Rings
 
