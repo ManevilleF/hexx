@@ -520,7 +520,7 @@ impl Hex {
     /// If you only need the coordinates see [`Self::ring`].
     ///
     /// # Note
-    /// The returned vector will be of `6 * radius` ([`Self::ring_count`])
+    /// The returned vector will be of `6 * radius` ([`Self::ring_count`]) length
     pub fn custom_ring(self, range: u32, start_dir: Direction, clockwise: bool) -> Vec<Self> {
         if range == 0 {
             return vec![self];
@@ -553,9 +553,43 @@ impl Hex {
     /// See [`Self::custom_ring`] for more options.
     ///
     /// # Note
-    /// The returned vector will be of `6 * radius` ([`Self::ring_count`])
+    /// The returned vector will be of `6 * radius` ([`Self::ring_count`]) length
     pub fn ring(self, range: u32) -> Vec<Self> {
         self.custom_ring(range, Direction::TopRight, false)
+    }
+
+    #[must_use]
+    /// Retrieves one [`Hex`] ring edge around `self` in a given `range`.
+    /// The returned coordinates start from `start_dir` and move counter clockwise around `self`
+    /// unless `clockwise` is set to `true`.
+    ///
+    /// If you only need the coordinates see [`Self::ring_edge`].
+    ///
+    /// # Note
+    /// The returned vector will be of `radius + 1` length
+    pub fn custom_ring_edge(self, range: u32, start_dir: Direction, clockwise: bool) -> Vec<Self> {
+        if range == 0 {
+            return vec![self];
+        }
+        let end_dir = Self::neighbor_coord(if clockwise {
+            start_dir.rotate_right(2)
+        } else {
+            start_dir.rotate_left(2)
+        });
+        let hex = self + Self::neighbor_coord(start_dir) * range as i32;
+        (0..=range).map(|i| hex + end_dir * i as i32).collect()
+    }
+
+    #[must_use]
+    /// Retrieves one [`Hex`] ring edge around `self` in a given `range`.
+    /// The returned coordinates start from [`Direction::TopRight`] and move counter clockwise around `self`.
+    ///
+    /// See [`Self::custom_ring_edge`] for more options.
+    ///
+    /// # Note
+    /// The returned vector will be of `radius + 1` length
+    pub fn ring_edge(self, range: u32, start_dir: Direction) -> Vec<Self> {
+        self.custom_ring_edge(range, start_dir, false)
     }
 
     #[allow(clippy::cast_possible_truncation)]

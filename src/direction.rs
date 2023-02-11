@@ -32,9 +32,10 @@ pub const DIRECTION_ANGLE_DEGREES: f32 = 60.0;
 ///
 /// See [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
 #[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub enum Direction {
+    #[default]
     /// Direction to (1, -1)
     ///
     /// Angles:

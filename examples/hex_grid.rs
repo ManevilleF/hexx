@@ -34,6 +34,7 @@ struct HighlightedHexes {
     pub selected: Hex,
     pub halfway: Hex,
     pub ring: Vec<Hex>,
+    pub edge: Vec<Hex>,
     pub line: Vec<Hex>,
     pub half_ring: Vec<Hex>,
     pub rotated: Vec<Hex>,
@@ -45,6 +46,7 @@ struct Map {
     entities: HashMap<Hex, Entity>,
     selected_material: Handle<StandardMaterial>,
     ring_material: Handle<StandardMaterial>,
+    edge_material: Handle<StandardMaterial>,
     line_material: Handle<StandardMaterial>,
     half_ring_material: Handle<StandardMaterial>,
     default_material: Handle<StandardMaterial>,
@@ -72,6 +74,7 @@ fn setup_grid(
     // materials
     let selected_material = materials.add(Color::RED.into());
     let ring_material = materials.add(Color::YELLOW.into());
+    let edge_material = materials.add(Color::CYAN.into());
     let line_material = materials.add(Color::ORANGE.into());
     let half_ring_material = materials.add(Color::LIME_GREEN.into());
     let default_material = materials.add(Color::WHITE.into());
@@ -101,6 +104,7 @@ fn setup_grid(
         default_material,
         line_material,
         half_ring_material,
+        edge_material,
     });
 }
 
@@ -124,6 +128,7 @@ fn handle_input(
             for vec in [
                 &highlighted_hexes.ring,
                 &highlighted_hexes.line,
+                &highlighted_hexes.edge,
                 &highlighted_hexes.half_ring,
                 &highlighted_hexes.rotated,
             ] {
@@ -143,12 +148,15 @@ fn handle_input(
             highlighted_hexes.line = Hex::ZERO.line_to(hex).collect();
             // Draw a ring
             highlighted_hexes.ring = Hex::ZERO.ring(hex.ulength());
+            // Draw an edge
+            highlighted_hexes.edge = Hex::ZERO.ring_edge(hex.ulength(), Default::default());
             // Draw a half ring
             highlighted_hexes.half_ring = Hex::ZERO.ring(hex.ulength() / 2);
             // Draw rotations
             highlighted_hexes.rotated = (1..6).map(|i| hex.rotate_right(i)).collect();
             for (vec, mat) in [
                 (&highlighted_hexes.ring, &map.ring_material),
+                (&highlighted_hexes.edge, &map.edge_material),
                 (&highlighted_hexes.line, &map.line_material),
                 (&highlighted_hexes.half_ring, &map.half_ring_material),
                 (&highlighted_hexes.rotated, &map.selected_material),
