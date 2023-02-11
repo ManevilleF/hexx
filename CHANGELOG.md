@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## Unreleased
+
+### Rings
+
+* Added new ring methods:
+  * `Hex::rings`
+  * `Hex::custom_rings`
+  * `Hex::ring_edge`
+  * `Hex::custom_ring_edge`
+  * `Hex::ring_edges`
+  * `Hex::custom_ring_edges`
+  * `Hex::cached_ring_edges`
+  * `Hex::cached_custom_ring_edges`
+  * `Hex::wedge`
+  * `Hex::custom_wedge`
+
 ## 0.3.0
 
 ### Fix
