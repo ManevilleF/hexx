@@ -5,7 +5,7 @@
 //! [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 //! [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
 //! [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
-//! [![dependency status](https://deps.rs/crate/hexx/0.2.0/status.svg)](https://deps.rs/crate/hexx)
+//! [![dependency status](https://deps.rs/crate/hexx/0.3.0/status.svg)](https://deps.rs/crate/hexx)
 //!
 //! Hexagonal tools lib in rust.
 //!
@@ -17,7 +17,7 @@
 //! - Generate hexagon meshes (planes or columns)
 //!
 //! I made the choice to use *Axial Coordinates* for performance and utility reasons,
-//! but the [`Hex`] type has conversion utilities with *cubic*, *doubled* and offset* coordinates.
+//! but the [`Hex`] type has conversion utilities with *cubic*, *doubled* and *offset* coordinates.
 //!
 //! > See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates)
 //!
