@@ -15,6 +15,8 @@
   * `Hex::cached_custom_ring_edges`
   * `Hex::wedge`
   * `Hex::custom_wedge`
+* (**BREAKING**) `Hex::custom_spiral_range` now returns an iterator
+* (**BREAKING**) `Hex::spiral_range` now returns an iterator
 
 ## 0.3.0
 

@@ -280,7 +280,6 @@ impl Hex {
         std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise))
     }
 
-    #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
     /// starting from `start_dir` and looping counter clockwise unless `clockwise` is set to `true`, forming a spiral
     ///
@@ -293,16 +292,10 @@ impl Hex {
         range: u32,
         start_dir: Direction,
         clockwise: bool,
-    ) -> Vec<Self> {
-        let mut res = Vec::with_capacity(Self::range_count(range));
-        for i in 0..=range {
-            res.extend(self.custom_ring(i, start_dir, clockwise));
-        }
-        res
+    ) -> impl Iterator<Item = Self> {
+        self.custom_rings(range, start_dir, clockwise).flatten()
     }
 
-    #[must_use]
-    #[allow(clippy::cast_sign_loss)]
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
     /// starting from [`Direction::TopRight`] and looping counter clockwise, forming a spiral.
     ///
@@ -310,7 +303,7 @@ impl Hex {
     ///
     /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
     /// information
-    pub fn spiral_range(self, range: u32) -> Vec<Self> {
+    pub fn spiral_range(self, range: u32) -> impl Iterator<Item = Self> {
         self.custom_spiral_range(range, Direction::TopRight, false)
     }
 
