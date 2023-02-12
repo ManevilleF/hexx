@@ -130,4 +130,36 @@ mod diagonal_direction {
             assert_eq!(dir.direction_right().diagonal_left(), dir);
         }
     }
+
+    #[test]
+    fn flat_angles_rad() {
+        for dir in DiagonalDirection::ALL_DIRECTIONS {
+            let expected = dir.direction_left().angle_flat() - PI / 6.0;
+            assert!(dir.angle_flat() - expected <= EPSILON);
+        }
+    }
+
+    #[test]
+    fn pointy_angles_rad() {
+        for dir in DiagonalDirection::ALL_DIRECTIONS {
+            let expected = dir.direction_left().angle_pointy() - PI / 6.0;
+            assert!(dir.angle_pointy() - expected <= EPSILON);
+        }
+    }
+
+    #[test]
+    fn flat_angles_degrees() {
+        for dir in DiagonalDirection::ALL_DIRECTIONS {
+            let expected = dir.direction_left().angle_flat_degrees() - 30.0;
+            assert!(dir.angle_flat_degrees() - expected <= EPSILON);
+        }
+    }
+
+    #[test]
+    fn pointy_angles_degrees() {
+        for dir in DiagonalDirection::ALL_DIRECTIONS {
+            let expected = dir.direction_left().angle_pointy_degrees() - 30.0;
+            assert!(dir.angle_pointy_degrees() - expected <= EPSILON);
+        }
+    }
 }
