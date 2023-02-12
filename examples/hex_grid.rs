@@ -162,10 +162,10 @@ fn handle_input(
             // Draw an dual wedge
             let dir = Hex::ZERO.direction_to(hex);
             let [a, b] = [dir.diagonal_left(), dir.diagonal_right()];
-            highlighted_hexes.dual_wedge = Hex::ZERO.wedge(0..=hex.ulength() / 2, a).collect();
+            highlighted_hexes.dual_wedge = Hex::ZERO.wedge(0..hex.ulength() / 2, a).collect();
             highlighted_hexes
                 .dual_wedge
-                .extend(Hex::ZERO.wedge(0..=hex.ulength() / 2, b));
+                .extend(Hex::ZERO.wedge(0..hex.ulength() / 2, b));
             for (vec, mat) in [
                 (&highlighted_hexes.ring, &map.ring_material),
                 (&highlighted_hexes.wedge, &map.wedge_material),

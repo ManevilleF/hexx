@@ -1,8 +1,5 @@
-use std::ops::RangeInclusive;
-
-use crate::DiagonalDirection;
-
 use super::{Direction, Hex};
+use crate::DiagonalDirection;
 
 impl Hex {
     #[must_use]
@@ -58,10 +55,17 @@ impl Hex {
     /// See [`Self::custom_rings`] for more options.
     /// If you only need the coordinates see [`Self::spiral_range`].
     ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let rings: Vec<_> = Hex::ZERO.rings(3..10).collect();
+    /// assert_eq!(rings.len(), 7);
+    /// ```
     ///
     /// # Note
     /// The returned iterator will be of `radius + 1` length
-    pub fn rings(self, range: RangeInclusive<u32>) -> impl Iterator<Item = Vec<Self>> {
+    pub fn rings(self, range: impl Iterator<Item = u32>) -> impl Iterator<Item = Vec<Self>> {
         range.map(move |r| self.ring(r))
     }
 
@@ -71,12 +75,19 @@ impl Hex {
     ///
     /// If you only need the coordinates see [`Self::spiral_range`] or [`Self::rings`].
     ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let rings: Vec<_> = Hex::ZERO.custom_rings(3..10, Direction::Top, true).collect();
+    /// assert_eq!(rings.len(), 7);
+    /// ```
     ///
     /// # Note
     /// The returned iterator will be of `radius + 1` length
     pub fn custom_rings(
         self,
-        range: RangeInclusive<u32>,
+        range: impl Iterator<Item = u32>,
         start_dir: Direction,
         clockwise: bool,
     ) -> impl Iterator<Item = Vec<Self>> {
@@ -129,11 +140,19 @@ impl Hex {
     /// `direction`.
     /// The returned edges coordinates are sorted counter clockwise around `self`.
     ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let edges: Vec<_> = Hex::ZERO.ring_edges(3..10, DiagonalDirection::Right).collect();
+    /// assert_eq!(edges.len(), 7);
+    /// ```
+    ///
     /// See also [`Self::custom_ring_edges`]
     /// If you only need the coordinates see [`Self::custom_wedge`]
     pub fn ring_edges(
         self,
-        range: RangeInclusive<u32>,
+        range: impl Iterator<Item = u32>,
         direction: DiagonalDirection,
     ) -> impl Iterator<Item = Vec<Self>> {
         range.map(move |r| self.ring_edge(r, direction))
@@ -144,11 +163,19 @@ impl Hex {
     /// The returned edges coordinates are sorted counter clockwise around `self` unless
     /// `clockwise` is set to `true`.
     ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let edges: Vec<_> = Hex::ZERO.custom_ring_edges(3..10, DiagonalDirection::Right, true).collect();
+    /// assert_eq!(edges.len(), 7);
+    /// ```
+    ///
     /// See also [`Self::ring_edges`]
     /// If you only need the coordinates see [`Self::wedge`]
     pub fn custom_ring_edges(
         self,
-        range: RangeInclusive<u32>,
+        range: impl Iterator<Item = u32>,
         direction: DiagonalDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Vec<Self>> {
@@ -164,7 +191,7 @@ impl Hex {
     /// If you only need the coordinates see [`Self::wedge`]
     pub fn custom_wedge(
         self,
-        range: RangeInclusive<u32>,
+        range: impl Iterator<Item = u32>,
         direction: DiagonalDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Self> {
@@ -190,7 +217,7 @@ impl Hex {
     /// See also [`Self::custom_ring_edges`] and [`Self::custom_wedge`]
     pub fn wedge(
         self,
-        range: RangeInclusive<u32>,
+        range: impl Iterator<Item = u32>,
         direction: DiagonalDirection,
     ) -> impl Iterator<Item = Self> {
         self.ring_edges(range, direction).flatten()
@@ -358,7 +385,7 @@ impl Hex {
     /// information
     pub fn custom_spiral_range(
         self,
-        range: RangeInclusive<u32>,
+        range: impl Iterator<Item = u32>,
         start_dir: Direction,
         clockwise: bool,
     ) -> impl Iterator<Item = Self> {
@@ -372,7 +399,7 @@ impl Hex {
     ///
     /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
     /// information
-    pub fn spiral_range(self, range: RangeInclusive<u32>) -> impl Iterator<Item = Self> {
+    pub fn spiral_range(self, range: impl Iterator<Item = u32>) -> impl Iterator<Item = Self> {
         self.custom_spiral_range(range, Direction::TopRight, false)
     }
 

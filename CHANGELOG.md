@@ -31,8 +31,8 @@
   * `Hex::wedge_to`
   * `Hex::custom_wedge`
   * `Hex::custom_wedge_to`
-* (**BREAKING**) `Hex::custom_spiral_range` now takes a `RangeInclusive<u32>` range and returns an iterator
-* (**BREAKING**) `Hex::spiral_range` now takes a `RangeInclusive<u32>` range and returns an iterator
+* (**BREAKING**) `Hex::custom_spiral_range` now takes a `Iterator<Item = u32>` as range and returns an iterator
+* (**BREAKING**) `Hex::spiral_range` now takes a `Iterator<Item = u32>` as range and returns an iterator
 
 ### Misc
 
