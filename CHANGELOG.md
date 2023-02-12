@@ -5,8 +5,10 @@
 ### Directions
 
 * Added `DiagonalDirection` enum with identical features as `Direction`
-* Added `Direction::diagonal_neighbors` to retrieve the neighboring `DiagonalDirection`s
-* Added `DiagonalDirection::direction_neighbors` to retrieve the neighboring `Direction`s
+* Added `Direction::diagonal_left` to retrieve the counter clockwise `DiagonalDirection` neighbor
+* Added `Direction::diagonal_right` to retrieve the clockwise `DiagonalDirection` neighbor
+* Added `DiagonalDirection::direction_left` to retrieve the counter clockwise `Direction` neighbor
+* Added `DiagonalDirection::direction_right` to retrieve the clockwise `Direction` neighbor
 * Implement `Neg` for `Direction` to compute the opposite direction
 * Implement `Neg` for `DiagonalDirection` to compute the opposite direction
 * Implement `Add<usize>` for `Direction` to rotate the direction clockwise
@@ -26,9 +28,11 @@
   * `Hex::cached_ring_edges`
   * `Hex::cached_custom_ring_edges`
   * `Hex::wedge`
+  * `Hex::wedge_to`
   * `Hex::custom_wedge`
-* (**BREAKING**) `Hex::custom_spiral_range` now returns an iterator
-* (**BREAKING**) `Hex::spiral_range` now returns an iterator
+  * `Hex::custom_wedge_to`
+* (**BREAKING**) `Hex::custom_spiral_range` now takes a `RangeInclusive<u32>` range and returns an iterator
+* (**BREAKING**) `Hex::spiral_range` now takes a `RangeInclusive<u32>` range and returns an iterator
 
 ### Misc
 

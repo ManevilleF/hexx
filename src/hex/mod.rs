@@ -390,6 +390,25 @@ impl Hex {
         }
     }
 
+    #[must_use]
+    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    pub fn direction_to(self, rhs: Self) -> Direction {
+        let [x, y, z] = (rhs - self).to_array3();
+        let [x, y, z] = [y - x, z - y, x - z];
+        let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
+        let (v, dir) = match xa.max(ya).max(za) {
+            v if v == xa => (x, Direction::BottomLeft),
+            v if v == ya => (y, Direction::Top),
+            v if v == za => (z, Direction::BottomRight),
+            _ => unreachable!(),
+        };
+        if v < 0 {
+            -dir
+        } else {
+            dir
+        }
+    }
+
     #[inline]
     #[must_use]
     /// Retrieves all 6 neighbor coordinates around `self`

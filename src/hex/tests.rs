@@ -417,7 +417,7 @@ fn custom_ring() {
 #[test]
 fn spiral_range() {
     let expected: Vec<_> = Hex::ZERO.range(10).collect();
-    let spiral: Vec<_> = Hex::ZERO.spiral_range(10).collect();
+    let spiral: Vec<_> = Hex::ZERO.spiral_range(0..=10).collect();
     assert_eq!(spiral.len(), expected.len());
     for hex in &expected {
         assert!(spiral.contains(hex));
