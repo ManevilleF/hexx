@@ -2,12 +2,14 @@
 mod convert;
 /// Traits implementations
 mod impls;
+/// Hex ring utils
+mod rings;
 #[cfg(test)]
 mod tests;
 
 pub use impls::{CenterExt, MeanExt};
 
-use crate::Direction;
+use crate::{DiagonalDirection, Direction};
 use glam::{IVec2, IVec3, Vec2};
 use itertools::Itertools;
 use std::cmp::{max, min};
@@ -156,6 +158,20 @@ impl Hex {
     /// This cubic space coordinate is computed as `-x - y`
     pub const fn z(self) -> i32 {
         -self.x - self.y
+    }
+
+    #[inline]
+    #[must_use]
+    /// Converts `self` to an array as `[x, y]`
+    pub const fn to_array(self) -> [i32; 2] {
+        [self.x, self.y]
+    }
+
+    #[inline]
+    #[must_use]
+    /// Converts `self` to an array as `[x, y, z]`
+    pub const fn to_array3(self) -> [i32; 3] {
+        [self.x, self.y, self.z()]
     }
 
     #[must_use]
@@ -356,6 +372,43 @@ impl Hex {
             .filter_map(|(a, b)| a.neighbor_direction(b))
     }
 
+    #[must_use]
+    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
+    pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
+        let [x, y, z] = (rhs - self).to_array3();
+        let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
+        let (v, dir) = match xa.max(ya).max(za) {
+            v if v == xa => (x, DiagonalDirection::Right),
+            v if v == ya => (y, DiagonalDirection::BottomLeft),
+            v if v == za => (z, DiagonalDirection::TopLeft),
+            _ => unreachable!(),
+        };
+        if v < 0 {
+            -dir
+        } else {
+            dir
+        }
+    }
+
+    #[must_use]
+    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    pub fn direction_to(self, rhs: Self) -> Direction {
+        let [x, y, z] = (rhs - self).to_array3();
+        let [x, y, z] = [y - x, z - y, x - z];
+        let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
+        let (v, dir) = match xa.max(ya).max(za) {
+            v if v == xa => (x, Direction::BottomLeft),
+            v if v == ya => (y, Direction::Top),
+            v if v == za => (z, Direction::BottomRight),
+            _ => unreachable!(),
+        };
+        if v < 0 {
+            -dir
+        } else {
+            dir
+        }
+    }
+
     #[inline]
     #[must_use]
     /// Retrieves all 6 neighbor coordinates around `self`
@@ -509,164 +562,6 @@ impl Hex {
     /// Counts how many coordinates there are in the given `range`
     pub const fn range_count(range: u32) -> usize {
         (3 * range * (range + 1) + 1) as usize
-    }
-
-    #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
-    /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from `start_dir` and loop counter clockwise around `self`
-    /// unless `clockwise` is set to `true`.
-    ///
-    /// If you only need the coordinates see [`Self::ring`].
-    ///
-    /// # Note
-    /// The returned vector will be of `6 * radius` ([`Self::ring_count`])
-    pub fn custom_ring(self, range: u32, start_dir: Direction, clockwise: bool) -> Vec<Self> {
-        if range == 0 {
-            return vec![self];
-        }
-        let mut directions = Self::NEIGHBORS_COORDS;
-        // TODO: improve code clarity
-        directions.rotate_left(start_dir as usize);
-        if clockwise {
-            directions.reverse();
-            directions.rotate_left(1);
-        } else {
-            directions.rotate_left(2);
-        }
-
-        let mut hex = self + Self::neighbor_coord(start_dir) * range as i32;
-        let mut res = Vec::with_capacity(Self::ring_count(range));
-        for dir in directions {
-            (0..range).for_each(|_| {
-                res.push(hex);
-                hex += dir;
-            });
-        }
-        res
-    }
-
-    #[must_use]
-    /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and loop around `self` counter clockwise.
-    ///
-    /// See [`Self::custom_ring`] for more options.
-    ///
-    /// # Note
-    /// The returned vector will be of `6 * radius` ([`Self::ring_count`])
-    pub fn ring(self, range: u32) -> Vec<Self> {
-        self.custom_ring(range, Direction::TopRight, false)
-    }
-
-    #[allow(clippy::cast_possible_truncation)]
-    #[must_use]
-    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
-    /// rings.
-    /// The returned rings start from [`Direction::TopRight`] and loop around `self` counter clockwise.
-    ///
-    /// If you only need the coordinates see [`Self::range`] or [`Self::spiral_range`].
-    ///
-    /// # Usage
-    ///
-    /// This function's objective is to pre-compute rings around a coordinate, the returned array
-    /// can be used as a cache to avoid extra computation.
-    ///
-    /// ## Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    ///
-    /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_rings::<10>();
-    /// // We have our target center
-    /// let target = Hex::new(11, 24);
-    /// // We retrieve the ring of range 5 and offset it to match the target
-    /// let five_ring = cache[5].iter().map(|h| *h + target);
-    /// ```
-    ///
-    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
-    /// information
-    pub fn cached_rings<const RANGE: usize>(self) -> [Vec<Self>; RANGE] {
-        std::array::from_fn(|r| self.ring(r as u32))
-    }
-
-    #[allow(clippy::cast_possible_truncation)]
-    #[must_use]
-    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
-    /// rings.
-    /// The returned rings start from `start_dir`] and loop around `self` counter clockwise unless
-    /// `clockwise` is set to `true`.
-    ///
-    /// See also [`Self::cached_rings`]
-    /// If you only need the coordinates see [`Self::range`] or [`Self::custom_spiral_range`].
-    ///
-    /// # Usage
-    ///
-    /// This function's objective is to pre-compute rings around a coordinate, the returned array
-    /// can be used as a cache to avoid extra computation.
-    ///
-    /// ## Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    ///
-    /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_custom_rings::<10>(Direction::Top, true);
-    /// // We have our target center
-    /// let target = Hex::new(11, 24);
-    /// // We retrieve the ring of range 5 and offset it to match the target
-    /// let five_ring = cache[5].iter().map(|h| *h + target);
-    /// ```
-    ///
-    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
-    /// information
-    pub fn cached_custom_rings<const RANGE: usize>(
-        self,
-        start_dir: Direction,
-        clockwise: bool,
-    ) -> [Vec<Self>; RANGE] {
-        std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise))
-    }
-
-    #[must_use]
-    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
-    /// starting from `start_dir` and looping counter clockwise unless `clockwise` is set to `true`, forming a spiral
-    ///
-    /// If you only need the coordinates see [`Self::spiral_range`].
-    ///
-    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
-    /// information
-    pub fn custom_spiral_range(
-        self,
-        range: u32,
-        start_dir: Direction,
-        clockwise: bool,
-    ) -> Vec<Self> {
-        let mut res = Vec::with_capacity(Self::range_count(range));
-        for i in 0..=range {
-            res.extend(self.custom_ring(i, start_dir, clockwise));
-        }
-        res
-    }
-
-    #[must_use]
-    #[allow(clippy::cast_sign_loss)]
-    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
-    /// starting from [`Direction::TopRight`] and looping counter clockwise, forming a spiral.
-    ///
-    /// See [`Self::custom_spiral_range`] for more options
-    ///
-    /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
-    /// information
-    pub fn spiral_range(self, range: u32) -> Vec<Self> {
-        self.custom_spiral_range(range, Direction::TopRight, false)
-    }
-
-    #[inline]
-    #[must_use]
-    /// Counts how many coordinates there are in a ring at the given `range`
-    pub const fn ring_count(range: u32) -> usize {
-        6 * range as usize
     }
 
     #[must_use]

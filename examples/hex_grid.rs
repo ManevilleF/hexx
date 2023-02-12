@@ -34,6 +34,8 @@ struct HighlightedHexes {
     pub selected: Hex,
     pub halfway: Hex,
     pub ring: Vec<Hex>,
+    pub wedge: Vec<Hex>,
+    pub dual_wedge: Vec<Hex>,
     pub line: Vec<Hex>,
     pub half_ring: Vec<Hex>,
     pub rotated: Vec<Hex>,
@@ -45,6 +47,8 @@ struct Map {
     entities: HashMap<Hex, Entity>,
     selected_material: Handle<StandardMaterial>,
     ring_material: Handle<StandardMaterial>,
+    wedge_material: Handle<StandardMaterial>,
+    dual_wedge_material: Handle<StandardMaterial>,
     line_material: Handle<StandardMaterial>,
     half_ring_material: Handle<StandardMaterial>,
     default_material: Handle<StandardMaterial>,
@@ -72,6 +76,8 @@ fn setup_grid(
     // materials
     let selected_material = materials.add(Color::RED.into());
     let ring_material = materials.add(Color::YELLOW.into());
+    let wedge_material = materials.add(Color::CYAN.into());
+    let dual_wedge_material = materials.add(Color::VIOLET.into());
     let line_material = materials.add(Color::ORANGE.into());
     let half_ring_material = materials.add(Color::LIME_GREEN.into());
     let default_material = materials.add(Color::WHITE.into());
@@ -101,6 +107,8 @@ fn setup_grid(
         default_material,
         line_material,
         half_ring_material,
+        wedge_material,
+        dual_wedge_material,
     });
 }
 
@@ -124,6 +132,8 @@ fn handle_input(
             for vec in [
                 &highlighted_hexes.ring,
                 &highlighted_hexes.line,
+                &highlighted_hexes.wedge,
+                &highlighted_hexes.dual_wedge,
                 &highlighted_hexes.half_ring,
                 &highlighted_hexes.rotated,
             ] {
@@ -143,12 +153,23 @@ fn handle_input(
             highlighted_hexes.line = Hex::ZERO.line_to(hex).collect();
             // Draw a ring
             highlighted_hexes.ring = Hex::ZERO.ring(hex.ulength());
+            // Draw an wedge
+            highlighted_hexes.wedge = Hex::ZERO.wedge_to(hex).collect();
             // Draw a half ring
             highlighted_hexes.half_ring = Hex::ZERO.ring(hex.ulength() / 2);
             // Draw rotations
             highlighted_hexes.rotated = (1..6).map(|i| hex.rotate_right(i)).collect();
+            // Draw an dual wedge
+            let dir = Hex::ZERO.direction_to(hex);
+            let [a, b] = [dir.diagonal_left(), dir.diagonal_right()];
+            highlighted_hexes.dual_wedge = Hex::ZERO.wedge(0..hex.ulength() / 2, a).collect();
+            highlighted_hexes
+                .dual_wedge
+                .extend(Hex::ZERO.wedge(0..hex.ulength() / 2, b));
             for (vec, mat) in [
                 (&highlighted_hexes.ring, &map.ring_material),
+                (&highlighted_hexes.wedge, &map.wedge_material),
+                (&highlighted_hexes.dual_wedge, &map.dual_wedge_material),
                 (&highlighted_hexes.line, &map.line_material),
                 (&highlighted_hexes.half_ring, &map.half_ring_material),
                 (&highlighted_hexes.rotated, &map.selected_material),

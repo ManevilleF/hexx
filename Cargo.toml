@@ -38,3 +38,6 @@ path = "examples/hex_grid.rs"
 [[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
+
+[profile.dev]
+opt-level = 1

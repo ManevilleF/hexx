@@ -1,5 +1,46 @@
 # CHANGELOG
 
+## Unreleased
+
+### Directions
+
+* Added `DiagonalDirection` enum with identical features as `Direction`
+* Added `Direction::diagonal_left` to retrieve the counter clockwise `DiagonalDirection` neighbor
+* Added `Direction::diagonal_right` to retrieve the clockwise `DiagonalDirection` neighbor
+* Added `DiagonalDirection::direction_left` to retrieve the counter clockwise `Direction` neighbor
+* Added `DiagonalDirection::direction_right` to retrieve the clockwise `Direction` neighbor
+* Implement `Neg` for `Direction` to compute the opposite direction
+* Implement `Neg` for `DiagonalDirection` to compute the opposite direction
+* Implement `Add<usize>` for `Direction` to rotate the direction clockwise
+* Implement `Add<usize>` for `DiagonalDirection` to rotate the direction clockwise
+* Implement `Sub<usize>` for `Direction` to rotate the direction counter clockwise
+* Implement `Sub<usize>` for `DiagonalDirection` to rotate the direction counter clockwise
+
+### Rings
+
+* Added new ring methods:
+  * `Hex::rings`
+  * `Hex::custom_rings`
+  * `Hex::ring_edge`
+  * `Hex::custom_ring_edge`
+  * `Hex::ring_edges`
+  * `Hex::custom_ring_edges`
+  * `Hex::cached_ring_edges`
+  * `Hex::cached_custom_ring_edges`
+  * `Hex::wedge`
+  * `Hex::wedge_to`
+  * `Hex::custom_wedge`
+  * `Hex::custom_wedge_to`
+* (**BREAKING**) `Hex::custom_spiral_range` now takes a `Iterator<Item = u32>` as range and returns an iterator
+* (**BREAKING**) `Hex::spiral_range` now takes a `Iterator<Item = u32>` as range and returns an iterator
+
+### Misc
+
+* Added `Hexx:to_array` method
+* Added `Hexx:to_array3` method
+* Added `From<Direction>` impl for `Hex`
+* Added `From<DiagonalDirection>` impl for `Hex`
+
 ## 0.3.0
 
 ### Fix

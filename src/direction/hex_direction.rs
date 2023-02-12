@@ -1,18 +1,6 @@
-use crate::HexOrientation;
-use std::f32::consts::PI;
-
-/// Angle in radian between *flat* and *pointy* top orientations.
-/// Equivalent to 30 degrees
-pub const DIRECTION_ANGLE_OFFSET: f32 = PI / 6.0;
-/// Angle in radian between *flat* and *pointy* top orientations.
-/// Equivalent to π / 6 in radians
-pub const DIRECTION_ANGLE_OFFSET_DEGREES: f32 = 30.0;
-/// Angle in radian between two adjacent directions counter clockwise.
-/// Equivalent to 60 degrees
-pub const DIRECTION_ANGLE_RAD: f32 = PI / 3.0;
-/// Angle in degrees between two adjacent directions counter clockwise.
-/// Equivalent to π / 3 in radians
-pub const DIRECTION_ANGLE_DEGREES: f32 = 60.0;
+#[allow(clippy::wildcard_imports)]
+use super::angles::*;
+use crate::{DiagonalDirection, Hex, HexOrientation};
 
 /// All 6 possible directions in hexagonal space.
 ///
@@ -32,9 +20,10 @@ pub const DIRECTION_ANGLE_DEGREES: f32 = 60.0;
 ///
 /// See [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
 #[repr(u8)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub enum Direction {
+    #[default]
     /// Direction to (1, -1)
     ///
     /// Angles:
@@ -206,6 +195,20 @@ impl Direction {
 
     #[inline]
     #[must_use]
+    /// Computes the opposite direction of `self`
+    pub const fn const_neg(self) -> Self {
+        match self {
+            Self::TopRight => Self::BottomLeft,
+            Self::Top => Self::Bottom,
+            Self::TopLeft => Self::BottomRight,
+            Self::BottomLeft => Self::TopRight,
+            Self::Bottom => Self::Top,
+            Self::BottomRight => Self::TopLeft,
+        }
+    }
+
+    #[inline]
+    #[must_use]
     #[doc(alias = "clockwise")]
     /// Returns the next direction in clockwise order
     pub const fn right(self) -> Self {
@@ -242,7 +245,7 @@ impl Direction {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(Direction::Top, Direction::Top.rotate_left(6));
+    /// assert_eq!(DiagonalDirection::Right, DiagonalDirection::Right.rotate_left(6));
     /// ```
     pub fn rotate_left(self, offset: usize) -> Self {
         let mut dirs = Self::ALL_DIRECTIONS;
@@ -258,7 +261,7 @@ impl Direction {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(Direction::Top, Direction::Top.rotate_right(6));
+    /// assert_eq!(DiagonalDirection::Right, DiagonalDirection::Right.rotate_right(6));
     /// ```
     pub fn rotate_right(self, offset: usize) -> Self {
         let mut dirs = Self::ALL_DIRECTIONS;
@@ -326,114 +329,54 @@ impl Direction {
     pub fn angle(self, orientation: &HexOrientation) -> f32 {
         self.angle_pointy() - orientation.angle_offset
     }
+
+    #[inline]
+    #[must_use]
+    /// Computes the counter clockwise [`DiagonalDirection`] neighbor of self.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let diagonal = Direction::Top.diagonal_left();
+    /// assert_eq!(diagonal, DiagonalDirection::TopLeft);
+    /// ```
+    pub const fn diagonal_left(self) -> DiagonalDirection {
+        match self {
+            Self::TopRight => DiagonalDirection::TopRight,
+            Self::Top => DiagonalDirection::TopLeft,
+            Self::TopLeft => DiagonalDirection::Left,
+            Self::BottomLeft => DiagonalDirection::BottomLeft,
+            Self::Bottom => DiagonalDirection::BottomRight,
+            Self::BottomRight => DiagonalDirection::Right,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Computes the clockwise [`DiagonalDirection`] neighbor of self.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let diagonal = Direction::Top.diagonal_right();
+    /// assert_eq!(diagonal, DiagonalDirection::TopRight);
+    /// ```
+    pub const fn diagonal_right(self) -> DiagonalDirection {
+        match self {
+            Self::TopRight => DiagonalDirection::Right,
+            Self::Top => DiagonalDirection::TopRight,
+            Self::TopLeft => DiagonalDirection::TopLeft,
+            Self::BottomLeft => DiagonalDirection::Left,
+            Self::Bottom => DiagonalDirection::BottomLeft,
+            Self::BottomRight => DiagonalDirection::BottomRight,
+        }
+    }
 }
 
-#[cfg(test)]
-#[allow(clippy::enum_glob_use)]
-mod test {
-    use super::Direction::*;
-    use super::*;
-    use std::f32::EPSILON;
-
-    #[test]
-    fn rotate_left_right() {
-        for direction in Direction::ALL_DIRECTIONS {
-            assert_eq!(direction, direction.rotate_right(6));
-            assert_eq!(direction, direction.rotate_right(12));
-            assert_eq!(direction, direction.rotate_right(1).rotate_left(1));
-            assert_eq!(direction, direction.rotate_left(1).rotate_right(1));
-            assert_eq!(direction.left(), direction.rotate_left(1));
-            assert_eq!(direction.left().left(), direction.rotate_left(2));
-            assert_eq!(direction.right(), direction.rotate_right(1));
-            assert_eq!(direction.right().right(), direction.rotate_right(2));
-        }
-    }
-
-    #[test]
-    fn rotations_reverse_each_other() {
-        for direction in Direction::ALL_DIRECTIONS {
-            assert_eq!(direction, direction.left().right());
-            assert_eq!(direction, direction.right().left());
-        }
-    }
-
-    #[test]
-    fn six_rotations_comes_home() {
-        for direction in Direction::ALL_DIRECTIONS {
-            let mut clockwise_dir = direction;
-            let mut counter_clockwise_dir = direction;
-
-            for _ in 0..6 {
-                clockwise_dir = clockwise_dir.left();
-                counter_clockwise_dir = counter_clockwise_dir.right();
-            }
-
-            assert_eq!(direction, clockwise_dir);
-            assert_eq!(direction, counter_clockwise_dir);
-        }
-    }
-
-    #[test]
-    fn flat_angles_degrees() {
-        let expected = [
-            (BottomRight, 330.0),
-            (TopRight, 30.0),
-            (Top, 90.0),
-            (TopLeft, 150.0),
-            (BottomLeft, 210.0),
-            (Bottom, 270.0),
-        ];
-        for (dir, angle) in expected {
-            assert!(dir.angle_flat_degrees() - angle <= EPSILON);
-        }
-    }
-
-    #[test]
-    fn flat_angles_rad() {
-        let expected = [
-            (BottomRight, 11.0 * PI / 6.0),
-            (TopRight, PI / 6.0),
-            (Top, PI / 2.0),
-            (TopLeft, 5.0 * PI / 6.0),
-            (BottomLeft, 7.0 * PI / 6.0),
-            (Bottom, 3.0 * PI / 2.0),
-        ];
-        let orientation = HexOrientation::flat();
-        for (dir, angle) in expected {
-            assert!(dir.angle_flat() - angle <= EPSILON);
-            assert!(dir.angle(&orientation) - angle <= EPSILON);
-        }
-    }
-
-    #[test]
-    fn pointy_angles_degrees() {
-        let expected = [
-            (BottomRight, 300.0),
-            (TopRight, 0.0),
-            (Top, 60.0),
-            (TopLeft, 120.0),
-            (BottomLeft, 180.0),
-            (Bottom, 240.0),
-        ];
-        for (dir, angle) in expected {
-            assert!(dir.angle_pointy_degrees() - angle <= EPSILON);
-        }
-    }
-
-    #[test]
-    fn pointy_angles_rad() {
-        let expected = [
-            (BottomRight, 5.0 * PI / 3.0),
-            (TopRight, 0.0),
-            (Top, PI / 3.0),
-            (TopLeft, 2.0 * PI / 3.0),
-            (BottomLeft, PI),
-            (Bottom, 4.0 * PI / 3.0),
-        ];
-        let orientation = HexOrientation::pointy();
-        for (dir, angle) in expected {
-            assert!(dir.angle_pointy() - angle <= EPSILON);
-            assert!(dir.angle(&orientation) - angle <= EPSILON);
-        }
+impl From<Direction> for Hex {
+    fn from(value: Direction) -> Self {
+        Self::NEIGHBORS_COORDS[value as usize]
     }
 }

@@ -31,6 +31,8 @@
  - Lines
  - Ranges
  - Rings
+ - Edges
+ - Wedges
  - Spirals
  - Rotation
  - Symmetry
@@ -39,7 +41,7 @@
 
  And the [`HexMap`] utility, for *wraparound* (seamless) hexagonal maps
 
- ## Usage in bevy
+ ## Usage in [Bevy](https://bevyengine.org/)
 
  If you want to generate 3D hexagonal mesh and use it in [bevy](bevyengine.org) you may do it this way:
 
