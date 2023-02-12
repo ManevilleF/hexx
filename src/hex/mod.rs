@@ -9,7 +9,7 @@ mod tests;
 
 pub use impls::{CenterExt, MeanExt};
 
-use crate::Direction;
+use crate::{DiagonalDirection, Direction};
 use glam::{IVec2, IVec3, Vec2};
 use itertools::Itertools;
 use std::cmp::{max, min};
@@ -370,6 +370,24 @@ impl Hex {
         self.line_to(other)
             .tuple_windows::<(_, _)>()
             .filter_map(|(a, b)| a.neighbor_direction(b))
+    }
+
+    #[must_use]
+    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
+    pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
+        let [x, y, z] = (rhs - self).to_array3();
+        let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
+        let (v, dir) = match xa.max(ya).max(za) {
+            v if v == xa => (x, DiagonalDirection::Right),
+            v if v == ya => (y, DiagonalDirection::BottomLeft),
+            v if v == za => (z, DiagonalDirection::TopLeft),
+            _ => unreachable!(),
+        };
+        if v < 0 {
+            -dir
+        } else {
+            dir
+        }
     }
 
     #[inline]

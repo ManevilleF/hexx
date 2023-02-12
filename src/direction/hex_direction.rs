@@ -332,29 +332,45 @@ impl Direction {
 
     #[inline]
     #[must_use]
-    /// Computes the two neighboring [`DiagonalDirection`] as `[left, right]`.
-    /// - `right` is the clockwise diagonal neighbor
-    /// - `left` is the counter clockwise diagonal neighbor
+    /// Computes the counter clockwise [`DiagonalDirection`] neighbor of self.
     ///
     /// # Example
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let [left, right] = Direction::Top.diagonal_neighbors();
-    /// assert_eq!(left, DiagonalDirection::TopLeft);
-    /// assert_eq!(right, DiagonalDirection::TopRight);
+    /// let diagonal = Direction::Top.diagonal_left();
+    /// assert_eq!(diagonal, DiagonalDirection::TopLeft);
     /// ```
-    pub fn diagonal_neighbors(self) -> [DiagonalDirection; 2] {
+    pub const fn diagonal_left(self) -> DiagonalDirection {
         match self {
-            Self::TopRight => [DiagonalDirection::TopRight, DiagonalDirection::Right],
-            Self::Top => [DiagonalDirection::TopLeft, DiagonalDirection::TopRight],
-            Self::TopLeft => [DiagonalDirection::Left, DiagonalDirection::TopLeft],
-            Self::BottomLeft => [DiagonalDirection::BottomLeft, DiagonalDirection::Left],
-            Self::Bottom => [
-                DiagonalDirection::BottomRight,
-                DiagonalDirection::BottomLeft,
-            ],
-            Self::BottomRight => [DiagonalDirection::Right, DiagonalDirection::BottomRight],
+            Self::TopRight => DiagonalDirection::TopRight,
+            Self::Top => DiagonalDirection::TopLeft,
+            Self::TopLeft => DiagonalDirection::Left,
+            Self::BottomLeft => DiagonalDirection::BottomLeft,
+            Self::Bottom => DiagonalDirection::BottomRight,
+            Self::BottomRight => DiagonalDirection::Right,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Computes the clockwise [`DiagonalDirection`] neighbor of self.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let diagonal = Direction::Top.diagonal_right();
+    /// assert_eq!(diagonal, DiagonalDirection::TopRight);
+    /// ```
+    pub const fn diagonal_right(self) -> DiagonalDirection {
+        match self {
+            Self::TopRight => DiagonalDirection::Right,
+            Self::Top => DiagonalDirection::TopRight,
+            Self::TopLeft => DiagonalDirection::TopLeft,
+            Self::BottomLeft => DiagonalDirection::Left,
+            Self::Bottom => DiagonalDirection::BottomLeft,
+            Self::BottomRight => DiagonalDirection::BottomRight,
         }
     }
 }

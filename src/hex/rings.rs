@@ -1,3 +1,5 @@
+use crate::DiagonalDirection;
+
 use super::{Direction, Hex};
 
 impl Hex {
@@ -81,50 +83,63 @@ impl Hex {
 
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
-    /// Retrieves one [`Hex`] ring edge around `self` in a given `range`.
-    /// The returned coordinates start from `start_dir` and move counter clockwise around `self`
-    /// unless `clockwise` is set to `true`.
+    /// Retrieves one [`Hex`] ring edge around `self` in a given `range` and `direction`.
+    /// The returned coordinates are sorted counter clockwise unless `clockwise` is set to `true`.
     ///
     /// If you only need the coordinates see [`Self::ring_edge`].
     ///
     /// # Note
     /// The returned vector will be of `radius + 1` length
-    pub fn custom_ring_edge(self, range: u32, start_dir: Direction, clockwise: bool) -> Vec<Self> {
+    pub fn custom_ring_edge(
+        self,
+        range: u32,
+        direction: DiagonalDirection,
+        clockwise: bool,
+    ) -> Vec<Self> {
         if range == 0 {
             return vec![self];
         }
-        let end_dir = Self::neighbor_coord(if clockwise {
-            start_dir + 2
+        let [start_dir, end_dir] = if clockwise {
+            let dir = direction.direction_left();
+            [dir, dir + 2]
         } else {
-            start_dir - 2
-        });
+            let dir = direction.direction_right();
+            [dir, dir - 2]
+        };
+        let end_dir = Self::neighbor_coord(end_dir);
         let hex = self + Self::neighbor_coord(start_dir) * range as i32;
         (0..=range).map(|i| hex + end_dir * i as i32).collect()
     }
 
     #[must_use]
-    /// Retrieves one [`Hex`] ring edge around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and move counter clockwise around `self`.
+    /// Retrieves one [`Hex`] ring edge around `self` in a given `range` and `direction`.
+    /// The returned coordinates are sorted counter clockwise around `self`.
     ///
     /// See [`Self::custom_ring_edge`] for more options.
     ///
     /// # Note
     /// The returned vector will be of `radius + 1` length
-    pub fn ring_edge(self, range: u32, start_dir: Direction) -> Vec<Self> {
-        self.custom_ring_edge(range, start_dir, false)
+    pub fn ring_edge(self, range: u32, direction: DiagonalDirection) -> Vec<Self> {
+        self.custom_ring_edge(range, direction, false)
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range`.
-    /// The returned edges start from [`start_dir`] and move counter clockwise around `self`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and
+    /// `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around `self`.
     ///
     /// See also [`Self::custom_ring_edges`]
     /// If you only need the coordinates see [`Self::custom_wedge`]
-    pub fn ring_edges(self, range: u32, start_dir: Direction) -> impl Iterator<Item = Vec<Self>> {
-        (0..=range).map(move |r| self.ring_edge(r, start_dir))
+    pub fn ring_edges(
+        self,
+        range: u32,
+        direction: DiagonalDirection,
+    ) -> impl Iterator<Item = Vec<Self>> {
+        (0..=range).map(move |r| self.ring_edge(r, direction))
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range`.
-    /// The returned edges start from [`start_dir`] and move counter clockwise around `self` unless
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and
+    /// `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around `self` unless
     /// `clockwise` is set to `true`.
     ///
     /// See also [`Self::ring_edges`]
@@ -132,14 +147,15 @@ impl Hex {
     pub fn custom_ring_edges(
         self,
         range: u32,
-        start_dir: Direction,
+        direction: DiagonalDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Vec<Self>> {
-        (0..=range).map(move |r| self.custom_ring_edge(r, start_dir, clockwise))
+        (0..=range).map(move |r| self.custom_ring_edge(r, direction, clockwise))
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range`.
-    /// The returned edges start from [`start_dir`] and move counter clockwise around `self` unless
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and
+    /// `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around `self` unless
     /// `clockwise` is set to `true`.
     ///
     /// See also [`Self::custom_ring_edges`]
@@ -147,26 +163,27 @@ impl Hex {
     pub fn custom_wedge(
         self,
         range: u32,
-        start_dir: Direction,
+        direction: DiagonalDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Self> {
-        self.custom_ring_edges(range, start_dir, clockwise)
+        self.custom_ring_edges(range, direction, clockwise)
             .flatten()
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range`.
-    /// The returned edges start from [`start_dir`] and move counter clockwise around `self`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and
+    /// `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around `self`.
     ///
     /// See also [`Self::custom_ring_edges`] and [`Self::custom_wedge`]
-    pub fn wedge(self, range: u32, start_dir: Direction) -> impl Iterator<Item = Self> {
-        self.ring_edges(range, start_dir).flatten()
+    pub fn wedge(self, range: u32, direction: DiagonalDirection) -> impl Iterator<Item = Self> {
+        self.ring_edges(range, direction).flatten()
     }
 
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` as an array of
-    /// edges.
-    /// The returned edges start from [`start_dir`] and move counter clockwise around `self` unless
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` and `direction`
+    /// as an array of edges.
+    /// The returned edges coordinates are sorted counter clockwise around `self` unless
     /// `clockwise` is set to `true`.
     ///
     /// See also [`Self::custom_cached_ring_edges`]
@@ -183,7 +200,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_custom_ring_edges::<10>(Direction::Top, true);
+    /// let cache = Hex::ORIGIN.cached_custom_ring_edges::<10>(DiagonalDirection::Right, true);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -194,17 +211,17 @@ impl Hex {
     /// information
     pub fn cached_custom_ring_edges<const RANGE: usize>(
         self,
-        start_dir: Direction,
+        direction: DiagonalDirection,
         clockwise: bool,
     ) -> [Vec<Self>; RANGE] {
-        std::array::from_fn(|r| self.custom_ring_edge(r as u32, start_dir, clockwise))
+        std::array::from_fn(|r| self.custom_ring_edge(r as u32, direction, clockwise))
     }
 
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` as an array of
-    /// edges.
-    /// The returned edges start from [`start_dir`] and move counter clockwise around `self`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` and
+    /// `direction` as an array of edges.
+    /// The returned edges coordinates are sorted counter clockwise around `self`.
     ///
     /// See also [`Self::custom_cached_ring_edges`]
     /// If you only need the coordinates see [`Self::ring_edges`] or [`Self::wedge`].
@@ -220,7 +237,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_ring_edges::<10>(Direction::Top);
+    /// let cache = Hex::ORIGIN.cached_ring_edges::<10>(DiagonalDirection::Right);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -229,8 +246,11 @@ impl Hex {
     ///
     /// See this [article](https://www.redblobgames.com/grids/hexagons/directions.html) for more
     /// information
-    pub fn cached_ring_edges<const RANGE: usize>(self, start_dir: Direction) -> [Vec<Self>; RANGE] {
-        std::array::from_fn(|r| self.ring_edge(r as u32, start_dir))
+    pub fn cached_ring_edges<const RANGE: usize>(
+        self,
+        direction: DiagonalDirection,
+    ) -> [Vec<Self>; RANGE] {
+        std::array::from_fn(|r| self.ring_edge(r as u32, direction))
     }
 
     #[allow(clippy::cast_possible_truncation)]

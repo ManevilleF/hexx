@@ -330,26 +330,45 @@ impl DiagonalDirection {
 
     #[inline]
     #[must_use]
-    /// Computes the two neighboring [`Direction`] as `[left, right]`.
-    /// - `right` is the clockwise neighbor
-    /// - `left` is the counter clockwise neighbor
+    /// Computes the counter clockwise [`Direction`] neighbor of `self`.
     ///
     /// # Example
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let [left, right] = DiagonalDirection::Right.direction_neighbors();
-    /// assert_eq!(left, Direction::TopRight);
-    /// assert_eq!(right, Direction::BottomRight);
+    /// let dir = DiagonalDirection::Right.direction_left();
+    /// assert_eq!(dir, Direction::TopRight);
     /// ```
-    pub fn direction_neighbors(self) -> [Direction; 2] {
+    pub const fn direction_left(self) -> Direction {
         match self {
-            Self::Right => [Direction::TopRight, Direction::BottomRight],
-            Self::TopRight => [Direction::Top, Direction::TopRight],
-            Self::TopLeft => [Direction::TopLeft, Direction::Top],
-            Self::Left => [Direction::BottomLeft, Direction::TopLeft],
-            Self::BottomLeft => [Direction::Bottom, Direction::BottomLeft],
-            Self::BottomRight => [Direction::BottomRight, Direction::Bottom],
+            Self::Right => Direction::TopRight,
+            Self::TopRight => Direction::Top,
+            Self::TopLeft => Direction::TopLeft,
+            Self::Left => Direction::BottomLeft,
+            Self::BottomLeft => Direction::Bottom,
+            Self::BottomRight => Direction::BottomRight,
+        }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Computes the clockwise [`Direction`] neighbor of `self`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let dir = DiagonalDirection::Right.direction_right();
+    /// assert_eq!(dir, Direction::BottomRight);
+    /// ```
+    pub const fn direction_right(self) -> Direction {
+        match self {
+            Self::Right => Direction::BottomRight,
+            Self::TopRight => Direction::TopRight,
+            Self::TopLeft => Direction::Top,
+            Self::Left => Direction::TopLeft,
+            Self::BottomLeft => Direction::BottomLeft,
+            Self::BottomRight => Direction::Bottom,
         }
     }
 }
