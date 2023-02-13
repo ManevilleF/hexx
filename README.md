@@ -76,10 +76,10 @@ pub fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
 
  ## Example
 
- ![example](docs/hex_grid.png)
+ ![example](docs/hex_grid.png?)
 
  > `cargo run --example hex_grid`
 
- ![example](docs/3d_columns.png)
+ ![example](docs/3d_columns.png?)
 
  > `cargo run --example 3d_columns`
