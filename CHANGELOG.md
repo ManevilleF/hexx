@@ -49,6 +49,10 @@
 * Added `From<Direction>` impl for `Hex`
 * Added `From<DiagonalDirection>` impl for `Hex`
 * (**BREAKING**) Grouped all iterator extensions (`MeanExt` and `CenterExt`) in a common `HexIterExt` trait
+* `Direction::rotate_left` is now `const`
+* `Direction::rotate_right` is now `const`
+* `DiagonalDirection::rotate_left` is now `const`
+* `DiagonalDirection::rotate_right` is now `const`
 
 ## 0.3.0
 

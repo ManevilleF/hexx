@@ -112,6 +112,16 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Instantiates a new hexagon from axial coordinates
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(3, 5);
+    /// assert_eq!(coord.x, 3);
+    /// assert_eq!(coord.y, 5);
+    /// assert_eq!(coord.z(), -3-5);
+    /// ```
     pub const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
@@ -119,6 +129,16 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Instantiates a new hexagon with all coordinates set to `v`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::splat(3);
+    /// assert_eq!(coord.x, 3);
+    /// assert_eq!(coord.y, 3);
+    /// assert_eq!(coord.z(), -3-3);
+    /// ```
     pub const fn splat(v: i32) -> Self {
         Self { x: v, y: v }
     }
@@ -131,6 +151,16 @@ impl Hex {
     ///
     /// Will panic if the coordinates are invalid, meaning that the sum of coordinates is not equal
     /// to zero
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new_cubic(3, 5, -8);
+    /// assert_eq!(coord.x, 3);
+    /// assert_eq!(coord.y, 5);
+    /// assert_eq!(coord.z(), -8);
+    /// ```
     pub const fn new_cubic(x: i32, y: i32, z: i32) -> Self {
         assert!(x + y + z == 0);
         Self { x, y }
@@ -165,6 +195,16 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Converts `self` to an array as `[x, y]`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(3, 5);
+    /// let [x, y] = coord.to_array();
+    /// assert_eq!(x, 3);
+    /// assert_eq!(y, 5);
+    /// ```
     pub const fn to_array(self) -> [i32; 2] {
         [self.x, self.y]
     }
@@ -172,6 +212,17 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Converts `self` to an array as `[x, y, z]`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(3, 5);
+    /// let [x, y, z] = coord.to_array3();
+    /// assert_eq!(x, 3);
+    /// assert_eq!(y, 5);
+    /// assert_eq!(z, -3-5);
+    /// ```
     pub const fn to_array3(self) -> [i32; 3] {
         [self.x, self.y, self.z()]
     }
@@ -265,7 +316,19 @@ impl Hex {
     #[inline]
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
-    /// Rounds floating point coordinates to [`Hex`]
+    /// Rounds floating point coordinates to [`Hex`].
+    /// This method is used for operations like multiplications and divisions with floating point
+    /// numbers.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let [x, y] = [0.6, 10.2];
+    /// let coord = Hex::round((x, y));
+    /// assert_eq!(coord.x, 1);
+    /// assert_eq!(coord.y, 10);
+    /// ```
     pub fn round((mut x, mut y): (f32, f32)) -> Self {
         let (mut x_r, mut y_r) = (x.round(), y.round());
         x -= x.round(); // remainder
@@ -282,6 +345,15 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Computes the absolute value of `self`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(-1, -32).abs();
+    /// assert_eq!(coord.x, 1);
+    /// assert_eq!(coord.y, 32);
+    /// ```
     pub const fn abs(self) -> Self {
         Self {
             x: self.x.abs(),
@@ -291,9 +363,17 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes coordinates length as a signed integer
+    /// Computes coordinates length as a signed integer.
+    /// The lenght of a [`Hex`] coordinate is equal to its distance from the origin.
     ///
     /// See [`Self::ulength`] for the unsigned version
+    ///
+    /// # Example
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(10, 0);
+    /// assert_eq!(coord.length(), 10);
+    /// ```
     pub const fn length(self) -> i32 {
         let [x, y, z] = [self.x.abs(), self.y.abs(), self.z().abs()];
         if x >= y && x >= z {
@@ -309,8 +389,16 @@ impl Hex {
     #[must_use]
     #[doc(alias = "unsigned_length")]
     /// Computes coordinates length as an unsigned integer
+    /// The lenght of a [`Hex`] coordinate is equal to its distance from the origin.
     ///
     /// See [`Self::length`] for the signed version
+    ///
+    /// # Example
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(10, 0);
+    /// assert_eq!(coord.ulength(), 10);
+    /// ```
     pub const fn ulength(self) -> u32 {
         let [x, y, z] = [
             self.x.unsigned_abs(),
@@ -354,6 +442,15 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Retrieves the neighbor coordinates matching the given `direction`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(10, 5);
+    /// let bottom = coord.neighbor(Direction::Bottom);
+    /// assert_eq!(bottom, Hex::new(10, 6));
+    /// ```
     pub const fn neighbor(self, direction: Direction) -> Self {
         self.const_add(Self::neighbor_coord(direction))
     }
@@ -362,12 +459,22 @@ impl Hex {
     #[must_use]
     /// Retrieves the direction of the given neighbor. Will return `None` if `other` is not a neighbor
     /// of `self`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(10, 5);
+    /// let bottom = coord.neighbor(Direction::Bottom);
+    /// let dir = coord.neighbor_direction(bottom).unwrap();
+    /// assert_eq!(dir, Direction::Bottom);
+    /// ```
     pub fn neighbor_direction(self, other: Self) -> Option<Direction> {
         Direction::iter().find(|&dir| self.neighbor(dir) == other)
     }
 
     #[inline]
-    /// Retrieves all directions in the line betzeen `self` and `other`
+    /// Retrieves all directions in the line between `self` and `other`
     pub fn directions_to(self, other: Self) -> impl Iterator<Item = Direction> {
         self.line_to(other)
             .tuple_windows::<(_, _)>()
