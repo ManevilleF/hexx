@@ -247,10 +247,15 @@ impl Direction {
     /// # use hexx::*;
     /// assert_eq!(DiagonalDirection::Right, DiagonalDirection::Right.rotate_left(6));
     /// ```
-    pub fn rotate_left(self, offset: usize) -> Self {
-        let mut dirs = Self::ALL_DIRECTIONS;
-        dirs.rotate_left(offset % 6);
-        dirs[self as usize]
+    pub const fn rotate_left(self, offset: usize) -> Self {
+        match offset % 6 {
+            1 => self.left(),
+            2 => self.left().left(),
+            3 => self.const_neg(),
+            4 => self.right().right(),
+            5 => self.right(),
+            _ => self,
+        }
     }
 
     #[inline]
@@ -263,10 +268,15 @@ impl Direction {
     /// # use hexx::*;
     /// assert_eq!(DiagonalDirection::Right, DiagonalDirection::Right.rotate_right(6));
     /// ```
-    pub fn rotate_right(self, offset: usize) -> Self {
-        let mut dirs = Self::ALL_DIRECTIONS;
-        dirs.rotate_right(offset % 6);
-        dirs[self as usize]
+    pub const fn rotate_right(self, offset: usize) -> Self {
+        match offset % 6 {
+            1 => self.right(),
+            2 => self.right().right(),
+            3 => self.const_neg(),
+            4 => self.left().left(),
+            5 => self.left(),
+            _ => self,
+        }
     }
 
     const POINTY_ANGLES_DEGREES: [f32; 6] = [

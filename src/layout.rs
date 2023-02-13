@@ -1,7 +1,8 @@
 use crate::{Direction, Hex, HexOrientation};
 use glam::Vec2;
 
-/// Hexagonal layout
+/// Hexagonal layout. This type is the bridge between your *world*/*pixel* coordinate system
+/// and the hexagonal coordinate system.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexLayout {
@@ -53,7 +54,7 @@ impl HexLayout {
 impl Default for HexLayout {
     fn default() -> Self {
         Self {
-            orientation: HexOrientation::flat(),
+            orientation: HexOrientation::default(),
             origin: Vec2::ZERO,
             hex_size: Vec2::ONE,
         }
