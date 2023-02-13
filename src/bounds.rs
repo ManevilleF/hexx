@@ -1,7 +1,7 @@
 use crate::Hex;
 
 /// Hexagonal bounds utils, representer as a center and radius
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexBounds {
     /// bounds center
@@ -31,8 +31,7 @@ impl HexBounds {
     #[must_use]
     /// Checks if `rhs` is in bounds
     pub const fn is_in_bounds(&self, rhs: Hex) -> bool {
-        let [x, y] = rhs.const_sub(self.center).to_array();
-        x.unsigned_abs() <= self.radius && y.unsigned_abs() <= self.radius
+        self.center.unsigned_distance_to(rhs) <= self.radius
     }
 
     #[must_use]
@@ -46,6 +45,16 @@ impl HexBounds {
     /// Returns an iterator with all the coordinates in bounds
     pub fn all_coords(&self) -> impl Iterator<Item = Hex> {
         self.center.range(self.radius)
+    }
+
+    /// Computes all coordinates in the intersection between `self` and `rhs`
+    pub fn intersecting_with(self, rhs: Self) -> impl Iterator<Item = Hex> {
+        let [start, end] = if self.radius > rhs.radius {
+            [rhs, self]
+        } else {
+            [self, rhs]
+        };
+        start.all_coords().filter(move |h| end.is_in_bounds(*h))
     }
 }
 
@@ -74,5 +83,13 @@ mod tests {
         for h in bounds.all_coords() {
             assert!(bounds.is_in_bounds(h));
         }
+    }
+
+    #[test]
+    fn intersecting_with() {
+        let ba = HexBounds::new(Hex::ZERO, 3);
+        let bb = HexBounds::new(Hex::new(4, 0), 3);
+        let intersection = ba.intersecting_with(bb);
+        assert_eq!(intersection.count(), 9);
     }
 }
