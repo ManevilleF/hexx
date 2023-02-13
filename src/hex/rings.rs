@@ -231,6 +231,29 @@ impl Hex {
         self.custom_wedge_to(rhs, false)
     }
 
+    /// Retrieves all successive [`Hex`] half ring edges around `self` in a given `range` and
+    /// `direction`.
+    ///
+    /// See also [`Self::wedge_dir_to`] and [`Self::wedge`]
+    pub fn corner_wedge(
+        self,
+        range: impl Iterator<Item = u32> + Clone,
+        direction: Direction,
+    ) -> impl Iterator<Item = Self> {
+        let left = self.wedge(range.clone(), direction.diagonal_left());
+        let right = self.wedge(range, direction.diagonal_right());
+        left.chain(right)
+            .filter(move |h| self.direction_to(*h) == direction)
+    }
+
+    /// Retrieves all successive [`Hex`] half ring edges from `self` to `rhs`
+    ///
+    /// See also [`Self::wedge_dir`] and [`Self::wedge_to`]
+    pub fn corner_wedge_to(self, rhs: Self) -> impl Iterator<Item = Self> {
+        let range = self.unsigned_distance_to(rhs);
+        self.corner_wedge(0..=range, self.direction_to(rhs))
+    }
+
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
     /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` and `direction`
