@@ -2,12 +2,14 @@
 mod convert;
 /// Traits implementations
 mod impls;
+/// Iterator tools module
+mod iter;
 /// Hex ring utils
 mod rings;
 #[cfg(test)]
 mod tests;
 
-pub use impls::{CenterExt, MeanExt};
+pub use iter::HexIterExt;
 
 use crate::{DiagonalDirection, Direction};
 use glam::{IVec2, IVec3, Vec2};

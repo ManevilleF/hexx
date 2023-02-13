@@ -70,6 +70,7 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
+mod bounds;
 mod conversions;
 mod direction;
 mod hex;
@@ -78,7 +79,7 @@ mod layout;
 mod mesh;
 mod orientation;
 
-pub use {direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*};
+pub use {bounds::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*};
 
 /// Map shapes generation functions
 pub mod shapes {

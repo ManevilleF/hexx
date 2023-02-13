@@ -36,12 +36,19 @@
 * (**BREAKING**) `Hex::custom_spiral_range` now takes a `Iterator<Item = u32>` as range and returns an iterator
 * (**BREAKING**) `Hex::spiral_range` now takes a `Iterator<Item = u32>` as range and returns an iterator
 
+### Bounds
+
+* Added `HexBounds` utility struct
+* `HexMap` now uses `HexBounds`
+* Added `bounds()` iterator util, to compute bounds from multiple hex coordinates
+
 ### Misc
 
 * Added `Hexx:to_array` method
 * Added `Hexx:to_array3` method
 * Added `From<Direction>` impl for `Hex`
 * Added `From<DiagonalDirection>` impl for `Hex`
+* (**BREAKING**) Grouped all iterator extensions (`MeanExt` and `CenterExt`) in a common `HexIterExt` trait
 
 ## 0.3.0
 
