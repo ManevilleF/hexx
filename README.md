@@ -69,6 +69,9 @@
 
  ## Layout usage
 
+ [`HexLayout`] is the bridge between your world/screen/pixel coordinate system and the hexagonal
+ coordinates system.
+
 ```rust
  use hexx::*;
 
@@ -78,9 +81,9 @@
     orientation: HexOrientation::flat(),
     ..Default::default()
  };
- // Get the hex coordinate clicked at `pixel_pos` on the screen
- let pixel_pos = Vec2::new(53.52, 189.28);
- let hex = layout.world_pos_to_hex(pixel_pos);
+ // Get the hex coordinate at the world position `world_pos`.
+ let world_pos = Vec2::new(53.52, 189.28);
+ let hex = layout.world_pos_to_hex(world_pos);
  // Get the world position of `hex`
  let hex = Hex::new(123, 45);
  let world_pos = layout.hex_to_world_pos(hex);
