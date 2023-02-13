@@ -669,6 +669,13 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Counts how many coordinates there are in the given `range`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// assert_eq!(Hex::range_count(15), 721);
+    /// ```
     pub const fn range_count(range: u32) -> usize {
         (3 * range * (range + 1) + 1) as usize
     }
