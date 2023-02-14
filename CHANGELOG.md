@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+### Fix
+
+* Fixed `Product` impl for `Hex` which is always returning (0, 0)
+
+### Additions
+
 * Added `Hex::min` method
 * Added `Hex::max` method
 * Added `Hex::signum` method
+* Added `Hex::dot` method
+* Added `Hex::from_slice` method
+* Added `Hex::write_to_slice` method
 * Added `Hex::dot` method
 
 ## 0.4.0 

@@ -19,8 +19,8 @@ impl Add<i32> for Hex {
     #[inline]
     fn add(self, rhs: i32) -> Self::Output {
         Self {
-            x: self.x + rhs,
-            y: self.y + rhs,
+            x: self.x.add(rhs),
+            y: self.y.add(rhs),
         }
     }
 }
@@ -28,26 +28,26 @@ impl Add<i32> for Hex {
 impl AddAssign for Hex {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
-        *self = *self + rhs;
+        *self = self.add(rhs);
     }
 }
 
 impl AddAssign<i32> for Hex {
     #[inline]
     fn add_assign(&mut self, rhs: i32) {
-        *self = *self + rhs;
+        *self = self.add(rhs);
     }
 }
 
 impl Sum for Hex {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
-        iter.fold(Self::ZERO, |a, b| a + b)
+        iter.fold(Self::ZERO, Self::const_add)
     }
 }
 
 impl<'a> Sum<&'a Self> for Hex {
     fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
-        iter.copied().sum()
+        iter.fold(Self::ZERO, |a, &b| Self::const_add(a, b))
     }
 }
 
@@ -66,8 +66,8 @@ impl Sub<i32> for Hex {
     #[inline]
     fn sub(self, rhs: i32) -> Self::Output {
         Self {
-            x: self.x - rhs,
-            y: self.y - rhs,
+            x: self.x.sub(rhs),
+            y: self.y.sub(rhs),
         }
     }
 }
@@ -75,14 +75,14 @@ impl Sub<i32> for Hex {
 impl SubAssign for Hex {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        *self = *self - rhs;
+        *self = self.sub(rhs);
     }
 }
 
 impl SubAssign<i32> for Hex {
     #[inline]
     fn sub_assign(&mut self, rhs: i32) {
-        *self = *self - rhs;
+        *self = self.sub(rhs);
     }
 }
 
@@ -92,8 +92,8 @@ impl Mul<Self> for Hex {
     #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
         Self {
-            x: self.x * rhs.x,
-            y: self.y * rhs.y,
+            x: self.x.mul(rhs.x),
+            y: self.y.mul(rhs.y),
         }
     }
 }
@@ -104,8 +104,8 @@ impl Mul<i32> for Hex {
     #[inline]
     fn mul(self, rhs: i32) -> Self::Output {
         Self {
-            x: self.x * rhs,
-            y: self.y * rhs,
+            x: self.x.mul(rhs),
+            y: self.y.mul(rhs),
         }
     }
 }
@@ -123,33 +123,33 @@ impl Mul<f32> for Hex {
 impl MulAssign for Hex {
     #[inline]
     fn mul_assign(&mut self, rhs: Self) {
-        *self = *self * rhs;
+        *self = self.mul(rhs);
     }
 }
 
 impl MulAssign<i32> for Hex {
     #[inline]
     fn mul_assign(&mut self, rhs: i32) {
-        *self = *self * rhs;
+        *self = self.mul(rhs);
     }
 }
 
 impl MulAssign<f32> for Hex {
     #[inline]
     fn mul_assign(&mut self, rhs: f32) {
-        *self = *self * rhs;
+        *self = self.mul(rhs);
     }
 }
 
 impl Product for Hex {
     fn product<I: Iterator<Item = Self>>(iter: I) -> Self {
-        iter.fold(Self::ZERO, |a, b| a * b)
+        iter.fold(Self::ONE, Self::mul)
     }
 }
 
 impl<'a> Product<&'a Self> for Hex {
     fn product<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
-        iter.copied().product()
+        iter.fold(Self::ONE, |a, &b| Self::mul(a, b))
     }
 }
 
@@ -159,8 +159,8 @@ impl Div<Self> for Hex {
     #[inline]
     fn div(self, rhs: Self) -> Self::Output {
         Self {
-            x: self.x / rhs.x,
-            y: self.y / rhs.y,
+            x: self.x.div(rhs.x),
+            y: self.y.div(rhs.y),
         }
     }
 }
@@ -195,21 +195,21 @@ impl Div<f32> for Hex {
 impl DivAssign for Hex {
     #[inline]
     fn div_assign(&mut self, rhs: Self) {
-        *self = *self / rhs;
+        *self = self.div(rhs);
     }
 }
 
 impl DivAssign<i32> for Hex {
     #[inline]
     fn div_assign(&mut self, rhs: i32) {
-        *self = *self / rhs;
+        *self = self.div(rhs);
     }
 }
 
 impl DivAssign<f32> for Hex {
     #[inline]
     fn div_assign(&mut self, rhs: f32) {
-        *self = *self / rhs;
+        *self = self.div(rhs);
     }
 }
 
@@ -234,14 +234,14 @@ impl Rem<i32> for Hex {
 impl RemAssign for Hex {
     #[inline]
     fn rem_assign(&mut self, rhs: Self) {
-        *self = *self % rhs;
+        *self = self.rem(rhs);
     }
 }
 
 impl RemAssign<i32> for Hex {
     #[inline]
     fn rem_assign(&mut self, rhs: i32) {
-        *self = *self % rhs;
+        *self = self.rem(rhs);
     }
 }
 
