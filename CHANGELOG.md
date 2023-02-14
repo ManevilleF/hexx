@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+* Added `Hex::min` method
+* Added `Hex::max` method
+* Added `Hex::signum` method
+* Added `Hex::dot` method
+
 ## 0.4.0 
 
 ### Directions

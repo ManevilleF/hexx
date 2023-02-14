@@ -58,10 +58,16 @@ impl Hex {
     pub const ONE: Self = Self::new(1, 1);
     /// X (Q) axis (1, 0)
     pub const X: Self = Self::new(1, 0);
+    /// -X (-Q) axis (-1, 0)
+    pub const NEG_X: Self = Self::X.const_neg();
     /// Y (R) axis (0, 1)
     pub const Y: Self = Self::new(0, 1);
+    /// -Y (-R) axis (0, -1)
+    pub const NEG_Y: Self = Self::new(0, -1);
     /// Z (S) axis (0, -1)
     pub const Z: Self = Self::new(0, -1);
+    /// -Z (S) axis (0, 1)
+    pub const NEG_Z: Self = Self::Y;
 
     /// Hexagon neighbor coordinates array, following [`Direction`] order
     ///
@@ -358,6 +364,50 @@ impl Hex {
         Self {
             x: self.x.abs(),
             y: self.y.abs(),
+        }
+    }
+    /// Returns a vector containing the minimum values for each element of `self` and `rhs`.
+    ///
+    /// In other words this computes `[self.x.min(rhs.x), self.y.min(rhs.y), ..]`.
+    #[inline]
+    #[must_use]
+    pub fn min(self, rhs: Self) -> Self {
+        Self {
+            x: self.x.min(rhs.x),
+            y: self.y.min(rhs.y),
+        }
+    }
+
+    /// Returns a vector containing the maximum values for each element of `self` and `rhs`.
+    ///
+    /// In other words this computes `[self.x.max(rhs.x), self.y.max(rhs.y), ..]`.
+    #[inline]
+    #[must_use]
+    pub fn max(self, rhs: Self) -> Self {
+        Self {
+            x: self.x.max(rhs.x),
+            y: self.y.max(rhs.y),
+        }
+    }
+
+    /// Computes the dot product of `self` and `rhs`.
+    #[inline]
+    #[must_use]
+    pub const fn dot(self, rhs: Self) -> i32 {
+        (self.x * rhs.x) + (self.y * rhs.y)
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns a [`Hex`] with elements representing the sign of `self`.
+    ///
+    ///  - `0` if the number is zero
+    ///  - `1` if the number is positive
+    ///  - `-1` if the number is negative
+    pub const fn signum(self) -> Self {
+        Self {
+            x: self.x.signum(),
+            y: self.y.signum(),
         }
     }
 
