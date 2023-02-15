@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 0.4.1
 
 ### Fix
 
