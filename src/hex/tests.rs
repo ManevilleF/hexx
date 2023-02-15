@@ -29,6 +29,14 @@ fn hex_sum() {
 }
 
 #[test]
+fn hex_product() {
+    assert_eq!(
+        Hex::X.line_to(Hex::new(5, 0)).product::<Hex>(),
+        Hex::new((1..=5).product(), 0)
+    );
+}
+
+#[test]
 fn hex_length() {
     assert_eq!(Hex::ZERO.length(), 0);
     assert_eq!(Hex::ZERO.ulength(), 0);
