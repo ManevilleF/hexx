@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## Unreleased
+
+### Fix
+
+* Fixed `Product` impl for `Hex` which is always returning (0, 0)
+
+### Additions
+
+* Added `Hex::min` method
+* Added `Hex::max` method
+* Added `Hex::signum` method
+* Added `Hex::dot` method
+* Added `Hex::from_slice` method
+* Added `Hex::write_to_slice` method
+* Added `Hex::dot` method
+
+### Impls
+
+* Added `BitOr` implementations for `Hex`
+* Added `BitXor` implementations for `Hex`
+* Added `BitAnd` implementations for `Hex`
+* Added `Shr` implementations for `Hex`
+* Added `Shl` implementations for `Hex`
+
 ## 0.4.0 
 
 ### Directions

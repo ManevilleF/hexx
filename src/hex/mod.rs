@@ -56,12 +56,26 @@ impl Hex {
     pub const ZERO: Self = Self::new(0, 0);
     /// (1, 1)
     pub const ONE: Self = Self::new(1, 1);
+    /// (-1, -1)
+    pub const NEG_ONE: Self = Self::ONE.const_neg();
+
     /// X (Q) axis (1, 0)
     pub const X: Self = Self::new(1, 0);
+    /// -X (-Q) axis (-1, 0)
+    pub const NEG_X: Self = Self::X.const_neg();
     /// Y (R) axis (0, 1)
     pub const Y: Self = Self::new(0, 1);
-    /// Z (S) axis (0, -1)
+    /// -Y (-R) axis (0, -1)
+    pub const NEG_Y: Self = Self::new(0, -1);
+    /// Z (S) axis (0, -1, **1**)
     pub const Z: Self = Self::new(0, -1);
+    /// -Z (S) axis (0, 1, **-1**)
+    pub const NEG_Z: Self = Self::Y;
+
+    /// The unit axes.
+    pub const AXES: [Self; 2] = [Self::X, Self::Y];
+    /// The cubic unit axes.
+    pub const CUBIC_AXES: [Self; 3] = [Self::X, Self::Y, Self::Z];
 
     /// Hexagon neighbor coordinates array, following [`Direction`] order
     ///
@@ -80,11 +94,11 @@ impl Hex {
     /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
         Self::new(1, -1),
-        Self::new(0, -1),
-        Self::new(-1, 0),
+        Self::NEG_Y,
+        Self::NEG_X,
         Self::new(-1, 1),
-        Self::new(0, 1),
-        Self::new(1, 0),
+        Self::Y,
+        Self::X,
     ];
 
     /// ```txt
@@ -103,10 +117,10 @@ impl Hex {
     pub const DIAGONAL_COORDS: [Self; 6] = [
         Self::new(2, -1),
         Self::new(1, -2),
-        Self::new(-1, -1),
+        Self::NEG_ONE,
         Self::new(-2, 1),
         Self::new(-1, 2),
-        Self::new(1, 1),
+        Self::ONE,
     ];
 
     #[inline]
@@ -225,6 +239,28 @@ impl Hex {
     /// ```
     pub const fn to_array3(self) -> [i32; 3] {
         [self.x, self.y, self.z()]
+    }
+
+    // Creates a [`Hex`] from the first 2 values in `slice`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `slice` is less than 2 elements long.
+    #[inline]
+    #[must_use]
+    pub const fn from_slice(slice: &[i32]) -> Self {
+        Self::new(slice[0], slice[1])
+    }
+
+    /// Writes the elements of `self` to the first 2 elements in `slice`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `slice` is less than 2 elements long.
+    #[inline]
+    pub fn write_to_slice(self, slice: &mut [i32]) {
+        slice[0] = self.x;
+        slice[1] = self.y;
     }
 
     #[must_use]
@@ -358,6 +394,50 @@ impl Hex {
         Self {
             x: self.x.abs(),
             y: self.y.abs(),
+        }
+    }
+    /// Returns a vector containing the minimum values for each element of `self` and `rhs`.
+    ///
+    /// In other words this computes `[self.x.min(rhs.x), self.y.min(rhs.y), ..]`.
+    #[inline]
+    #[must_use]
+    pub fn min(self, rhs: Self) -> Self {
+        Self {
+            x: self.x.min(rhs.x),
+            y: self.y.min(rhs.y),
+        }
+    }
+
+    /// Returns a vector containing the maximum values for each element of `self` and `rhs`.
+    ///
+    /// In other words this computes `[self.x.max(rhs.x), self.y.max(rhs.y), ..]`.
+    #[inline]
+    #[must_use]
+    pub fn max(self, rhs: Self) -> Self {
+        Self {
+            x: self.x.max(rhs.x),
+            y: self.y.max(rhs.y),
+        }
+    }
+
+    /// Computes the dot product of `self` and `rhs`.
+    #[inline]
+    #[must_use]
+    pub const fn dot(self, rhs: Self) -> i32 {
+        (self.x * rhs.x) + (self.y * rhs.y)
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns a [`Hex`] with elements representing the sign of `self`.
+    ///
+    ///  - `0` if the number is zero
+    ///  - `1` if the number is positive
+    ///  - `-1` if the number is negative
+    pub const fn signum(self) -> Self {
+        Self {
+            x: self.x.signum(),
+            y: self.y.signum(),
         }
     }
 
