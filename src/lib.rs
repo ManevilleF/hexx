@@ -129,7 +129,9 @@ mod orientation;
 
 /// Used glam types reexport
 pub use glam::{IVec2, Vec2};
-pub use {bounds::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*};
+pub use {
+    bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*,
+};
 
 /// Map shapes generation functions
 pub mod shapes {
