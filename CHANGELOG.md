@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Unreleased
+
+* Fixed `conversion` module was private (#42)
+* Fixed `Hex::line_to` returning `(0, 0)` when both ends are identical (#43)
+
 ## 0.4.1
 
 ### Fix

@@ -719,7 +719,7 @@ impl Hex {
     /// assert_eq!(line.len(), 6);
     /// ````
     pub fn line_to(self, other: Self) -> impl Iterator<Item = Self> {
-        let distance = self.distance_to(other);
+        let distance = self.distance_to(other).max(1);
         let [a, b]: [Vec2; 2] = [self.as_vec2(), other.as_vec2()];
         (0..=distance).map(move |step| a.lerp(b, step as f32 / distance as f32).into())
     }

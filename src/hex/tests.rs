@@ -338,6 +338,13 @@ fn line_to() {
 }
 
 #[test]
+fn empty_line_to() {
+    let start = Hex::new(3, -7);
+    let line: Vec<_> = start.line_to(start).collect();
+    assert_eq!(line, vec![start, start]);
+}
+
+#[test]
 fn directions_to() {
     let a = Hex::new(0, 0);
     let b = Hex::new(5, 5);
