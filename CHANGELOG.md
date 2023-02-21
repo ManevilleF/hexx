@@ -1,10 +1,13 @@
 # CHANGELOG
 
+## Unreleased
+
+* Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`
+
 ## 0.4.2
 
 * Fixed `conversion` module was private (#42)
 * Fixed `Hex::line_to` returning `(0, 0)` when both ends are identical (#43)
-* Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`
 
 ## 0.4.1
 

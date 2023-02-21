@@ -243,7 +243,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    #[deprecated(since = "0.4.2", note = "Prefer Hex::to_cubic_array")]
+    #[deprecated(since = "0.5.0", note = "Prefer Hex::to_cubic_array")]
     /// Converts `self` to cubic coordinates an array as `[x, y, z]`
     pub const fn to_array3(self) -> [i32; 3] {
         self.to_cubic_array()
@@ -573,7 +573,7 @@ impl Hex {
     #[must_use]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
     pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
-        let [x, y, z] = (rhs - self).to_array3();
+        let [x, y, z] = (rhs - self).to_cubic_array();
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
         let (v, dir) = match xa.max(ya).max(za) {
             v if v == xa => (x, DiagonalDirection::Right),
@@ -591,7 +591,7 @@ impl Hex {
     #[must_use]
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
     pub fn direction_to(self, rhs: Self) -> Direction {
-        let [x, y, z] = (rhs - self).to_array3();
+        let [x, y, z] = (rhs - self).to_cubic_array();
         let [x, y, z] = [y - x, z - y, x - z];
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
         let (v, dir) = match xa.max(ya).max(za) {
