@@ -225,7 +225,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Converts `self` to an array as `[x, y, z]`
+    /// Converts `self` to cubic coordinates an array as `[x, y, z]`
     ///
     /// # Example
     ///
@@ -237,8 +237,16 @@ impl Hex {
     /// assert_eq!(y, 5);
     /// assert_eq!(z, -3-5);
     /// ```
-    pub const fn to_array3(self) -> [i32; 3] {
+    pub const fn to_cubic_array(self) -> [i32; 3] {
         [self.x, self.y, self.z()]
+    }
+
+    #[inline]
+    #[must_use]
+    #[deprecated(since = "0.5.0", note = "Prefer Hex::to_cubic_array")]
+    /// Converts `self` to cubic coordinates an array as `[x, y, z]`
+    pub const fn to_array3(self) -> [i32; 3] {
+        self.to_cubic_array()
     }
 
     // Creates a [`Hex`] from the first 2 values in `slice`.
@@ -279,6 +287,7 @@ impl Hex {
 
     #[must_use]
     #[inline]
+    #[doc(alias = "as_cubic")]
     /// Converts `self` to an [`IVec3`] using cubic coordinates.
     /// This operation is a direct mapping of coordinates.
     /// To convert hex coordinates to world space use [`HexLayout`]
@@ -564,7 +573,7 @@ impl Hex {
     #[must_use]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
     pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
-        let [x, y, z] = (rhs - self).to_array3();
+        let [x, y, z] = (rhs - self).to_cubic_array();
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
         let (v, dir) = match xa.max(ya).max(za) {
             v if v == xa => (x, DiagonalDirection::Right),
@@ -582,7 +591,7 @@ impl Hex {
     #[must_use]
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
     pub fn direction_to(self, rhs: Self) -> Direction {
-        let [x, y, z] = (rhs - self).to_array3();
+        let [x, y, z] = (rhs - self).to_cubic_array();
         let [x, y, z] = [y - x, z - y, x - z];
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
         let (v, dir) = match xa.max(ya).max(za) {
