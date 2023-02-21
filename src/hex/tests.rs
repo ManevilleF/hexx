@@ -341,7 +341,7 @@ fn line_to() {
 fn empty_line_to() {
     let start = Hex::new(3, -7);
     let line: Vec<_> = start.line_to(start).collect();
-    assert_eq!(line, vec![start, start]);
+    assert_eq!(line, vec![start]);
 }
 
 #[test]
