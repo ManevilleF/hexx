@@ -307,8 +307,12 @@ fn lerp() {
 fn line_to() {
     let a = Hex::new(0, 0);
     let b = Hex::new(5, 0);
+    let line = a.line_to(b);
+    let len = line.len();
+    let line: Vec<_> = line.collect();
+    assert_eq!(line.len(), len);
     assert_eq!(
-        a.line_to(b).collect::<Vec<_>>(),
+        line,
         vec![
             a,
             Hex::new(1, 0),
@@ -319,8 +323,12 @@ fn line_to() {
         ]
     );
     let b = Hex::new(5, 5);
+    let line = a.line_to(b);
+    let len = line.len();
+    let line: Vec<_> = line.collect();
+    assert_eq!(line.len(), len);
     assert_eq!(
-        a.line_to(b).collect::<Vec<_>>(),
+        line,
         vec![
             a,
             Hex::new(0, 1),
@@ -340,8 +348,9 @@ fn line_to() {
 #[test]
 fn empty_line_to() {
     let start = Hex::new(3, -7);
-    let line: Vec<_> = start.line_to(start).collect();
-    assert_eq!(line, vec![start]);
+    let line = start.line_to(start);
+    assert_eq!(line.len(), 1);
+    assert_eq!(line.collect::<Vec<_>>(), vec![start]);
 }
 
 #[test]
@@ -371,6 +380,22 @@ fn range_count() {
     assert_eq!(Hex::range_count(1), 7);
     assert_eq!(Hex::range_count(10), 331);
     assert_eq!(Hex::range_count(15), 721);
+}
+
+#[test]
+fn range() {
+    let hex = Hex::new(13, -54);
+    let mut range = hex.range(16);
+    assert_eq!(range.len(), Hex::range_count(16));
+    assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
+    println!("{:#?}", range.size_hint());
+    let _ = range.next();
+    println!("{:#?}", range.size_hint());
+    assert_eq!(range.len(), Hex::range_count(16) - 1);
+    assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
+    let _ = range.next();
+    assert_eq!(range.len(), Hex::range_count(16) - 2);
+    assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
 }
 
 #[test]

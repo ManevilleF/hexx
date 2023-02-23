@@ -152,8 +152,9 @@ pub mod shapes {
         (0..=size).flat_map(move |x| (0..=(size - x)).map(move |y| Hex::new(x as i32, y as i32)))
     }
 
+    #[must_use]
     /// Generates an hexagonal layout around `center` with a custom `radius`.
-    pub fn hexagon(center: Hex, radius: u32) -> impl Iterator<Item = Hex> {
+    pub fn hexagon(center: Hex, radius: u32) -> impl ExactSizeIterator<Item = Hex> {
         center.range(radius)
     }
 

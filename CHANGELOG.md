@@ -3,6 +3,10 @@
 ## Unreleased
 
 * Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`
+* `Hex::range` now returns a `FixedSizeIterator` instead of a simple `Iterator`
+* `Hex::line_to` now returns a `FixedSizeIterator` instead of a simple `Iterator`
+* `shapes::hexagon` now returns a `FixedSizeIterator` instead of a simple `Iterator`
+* `HexBounds::all_coords` now returns a `FixedSizeIterator` instead of a simple `Iterator`
 
 ## 0.4.2
 

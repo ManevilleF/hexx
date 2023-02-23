@@ -36,14 +36,17 @@ impl HexBounds {
 
     #[must_use]
     #[inline]
+    #[doc(alias = "coords_count")]
+    #[doc(alias = "len")]
     /// Returns the number of hexagons in bounds
     pub const fn hex_count(&self) -> usize {
         Hex::range_count(self.radius)
     }
 
     #[doc(alias = "all_items")]
+    #[must_use]
     /// Returns an iterator with all the coordinates in bounds
-    pub fn all_coords(&self) -> impl Iterator<Item = Hex> {
+    pub fn all_coords(&self) -> impl ExactSizeIterator<Item = Hex> {
         self.center.range(self.radius)
     }
 

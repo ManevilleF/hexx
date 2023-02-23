@@ -13,6 +13,7 @@ pub use iter::HexIterExt;
 
 use crate::{DiagonalDirection, Direction};
 use glam::{IVec2, IVec3, Vec2};
+use iter::ExactSizeHexIterator;
 use itertools::Itertools;
 use std::cmp::{max, min};
 
@@ -716,6 +717,7 @@ impl Hex {
     }
 
     #[allow(clippy::cast_precision_loss)]
+    #[must_use]
     /// Computes all coordinates in a line from `self` to `other`.
     ///
     /// # Example
@@ -724,14 +726,19 @@ impl Hex {
     /// let start = Hex::ZERO;
     /// let end = Hex::new(5, 0);
     ///
-    /// let line: Vec<Hex> = start.line_to(end).collect();
+    /// let line = start.line_to(end);
+    /// assert_eq!(line.len(), 6);
+    /// let line: Vec<Hex> = line.collect();
     /// assert_eq!(line.len(), 6);
     /// ````
-    pub fn line_to(self, other: Self) -> impl Iterator<Item = Self> {
-        let distance = self.distance_to(other);
+    pub fn line_to(self, other: Self) -> impl ExactSizeIterator<Item = Self> {
+        let distance = self.unsigned_distance_to(other);
         let dist = distance.max(1) as f32;
         let [a, b]: [Vec2; 2] = [self.as_vec2(), other.as_vec2()];
-        (0..=distance).map(move |step| a.lerp(b, step as f32 / dist).into())
+        ExactSizeHexIterator {
+            iter: (0..=distance).map(move |step| a.lerp(b, step as f32 / dist).into()),
+            count: distance as usize + 1,
+        }
     }
 
     /// Performs a linear interpolation between `self` and `rhs` based on the value `s`.
@@ -748,12 +755,18 @@ impl Hex {
     }
 
     #[allow(clippy::cast_possible_wrap)]
-    /// Retrieves all [`Hex`] around `self` in a given `range`
-    pub fn range(self, range: u32) -> impl Iterator<Item = Self> {
-        let range = range as i32;
-        (-range..=range).flat_map(move |x| {
-            (max(-range, -x - range)..=min(range, range - x)).map(move |y| self + Self::new(x, y))
-        })
+    #[must_use]
+    /// Retrieves all [`Hex`] around `self` in a given `range`.
+    /// The number of returned coordinates is equal to `Hex::range_count(range)`
+    pub fn range(self, range: u32) -> impl ExactSizeIterator<Item = Self> {
+        let radius = range as i32;
+        ExactSizeHexIterator {
+            iter: (-radius..=radius).flat_map(move |x| {
+                (max(-radius, -x - radius)..=min(radius, radius - x))
+                    .map(move |y| self + Self::new(x, y))
+            }),
+            count: Self::range_count(range),
+        }
     }
 
     #[inline]
