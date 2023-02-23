@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### FixedSizeIterator
+
 * Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`
 * `Hex::range` now returns a `FixedSizeIterator` instead of a simple `Iterator`
 * `Hex::line_to` now returns a `FixedSizeIterator` instead of a simple `Iterator`
@@ -10,6 +12,10 @@
 
 * (**BREAKING**) `Hex::ring_edge` now returns a `FixedSizeIterator` instead of a `Vec`
 * (**BREAKING**) `Hex::custom_ring_edge` now returns a `FixedSizeIterator` instead of a `Vec`
+
+### Miscellaneous
+
+* Added `Hex::wedge_count` to count the amount of coordinate in a wedge
 
 ## 0.4.2
 

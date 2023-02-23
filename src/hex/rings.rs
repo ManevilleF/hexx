@@ -214,6 +214,22 @@ impl Hex {
         self.custom_wedge(0..=range, direction, clockwise)
     }
 
+    /// Counts how many coordinates there are in a wedge of given `range`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let hex = Hex::new(3, -6);
+    /// let wedge: Vec<Hex> = hex.wedge(0..=13, DiagonalDirection::Right).collect();
+    /// assert_eq!(wedge.len(), Hex::wedge_count(13) as usize);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub const fn wedge_count(range: u32) -> u32 {
+        range * (range + 3) / 2 + 1
+    }
+
     /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and
     /// `direction`.
     /// The returned edges coordinates are sorted counter clockwise around `self`.

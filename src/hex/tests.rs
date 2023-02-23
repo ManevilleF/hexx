@@ -458,9 +458,7 @@ fn custom_ring() {
 fn ring_edge() {
     let hex = Hex::new(-189, 35);
     let edge = hex.ring_edge(48, DiagonalDirection::TopRight);
-    let len = edge.len();
-    let edge: Vec<_> = edge.collect();
-    assert_eq!(edge.len(), len);
+    assert_eq!(edge.len(), edge.count());
     // empty
     let edge = hex.ring_edge(0, DiagonalDirection::TopRight);
     let len = edge.len();
@@ -473,6 +471,19 @@ fn ring_edge() {
     let edge: Vec<_> = edge.collect();
     assert_eq!(edge.len(), len);
     assert_eq!(edge.len(), 2);
+}
+
+#[test]
+#[allow(clippy::cast_possible_truncation)]
+fn wedge() {
+    let hex = Hex::new(98, -123);
+    for dir in DiagonalDirection::ALL_DIRECTIONS {
+        for range in 0..=30 {
+            let wedge: Vec<_> = hex.wedge(0..=range, dir).collect();
+            assert_eq!(wedge.len() as u32, range * (range + 3) / 2 + 1);
+            assert_eq!(wedge.len() as u32, Hex::wedge_count(range));
+        }
+    }
 }
 
 #[test]
