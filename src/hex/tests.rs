@@ -455,6 +455,27 @@ fn custom_ring() {
 }
 
 #[test]
+fn ring_edge() {
+    let hex = Hex::new(-189, 35);
+    let edge = hex.ring_edge(48, DiagonalDirection::TopRight);
+    let len = edge.len();
+    let edge: Vec<_> = edge.collect();
+    assert_eq!(edge.len(), len);
+    // empty
+    let edge = hex.ring_edge(0, DiagonalDirection::TopRight);
+    let len = edge.len();
+    let edge: Vec<_> = edge.collect();
+    assert_eq!(edge.len(), len);
+    assert_eq!(edge, vec![hex]);
+    // len 1
+    let edge = hex.ring_edge(1, DiagonalDirection::TopRight);
+    let len = edge.len();
+    let edge: Vec<_> = edge.collect();
+    assert_eq!(edge.len(), len);
+    assert_eq!(edge.len(), 2);
+}
+
+#[test]
 fn spiral_range() {
     let expected: Vec<_> = Hex::ZERO.range(10).collect();
     let spiral: Vec<_> = Hex::ZERO.spiral_range(0..=10).collect();

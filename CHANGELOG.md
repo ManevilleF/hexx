@@ -8,6 +8,9 @@
 * `shapes::hexagon` now returns a `FixedSizeIterator` instead of a simple `Iterator`
 * `HexBounds::all_coords` now returns a `FixedSizeIterator` instead of a simple `Iterator`
 
+* (**BREAKING**) `Hex::ring_edge` now returns a `FixedSizeIterator` instead of a `Vec`
+* (**BREAKING**) `Hex::custom_ring_edge` now returns a `FixedSizeIterator` instead of a `Vec`
+
 ## 0.4.2
 
 * Fixed `conversion` module was private (#42)
