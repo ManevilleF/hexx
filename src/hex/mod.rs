@@ -3,7 +3,7 @@ mod convert;
 /// Traits implementations
 mod impls;
 /// Iterator tools module
-mod iter;
+pub(crate) mod iter;
 /// Hex ring utils
 mod rings;
 #[cfg(test)]

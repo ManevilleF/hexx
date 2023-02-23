@@ -8,8 +8,12 @@
 * `Hex::line_to` now returns a `ExactSizeIterator` instead of a simple `Iterator`
 * `Hex::wedge_to` now returns a `ExactSizeIterator` instead of a simple `Iterator`
 * `Hex::custom_wedge_to` now returns a `ExactSizeIterator` instead of a simple `Iterator`
-* `shapes::hexagon` now returns a `ExactSizeIterator` instead of a simple `Iterator`
 * `HexBounds::all_coords` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `shapes::hexagon` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `shapes::parallelogram` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `shapes::triangle` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `shapes::pointy_rectangle` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `shapes::flat_rectangle` now returns a `ExactSizeIterator` instead of a simple `Iterator`
 
 * (**BREAKING**) `Hex::ring_edge` now returns a `ExactSizeIterator` instead of a `Vec`
 * (**BREAKING**) `Hex::custom_ring_edge` now returns a `ExactSizeIterator` instead of a `Vec`
