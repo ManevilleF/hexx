@@ -482,6 +482,8 @@ fn wedge() {
             let wedge: Vec<_> = hex.wedge(0..=range, dir).collect();
             assert_eq!(wedge.len() as u32, range * (range + 3) / 2 + 1);
             assert_eq!(wedge.len() as u32, Hex::wedge_count(range));
+            let full_wedge = hex.full_wedge(range, dir);
+            assert_eq!(full_wedge.len(), wedge.len());
         }
     }
 }

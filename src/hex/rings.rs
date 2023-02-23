@@ -186,20 +186,21 @@ impl Hex {
         ranges.map(move |r| self.custom_ring_edge(r, direction, clockwise).collect())
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and
+    /// Retrieves all successive [`Hex`] ring edges around `self` in given `ranges` and
     /// `direction`.
     /// The returned edges coordinates are sorted counter clockwise around `self` unless
     /// `clockwise` is set to `true`.
     ///
     /// See also [`Self::custom_ring_edges`]
     /// If you only need the coordinates see [`Self::wedge`]
+    /// If you want a full wedge see [`Self::custom_full_wedge`]
     pub fn custom_wedge(
         self,
-        range: impl Iterator<Item = u32>,
+        ranges: impl Iterator<Item = u32>,
         direction: DiagonalDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Self> {
-        self.custom_ring_edges(range, direction, clockwise)
+        self.custom_ring_edges(ranges, direction, clockwise)
             .flatten()
     }
 
@@ -208,10 +209,36 @@ impl Hex {
     /// `clockwise` is set to `true`.
     ///
     /// See also [`Self::custom_ring_edges`] and [`Self::wedge_to`]
-    pub fn custom_wedge_to(self, rhs: Self, clockwise: bool) -> impl Iterator<Item = Self> {
+    #[must_use]
+    pub fn custom_wedge_to(
+        self,
+        rhs: Self,
+        clockwise: bool,
+    ) -> impl ExactSizeIterator<Item = Self> {
         let range = self.unsigned_distance_to(rhs);
         let direction = self.diagonal_to(rhs);
-        self.custom_wedge(0..=range, direction, clockwise)
+        ExactSizeHexIterator {
+            iter: self.custom_wedge(0..=range, direction, clockwise),
+            count: Self::wedge_count(range) as usize,
+        }
+    }
+
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and `direction`
+    /// The returned edges coordinates are sorted counter clockwise around `self` unless
+    /// `clockwise` is set to `true`.
+    ///
+    /// See also [`Self::custom_wedge`] and [`Self::full_wedge`]
+    #[must_use]
+    pub fn custom_full_wedge(
+        self,
+        range: u32,
+        direction: DiagonalDirection,
+        clockwise: bool,
+    ) -> impl ExactSizeIterator<Item = Self> {
+        ExactSizeHexIterator {
+            iter: self.custom_wedge(0..=range, direction, clockwise),
+            count: Self::wedge_count(range) as usize,
+        }
     }
 
     /// Counts how many coordinates there are in a wedge of given `range`
@@ -247,8 +274,26 @@ impl Hex {
     /// The returned edges coordinates are sorted counter clockwise.
     ///
     /// See also [`Self::custom_ring_edges`] and [`Self::custom_wedge_to`]
-    pub fn wedge_to(self, rhs: Self) -> impl Iterator<Item = Self> {
+    #[must_use]
+    pub fn wedge_to(self, rhs: Self) -> impl ExactSizeIterator<Item = Self> {
         self.custom_wedge_to(rhs, false)
+    }
+
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and `direction`
+    /// The returned edges coordinates are sorted counter clockwise around `self` unless
+    /// `clockwise` is set to `true`.
+    ///
+    /// See also [`Self::custom_full_wedge`] and [`Self::wedge`]
+    #[must_use]
+    pub fn full_wedge(
+        self,
+        range: u32,
+        direction: DiagonalDirection,
+    ) -> impl ExactSizeIterator<Item = Self> {
+        ExactSizeHexIterator {
+            iter: self.wedge(0..=range, direction),
+            count: Self::wedge_count(range) as usize,
+        }
     }
 
     /// Retrieves all successive [`Hex`] half ring edges around `self` in a given `range` and

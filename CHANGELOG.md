@@ -2,20 +2,27 @@
 
 ## Unreleased
 
-### FixedSizeIterator
+### ExactSizeIterator
 
-* Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`
-* `Hex::range` now returns a `FixedSizeIterator` instead of a simple `Iterator`
-* `Hex::line_to` now returns a `FixedSizeIterator` instead of a simple `Iterator`
-* `shapes::hexagon` now returns a `FixedSizeIterator` instead of a simple `Iterator`
-* `HexBounds::all_coords` now returns a `FixedSizeIterator` instead of a simple `Iterator`
+* `Hex::range` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `Hex::line_to` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `Hex::wedge_to` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `Hex::custom_wedge_to` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `shapes::hexagon` now returns a `ExactSizeIterator` instead of a simple `Iterator`
+* `HexBounds::all_coords` now returns a `ExactSizeIterator` instead of a simple `Iterator`
 
-* (**BREAKING**) `Hex::ring_edge` now returns a `FixedSizeIterator` instead of a `Vec`
-* (**BREAKING**) `Hex::custom_ring_edge` now returns a `FixedSizeIterator` instead of a `Vec`
+* (**BREAKING**) `Hex::ring_edge` now returns a `ExactSizeIterator` instead of a `Vec`
+* (**BREAKING**) `Hex::custom_ring_edge` now returns a `ExactSizeIterator` instead of a `Vec`
+
+### Additions 
+
+* Added `Hex::wedge_count` to count the amount of coordinate in a wedge
+* Added `Hex::full_wedge` which returns an `ExactSizeIterator`
+* Added `Hex::custom_full_wedge` which returns an `ExactSizeIterator`
 
 ### Miscellaneous
 
-* Added `Hex::wedge_count` to count the amount of coordinate in a wedge
+* Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`
 
 ## 0.4.2
 
