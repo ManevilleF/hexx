@@ -217,10 +217,7 @@ impl Hex {
     ) -> impl ExactSizeIterator<Item = Self> {
         let range = self.unsigned_distance_to(rhs);
         let direction = self.diagonal_to(rhs);
-        ExactSizeHexIterator {
-            iter: self.custom_wedge(0..=range, direction, clockwise),
-            count: Self::wedge_count(range) as usize,
-        }
+        self.custom_full_wedge(range, direction, clockwise)
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and `direction`
@@ -280,8 +277,7 @@ impl Hex {
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and `direction`
-    /// The returned edges coordinates are sorted counter clockwise around `self` unless
-    /// `clockwise` is set to `true`.
+    /// The returned edges coordinates are sorted counter clockwise around `self`.
     ///
     /// See also [`Self::custom_full_wedge`] and [`Self::wedge`]
     #[must_use]
@@ -290,10 +286,7 @@ impl Hex {
         range: u32,
         direction: DiagonalDirection,
     ) -> impl ExactSizeIterator<Item = Self> {
-        ExactSizeHexIterator {
-            iter: self.wedge(0..=range, direction),
-            count: Self::wedge_count(range) as usize,
-        }
+        self.custom_full_wedge(range, direction, false)
     }
 
     /// Retrieves all successive [`Hex`] half ring edges around `self` in a given `range` and
