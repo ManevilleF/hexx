@@ -118,58 +118,27 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
-mod bounds;
-mod conversions;
-mod direction;
-mod hex;
-mod hex_map;
-mod layout;
-mod mesh;
-mod orientation;
+/// Hexagonal range bounds module
+pub mod bounds;
+/// Hexagonal coordinates conversion module
+pub mod conversions;
+/// Hexagonal directions module
+pub mod direction;
+/// Hexagonal coordinates module
+pub mod hex;
+/// Wraparound hex grid module
+pub mod hex_map;
+/// Hexagonal layout module
+pub mod layout;
+/// Mesh generation utils module
+pub mod mesh;
+/// Hexagon oritentation module
+pub mod orientation;
+/// Map shapes generation functions
+pub mod shapes;
 
 /// Used glam types reexport
 pub use glam::{IVec2, Vec2};
 pub use {
     bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*,
 };
-
-/// Map shapes generation functions
-pub mod shapes {
-    use super::Hex;
-
-    /// Generates a parallelogram layout from `min` to `max`
-    pub fn parallelogram(min: Hex, max: Hex) -> impl Iterator<Item = Hex> {
-        (min.x()..=max.x()).flat_map(move |x| (min.y()..=max.y()).map(move |y| Hex::new(x, y)))
-    }
-
-    /// Generates a triangle with a custom `size`
-    ///
-    /// # Note
-    ///
-    /// To offset the map, apply the offset to each `Item` of the returned iterator
-    #[allow(clippy::cast_possible_wrap)]
-    pub fn triangle(size: u32) -> impl Iterator<Item = Hex> {
-        (0..=size).flat_map(move |x| (0..=(size - x)).map(move |y| Hex::new(x as i32, y as i32)))
-    }
-
-    /// Generates an hexagonal layout around `center` with a custom `radius`.
-    pub fn hexagon(center: Hex, radius: u32) -> impl Iterator<Item = Hex> {
-        center.range(radius)
-    }
-
-    /// Generates a rectangle with the given bounds for "pointy topped" hexagons
-    pub fn pointy_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
-        (top..=bottom).flat_map(move |y| {
-            let y_offset = y >> 1;
-            ((left - y_offset)..=(right - y_offset)).map(move |x| Hex::new(x, y))
-        })
-    }
-
-    /// Generates a rectangle with the given bounds for "flat topped" hexagons
-    pub fn flat_rectangle([left, right, top, bottom]: [i32; 4]) -> impl Iterator<Item = Hex> {
-        (left..=right).flat_map(move |x| {
-            let x_offset = x >> 1;
-            ((top - x_offset)..=(bottom - x_offset)).map(move |y| Hex::new(x, y))
-        })
-    }
-}

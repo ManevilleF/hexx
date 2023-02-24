@@ -66,3 +66,30 @@ impl<I: Iterator<Item = Hex>> HexIterExt for I {
         self.collect()
     }
 }
+
+/// Private container for a [`Hex`] [`Iterator`] of known size
+#[derive(Debug, Clone)]
+pub struct ExactSizeHexIterator<I> {
+    /// The inner iterator
+    pub iter: I,
+    /// The remaining iterator elements count
+    pub count: usize,
+}
+
+impl<I> Iterator for ExactSizeHexIterator<I>
+where
+    I: Iterator<Item = Hex>,
+{
+    type Item = Hex;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.count = self.count.saturating_sub(1);
+        self.iter.next()
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.count, Some(self.count))
+    }
+}
+
+impl<I> ExactSizeIterator for ExactSizeHexIterator<I> where I: Iterator<Item = Hex> {}

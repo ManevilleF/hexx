@@ -307,8 +307,12 @@ fn lerp() {
 fn line_to() {
     let a = Hex::new(0, 0);
     let b = Hex::new(5, 0);
+    let line = a.line_to(b);
+    let len = line.len();
+    let line: Vec<_> = line.collect();
+    assert_eq!(line.len(), len);
     assert_eq!(
-        a.line_to(b).collect::<Vec<_>>(),
+        line,
         vec![
             a,
             Hex::new(1, 0),
@@ -319,8 +323,12 @@ fn line_to() {
         ]
     );
     let b = Hex::new(5, 5);
+    let line = a.line_to(b);
+    let len = line.len();
+    let line: Vec<_> = line.collect();
+    assert_eq!(line.len(), len);
     assert_eq!(
-        a.line_to(b).collect::<Vec<_>>(),
+        line,
         vec![
             a,
             Hex::new(0, 1),
@@ -340,8 +348,9 @@ fn line_to() {
 #[test]
 fn empty_line_to() {
     let start = Hex::new(3, -7);
-    let line: Vec<_> = start.line_to(start).collect();
-    assert_eq!(line, vec![start]);
+    let line = start.line_to(start);
+    assert_eq!(line.len(), 1);
+    assert_eq!(line.collect::<Vec<_>>(), vec![start]);
 }
 
 #[test]
@@ -371,6 +380,22 @@ fn range_count() {
     assert_eq!(Hex::range_count(1), 7);
     assert_eq!(Hex::range_count(10), 331);
     assert_eq!(Hex::range_count(15), 721);
+}
+
+#[test]
+fn range() {
+    let hex = Hex::new(13, -54);
+    let mut range = hex.range(16);
+    assert_eq!(range.len(), Hex::range_count(16));
+    assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
+    println!("{:#?}", range.size_hint());
+    let _ = range.next();
+    println!("{:#?}", range.size_hint());
+    assert_eq!(range.len(), Hex::range_count(16) - 1);
+    assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
+    let _ = range.next();
+    assert_eq!(range.len(), Hex::range_count(16) - 2);
+    assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
 }
 
 #[test]
@@ -426,6 +451,40 @@ fn custom_ring() {
     assert_eq!(expected.len(), ring.len());
     for h in &ring {
         assert!(expected.contains(h));
+    }
+}
+
+#[test]
+fn ring_edge() {
+    let hex = Hex::new(-189, 35);
+    let edge = hex.ring_edge(48, DiagonalDirection::TopRight);
+    assert_eq!(edge.len(), edge.count());
+    // empty
+    let edge = hex.ring_edge(0, DiagonalDirection::TopRight);
+    let len = edge.len();
+    let edge: Vec<_> = edge.collect();
+    assert_eq!(edge.len(), len);
+    assert_eq!(edge, vec![hex]);
+    // len 1
+    let edge = hex.ring_edge(1, DiagonalDirection::TopRight);
+    let len = edge.len();
+    let edge: Vec<_> = edge.collect();
+    assert_eq!(edge.len(), len);
+    assert_eq!(edge.len(), 2);
+}
+
+#[test]
+#[allow(clippy::cast_possible_truncation)]
+fn wedge() {
+    let hex = Hex::new(98, -123);
+    for dir in DiagonalDirection::ALL_DIRECTIONS {
+        for range in 0..=30 {
+            let wedge: Vec<_> = hex.wedge(0..=range, dir).collect();
+            assert_eq!(wedge.len() as u32, range * (range + 3) / 2 + 1);
+            assert_eq!(wedge.len() as u32, Hex::wedge_count(range));
+            let full_wedge = hex.full_wedge(range, dir);
+            assert_eq!(full_wedge.len(), wedge.len());
+        }
     }
 }
 
