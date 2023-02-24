@@ -1,6 +1,10 @@
 /// [`Hex`] diagonal directions
+///
+/// [`Hex`]: crate::Hex
 mod diagonal_direction;
 /// [`Hex`] neighbor directions
+///
+/// [`Hex`]: crate::Hex
 mod hex_direction;
 /// Trait implementations
 mod impls;

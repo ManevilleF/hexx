@@ -3,17 +3,17 @@ mod convert;
 /// Traits implementations
 mod impls;
 /// Iterator tools module
-pub(crate) mod iter;
+mod iter;
 /// Hex ring utils
 mod rings;
 #[cfg(test)]
 mod tests;
 
+pub(crate) use iter::ExactSizeHexIterator;
 pub use iter::HexIterExt;
 
 use crate::{DiagonalDirection, Direction};
 use glam::{IVec2, IVec3, Vec2};
-use iter::ExactSizeHexIterator;
 use itertools::Itertools;
 use std::cmp::{max, min};
 

@@ -1,7 +1,8 @@
-use crate::{hex::iter::ExactSizeHexIterator, Hex};
+use crate::{hex::ExactSizeHexIterator, Hex};
 
 /// Generates a parallelogram layout from `min` to `max`
 #[must_use]
+#[allow(clippy::cast_sign_loss)]
 pub fn parallelogram(min: Hex, max: Hex) -> impl ExactSizeIterator<Item = Hex> {
     let dist = (max.x.saturating_sub(min.x) + 1) * (max.y.saturating_sub(min.y) + 1);
     ExactSizeHexIterator {
@@ -38,6 +39,7 @@ pub fn hexagon(center: Hex, radius: u32) -> impl ExactSizeIterator<Item = Hex> {
 /// The generations goes `left` to `right` and `top` to `bottom`, therefore `right` must be greater
 /// than `left` and `bottom` must be greater than `top`.
 #[must_use]
+#[allow(clippy::cast_sign_loss)]
 pub fn pointy_rectangle(
     [left, right, top, bottom]: [i32; 4],
 ) -> impl ExactSizeIterator<Item = Hex> {
@@ -57,6 +59,7 @@ pub fn pointy_rectangle(
 /// The generations goes `left` to `right` and `top` to `bottom`, therefore `right` must be greater
 /// than `left` and `bottom` must be greater than `top`.
 #[must_use]
+#[allow(clippy::cast_sign_loss)]
 pub fn flat_rectangle([left, right, top, bottom]: [i32; 4]) -> impl ExactSizeIterator<Item = Hex> {
     let count = (right.saturating_sub(left) + 1) * (bottom.saturating_sub(top) + 1);
     ExactSizeHexIterator {
@@ -103,7 +106,7 @@ mod tests {
     fn pointy_rectangle_test() {
         for left in -20..=20 {
             for right in 0..=20 {
-                for top in -20..-20 {
+                for top in -20..=20 {
                     for bottom in 0..=20 {
                         let iter = pointy_rectangle([left, left + right, top, top + bottom]);
                         assert_eq!(iter.len(), iter.count());
@@ -117,7 +120,7 @@ mod tests {
     fn flat_rectangle_test() {
         for left in -20..=20 {
             for right in 0..=20 {
-                for top in -20..-20 {
+                for top in -20..=20 {
                     for bottom in 0..=20 {
                         let iter = flat_rectangle([left, left + right, top, top + bottom]);
                         assert_eq!(iter.len(), iter.count());

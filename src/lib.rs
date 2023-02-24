@@ -118,19 +118,27 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
-mod bounds;
-mod conversions;
-mod direction;
-mod hex;
-mod hex_map;
-mod layout;
-mod mesh;
-mod orientation;
+/// Hexagonal range bounds module
+pub mod bounds;
+/// Hexagonal coordinates conversion module
+pub mod conversions;
+/// Hexagonal directions module
+pub mod direction;
+/// Hexagonal coordinates module
+pub mod hex;
+/// Wraparound hex grid module
+pub mod hex_map;
+/// Hexagonal layout module
+pub mod layout;
+/// Mesh generation utils module
+pub mod mesh;
+/// Hexagon oritentation module
+pub mod orientation;
+/// Map shapes generation functions
+pub mod shapes;
 
 /// Used glam types reexport
 pub use glam::{IVec2, Vec2};
 pub use {
     bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*,
 };
-/// Map shapes generation functions
-pub mod shapes;

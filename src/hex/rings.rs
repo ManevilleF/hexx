@@ -70,7 +70,7 @@ impl Hex {
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
-    /// The returned coordinates start from [`start_dir`] and loop around `self` counter clockwise
+    /// The returned coordinates start from `start_dir` and loop around `self` counter clockwise
     /// unless `clockwise` is set to true.
     ///
     /// If you only need the coordinates see [`Self::spiral_range`] or [`Self::rings`].
@@ -299,7 +299,7 @@ impl Hex {
     /// Retrieves all successive [`Hex`] half ring edges around `self` in a given `range` and
     /// `direction`.
     ///
-    /// See also [`Self::wedge_dir_to`] and [`Self::wedge`]
+    /// See also [`Self::corner_wedge_to`] and [`Self::wedge`]
     pub fn corner_wedge(
         self,
         range: impl Iterator<Item = u32> + Clone,
@@ -313,7 +313,7 @@ impl Hex {
 
     /// Retrieves all successive [`Hex`] half ring edges from `self` to `rhs`
     ///
-    /// See also [`Self::wedge_dir`] and [`Self::wedge_to`]
+    /// See also [`Self::corner_wedge_to`] and [`Self::wedge_to`]
     pub fn corner_wedge_to(self, rhs: Self) -> impl Iterator<Item = Self> {
         let range = self.unsigned_distance_to(rhs);
         self.corner_wedge(0..=range, self.direction_to(rhs))
@@ -326,7 +326,7 @@ impl Hex {
     /// The returned edges coordinates are sorted counter clockwise around `self` unless
     /// `clockwise` is set to `true`.
     ///
-    /// See also [`Self::custom_cached_ring_edges`]
+    /// See also [`Self::cached_ring_edges`]
     /// If you only need the coordinates see [`Self::ring_edges`] or [`Self::wedge`].
     ///
     /// # Usage
@@ -366,7 +366,7 @@ impl Hex {
     /// `direction` as an array of edges.
     /// The returned edges coordinates are sorted counter clockwise around `self`.
     ///
-    /// See also [`Self::custom_cached_ring_edges`]
+    /// See also [`Self::cached_custom_ring_edges`]
     /// If you only need the coordinates see [`Self::ring_edges`] or [`Self::wedge`].
     ///
     /// # Usage
@@ -402,7 +402,7 @@ impl Hex {
     /// rings.
     /// The returned rings start from [`Direction::TopRight`] and loop around `self` counter clockwise.
     ///
-    /// See also [`Self::custom_cached_rings`]
+    /// See also [`Self::cached_custom_rings`]
     /// If you only need the coordinates see [`Self::range`] or [`Self::spiral_range`].
     ///
     /// # Usage
