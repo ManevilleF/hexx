@@ -17,6 +17,8 @@
 
 * (**BREAKING**) `Hex::ring_edge` now returns a `ExactSizeIterator` instead of a `Vec`
 * (**BREAKING**) `Hex::custom_ring_edge` now returns a `ExactSizeIterator` instead of a `Vec`
+* (**BREAKING**) `Hex::custom_ring_edges` now returns an `Iterator` with an `ExactSizeIterator` item instead of a `Vec`
+* (**BREAKING**) `Hex::ring_edges` now returns an `Iterator` with an `ExactSizeIterator` item instead of a `Vec`
 
 ### Additions 
 

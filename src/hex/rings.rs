@@ -158,8 +158,8 @@ impl Hex {
         self,
         ranges: impl Iterator<Item = u32>,
         direction: DiagonalDirection,
-    ) -> impl Iterator<Item = Vec<Self>> {
-        ranges.map(move |r| self.ring_edge(r, direction).collect())
+    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
+        ranges.map(move |r| self.ring_edge(r, direction))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given `ranges` and
@@ -182,8 +182,8 @@ impl Hex {
         ranges: impl Iterator<Item = u32>,
         direction: DiagonalDirection,
         clockwise: bool,
-    ) -> impl Iterator<Item = Vec<Self>> {
-        ranges.map(move |r| self.custom_ring_edge(r, direction, clockwise).collect())
+    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
+        ranges.map(move |r| self.custom_ring_edge(r, direction, clockwise))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given `ranges` and
