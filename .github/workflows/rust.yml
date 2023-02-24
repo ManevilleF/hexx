@@ -67,4 +67,4 @@ jobs:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - name: rustdoc
-        run: cargo rustdoc --all-features
+        run: cargo rustdoc --all-features -- -D warnings
