@@ -26,6 +26,19 @@
 * Added `Hex::full_wedge` which returns an `ExactSizeIterator`
 * Added `Hex::custom_full_wedge` which returns an `ExactSizeIterator`
 
+### Directions
+
+* (**BREAKING**) Removed implementation of `Direction + usize` to rotate clockwise, replaced by the shift right operator `>>`
+* (**BREAKING**) Removed implementation of `DiagonalDirection + usize` to rotate clockwise, replaced by the shift right operator `>>`
+* (**BREAKING**) Removed implementation of `Direction - usize` to rotate counter clockwise, replaced by the shift left operator `<<`
+* (**BREAKING**) Removed implementation of `DiagonalDirection - usize` to rotate counter clockwise, replaced by the shift left operator `<<`
+* Added `Hex::diagonal_neigbhor`
+* Added `Hex::diagonal_neigbhor_coord`
+* Added `Add<Direction>` and `AddAssign<Direction>` impls for `Hex` 
+* Added `Add<DiagonalDirection>` and `AddAssign<DiagonalDirection>` impls for `Hex` 
+* Added `Sub<Direction>` and `SubAssign<Direction>` impls for `Hex` 
+* Added `Sub<DiagonalDirection>` and `SubAssign<DiagonalDirection>` impls for `Hex` 
+
 ### Miscellaneous
 
 * Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`

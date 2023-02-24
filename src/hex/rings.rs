@@ -111,10 +111,10 @@ impl Hex {
     ) -> impl ExactSizeIterator<Item = Self> {
         let [start_dir, end_dir] = if clockwise {
             let dir = direction.direction_left();
-            [dir, dir + 2]
+            [dir, dir >> 2]
         } else {
             let dir = direction.direction_right();
-            [dir, dir - 2]
+            [dir, dir << 2]
         };
         let end_dir = Self::neighbor_coord(end_dir);
         let hex = self + Self::neighbor_coord(start_dir) * radius as i32;
