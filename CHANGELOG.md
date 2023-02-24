@@ -38,6 +38,8 @@
 * Added `Add<DiagonalDirection>` and `AddAssign<DiagonalDirection>` impls for `Hex` 
 * Added `Sub<Direction>` and `SubAssign<Direction>` impls for `Hex` 
 * Added `Sub<DiagonalDirection>` and `SubAssign<DiagonalDirection>` impls for `Hex` 
+* Added `Mul<i32>` for `Direction` returning its `Hex` vector multiplied
+* Added `Mul<i32>` for `DiagonalDirection` returning its `Hex` vector multiplied
 
 ### Miscellaneous
 

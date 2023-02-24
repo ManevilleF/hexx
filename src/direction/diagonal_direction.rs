@@ -20,15 +20,15 @@ use crate::{Direction, HexOrientation};
 ///
 /// ## Operations
 ///
-/// Directions can be rotated:
-///  - *clockwise* with:
+/// Directions can be:
+///  - rotated *clockwise* with:
 ///     - [`Self::right`] and [`Self::rotate_right`]
 ///     - The shift right `>>` operator
-///  - *counter clockwise* with:
+///  - rotated *counter clockwise* with:
 ///     - [`Self::left`] and [`Self::rotate_left`]
 ///     - The shift left `<<` operator
-///
-/// And negated using the minus `-` operator.
+///  - negated using the minus `-` operator
+///  - multiplied by an `i32`, returning a [`Hex`](crate::Hex) vector
 ///
 /// Example:
 /// ```rust
@@ -190,7 +190,7 @@ pub enum DiagonalDirection {
 }
 
 impl DiagonalDirection {
-    /// All 6 diagonal directions matching [`Hex::DIAGONAL_COORDS`]
+    /// All 6 diagonal directions matching [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS)
     /// ```txt
     ///            x Axis
     ///           \___/

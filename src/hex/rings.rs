@@ -26,7 +26,7 @@ impl Hex {
             directions.rotate_left(2);
         }
 
-        let mut hex = self + Self::neighbor_coord(start_dir) * range as i32;
+        let mut hex = self + start_dir * range as i32;
         let mut res = Vec::with_capacity(Self::ring_count(range));
         for dir in directions {
             (0..range).for_each(|_| {
@@ -116,8 +116,7 @@ impl Hex {
             let dir = direction.direction_right();
             [dir, dir << 2]
         };
-        let end_dir = Self::neighbor_coord(end_dir);
-        let hex = self + Self::neighbor_coord(start_dir) * radius as i32;
+        let hex = self + start_dir * radius as i32;
         ExactSizeHexIterator {
             iter: (0..=radius).map(move |i| hex + end_dir * i as i32),
             count: radius as usize + 1,
