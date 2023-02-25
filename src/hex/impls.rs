@@ -1,4 +1,4 @@
-use super::Hex;
+use crate::{DiagonalDirection, Direction, Hex};
 use std::{
     iter::{Product, Sum},
     ops::{
@@ -28,6 +28,24 @@ impl Add<i32> for Hex {
     }
 }
 
+impl Add<Direction> for Hex {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: Direction) -> Self::Output {
+        self.add(Self::from(rhs))
+    }
+}
+
+impl Add<DiagonalDirection> for Hex {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: DiagonalDirection) -> Self::Output {
+        self.add(Self::from(rhs))
+    }
+}
+
 impl AddAssign for Hex {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
@@ -38,6 +56,20 @@ impl AddAssign for Hex {
 impl AddAssign<i32> for Hex {
     #[inline]
     fn add_assign(&mut self, rhs: i32) {
+        *self = self.add(rhs);
+    }
+}
+
+impl AddAssign<Direction> for Hex {
+    #[inline]
+    fn add_assign(&mut self, rhs: Direction) {
+        *self = self.add(rhs);
+    }
+}
+
+impl AddAssign<DiagonalDirection> for Hex {
+    #[inline]
+    fn add_assign(&mut self, rhs: DiagonalDirection) {
         *self = self.add(rhs);
     }
 }
@@ -75,6 +107,24 @@ impl Sub<i32> for Hex {
     }
 }
 
+impl Sub<Direction> for Hex {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: Direction) -> Self::Output {
+        self.sub(Self::from(rhs))
+    }
+}
+
+impl Sub<DiagonalDirection> for Hex {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: DiagonalDirection) -> Self::Output {
+        self.sub(Self::from(rhs))
+    }
+}
+
 impl SubAssign for Hex {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
@@ -85,6 +135,20 @@ impl SubAssign for Hex {
 impl SubAssign<i32> for Hex {
     #[inline]
     fn sub_assign(&mut self, rhs: i32) {
+        *self = self.sub(rhs);
+    }
+}
+
+impl SubAssign<Direction> for Hex {
+    #[inline]
+    fn sub_assign(&mut self, rhs: Direction) {
+        *self = self.sub(rhs);
+    }
+}
+
+impl SubAssign<DiagonalDirection> for Hex {
+    #[inline]
+    fn sub_assign(&mut self, rhs: DiagonalDirection) {
         *self = self.sub(rhs);
     }
 }

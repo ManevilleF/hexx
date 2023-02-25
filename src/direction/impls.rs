@@ -1,6 +1,6 @@
-use std::ops::{Add, Neg, Sub};
+use std::ops::{Mul, Neg, Shl, Shr};
 
-use crate::{DiagonalDirection, Direction};
+use crate::{DiagonalDirection, Direction, Hex};
 
 impl Neg for DiagonalDirection {
     type Output = Self;
@@ -18,34 +18,50 @@ impl Neg for Direction {
     }
 }
 
-impl Add<usize> for Direction {
+impl Shr<usize> for Direction {
     type Output = Self;
 
-    fn add(self, rhs: usize) -> Self::Output {
+    fn shr(self, rhs: usize) -> Self::Output {
         self.rotate_right(rhs)
     }
 }
 
-impl Add<usize> for DiagonalDirection {
+impl Shr<usize> for DiagonalDirection {
     type Output = Self;
 
-    fn add(self, rhs: usize) -> Self::Output {
+    fn shr(self, rhs: usize) -> Self::Output {
         self.rotate_right(rhs)
     }
 }
 
-impl Sub<usize> for Direction {
+impl Shl<usize> for Direction {
     type Output = Self;
 
-    fn sub(self, rhs: usize) -> Self::Output {
+    fn shl(self, rhs: usize) -> Self::Output {
         self.rotate_left(rhs)
     }
 }
 
-impl Sub<usize> for DiagonalDirection {
+impl Shl<usize> for DiagonalDirection {
     type Output = Self;
 
-    fn sub(self, rhs: usize) -> Self::Output {
+    fn shl(self, rhs: usize) -> Self::Output {
         self.rotate_left(rhs)
+    }
+}
+
+impl Mul<i32> for Direction {
+    type Output = Hex;
+
+    fn mul(self, rhs: i32) -> Self::Output {
+        Hex::from(self).mul(rhs)
+    }
+}
+
+impl Mul<i32> for DiagonalDirection {
+    type Output = Hex;
+
+    fn mul(self, rhs: i32) -> Self::Output {
+        Hex::from(self).mul(rhs)
     }
 }

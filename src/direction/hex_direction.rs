@@ -1,6 +1,6 @@
 #[allow(clippy::wildcard_imports)]
 use super::angles::*;
-use crate::{DiagonalDirection, Hex, HexOrientation};
+use crate::{DiagonalDirection, HexOrientation};
 
 /// All 6 possible directions in hexagonal space.
 ///
@@ -19,6 +19,28 @@ use crate::{DiagonalDirection, Hex, HexOrientation};
 /// ```
 ///
 /// See [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
+///
+///
+/// ## Operations
+///
+/// Directions can be:
+///  - rotated *clockwise* with:
+///     - [`Self::right`] and [`Self::rotate_right`]
+///     - The shift right `>>` operator
+///  - rotated *counter clockwise* with:
+///     - [`Self::left`] and [`Self::rotate_left`]
+///     - The shift left `<<` operator
+///  - negated using the minus `-` operator
+///  - multiplied by an `i32`, returning a [`Hex`](crate::Hex) vector
+///
+/// Example:
+/// ```rust
+/// # use hexx::*;
+/// let direction = Direction::Top;
+/// assert_eq!(-direction, Direction::Bottom);
+/// assert_eq!(direction >> 1, Direction::TopRight);
+/// assert_eq!(direction << 1, Direction::TopLeft);
+/// ```
 #[repr(u8)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
@@ -46,6 +68,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
+    #[doc(alias = "NorthEast")]
     TopRight = 0,
     /// Direction to (0, -1)
     ///
@@ -69,6 +92,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
+    #[doc(alias = "North")]
     Top = 1,
     /// Direction to (-1, 0)
     ///
@@ -92,6 +116,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
+    #[doc(alias = "NorthWest")]
     TopLeft = 2,
     /// Direction to (-1, 1)
     ///
@@ -115,6 +140,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
+    #[doc(alias = "SouthWest")]
     BottomLeft = 3,
     /// Direction to (0, 1)
     ///
@@ -138,6 +164,7 @@ pub enum Direction {
     ///       +--+  X  +--+   y Axis
     ///           \___/
     /// ```
+    #[doc(alias = "South")]
     Bottom = 4,
     /// Drection to (1, 0)
     ///
@@ -161,6 +188,7 @@ pub enum Direction {
     ///       +--+     +--+   y Axis
     ///           \___/
     /// ```
+    #[doc(alias = "SouthEast")]
     BottomRight = 5,
 }
 
@@ -382,11 +410,5 @@ impl Direction {
             Self::Bottom => DiagonalDirection::BottomLeft,
             Self::BottomRight => DiagonalDirection::BottomRight,
         }
-    }
-}
-
-impl From<Direction> for Hex {
-    fn from(value: Direction) -> Self {
-        Self::NEIGHBORS_COORDS[value as usize]
     }
 }

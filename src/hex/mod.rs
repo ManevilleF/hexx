@@ -531,6 +531,13 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    /// Retrieves the diagonal neighbor coordinates matching the given `direction`
+    pub const fn diagonal_neighbor_coord(direction: DiagonalDirection) -> Self {
+        Self::DIAGONAL_COORDS[direction as usize]
+    }
+
+    #[inline]
+    #[must_use]
     /// Retrieves the neighbor coordinates matching the given `direction`
     ///
     /// # Example
@@ -543,6 +550,22 @@ impl Hex {
     /// ```
     pub const fn neighbor(self, direction: Direction) -> Self {
         self.const_add(Self::neighbor_coord(direction))
+    }
+
+    #[inline]
+    #[must_use]
+    /// Retrieves the diagonal neighbor coordinates matching the given `direction`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = Hex::new(10, 5);
+    /// let bottom = coord.diagonal_neighbor(DiagonalDirection::Right);
+    /// assert_eq!(bottom, Hex::new(12, 4));
+    /// ```
+    pub const fn diagonal_neighbor(self, direction: DiagonalDirection) -> Self {
+        self.const_add(Self::diagonal_neighbor_coord(direction))
     }
 
     #[inline]
