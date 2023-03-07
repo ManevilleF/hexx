@@ -31,6 +31,9 @@ version = "0.10"
 features = ["bevy_render", "bevy_pbr", "bevy_core_pipeline", "bevy_asset", "bevy_winit", "x11"]
 default-features = false
 
+[dev-dependencies]
+criterion = "0.4"
+
 [[example]]
 name = "hex_grid"
 path = "examples/hex_grid.rs"
@@ -38,6 +41,14 @@ path = "examples/hex_grid.rs"
 [[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
+
+[[bench]]
+name = "length"
+harness = false
+
+[[bench]]
+name = "wedges"
+harness = false
 
 [profile.dev]
 opt-level = 1
