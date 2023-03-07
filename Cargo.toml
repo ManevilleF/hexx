@@ -16,7 +16,7 @@ default = []
 ser_de = ["serde", "glam/serde"]
 
 [dependencies]
-glam = "0.22"
+glam = "0.23"
 itertools = "0.10"
 
 [dependencies.serde]
@@ -27,8 +27,8 @@ optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.9"
-features = ["render", "bevy_asset", "bevy_winit", "x11"]
+version = "0.10"
+features = ["bevy_render", "bevy_pbr", "bevy_core_pipeline", "bevy_asset", "bevy_winit", "x11"]
 default-features = false
 
 [[example]]
