@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::render::mesh::Indices;
 use bevy::render::render_resource::PrimitiveTopology;
-use bevy::time::common_conditions::on_fixed_timer;
+use bevy::time::common_conditions::on_timer;
 use hexx::shapes;
 use hexx::*;
 use std::collections::HashMap;
@@ -25,11 +25,7 @@ pub fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup_camera)
         .add_startup_system(setup_grid)
-        .add_system(
-            animate_rings
-                .in_schedule(CoreSchedule::FixedUpdate)
-                .run_if(on_fixed_timer(TIME_STEP)),
-        )
+        .add_system(animate_rings.run_if(on_timer(TIME_STEP)))
         .run();
 }
 
