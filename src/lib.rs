@@ -87,7 +87,7 @@
 //! let world_pos = layout.hex_to_world_pos(hex);
 //!```
 //!
-//! ## Usage in [Bevy](https://bevyengine.org/) 0.9.x
+//! ## Usage in [Bevy](https://bevyengine.org/)
 //!
 //! If you want to generate 3D hexagonal mesh and use it in [bevy](bevyengine.org) you may do it this way:
 //!

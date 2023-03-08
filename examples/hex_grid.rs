@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 use bevy::render::mesh::Indices;
 use bevy::render::render_resource::PrimitiveTopology;
+use bevy::window::PrimaryWindow;
 use hexx::shapes;
 use hexx::*;
 
@@ -16,11 +17,10 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
-            window: WindowDescriptor {
-                width: 1_000.0,
-                height: 1_000.0,
+            primary_window: Some(Window {
+                resolution: (1_000.0, 1_000.0).into(),
                 ..default()
-            },
+            }),
             ..default()
         }))
         .add_startup_system(setup_camera)
@@ -115,11 +115,11 @@ fn setup_grid(
 /// Input interaction
 fn handle_input(
     mut commands: Commands,
-    windows: Res<Windows>,
+    windows: Query<&Window, With<PrimaryWindow>>,
     map: Res<Map>,
     mut highlighted_hexes: Local<HighlightedHexes>,
 ) {
-    let window = windows.primary();
+    let window = windows.single();
     if let Some(pos) = window.cursor_position() {
         let pos = Vec2::new(pos.x, window.height() - pos.y)
             - Vec2::new(window.width(), window.height()) / 2.0;

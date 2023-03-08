@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 use bevy::render::mesh::Indices;
 use bevy::render::render_resource::PrimitiveTopology;
-use bevy::time::FixedTimestep;
+use bevy::time::common_conditions::on_timer;
 use hexx::shapes;
 use hexx::*;
 use std::collections::HashMap;
+use std::time::Duration;
 
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(1.0);
@@ -12,6 +13,8 @@ const HEX_SIZE: Vec2 = Vec2::splat(1.0);
 const COLUMN_HEIGHT: f32 = 10.0;
 /// Map radius
 const MAP_RADIUS: u32 = 20;
+/// Animation time step
+const TIME_STEP: Duration = Duration::from_millis(100);
 
 pub fn main() {
     App::new()
@@ -22,11 +25,7 @@ pub fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup_camera)
         .add_startup_system(setup_grid)
-        .add_system_set(
-            SystemSet::new()
-                .with_run_criteria(FixedTimestep::step(0.1))
-                .with_system(animate_rings),
-        )
+        .add_system(animate_rings.run_if(on_timer(TIME_STEP)))
         .run();
 }
 

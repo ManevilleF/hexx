@@ -45,6 +45,8 @@
 
 * Deprecated `Hex::to_array3` in favor of `Hex::to_cubic_array`
 * Made most modules public but kept the wildcard exports at the crate root
+* Bump `bevy` dev dependenvy to `0.10` and updated the examples
+* Bump `glam` to `0.23`
 
 ## 0.4.2
 
