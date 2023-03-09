@@ -1,5 +1,8 @@
-<!-- cargo-sync-readme start -->
+<p align="center">
+  <img src="docs/logo.png" alt="logo">
+</p>
 
+<!-- cargo-sync-readme start -->
  # Hexx
 
  [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
