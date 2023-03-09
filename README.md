@@ -2,15 +2,14 @@
   <img src="docs/logo.png" alt="logo">
 </p>
 
-<!-- cargo-sync-readme start -->
- # Hexx
+[![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
+[![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
+[![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
+[![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.5.0/status.svg)](https://deps.rs/crate/hexx)
 
- [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
- [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
- [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
- [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
- [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
- [![dependency status](https://deps.rs/crate/hexx/0.5.0/status.svg)](https://deps.rs/crate/hexx)
+<!-- cargo-sync-readme start -->
 
  Hexagonal tools lib in rust.
 
