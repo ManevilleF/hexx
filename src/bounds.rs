@@ -8,7 +8,7 @@ use crate::Hex;
 /// ```rust
 /// # use hexx::*;
 ///
-/// let iter = Hex::ZERO.line_to(Hexx:new(123, -456));
+/// let iter = Hex::ZERO.line_to(Hex::new(123, -456));
 /// // You can compute the bounds of `iter`
 /// let bounds: HexBounds = iter.collect();
 /// ```

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Unreleased
+
+* Documentation improvements
+* Added `HexMap::bounds` getter method
+
 ## 0.5.0
 
 ### ExactSizeIterator

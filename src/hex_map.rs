@@ -12,10 +12,10 @@ use crate::{Hex, HexBounds};
 /// let map = HexMap::new(10).with_center(Hex::new(1, 2));
 /// // Define a coordinate, even ouside of bounds
 /// let hex = Hex::new(100, 100);
-/// assert!(!map.bounds.is_in_bounds(hex));
+/// assert!(!map.bounds().is_in_bounds(hex));
 /// // Retrieve the wrapped position in the map
 /// let wrapped_hex = map.wrapped_hex(hex);
-/// assert!(map.bounds.is_in_bounds(hex));
+/// assert!(map.bounds().is_in_bounds(wrapped_hex));
 /// ```
 ///
 /// [wraparound]: https://www.redblobgames.com/grids/hexagons/#wraparound
@@ -64,6 +64,13 @@ impl HexMap {
     /// Returns the map center coordinates
     pub const fn center(&self) -> Hex {
         self.bounds.center
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the map bounds
+    pub const fn bounds(&self) -> &HexBounds {
+        &self.bounds
     }
 
     #[inline]

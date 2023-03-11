@@ -20,7 +20,7 @@
 //!
 //! ### Cargo features
 //!
-//! `hexx` supports serialization and deserialization of most types using [serde],
+//! `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
 //! through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
 //!
 //! - `hexx = { version = "0.5", features = ["ser_de"] }`
@@ -141,8 +141,7 @@ pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
 
-/// Used glam types reexport
-pub use glam::{IVec2, Vec2};
+pub use glam::{IVec2, IVec3, Vec2};
 pub use {
     bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*,
 };

@@ -33,7 +33,7 @@
 
  ### Cargo features
 
- `hexx` supports serialization and deserialization of most types using [serde],
+ `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
  through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
 
  - `hexx = { version = "0.5", features = ["ser_de"] }`
