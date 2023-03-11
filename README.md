@@ -1,13 +1,15 @@
+<p align="center">
+  <img src="docs/logo.png" alt="logo">
+</p>
+
+[![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
+[![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
+[![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
+[![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.5.0/status.svg)](https://deps.rs/crate/hexx)
+
 <!-- cargo-sync-readme start -->
-
- # Hexx
-
- [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
- [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
- [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
- [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
- [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
- [![dependency status](https://deps.rs/crate/hexx/0.5.0/status.svg)](https://deps.rs/crate/hexx)
 
  Hexagonal tools lib in rust.
 
@@ -22,6 +24,19 @@
  but the [`Hex`] type has conversion utilities with *cubic*, *doubled* and *offset* coordinates.
 
  > See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates)
+
+ ## Installation
+
+ Run `cargo add hexx` in your project or add the following line to your `Cargo.toml`:
+
+ - `hexx = "0.5`
+
+ ### Cargo features
+
+ `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
+ through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
+
+ - `hexx = { version = "0.5", features = ["ser_de"] }`
 
  ## Features
 

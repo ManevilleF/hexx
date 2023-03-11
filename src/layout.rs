@@ -3,6 +3,25 @@ use glam::Vec2;
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel* coordinate system
 /// and the hexagonal coordinate system.
+///
+/// # Example
+///
+/// ```rust
+/// # use hexx::*;
+///
+/// let layout = HexLayout {
+///     // We want flat topped hexagons
+///     orientation: HexOrientation::flat(),
+///     // We define the world space origin equivalent of `Hex::ZERO` in hex space
+///     origin: Vec2::new(1.0, 2.0),
+///     // We define the world space size of the hexagons
+///     hex_size: Vec2::new(1.0, 1.0)
+/// };
+/// // You can now find the world positon (center) of any given hexagon
+/// let world_pos = layout.hex_to_world_pos(Hex::ZERO);
+/// // You can also find which hexagon is at a given world/screen position
+/// let hex_pos = layout.world_pos_to_hex(Vec2::new(1.23, 45.678));
+/// ```
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexLayout {

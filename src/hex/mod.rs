@@ -36,8 +36,8 @@ use std::cmp::{max, min};
 /// # Conversions
 ///
 ///  * Cubic: use [`Self::z`] to compute the third axis
-///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::from_offset_coordinates`]
-///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::from_doubled_coordinates`]
+///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::to_offset_coordinates`]
+///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::to_doubled_coordinates`]
 ///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
@@ -453,6 +453,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    #[doc(alias = "magnitude")]
     /// Computes coordinates length as a signed integer.
     /// The lenght of a [`Hex`] coordinate is equal to its distance from the origin.
     ///
