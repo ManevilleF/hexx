@@ -25,6 +25,19 @@
 
  > See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates)
 
+ ## Installation
+
+ Run `cargo add hexx` in your project or add the following line to your `Cargo.toml`:
+
+ - `hexx = "0.5`
+
+ ### Cargo features
+
+ `hexx` supports serialization and deserialization of most types using [serde],
+ through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
+
+ - `hexx = { version = "0.5", features = ["ser_de"] }`
+
  ## Features
 
  `hexx` provides the [`Hex`] coordinates with:

@@ -1,6 +1,17 @@
 use crate::Hex;
 
-/// Hexagonal bounds utils, representer as a center and radius
+/// Hexagonal bounds utils, representer as a center and radius.
+/// This type can be defined manually or from a [`Hex`] iterator.
+///
+/// # Example
+///
+/// ```rust
+/// # use hexx::*;
+///
+/// let iter = Hex::ZERO.line_to(Hexx:new(123, -456));
+/// // You can compute the bounds of `iter`
+/// let bounds: HexBounds = iter.collect();
+/// ```
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexBounds {

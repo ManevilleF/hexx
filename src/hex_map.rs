@@ -1,11 +1,28 @@
 use crate::{Hex, HexBounds};
 
 /// Hexagon shaped map with [wraparound] utils.
+/// This is very useful for seamless repeating maps, with features like going out of the map on one
+/// side and getting teleported to the other side.
+///
+/// # Example
+///
+/// ```rust
+/// # use hexx::*;
+///
+/// let map = HexMap::new(10).with_center(Hex::new(1, 2));
+/// // Define a coordinate, even ouside of bounds
+/// let hex = Hex::new(100, 100);
+/// assert!(!map.bounds.is_in_bounds(hex));
+/// // Retrieve the wrapped position in the map
+/// let wrapped_hex = map.wrapped_hex(hex);
+/// assert!(map.bounds.is_in_bounds(hex));
+/// ```
 ///
 /// [wraparound]: https://www.redblobgames.com/grids/hexagons/#wraparound
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexMap {
+    /// The bounds of the map
     bounds: HexBounds,
     /// The 6 mirror centers, used to wrap coordinates
     mirrors: [Hex; 6],
@@ -56,9 +73,10 @@ impl HexMap {
         self.bounds.radius
     }
 
-    /// Wraps `hex` in the given map radius.
-    /// this allows for seamless *wraparound* hexagonal maps.
-    /// See this [article] for more information.
+    /// Wraps `hex` in the given map, always returning a coordinate in the map bounds.
+    ///
+    /// > This allows for seamless *wraparound* hexagonal maps.
+    /// > See this [article] for more information.
     ///
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     #[must_use]
