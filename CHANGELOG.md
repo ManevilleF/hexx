@@ -4,6 +4,7 @@
 
 * Documentation improvements
 * Added `HexMap::bounds` getter method
+* Added `glam::IVec3` reexport
 
 ## 0.5.0
 
