@@ -50,5 +50,13 @@ harness = false
 name = "wedges"
 harness = false
 
+[[bench]]
+name = "lines"
+harness = false
+
+[[bench]]
+name = "rings"
+harness = false
+
 [profile.dev]
 opt-level = 1
