@@ -121,7 +121,7 @@
 //! - [`MeshInfo::hexagonal_column`] (38 vertices) with the bottom face
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
-#![allow(clippy::default_trait_access, clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions)]
 /// Hexagonal range bounds module
 pub mod bounds;
 /// Hexagonal coordinates conversion module
