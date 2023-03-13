@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 0.5.1
 
 * Documentation improvements
 * Added `HexMap::bounds` getter method
