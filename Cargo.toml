@@ -31,8 +31,9 @@ version = "0.10"
 features = ["bevy_render", "bevy_pbr", "bevy_core_pipeline", "bevy_asset", "bevy_winit", "x11"]
 default-features = false
 
-[dev-dependencies]
-criterion = "0.4"
+[dev-dependencies.criterion]
+version = "0.4"
+features = ["html_reports"]
 
 [[example]]
 name = "hex_grid"
