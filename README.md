@@ -29,7 +29,7 @@
 
  Run `cargo add hexx` in your project or add the following line to your `Cargo.toml`:
 
- - `hexx = "0.5`
+ - `hexx = "0.5"`
 
  ### Cargo features
 
