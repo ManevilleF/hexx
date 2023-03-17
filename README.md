@@ -143,11 +143,11 @@
 
  > `cargo run --example hex_grid`
 
- ![example](docs/scroll_map.png?)
+ ![example](docs/scroll_map.mp4)
 
  > `cargo run --example scroll_map`
 
- ![example](docs/wrap_map.png?)
+ ![example](docs/wrap_map.mp4)
 
  > `cargo run --example wrap_map`
 
