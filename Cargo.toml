@@ -40,6 +40,10 @@ name = "hex_grid"
 path = "examples/hex_grid.rs"
 
 [[example]]
+name = "scroll_map"
+path = "examples/scroll_map.rs"
+
+[[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
 
