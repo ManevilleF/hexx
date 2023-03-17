@@ -34,6 +34,8 @@ struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub layout: HexLayout,
     pub wrap_map: HexMap,
+    pub default_mat: Handle<StandardMaterial>,
+    pub selected_mat: Handle<StandardMaterial>,
 }
 
 /// 3D Orthogrpahic camera setup
@@ -55,19 +57,17 @@ fn setup_grid(
         ..default()
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
-
+    let default_mat = materials.add(Color::WHITE.into());
+    let selected_mat = materials.add(Color::RED.into());
     let wrap_map = HexMap::new(MAP_RADIUS);
     let entities = wrap_map
         .all_coords()
         .map(|hex| {
-            let v = 1.0 - (hex.length() as f32 / MAP_RADIUS as f32);
-            let color = Color::rgb(v, v, v);
-            let material = materials.add(color.into());
             let pos = layout.hex_to_world_pos(hex);
             let entity = commands
                 .spawn(MaterialMeshBundle {
                     mesh: mesh.clone(),
-                    material,
+                    material: default_mat.clone(),
                     transform: Transform::from_xyz(pos.x, 0.0, pos.y),
                     ..default()
                 })
@@ -79,6 +79,8 @@ fn setup_grid(
         entities,
         layout,
         wrap_map,
+        default_mat,
+        selected_mat,
     })
 }
 
@@ -87,19 +89,24 @@ fn handle_input(
     mut commands: Commands,
     windows: Query<&Window, With<PrimaryWindow>>,
     grid: Res<HexGrid>,
+    mut current_hex: Local<Hex>,
 ) {
     let window = windows.single();
     if let Some(pos) = window.cursor_position() {
         let pos = Vec2::new(pos.x, window.height() - pos.y)
             - Vec2::new(window.width(), window.height()) / 2.0;
         let hex_pos = grid.layout.world_pos_to_hex(pos);
-        for h in hex_pos.range(grid.wrap_map.bounds().radius) {
-            let wrapped = grid.wrap_map.wrapped_hex(h);
-            let pos = grid.layout.hex_to_world_pos(h);
-            commands
-                .entity(grid.entities[&wrapped])
-                .insert(Transform::from_xyz(pos.x, 0.0, pos.y));
+        if hex_pos == *current_hex {
+            return;
         }
+        let wrapped = grid.wrap_map.wrapped_hex(hex_pos);
+        commands
+            .entity(grid.entities[&current_hex])
+            .insert(grid.default_mat.clone());
+        commands
+            .entity(grid.entities[&wrapped])
+            .insert(grid.selected_mat.clone());
+        *current_hex = wrapped;
     }
 }
 

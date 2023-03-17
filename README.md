@@ -143,6 +143,14 @@
 
  > `cargo run --example hex_grid`
 
+ ![example](docs/scroll_map.png?)
+
+ > `cargo run --example scroll_map`
+
+ ![example](docs/wrap_map.png?)
+
+ > `cargo run --example wrap_map`
+
  ![example](docs/3d_columns.png?)
 
  > `cargo run --example 3d_columns`
