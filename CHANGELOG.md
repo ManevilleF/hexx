@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 0.5.2 
 
 * `HexMap::all_coords` now returns a `ExactSizeIterator` instead of a simple `Iterator`
 * Added `scroll_map` example
