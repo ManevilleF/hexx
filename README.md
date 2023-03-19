@@ -137,12 +137,20 @@
 
 > See the [examples](examples) for bevy usage
 
- ## Example
+ ## Examples
 
- ![example](docs/hex_grid.png?)
+  <img src='docs/hex_grid.png?' width=500/>
 
  > `cargo run --example hex_grid`
 
- ![example](docs/3d_columns.png?)
+  https://user-images.githubusercontent.com/26703856/225945177-7fb8eb73-0bca-47c8-af68-9643c7b229f2.mp4
+
+ > `cargo run --example scroll_map`
+
+  https://user-images.githubusercontent.com/26703856/225945154-8395f5cb-9de3-42c8-86b0-674bc1a1c499.mp4
+
+ > `cargo run --example wrap_map`
+
+  <img src='docs/3d_columns.png?' width=500/>
 
  > `cargo run --example 3d_columns`

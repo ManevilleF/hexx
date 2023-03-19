@@ -109,7 +109,8 @@ impl HexMap {
     }
 
     /// Returns an iterator with all the coordinates in the map bounds
-    pub fn all_coords(&self) -> impl Iterator<Item = Hex> {
+    #[must_use]
+    pub fn all_coords(&self) -> impl ExactSizeIterator<Item = Hex> {
         self.bounds.all_coords()
     }
 }
