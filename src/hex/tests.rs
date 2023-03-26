@@ -368,6 +368,7 @@ fn empty_line_to() {
 }
 
 #[test]
+#[allow(deprecated)]
 fn directions_to() {
     let a = Hex::new(0, 0);
     let b = Hex::new(5, 5);
