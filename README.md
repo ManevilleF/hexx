@@ -139,18 +139,18 @@
 
  ## Examples
 
-![hex_grid](docs/hex_grid.png, "hex grid example")
+![hex_grid](docs/hex_grid.png "hex grid example")
 
  > `cargo run --example hex_grid`
 
-![scroll_map](docs/scroll_map.gif, "scroll map example")
+![scroll_map](docs/scroll_map.gif "scroll map example")
 
  > `cargo run --example scroll_map`
 
-![wrap_map](docs/wrap_map.gif, "wrap map example")
+![wrap_map](docs/wrap_map.gif "wrap map example")
 
  > `cargo run --example wrap_map`
 
-![columns](docs/3d_columns.png, "3d columns example")
+![columns](docs/3d_columns.png "3d columns example")
 
  > `cargo run --example 3d_columns`
