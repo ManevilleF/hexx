@@ -16,7 +16,6 @@ pub use iter::HexIterExt;
 
 use crate::{DiagonalDirection, Direction};
 use glam::{IVec2, IVec3, Vec2};
-use itertools::Itertools;
 use std::cmp::{max, min};
 
 /// Hexagonal [axial] coordinates
@@ -589,18 +588,6 @@ impl Hex {
         Direction::iter().find(|&dir| self.neighbor(dir) == other)
     }
 
-    #[inline]
-    #[deprecated(
-        since = "0.5.3",
-        note = "0.6.0 will drop this method, open an issue if you are using it"
-    )]
-    /// Retrieves all directions in the line between `self` and `other`
-    pub fn directions_to(self, other: Self) -> impl Iterator<Item = Direction> {
-        self.line_to(other)
-            .tuple_windows::<(_, _)>()
-            .filter_map(|(a, b)| a.neighbor_direction(b))
-    }
-
     #[must_use]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
     pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
@@ -859,13 +846,9 @@ impl Hex {
         }
         let mut res = self;
         while res.ulength() > radius {
-            let mirror = mirrors
-                .iter()
-                .copied()
-                .sorted_unstable_by_key(|m| res.distance_to(*m))
-                .next()
-                .unwrap(); // Safe
-            res -= mirror;
+            let mut mirror = mirrors.to_vec();
+            mirrors.sort_unstable_by_key(|m| res.distance_to(*m));
+            res -= mirrors[0];
         }
         res
     }

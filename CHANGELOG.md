@@ -3,6 +3,8 @@
 ## Unreleased
 
 * Changed logo (#63)
+* Drop `itertools` dependency
+* Removed deprecated `Hex::directions_to` method
 
 ## 0.5.3 
 

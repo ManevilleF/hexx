@@ -17,7 +17,6 @@ ser_de = ["serde", "glam/serde"]
 
 [dependencies]
 glam = "0.23"
-itertools = "0.10"
 
 [dependencies.serde]
 version = "1"
