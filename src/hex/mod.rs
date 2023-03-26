@@ -846,7 +846,7 @@ impl Hex {
         }
         let mut res = self;
         while res.ulength() > radius {
-            let mut mirror = mirrors.to_vec();
+            let mut mirrors = mirrors.to_vec();
             mirrors.sort_unstable_by_key(|m| res.distance_to(*m));
             res -= mirrors[0];
         }
