@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+* Improved `README` examples section
+
 ## 0.5.2 
 
 * `HexMap::all_coords` now returns a `ExactSizeIterator` instead of a simple `Iterator`

@@ -139,18 +139,28 @@
 
  ## Examples
 
-  <img src='docs/hex_grid.png?' width=500/>
+`hexx` provides interactive examples showcasing various features:
+
+![hex_grid](docs/hex_grid.png "hex grid example")
 
  > `cargo run --example hex_grid`
 
-  https://user-images.githubusercontent.com/26703856/225945177-7fb8eb73-0bca-47c8-af68-9643c7b229f2.mp4
+This example showcases hex ranges, rings, wedges, rotation, and lines
+
+![scroll_map](docs/scroll_map.gif "scroll map example")
 
  > `cargo run --example scroll_map`
 
-  https://user-images.githubusercontent.com/26703856/225945154-8395f5cb-9de3-42c8-86b0-674bc1a1c499.mp4
+ This example showcases the `HexMap` struct for scrolling maps
+
+![wrap_map](docs/wrap_map.gif "wrap map example")
 
  > `cargo run --example wrap_map`
 
-  <img src='docs/3d_columns.png?' width=500/>
+ This example showcases the `HexMap` struct for looping/wrapping map
+
+![columns](docs/3d_columns.png "3d columns example")
 
  > `cargo run --example 3d_columns`
+
+ This example showcases the 3d hexagon columns procedural generation
