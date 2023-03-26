@@ -590,6 +590,10 @@ impl Hex {
     }
 
     #[inline]
+    #[deprecated(
+        since = "0.5.3",
+        note = "0.6.0 will drop this method, open an issue if you are using it"
+    )]
     /// Retrieves all directions in the line between `self` and `other`
     pub fn directions_to(self, other: Self) -> impl Iterator<Item = Direction> {
         self.line_to(other)

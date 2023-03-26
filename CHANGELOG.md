@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 0.5.3 
 
 * Improved `README` examples section
 * Added `Hex` swizzle methods:
@@ -13,6 +13,7 @@
   * `zx`
   * `zy`
 * Improved CI workflow and added a check for a new entry in `CHANGELOG.md`
+* Deprecated `Hex::directions_to`
 
 ## 0.5.2 
 
