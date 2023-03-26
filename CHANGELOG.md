@@ -12,6 +12,7 @@
   * `xz`
   * `zx`
   * `zy`
+* Improved CI workflow and added a check for a new entry in `CHANGELOG.md`
 
 ## 0.5.2 
 
