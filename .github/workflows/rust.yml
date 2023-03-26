@@ -20,26 +20,30 @@ jobs:
         run: cargo build --verbose
 
   examples:
+    needs: [build, fmt]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - name: build examples
         run: cargo build --examples --verbose
-  test:
+
+  tests:
+    needs: [build, fmt]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-      - name: test
+      - name: Run tests
         run: cargo test --tests --all-features
 
   doctest:
+    needs: [build, fmt]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-      - name: test
+      - name: Run doctests
         run: cargo test --doc --all-features
 
   fmt:
@@ -51,21 +55,33 @@ jobs:
         run: cargo fmt --all -- --check
 
   clippy:
+    needs: [build, fmt]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - name: Cargo clippy installation
         run: rustup component add clippy
-      - name: clippy default check
+      - name: Run clippy default check
         run: cargo clippy --all --tests -- -D warnings
-      - name: clippy all features check
+      - name: Run clippy all features check
         run: cargo clippy --all-features --all --tests -- -D warnings
 
   rustdoc:
+    needs: [build, fmt]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-      - name: rustdoc
+      - name: Run rustdoc
         run: cargo rustdoc --all-features -- -D warnings
+
+  checks:
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce changelog
+        uses: dangoslen/changelog-enforcer@v3
+        with:
+          missingUpdateErrorMessage: Please add an entry to the CHANGELOG documenting your changes
+
