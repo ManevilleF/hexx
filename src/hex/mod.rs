@@ -6,6 +6,8 @@ mod impls;
 mod iter;
 /// Hex ring utils
 mod rings;
+/// swizzle utils
+mod siwzzle;
 #[cfg(test)]
 mod tests;
 
@@ -649,6 +651,15 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] counter clockwise (by -60 degrees)
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let hex = Hex::new(1, 2);
+    /// assert_eq!(hex.left(), Hex::new(3, -1));
+    /// ```
     pub const fn left(self) -> Self {
         Self::new(-self.z(), -self.x)
     }
@@ -684,6 +695,15 @@ impl Hex {
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] clockwise (by 60 degrees)
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let hex = Hex::new(1, 2);
+    /// assert_eq!(hex.right(), Hex::new(-2, 3));
+    /// ```
     pub const fn right(self) -> Self {
         Self::new(-self.y, -self.z())
     }

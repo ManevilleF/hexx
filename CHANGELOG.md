@@ -3,6 +3,15 @@
 ## Unreleased
 
 * Improved `README` examples section
+* Added `Hex` swizzle methods:
+  * `xx`
+  * `yy`
+  * `zz`
+  * `yx`
+  * `yz`
+  * `xz`
+  * `zx`
+  * `zy`
 
 ## 0.5.2 
 
