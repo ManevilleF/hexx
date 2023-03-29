@@ -4,6 +4,9 @@ mod convert;
 mod impls;
 /// Iterator tools module
 mod iter;
+#[cfg(feature = "packed_hex")]
+/// packed hex module
+mod packed;
 /// Hex ring utils
 mod rings;
 /// swizzle utils
@@ -13,6 +16,8 @@ mod tests;
 
 pub(crate) use iter::ExactSizeHexIterator;
 pub use iter::HexIterExt;
+#[cfg(feature = "packed_hex")]
+pub use packed::PackedHex;
 
 use crate::{DiagonalDirection, Direction};
 use glam::{IVec2, IVec3, Vec2};

@@ -11,7 +11,8 @@ repository = "https://github.com/ManevilleF/hexx"
 exclude = [".github"]
 
 [features]
-default = []
+default = ["packed_hex"]
+packed_hex = []
 # serde compatibility
 ser_de = ["serde", "glam/serde"]
 

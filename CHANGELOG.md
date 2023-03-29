@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+* Added `PackedHex` struct for bit packed `Hex` coordinates
+
 ## 0.5.3 
 
 * Improved `README` examples section
