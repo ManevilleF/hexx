@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.png" alt="logo">
+  <img src="docs/hexx.png?" alt="logo">
 </p>
 
 [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
