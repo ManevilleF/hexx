@@ -368,28 +368,6 @@ fn empty_line_to() {
 }
 
 #[test]
-#[allow(deprecated)]
-fn directions_to() {
-    let a = Hex::new(0, 0);
-    let b = Hex::new(5, 5);
-    assert_eq!(
-        a.directions_to(b).collect::<Vec<_>>(),
-        vec![
-            Direction::Bottom,
-            Direction::BottomRight,
-            Direction::Bottom,
-            Direction::BottomRight,
-            Direction::Bottom,
-            Direction::BottomRight,
-            Direction::Bottom,
-            Direction::BottomRight,
-            Direction::Bottom,
-            Direction::BottomRight
-        ]
-    );
-}
-
-#[test]
 fn range_count() {
     assert_eq!(Hex::range_count(0), 1);
     assert_eq!(Hex::range_count(1), 7);
