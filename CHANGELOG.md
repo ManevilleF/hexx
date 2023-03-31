@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+* Changed logo (#63)
+
 ## 0.5.3 
 
 * Improved `README` examples section
