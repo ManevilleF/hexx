@@ -12,10 +12,6 @@ const MAP_RADIUS: u32 = 10;
 
 pub fn main() {
     App::new()
-        .insert_resource(AmbientLight {
-            brightness: 1.0,
-            ..default()
-        })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 resolution: (1_000.0, 1_000.0).into(),
@@ -34,23 +30,19 @@ struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub layout: HexLayout,
     pub wrap_map: HexMap,
-    pub default_mat: Handle<StandardMaterial>,
-    pub selected_mat: Handle<StandardMaterial>,
+    pub default_mat: Handle<ColorMaterial>,
+    pub selected_mat: Handle<ColorMaterial>,
 }
 
 /// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 10.0, 0.0).looking_at(Vec3::ZERO, -Vec3::Z),
-        projection: OrthographicProjection::default().into(),
-        ..default()
-    });
+    commands.spawn(Camera2dBundle::default());
 }
 
 fn setup_grid(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let layout = HexLayout {
         hex_size: HEX_SIZE,
@@ -65,10 +57,10 @@ fn setup_grid(
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let entity = commands
-                .spawn(MaterialMeshBundle {
-                    mesh: mesh.clone(),
+                .spawn(ColorMesh2dBundle {
+                    mesh: mesh.clone().into(),
                     material: default_mat.clone(),
-                    transform: Transform::from_xyz(pos.x, 0.0, pos.y),
+                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
                     ..default()
                 })
                 .id();
@@ -93,8 +85,7 @@ fn handle_input(
 ) {
     let window = windows.single();
     if let Some(pos) = window.cursor_position() {
-        let pos = Vec2::new(pos.x, window.height() - pos.y)
-            - Vec2::new(window.width(), window.height()) / 2.0;
+        let pos = pos - Vec2::new(window.width(), window.height()) / 2.0;
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         if hex_pos == *current_hex {
             return;
@@ -112,7 +103,7 @@ fn handle_input(
 
 /// Compute a bevy mesh from the layout
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
-    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO);
+    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO).facing(Vec3::Z);
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
