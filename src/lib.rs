@@ -25,6 +25,12 @@
 //!
 //! - `hexx = { version = "0.5", features = ["ser_de"] }`
 //!
+//! By default `Hex` uses rust classic memory layout, if you want to use `hexx` through the FFI or
+//! have `Hex` be stored without any memory padding, the `packed` feature will make `Hex`
+//! `repr(C)`. To enable this behaviour add the following line to your `Cargo.toml`:
+//!
+//! - `hexx = { version = "0.5", features = ["packed"] }`
+//!
 //! ## Features
 //!
 //! `hexx` provides the [`Hex`] coordinates with:

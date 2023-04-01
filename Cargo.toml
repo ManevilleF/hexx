@@ -12,6 +12,7 @@ exclude = [".github"]
 
 [features]
 default = []
+packed = []
 # serde compatibility
 ser_de = ["serde", "glam/serde"]
 

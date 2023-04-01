@@ -10,6 +10,7 @@
   - Before: `Hex::new()`
   - Now: `hex()`
 * `Hex` won't derive `Debug` or `Hash` on spirv archs (#66)
+* Added `packed` feature to make `Hex` `repr(C)` (#67)
 
 ### Examples
 
