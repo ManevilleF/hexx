@@ -55,18 +55,18 @@ fn hex_length() {
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]
 fn hex_avg_center() {
-    let hexes = [
+    let points = [
         Hex::ONE,
         Hex::new(5, -12),
         Hex::new(15, 2),
         Hex::new(-5, 24),
         Hex::new(-1, 17),
     ];
-    let mean = hexes.iter().sum::<Hex>() / hexes.len() as i32;
+    let mean = points.iter().sum::<Hex>() / points.len() as i32;
     let center = Hex::new(10, 12) / 2;
 
-    assert_eq!(hexes.into_iter().average(), mean);
-    assert_eq!(hexes.into_iter().center(), center);
+    assert_eq!(points.into_iter().average(), mean);
+    assert_eq!(points.into_iter().center(), center);
     assert_ne!(center, mean);
 
     for r in 0..30 {
@@ -122,12 +122,12 @@ fn int_division() {
 
     for x in 0..30 {
         for y in 0..30 {
-            let hex = Hex { x, y };
+            let p = Hex { x, y };
             for d in 1..30 {
-                let expected_len = hex.length() / d;
-                let res_int = hex / d;
-                let res_float = hex / d as f32;
-                let res_lerp = Hex::ZERO.lerp(hex, expected_len as f32 / hex.length() as f32);
+                let expected_len = p.length() / d;
+                let res_int = p / d;
+                let res_float = p / d as f32;
+                let res_lerp = Hex::ZERO.lerp(p, expected_len as f32 / p.length() as f32);
 
                 assert_eq!(res_int.length(), expected_len);
                 assert_eq!(res_int, res_float);
@@ -141,19 +141,19 @@ fn int_division() {
 fn hex_rem() {
     for x in 1..30 {
         for y in 1..30 {
-            let hex = Hex::new(x, y);
+            let p = Hex::new(x, y);
             for x2 in 1..30 {
                 for y2 in 1..30 {
                     // Int
                     let rhs = x2;
-                    let div = hex / rhs;
-                    let rem = hex % rhs;
-                    assert_eq!(div * rhs + rem, hex);
+                    let div = p / rhs;
+                    let rem = p % rhs;
+                    assert_eq!(div * rhs + rem, p);
                     // Hex
                     let rhs = Hex::new(x2, y2);
-                    let div = hex / rhs;
-                    let rem = hex % rhs;
-                    assert_eq!(div * rhs + rem, hex);
+                    let div = p / rhs;
+                    let rem = p % rhs;
+                    assert_eq!(div * rhs + rem, p);
                 }
             }
         }
@@ -237,52 +237,52 @@ fn rotation() {
 
 #[test]
 fn rotate_right() {
-    let hex = Hex::new(5, 0);
-    let new = hex.right();
+    let point = Hex::new(5, 0);
+    let new = point.right();
     assert_eq!(new, Hex::new(0, 5));
-    assert_eq!(hex.rotate_right(1), new);
+    assert_eq!(point.rotate_right(1), new);
     let new = new.right();
     assert_eq!(new, Hex::new(-5, 5));
-    assert_eq!(hex.rotate_right(2), new);
+    assert_eq!(point.rotate_right(2), new);
     let new = new.right();
     assert_eq!(new, Hex::new(-5, 0));
-    assert_eq!(hex.rotate_right(3), new);
+    assert_eq!(point.rotate_right(3), new);
     let new = new.right();
     assert_eq!(new, Hex::new(0, -5));
-    assert_eq!(hex.rotate_right(4), new);
+    assert_eq!(point.rotate_right(4), new);
     let new = new.right();
     assert_eq!(new, Hex::new(5, -5));
-    assert_eq!(hex.rotate_right(5), new);
+    assert_eq!(point.rotate_right(5), new);
     let new = new.right();
-    assert_eq!(new, hex);
-    assert_eq!(hex.rotate_right(6), new);
-    assert_eq!(hex.rotate_right(7), hex.rotate_right(1));
-    assert_eq!(hex.rotate_right(10), hex.rotate_right(4));
+    assert_eq!(new, point);
+    assert_eq!(point.rotate_right(6), new);
+    assert_eq!(point.rotate_right(7), point.rotate_right(1));
+    assert_eq!(point.rotate_right(10), point.rotate_right(4));
 }
 
 #[test]
 fn rotate_left() {
-    let hex = Hex::new(5, 0);
-    let new = hex.left();
+    let point = Hex::new(5, 0);
+    let new = point.left();
     assert_eq!(new, Hex::new(5, -5));
-    assert_eq!(hex.rotate_left(1), new);
+    assert_eq!(point.rotate_left(1), new);
     let new = new.left();
     assert_eq!(new, Hex::new(0, -5));
-    assert_eq!(hex.rotate_left(2), new);
+    assert_eq!(point.rotate_left(2), new);
     let new = new.left();
     assert_eq!(new, Hex::new(-5, 0));
-    assert_eq!(hex.rotate_left(3), new);
+    assert_eq!(point.rotate_left(3), new);
     let new = new.left();
     assert_eq!(new, Hex::new(-5, 5));
-    assert_eq!(hex.rotate_left(4), new);
+    assert_eq!(point.rotate_left(4), new);
     let new = new.left();
     assert_eq!(new, Hex::new(0, 5));
-    assert_eq!(hex.rotate_left(5), new);
+    assert_eq!(point.rotate_left(5), new);
     let new = new.left();
-    assert_eq!(new, hex);
-    assert_eq!(hex.rotate_left(6), new);
-    assert_eq!(hex.rotate_left(7), hex.rotate_left(1));
-    assert_eq!(hex.rotate_left(10), hex.rotate_left(4));
+    assert_eq!(new, point);
+    assert_eq!(point.rotate_left(6), new);
+    assert_eq!(point.rotate_left(7), point.rotate_left(1));
+    assert_eq!(point.rotate_left(10), point.rotate_left(4));
 }
 
 #[test]
@@ -377,8 +377,8 @@ fn range_count() {
 
 #[test]
 fn range() {
-    let hex = Hex::new(13, -54);
-    let mut range = hex.range(16);
+    let point = Hex::new(13, -54);
+    let mut range = point.range(16);
     assert_eq!(range.len(), Hex::range_count(16));
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
     println!("{:#?}", range.size_hint());
@@ -393,16 +393,16 @@ fn range() {
 
 #[test]
 fn ring() {
-    let hex = Hex::ZERO;
-    assert_eq!(hex.ring(0), vec![hex]);
-    let expected = hex.all_neighbors().to_vec();
-    assert_eq!(hex.ring(1), expected);
+    let point = Hex::ZERO;
+    assert_eq!(point.ring(0), vec![point]);
+    let expected = point.all_neighbors().to_vec();
+    assert_eq!(point.ring(1), expected);
 
     let radius = 5;
-    let mut range: Vec<_> = hex.range(radius).collect();
-    let removed: Vec<_> = hex.range(radius - 1).collect();
+    let mut range: Vec<_> = point.range(radius).collect();
+    let removed: Vec<_> = point.range(radius - 1).collect();
     range.retain(|h| !removed.contains(h));
-    let ring = hex.ring(5);
+    let ring = point.ring(5);
     assert_eq!(ring.len(), range.len());
     for h in &ring {
         assert!(range.contains(h));
@@ -412,10 +412,10 @@ fn ring() {
 #[test]
 #[allow(clippy::cast_possible_truncation)]
 fn cached_rings() {
-    let hex = Hex::ZERO;
-    let cache = hex.cached_rings::<10>();
+    let point = Hex::ZERO;
+    let cache = point.cached_rings::<10>();
     for (r, ring) in cache.into_iter().enumerate() {
-        assert_eq!(ring, hex.ring(r as u32));
+        assert_eq!(ring, point.ring(r as u32));
     }
 }
 
@@ -430,17 +430,17 @@ fn ring_offset() {
 
 #[test]
 fn custom_ring() {
-    let hex = Hex::ZERO;
-    assert_eq!(hex.custom_ring(0, Direction::TopLeft, true), vec![hex]);
+    let point = Hex::ZERO;
+    assert_eq!(point.custom_ring(0, Direction::TopLeft, true), vec![point]);
 
     // clockwise
-    let mut expected = hex.ring(5);
+    let mut expected = point.ring(5);
     expected.reverse();
     expected.rotate_right(1);
-    assert_eq!(hex.custom_ring(5, Direction::TopRight, true), expected);
+    assert_eq!(point.custom_ring(5, Direction::TopRight, true), expected);
     // offsetted
-    let expected = hex.ring(5);
-    let ring = hex.custom_ring(5, Direction::BottomLeft, false);
+    let expected = point.ring(5);
+    let ring = point.custom_ring(5, Direction::BottomLeft, false);
     assert_eq!(expected.len(), ring.len());
     for h in &ring {
         assert!(expected.contains(h));
@@ -449,17 +449,17 @@ fn custom_ring() {
 
 #[test]
 fn ring_edge() {
-    let hex = Hex::new(-189, 35);
-    let edge = hex.ring_edge(48, DiagonalDirection::TopRight);
+    let point = Hex::new(-189, 35);
+    let edge = point.ring_edge(48, DiagonalDirection::TopRight);
     assert_eq!(edge.len(), edge.count());
     // empty
-    let edge = hex.ring_edge(0, DiagonalDirection::TopRight);
+    let edge = point.ring_edge(0, DiagonalDirection::TopRight);
     let len = edge.len();
     let edge: Vec<_> = edge.collect();
     assert_eq!(edge.len(), len);
-    assert_eq!(edge, vec![hex]);
+    assert_eq!(edge, vec![point]);
     // len 1
-    let edge = hex.ring_edge(1, DiagonalDirection::TopRight);
+    let edge = point.ring_edge(1, DiagonalDirection::TopRight);
     let len = edge.len();
     let edge: Vec<_> = edge.collect();
     assert_eq!(edge.len(), len);
@@ -469,13 +469,13 @@ fn ring_edge() {
 #[test]
 #[allow(clippy::cast_possible_truncation)]
 fn wedge() {
-    let hex = Hex::new(98, -123);
+    let point = Hex::new(98, -123);
     for dir in DiagonalDirection::ALL_DIRECTIONS {
         for range in 0..=30 {
-            let wedge: Vec<_> = hex.wedge(0..=range, dir).collect();
+            let wedge: Vec<_> = point.wedge(0..=range, dir).collect();
             assert_eq!(wedge.len() as u32, range * (range + 3) / 2 + 1);
             assert_eq!(wedge.len() as u32, Hex::wedge_count(range));
-            let full_wedge = hex.full_wedge(range, dir);
+            let full_wedge = point.full_wedge(range, dir);
             assert_eq!(full_wedge.len(), wedge.len());
         }
     }

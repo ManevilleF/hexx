@@ -235,9 +235,9 @@ impl Hex {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let hex = Hex::from_array([3, 5]);
-    /// assert_eq!(hex.x, 3);
-    /// assert_eq!(hex.y, 5);
+    /// let p = Hex::from_array([3, 5]);
+    /// assert_eq!(p.x, 3);
+    /// assert_eq!(p.y, 5);
     /// ```
     pub const fn from_array([x, y]: [i32; 2]) -> Self {
         Self::new(x, y)
@@ -683,8 +683,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.left(), Hex::new(3, -1));
+    /// let p = Hex::new(1, 2);
+    /// assert_eq!(p.left(), Hex::new(3, -1));
     /// ```
     pub const fn left(self) -> Self {
         Self::new(-self.z(), -self.x)
@@ -727,8 +727,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.right(), Hex::new(-2, 3));
+    /// let p = Hex::new(1, 2);
+    /// assert_eq!(p.right(), Hex::new(-2, 3));
     /// ```
     pub const fn right(self) -> Self {
         Self::new(-self.y, -self.z())

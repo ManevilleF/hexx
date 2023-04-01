@@ -11,8 +11,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.xx(), Hex::new(1, 1));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.xx(), Hex::new(1, 1));
     /// ```
     pub const fn xx(self) -> Self {
         Self::splat(self.x)
@@ -28,8 +28,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.yy(), Hex::new(2, 2));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.yy(), Hex::new(2, 2));
     /// ```
     pub const fn yy(self) -> Self {
         Self::splat(self.y)
@@ -45,8 +45,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.zz(), Hex::new(-3, -3));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.zz(), Hex::new(-3, -3));
     /// ```
     pub const fn zz(self) -> Self {
         Self::splat(self.z())
@@ -62,8 +62,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.yx(), Hex::new(2, 1));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.yx(), Hex::new(2, 1));
     /// ```
     pub const fn yx(self) -> Self {
         Self {
@@ -82,8 +82,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.yz(), Hex::new(2, -3));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.yz(), Hex::new(2, -3));
     /// ```
     pub const fn yz(self) -> Self {
         Self {
@@ -102,8 +102,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.xz(), Hex::new(1, -3));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.xz(), Hex::new(1, -3));
     /// ```
     pub const fn xz(self) -> Self {
         Self {
@@ -122,8 +122,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.zx(), Hex::new(-3, 1));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.zx(), Hex::new(-3, 1));
     /// ```
     pub const fn zx(self) -> Self {
         Self {
@@ -142,8 +142,8 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let hex = Hex::new(1, 2);
-    /// assert_eq!(hex.zy(), Hex::new(-3, 2));
+    /// let point = Hex::new(1, 2);
+    /// assert_eq!(point.zy(), Hex::new(-3, 2));
     /// ```
     pub const fn zy(self) -> Self {
         Self {

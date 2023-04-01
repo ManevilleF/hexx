@@ -77,9 +77,9 @@ mod tests {
 
     #[test]
     fn hexagon_test() {
-        let hex = Hex::new(3, -987);
+        let point = Hex::new(3, -987);
         for range in 0..=30 {
-            let iter = hexagon(hex, range);
+            let iter = hexagon(point, range);
             assert_eq!(iter.len(), iter.count());
         }
     }
