@@ -5,13 +5,13 @@
 * Changed logo (#63)
 * Drop `itertools` dependency (#58)
 * Removed deprecated `Hex::directions_to` method (#58)
-* added `MeshInfo::facing` utils method to rotate hex meshes
+* added `MeshInfo::facing` utils method to rotate hex meshes (#65)
 
 ### Examples
 
-* `hex_grid` example now uses a 2d mesh and camera
-* `scroll_map` example now uses a 2d mesh and camera
-* `wrap_map` example now uses a 2d mesh and camera
+* `hex_grid` example now uses a 2d mesh and camera (#65)
+* `scroll_map` example now uses a 2d mesh and camera (#65)
+* `wrap_map` example now uses a 2d mesh and camera (#65)
 
 ## 0.5.3 
 
