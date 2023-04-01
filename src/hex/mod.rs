@@ -1,3 +1,4 @@
+#![allow(clippy::inline_always)]
 /// Type conversions
 mod convert;
 /// Traits implementations
@@ -42,13 +43,31 @@ use std::cmp::{max, min};
 ///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
-#[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Default, Eq, PartialEq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Debug, Hash))]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct Hex {
     /// `x` axial coordinate (sometimes called `q` or `i`)
     pub x: i32,
     /// `y` axial coordinate (sometimes called `r` or `j`)
     pub y: i32,
+}
+
+#[inline(always)]
+#[must_use]
+/// Instantiates a new hexagon from axial coordinates
+///
+/// # Example
+///
+/// ```rust
+/// # use hexx::*;
+/// let coord = hex(3, 5);
+/// assert_eq!(coord.x, 3);
+/// assert_eq!(coord.y, 5);
+/// assert_eq!(coord.z(), -3-5);
+/// ```
+pub const fn hex(x: i32, y: i32) -> Hex {
+    Hex::new(x, y)
 }
 
 impl Hex {
@@ -125,7 +144,7 @@ impl Hex {
         Self::ONE,
     ];
 
-    #[inline]
+    #[inline(always)]
     #[must_use]
     /// Instantiates a new hexagon from axial coordinates
     ///
@@ -210,6 +229,22 @@ impl Hex {
 
     #[inline]
     #[must_use]
+    /// Creates a [`Hex`] from an array
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let hex = Hex::from_array([3, 5]);
+    /// assert_eq!(hex.x, 3);
+    /// assert_eq!(hex.y, 5);
+    /// ```
+    pub const fn from_array([x, y]: [i32; 2]) -> Self {
+        Self::new(x, y)
+    }
+
+    #[inline]
+    #[must_use]
     /// Converts `self` to an array as `[x, y]`
     ///
     /// # Example
@@ -251,7 +286,7 @@ impl Hex {
         self.to_cubic_array()
     }
 
-    // Creates a [`Hex`] from the first 2 values in `slice`.
+    /// Creates a [`Hex`] from the first 2 values in `slice`.
     ///
     /// # Panics
     ///

@@ -5,7 +5,11 @@
 * Changed logo (#63)
 * Drop `itertools` dependency (#58)
 * Removed deprecated `Hex::directions_to` method (#58)
-* added `MeshInfo::facing` utils method to rotate hex meshes (#65)
+* Added `MeshInfo::facing` utils method to rotate hex meshes (#65)
+* Added `hex` utils function to create an `Hex`, making it less boilerplate (#66):
+  - Before: `Hex::new()`
+  - Now: `hex()`
+* `Hex` won't derive `Debug` or `Hash` on spirv archs (#66)
 
 ### Examples
 

@@ -62,8 +62,8 @@
  use hexx::*;
 
  // Declare points in hexagonal spaces
- let point_a = Hex::new(10, -5);
- let point_b = Hex::new(-8, 15);
+ let point_a = hex(10, -5); // Equivalent of `Hex::new(10, -5)`
+ let point_b = hex(-8, 15);
  // Find distance between them
  let dist = point_a.unsigned_distance_to(point_b);
  // Compute a line between points
@@ -100,7 +100,7 @@
  let world_pos = Vec2::new(53.52, 189.28);
  let hex = layout.world_pos_to_hex(world_pos);
  // Get the world position of `hex`
- let hex = Hex::new(123, 45);
+ let hex = hex(123, 45);
  let world_pos = layout.hex_to_world_pos(hex);
 ```
 
