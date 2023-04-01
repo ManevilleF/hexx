@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/hexx.png?" alt="logo">
+  <img src="docs/hexx.png?" alt="Hexx">
 </p>
 
 [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
@@ -37,6 +37,12 @@
  through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
 
  - `hexx = { version = "0.5", features = ["ser_de"] }`
+
+ By default `Hex` uses rust classic memory layout, if you want to use `hexx` through the FFI or
+ have `Hex` be stored without any memory padding, the `packed` feature will make `Hex`
+ `repr(C)`. To enable this behaviour add the following line to your `Cargo.toml`:
+
+ - `hexx = { version = "0.5", features = ["packed"] }`
 
  ## Features
 

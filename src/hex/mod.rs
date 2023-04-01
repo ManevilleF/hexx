@@ -46,6 +46,7 @@ use std::cmp::{max, min};
 #[derive(Copy, Clone, Default, Eq, PartialEq)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug, Hash))]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "packed", repr(C))]
 pub struct Hex {
     /// `x` axial coordinate (sometimes called `q` or `i`)
     pub x: i32,
