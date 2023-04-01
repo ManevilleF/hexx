@@ -19,7 +19,7 @@ const TIME_STEP: Duration = Duration::from_millis(100);
 pub fn main() {
     App::new()
         .insert_resource(AmbientLight {
-            brightness: 1.0,
+            brightness: 0.1,
             ..default()
         })
         .add_plugins(DefaultPlugins)
@@ -44,8 +44,13 @@ struct HighlightedHexes {
 
 /// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
+    let transform = Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y);
     commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 50.0, 50.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform,
+        ..default()
+    });
+    commands.spawn(DirectionalLightBundle {
+        transform,
         ..default()
     });
 }
@@ -72,7 +77,8 @@ fn setup_grid(
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
                 .spawn(PbrBundle {
-                    transform: Transform::from_xyz(pos.x, 0.0, pos.y).with_scale(Vec3::splat(0.9)),
+                    transform: Transform::from_xyz(pos.x, hex.length() as f32 / 2.0, pos.y)
+                        .with_scale(Vec3::splat(0.9)),
                     mesh: mesh_handle.clone(),
                     material: default_material.clone(),
                     ..default()

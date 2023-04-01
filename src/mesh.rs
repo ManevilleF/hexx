@@ -1,5 +1,8 @@
 use crate::{Hex, HexLayout};
-use glam::{Vec2, Vec3};
+use glam::{Quat, Vec2, Vec3};
+
+const UP_VECTOR: [f32; 3] = [0.0, 1.0, 0.0];
+const DOWN_VECTOR: [f32; 3] = [0.0, -1.0, 0.0];
 
 #[derive(Debug, Clone)]
 /// Mesh information. The `const LEN` attribute ensures that there is the same number of vertices, normals and uvs
@@ -12,6 +15,34 @@ pub struct MeshInfo<const LEN: usize> {
     pub uvs: [[f32; 2]; LEN],
     /// Vertex indices for triangles
     pub indices: Vec<u16>,
+    /// Direction the mesh is facing
+    facing: [f32; 3],
+}
+
+impl<const LEN: usize> MeshInfo<LEN> {
+    /// Returns a new [`MeshInfo`] but rotated in order to face `facing` direction
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `facing` is zero length
+    #[inline]
+    #[must_use]
+    pub fn facing(self, facing: Vec3) -> Self {
+        let current_facing = Vec3::from_array(self.facing);
+        let facing = facing.normalize();
+        let rotation = Quat::from_rotation_arc(current_facing, facing);
+
+        Self {
+            vertices: self
+                .vertices
+                .map(|v| rotation.mul_vec3(Vec3::from_array(v)).to_array()),
+            normals: self
+                .normals
+                .map(|n| rotation.mul_vec3(Vec3::from_array(n)).to_array()),
+            facing: facing.to_array(),
+            ..self
+        }
+    }
 }
 
 impl MeshInfo<7> {
@@ -42,7 +73,7 @@ impl MeshInfo<7> {
                 (corners[4] + uv_delta).to_array(),
                 (corners[5] + uv_delta).to_array(),
             ],
-            normals: [[0., 1., 0.]; 7],
+            normals: [UP_VECTOR; 7],
             indices: vec![
                 1, 0, 2, // 1
                 2, 0, 3, // 2
@@ -51,6 +82,7 @@ impl MeshInfo<7> {
                 5, 0, 6, // 5
                 6, 0, 1, // 6
             ],
+            facing: UP_VECTOR,
         }
     }
 }
@@ -175,13 +207,13 @@ impl MeshInfo<31> {
             ],
             normals: [
                 // Top face
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
                 // Quad 0
                 quad_normals[0],
                 quad_normals[0],
@@ -214,6 +246,7 @@ impl MeshInfo<31> {
                 quad_normals[5],
             ],
             indices,
+            facing: UP_VECTOR,
         }
     }
 }
@@ -280,7 +313,7 @@ impl MeshInfo<13> {
         Self {
             vertices,
             normals: [
-                [0., 1., 0.],
+                UP_VECTOR,
                 quad_normals[0],
                 quad_normals[1],
                 quad_normals[2],
@@ -296,6 +329,7 @@ impl MeshInfo<13> {
             ],
             uvs: [[0., 1.]; 13], // TODO: Find decent UV mapping
             indices,
+            facing: UP_VECTOR,
         }
     }
 }
@@ -445,13 +479,13 @@ impl MeshInfo<38> {
             ],
             normals: [
                 // Top face
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
-                [0., 1., 0.],
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
+                UP_VECTOR,
                 // Quad 0
                 quad_normals[0],
                 quad_normals[0],
@@ -483,15 +517,16 @@ impl MeshInfo<38> {
                 quad_normals[5],
                 quad_normals[5],
                 // Bottom face
-                [0., -1., 0.],
-                [0., -1., 0.],
-                [0., -1., 0.],
-                [0., -1., 0.],
-                [0., -1., 0.],
-                [0., -1., 0.],
-                [0., -1., 0.],
+                DOWN_VECTOR,
+                DOWN_VECTOR,
+                DOWN_VECTOR,
+                DOWN_VECTOR,
+                DOWN_VECTOR,
+                DOWN_VECTOR,
+                DOWN_VECTOR,
             ],
             indices,
+            facing: UP_VECTOR,
         }
     }
 }
