@@ -9,13 +9,13 @@ use crate::{Hex, HexBounds};
 /// ```rust
 /// # use hexx::*;
 ///
-/// let map = HexMap::new(10).with_center(Hex::new(1, 2));
+/// let map = HexMap::new(10).with_center(hex(1, 2));
 /// // Define a coordinate, even ouside of bounds
-/// let hex = Hex::new(100, 100);
-/// assert!(!map.bounds().is_in_bounds(hex));
+/// let point = Hex::new(100, 100);
+/// assert!(!map.bounds().is_in_bounds(point));
 /// // Retrieve the wrapped position in the map
-/// let wrapped_hex = map.wrapped_hex(hex);
-/// assert!(map.bounds().is_in_bounds(wrapped_hex));
+/// let wrapped_point = map.wrapped_hex(point);
+/// assert!(map.bounds().is_in_bounds(wrapped_point));
 /// ```
 ///
 /// [wraparound]: https://www.redblobgames.com/grids/hexagons/#wraparound

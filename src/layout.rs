@@ -86,13 +86,13 @@ mod tests {
 
     #[test]
     fn flat_corners() {
-        let hex = Hex::new(0, 0);
+        let point = Hex::new(0, 0);
         let layout = HexLayout {
             orientation: HexOrientation::flat(),
             origin: Vec2::ZERO,
             hex_size: Vec2::new(10., 10.),
         };
-        let corners = layout.hex_corners(hex).map(Vec2::round);
+        let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
             corners,
             [
@@ -108,13 +108,13 @@ mod tests {
 
     #[test]
     fn pointy_corners() {
-        let hex = Hex::new(0, 0);
+        let point = Hex::new(0, 0);
         let layout = HexLayout {
             orientation: HexOrientation::pointy(),
             origin: Vec2::ZERO,
             hex_size: Vec2::new(10., 10.),
         };
-        let corners = layout.hex_corners(hex).map(Vec2::round);
+        let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
             corners,
             [

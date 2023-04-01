@@ -26,12 +26,12 @@ impl Hex {
             directions.rotate_left(2);
         }
 
-        let mut hex = self + start_dir * range as i32;
+        let mut point = self + start_dir * range as i32;
         let mut res = Vec::with_capacity(Self::ring_count(range));
         for dir in directions {
             (0..range).for_each(|_| {
-                res.push(hex);
-                hex += dir;
+                res.push(point);
+                point += dir;
             });
         }
         res
@@ -116,9 +116,9 @@ impl Hex {
             let dir = direction.direction_right();
             [dir, dir << 2]
         };
-        let hex = self + start_dir * radius as i32;
+        let p = self + start_dir * radius as i32;
         ExactSizeHexIterator {
-            iter: (0..=radius).map(move |i| hex + end_dir * i as i32),
+            iter: (0..=radius).map(move |i| p + end_dir * i as i32),
             count: radius as usize + 1,
         }
     }
@@ -243,8 +243,8 @@ impl Hex {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let hex = Hex::new(3, -6);
-    /// let wedge: Vec<Hex> = hex.wedge(0..=13, DiagonalDirection::Right).collect();
+    /// let point = Hex::new(3, -6);
+    /// let wedge: Vec<Hex> = point.wedge(0..=13, DiagonalDirection::Right).collect();
     /// assert_eq!(wedge.len(), Hex::wedge_count(13) as usize);
     /// ```
     #[inline]

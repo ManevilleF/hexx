@@ -114,9 +114,9 @@ fn handle_input(
     let window = windows.single();
     if let Some(pos) = window.cursor_position() {
         let pos = pos - Vec2::new(window.width(), window.height()) / 2.0;
-        let hex = map.layout.world_pos_to_hex(pos);
-        if let Some(entity) = map.entities.get(&hex).copied() {
-            if hex == highlighted_hexes.selected {
+        let coord = map.layout.world_pos_to_hex(pos);
+        if let Some(entity) = map.entities.get(&coord).copied() {
+            if coord == highlighted_hexes.selected {
                 return;
             }
             // Clear highlighted hexes materials
@@ -141,17 +141,17 @@ fn handle_input(
                 .entity(map.entities[&highlighted_hexes.halfway])
                 .insert(map.default_material.clone());
             // Draw a  line
-            highlighted_hexes.line = Hex::ZERO.line_to(hex).collect();
+            highlighted_hexes.line = Hex::ZERO.line_to(coord).collect();
             // Draw a ring
-            highlighted_hexes.ring = Hex::ZERO.ring(hex.ulength());
+            highlighted_hexes.ring = Hex::ZERO.ring(coord.ulength());
             // Draw an wedge
-            highlighted_hexes.wedge = Hex::ZERO.wedge_to(hex).collect();
+            highlighted_hexes.wedge = Hex::ZERO.wedge_to(coord).collect();
             // Draw a half ring
-            highlighted_hexes.half_ring = Hex::ZERO.ring(hex.ulength() / 2);
+            highlighted_hexes.half_ring = Hex::ZERO.ring(coord.ulength() / 2);
             // Draw rotations
-            highlighted_hexes.rotated = (1..6).map(|i| hex.rotate_right(i)).collect();
+            highlighted_hexes.rotated = (1..6).map(|i| coord.rotate_right(i)).collect();
             // Draw an dual wedge
-            highlighted_hexes.dir_wedge = Hex::ZERO.corner_wedge_to(hex / 2).collect();
+            highlighted_hexes.dir_wedge = Hex::ZERO.corner_wedge_to(coord / 2).collect();
             for (vec, mat) in [
                 (&highlighted_hexes.ring, &map.ring_material),
                 (&highlighted_hexes.wedge, &map.wedge_material),
@@ -167,7 +167,7 @@ fn handle_input(
                 }
             }
             // Make the half selction red
-            highlighted_hexes.halfway = hex / 2;
+            highlighted_hexes.halfway = coord / 2;
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
                 .insert(map.selected_material.clone());
@@ -175,7 +175,7 @@ fn handle_input(
             commands
                 .entity(entity)
                 .insert(map.selected_material.clone());
-            highlighted_hexes.selected = hex;
+            highlighted_hexes.selected = coord;
         }
     }
 }

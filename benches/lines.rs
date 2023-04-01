@@ -8,8 +8,8 @@ pub fn line_benchmark(c: &mut Criterion) {
 
     group.bench_with_input(BenchmarkId::new("Line", dist), &dist, |b, dist| {
         b.iter(|| {
-            let hex = black_box(Hex::ZERO);
-            hex.line_to(black_box(Hex::splat(*dist)))
+            let p = black_box(Hex::ZERO);
+            p.line_to(black_box(Hex::splat(*dist)))
         })
     });
     group.finish();

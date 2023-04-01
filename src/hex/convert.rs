@@ -4,14 +4,14 @@ use glam::{IVec2, IVec3, Vec2};
 impl From<(i32, i32)> for Hex {
     #[inline]
     fn from((x, y): (i32, i32)) -> Self {
-        Self { x, y }
+        Self::new(x, y)
     }
 }
 
 impl From<[i32; 2]> for Hex {
     #[inline]
-    fn from([x, y]: [i32; 2]) -> Self {
-        Self { x, y }
+    fn from(a: [i32; 2]) -> Self {
+        Self::from_array(a)
     }
 }
 
