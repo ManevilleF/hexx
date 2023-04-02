@@ -27,12 +27,9 @@ impl Ord for Node {
 }
 
 fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
-    let mut path = vec![end];
-    let mut current = end;
-    while let Some(previous) = came_from.get(&current) {
-        current = *previous;
-        path.push(current);
-    }
+    let mut path: Vec<_> =
+        std::iter::successors(Some(end), move |&current| came_from.get(&current).copied())
+            .collect();
     path.reverse();
     path
 }
@@ -54,7 +51,7 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 /// let forbidden_coords: HashSet<Hex> = vec![hex(2, 0), hex(3,0), hex(1, 1)].into();
 /// let path = a_star(start, end, |h| (!forbidden_coords.contains(&h)).then_some(0));
 /// ```
-pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Vec<Hex> {
+pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option<Vec<Hex>> {
     let heuristic = |h: Hex| h.unsigned_distance_to(start);
 
     let start_node = Node {
@@ -71,7 +68,7 @@ pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Vec<He
 
     while let Some(node) = open.pop() {
         if node.coord == end {
-            return reconstruct_path(&came_from, end);
+            return Some(reconstruct_path(&came_from, end));
         }
         for neighbor in node.coord.all_neighbors() {
             let Some(cost) = cost(neighbor) else { continue };
@@ -88,5 +85,5 @@ pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Vec<He
             }
         }
     }
-    vec![]
+    None
 }
