@@ -103,7 +103,6 @@ fn handle_input(
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else { return };
         if buttons.just_pressed(MouseButton::Left) {
-            //
             if grid.blocked_coords.contains(&hex_pos) {
                 grid.blocked_coords.remove(&hex_pos);
                 commands.entity(entity).insert(grid.default_mat.clone());
