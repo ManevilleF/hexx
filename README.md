@@ -1,4 +1,6 @@
-![logo](docs/hexx.png? "Hexx")
+<p align="center">
+  <img src="docs/hexx.png?" alt="Hexx">
+</p>
 
 [![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
