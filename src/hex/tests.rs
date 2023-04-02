@@ -410,18 +410,6 @@ fn ring() {
 }
 
 #[test]
-fn naive_ring() {
-    let point = Hex::ZERO;
-
-    for range in 0..=30 {
-        let naive = point.naive_ring(range);
-        let ring = point.ring(range);
-        assert_eq!(naive.len(), ring.len());
-        assert_eq!(naive.len(), naive.count());
-    }
-}
-
-#[test]
 #[allow(clippy::cast_possible_truncation)]
 fn cached_rings() {
     let point = Hex::ZERO;

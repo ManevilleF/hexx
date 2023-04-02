@@ -16,8 +16,6 @@
 
 * (**BREAKING**) `Hex::ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
 * (**BREAKING**) `Hex::custom_ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
-* (**BREAKING**) `Hex::rings` now returns an iterator of `ExactSizeIterator` instead of `Vec` (#68)
-* (**BREAKING**) `Hex::custom_rings` now returns an iterator of `ExactSizeIterator` instead of `Vec` (#68)
 
 ### Examples
 

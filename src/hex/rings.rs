@@ -74,11 +74,8 @@ impl Hex {
     /// let rings: Vec<Vec<Hex>> = Hex::ZERO.rings(3..10).collect();
     /// assert_eq!(rings.len(), 7);
     /// ```
-    pub fn rings(
-        self,
-        range: impl Iterator<Item = u32>,
-    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
-        range.map(move |r| self.ring(r))
+    pub fn rings(self, range: impl Iterator<Item = u32>) -> impl Iterator<Item = Vec<Self>> {
+        range.map(move |r| self.ring(r).collect())
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
@@ -99,8 +96,8 @@ impl Hex {
         range: impl Iterator<Item = u32>,
         start_dir: Direction,
         clockwise: bool,
-    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
-        range.map(move |r| self.custom_ring(r, start_dir, clockwise))
+    ) -> impl Iterator<Item = Vec<Self>> {
+        range.map(move |r| self.custom_ring(r, start_dir, clockwise).collect())
     }
 
     #[must_use]
