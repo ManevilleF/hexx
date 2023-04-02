@@ -3,12 +3,13 @@ use std::collections::{BinaryHeap, HashMap};
 
 struct Node {
     coord: Hex,
-    cost: u32,
+    /// distance
+    heuristic: u32,
 }
 
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
-        self.cost == other.cost
+        self.heuristic == other.heuristic
     }
 }
 
@@ -16,13 +17,13 @@ impl Eq for Node {}
 
 impl PartialOrd for Node {
     fn partial_cmp(&self, rhs: &Self) -> Option<std::cmp::Ordering> {
-        rhs.cost.partial_cmp(&self.cost)
+        rhs.heuristic.partial_cmp(&self.heuristic)
     }
 }
 
 impl Ord for Node {
     fn cmp(&self, rhs: &Self) -> std::cmp::Ordering {
-        rhs.cost.cmp(&self.cost)
+        rhs.heuristic.cmp(&self.heuristic)
     }
 }
 
@@ -93,15 +94,17 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option<Vec<Hex>> {
     let heuristic = |h: Hex| h.unsigned_distance_to(start);
 
+    // We return early if the end is not included
+    cost(end)?;
     let start_node = Node {
         coord: start,
-        cost: heuristic(start),
+        heuristic: heuristic(start),
     };
     let mut open = BinaryHeap::new();
-    let mut costs = HashMap::new();
-    costs.insert(start, start_node.cost);
-    let mut came_from = HashMap::new();
     open.push(start_node);
+    let mut costs = HashMap::new();
+    costs.insert(start, 0);
+    let mut came_from = HashMap::new();
 
     while let Some(node) = open.pop() {
         if node.coord == end {
@@ -109,13 +112,13 @@ pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option
         }
         for neighbor in node.coord.all_neighbors() {
             let Some(cost) = cost(neighbor) else { continue };
-            let neighbor_cost = costs[&node.coord] + cost + heuristic(neighbor);
+            let neighbor_cost = costs[&node.coord] + cost;
             if !costs.contains_key(&neighbor) || costs[&neighbor] > neighbor_cost {
                 came_from.insert(neighbor, node.coord);
                 costs.insert(neighbor, neighbor_cost);
                 open.push(Node {
                     coord: neighbor,
-                    cost: neighbor_cost,
+                    heuristic: neighbor_cost + heuristic(neighbor),
                 });
             }
         }
