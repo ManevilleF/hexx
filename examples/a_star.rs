@@ -7,8 +7,8 @@ use bevy::{
 use hexx::{algorithms::a_star, *};
 
 /// World size of the hexagons (outer radius)
-const HEX_SIZE: Vec2 = Vec2::splat(10.0);
-const MAP_RADIUS: u32 = 30;
+const HEX_SIZE: Vec2 = Vec2::splat(14.0);
+const MAP_RADIUS: u32 = 20;
 
 pub fn main() {
     App::new()
