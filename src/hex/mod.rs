@@ -834,7 +834,7 @@ impl Hex {
         ExactSizeHexIterator {
             iter: (-radius..=radius).flat_map(move |x| {
                 (max(-radius, -x - radius)..=min(radius, radius - x))
-                    .map(move |y| self + Self::new(x, y))
+                    .map(move |y| self.const_add(Self::new(x, y)))
             }),
             count: Self::range_count(range),
         }

@@ -75,7 +75,7 @@
  // Compute a line between points
  let line: Vec<Hex> = point_a.line_to(point_b).collect();
  // Compute a ring from `point_a` containing `point_b`
- let ring: Vec<Hex> = point_a.ring(dist);
+ let ring: Vec<Hex> = point_a.ring(dist).collect();
  // Rotate `point_b` around `point_a` by 2 times 60 degrees clockwise
  let rotated = point_b.rotate_right_around(point_a, 2);
  // Find the direction between the two points

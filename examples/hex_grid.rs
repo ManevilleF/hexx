@@ -143,19 +143,19 @@ fn handle_input(
             // Draw a  line
             highlighted_hexes.line = Hex::ZERO.line_to(coord).collect();
             // Draw a ring
-            highlighted_hexes.ring = Hex::ZERO.ring(coord.ulength());
+            highlighted_hexes.ring = Hex::ZERO.ring(coord.ulength()).collect();
             // Draw an wedge
             highlighted_hexes.wedge = Hex::ZERO.wedge_to(coord).collect();
             // Draw a half ring
-            highlighted_hexes.half_ring = Hex::ZERO.ring(coord.ulength() / 2);
+            highlighted_hexes.half_ring = Hex::ZERO.ring(coord.ulength() / 2).collect();
             // Draw rotations
             highlighted_hexes.rotated = (1..6).map(|i| coord.rotate_right(i)).collect();
             // Draw an dual wedge
             highlighted_hexes.dir_wedge = Hex::ZERO.corner_wedge_to(coord / 2).collect();
             for (vec, mat) in [
-                (&highlighted_hexes.ring, &map.ring_material),
                 (&highlighted_hexes.wedge, &map.wedge_material),
                 (&highlighted_hexes.dir_wedge, &map.dir_wedge_material),
+                (&highlighted_hexes.ring, &map.ring_material),
                 (&highlighted_hexes.line, &map.line_material),
                 (&highlighted_hexes.half_ring, &map.half_ring_material),
                 (&highlighted_hexes.rotated, &map.selected_material),

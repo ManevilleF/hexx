@@ -4,13 +4,18 @@
 
 * Changed logo (#63)
 * Drop `itertools` dependency (#58)
-* Removed deprecated `Hex::directions_to` method (#58)
+* (**BREAKING**) Removed deprecated `Hex::directions_to` method (#58)
 * Added `MeshInfo::facing` utils method to rotate hex meshes (#65)
 * Added `hex` utils function to create an `Hex`, making it less boilerplate (#66):
   - Before: `Hex::new()`
   - Now: `hex()`
 * `Hex` won't derive `Debug` or `Hash` on spirv archs (#66)
 * Added `packed` feature to make `Hex` `repr(C)` (#67)
+
+### ExactSizeIterator
+
+* (**BREAKING**) `Hex::ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
+* (**BREAKING**) `Hex::custom_ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
 
 ### Examples
 
