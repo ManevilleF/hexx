@@ -36,7 +36,8 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 
 /// Performs A star pathfinding between `start` and `end`.
 /// The `cost` parameter should give the cost of each coordinate (`Some`) or indicate the
-/// coordinate is not included in the pathfinding (`None`)
+/// coordinate is not included in the pathfinding (`None`).
+/// This function already takes care of heuristics based on the distance between `start` and `end`.
 ///
 /// # Examples
 ///
@@ -44,12 +45,50 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 ///
 /// ```rust
 /// # use hexx::*;
+/// # use std::collections::HashSet;
 /// use hexx::algorithms::a_star;
 ///
 /// let start = hex(0, 0);
 /// let end = hex(10, 0);
-/// let forbidden_coords: HashSet<Hex> = vec![hex(2, 0), hex(3,0), hex(1, 1)].into();
+/// let forbidden_coords: HashSet<Hex> = HashSet::new();
+/// // Add forbidden coordinates
+/// // forbidden_coords.insert(hex(2, 0));
+/// // ..
 /// let path = a_star(start, end, |h| (!forbidden_coords.contains(&h)).then_some(0));
+/// ```
+/// - Compute a A star with no boundaries and some biome costs
+///
+/// ```rust
+/// # use hexx::*;
+/// # use std::collections::HashMap;
+/// use hexx::algorithms::a_star;
+///
+/// enum Biome {
+///    Mountain,
+///    Plains,
+///    Forest,
+///    Desert
+/// }
+///
+/// impl Biome {
+///
+///    pub fn cost(&self) -> Option<u32> {
+///       match self {
+///          Self::Mountain => None, // Moutains are not included in pathfinding
+///          Self::Plains => Some(0),
+///          Self::Forest => Some(1),
+///          Self::Desert => Some(2)
+///       }
+///    }
+/// }
+///
+/// let start = hex(0, 0);
+/// let end = hex(10, 0);
+/// let mut biomes: HashMap<Hex, Biome> = HashMap::new();
+/// // Set coordinate biomes
+/// // biomes.insert(hex(1, 2), Biome::Mountain);
+/// // ..
+/// let path = a_star(start, end, |h| biomes.get(&h).and_then(|b| b.cost()));
 /// ```
 pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option<Vec<Hex>> {
     let heuristic = |h: Hex| h.unsigned_distance_to(start);

@@ -121,11 +121,7 @@ fn handle_input(
             commands.entity(*entity).insert(grid.default_mat.clone());
         }
         let Some(path) = a_star(Hex::ZERO, hex_pos, |h| {
-            if grid.blocked_coords.contains(&h) || h.ulength() > MAP_RADIUS {
-                None
-            } else {
-                Some(0)
-            }
+            (!grid.blocked_coords.contains(&h) && h.ulength() <= MAP_RADIUS).then_some(0)
         }) else { return };
         let entities: HashSet<_> = path
             .into_iter()
