@@ -394,9 +394,9 @@ fn range() {
 #[test]
 fn ring() {
     let point = Hex::ZERO;
-    assert_eq!(point.ring(0), vec![point]);
+    assert_eq!(point.ring(0).collect::<Vec<_>>(), vec![point]);
     let expected = point.all_neighbors().to_vec();
-    assert_eq!(point.ring(1), expected);
+    assert_eq!(point.ring(1).collect::<Vec<_>>(), expected);
 
     let radius = 5;
     let mut range: Vec<_> = point.range(radius).collect();
@@ -404,8 +404,20 @@ fn ring() {
     range.retain(|h| !removed.contains(h));
     let ring = point.ring(5);
     assert_eq!(ring.len(), range.len());
-    for h in &ring {
-        assert!(range.contains(h));
+    for h in ring {
+        assert!(range.contains(&h));
+    }
+}
+
+#[test]
+fn naive_ring() {
+    let point = Hex::ZERO;
+
+    for range in 0..=30 {
+        let naive = point.naive_ring(range);
+        let ring = point.ring(range);
+        assert_eq!(naive.len(), ring.len());
+        assert_eq!(naive.len(), naive.count());
     }
 }
 
@@ -415,7 +427,8 @@ fn cached_rings() {
     let point = Hex::ZERO;
     let cache = point.cached_rings::<10>();
     for (r, ring) in cache.into_iter().enumerate() {
-        assert_eq!(ring, point.ring(r as u32));
+        let expected: Vec<_> = point.ring(r as u32).collect();
+        assert_eq!(ring, expected);
     }
 }
 
@@ -424,26 +437,36 @@ fn ring_offset() {
     let zero = Hex::ZERO;
     let target = Hex::new(14, 7);
 
-    let expected: Vec<_> = zero.ring(10).into_iter().map(|h| h + target).collect();
-    assert_eq!(target.ring(10), expected);
+    let expected: Vec<_> = zero.ring(10).map(|h| h + target).collect();
+    assert_eq!(target.ring(10).collect::<Vec<_>>(), expected);
 }
 
 #[test]
 fn custom_ring() {
     let point = Hex::ZERO;
-    assert_eq!(point.custom_ring(0, Direction::TopLeft, true), vec![point]);
+    assert_eq!(
+        point
+            .custom_ring(0, Direction::TopLeft, true)
+            .collect::<Vec<_>>(),
+        vec![point]
+    );
 
     // clockwise
-    let mut expected = point.ring(5);
+    let mut expected: Vec<_> = point.ring(5).collect();
     expected.reverse();
     expected.rotate_right(1);
-    assert_eq!(point.custom_ring(5, Direction::TopRight, true), expected);
+    assert_eq!(
+        point
+            .custom_ring(5, Direction::TopRight, true)
+            .collect::<Vec<_>>(),
+        expected
+    );
     // offsetted
-    let expected = point.ring(5);
+    let expected: Vec<_> = point.ring(5).collect();
     let ring = point.custom_ring(5, Direction::BottomLeft, false);
     assert_eq!(expected.len(), ring.len());
-    for h in &ring {
-        assert!(expected.contains(h));
+    for h in ring {
+        assert!(expected.contains(&h));
     }
 }
 

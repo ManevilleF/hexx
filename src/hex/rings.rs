@@ -8,14 +8,17 @@ impl Hex {
     /// The returned coordinates start from `start_dir` and loop counter clockwise around `self`
     /// unless `clockwise` is set to `true`.
     ///
-    /// If you only need the coordinates see [`Self::ring`].
+    /// > If you only need the coordinates see [`Self::ring`]
     ///
     /// # Note
-    /// The returned vector will be of `6 * radius` ([`Self::ring_count`]) length
-    pub fn custom_ring(self, range: u32, start_dir: Direction, clockwise: bool) -> Vec<Self> {
-        if range == 0 {
-            return vec![self];
-        }
+    /// The returned iterator will have `6 * range` ([`Self::ring_count`]) items, unless `range` is
+    /// 0 which will return `self`
+    pub fn custom_ring(
+        self,
+        range: u32,
+        start_dir: Direction,
+        clockwise: bool,
+    ) -> impl ExactSizeIterator<Item = Self> {
         let mut directions = Self::NEIGHBORS_COORDS;
         // TODO: improve code clarity
         directions.rotate_left(start_dir as usize);
@@ -26,26 +29,35 @@ impl Hex {
             directions.rotate_left(2);
         }
 
-        let mut point = self + start_dir * range as i32;
-        let mut res = Vec::with_capacity(Self::ring_count(range));
-        for dir in directions {
-            (0..range).for_each(|_| {
-                res.push(point);
-                point += dir;
+        let point = self + start_dir * range as i32;
+        let iter = directions
+            .into_iter()
+            .flat_map(move |dir| std::iter::repeat(dir).take(range as usize))
+            .scan(point, move |pos, dir| {
+                let next = *pos + dir;
+                if next == point {
+                    None
+                } else {
+                    *pos = next;
+                    Some(next)
+                }
             });
+        ExactSizeHexIterator {
+            iter: std::iter::once(point).chain(iter),
+            count: Self::ring_count(range),
         }
-        res
     }
 
     #[must_use]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
     /// The returned coordinates start from [`Direction::TopRight`] and loop around `self` counter clockwise.
     ///
-    /// See [`Self::custom_ring`] for more options.
+    /// > See [`Self::custom_ring`] for more options.
     ///
     /// # Note
-    /// The returned vector will be of `6 * radius` ([`Self::ring_count`]) length
-    pub fn ring(self, range: u32) -> Vec<Self> {
+    /// The returned iterator will have `6 * range` ([`Self::ring_count`]) items, unless `range` is
+    /// 0 which will return `self`
+    pub fn ring(self, range: u32) -> impl ExactSizeIterator<Item = Self> {
         self.custom_ring(range, Direction::TopRight, false)
     }
 
@@ -59,13 +71,13 @@ impl Hex {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let rings: Vec<_> = Hex::ZERO.rings(3..10).collect();
+    /// let rings: Vec<Vec<Hex>> = Hex::ZERO.rings(3..10).collect();
     /// assert_eq!(rings.len(), 7);
     /// ```
-    ///
-    /// # Note
-    /// The returned iterator will be of `radius + 1` length
-    pub fn rings(self, range: impl Iterator<Item = u32>) -> impl Iterator<Item = Vec<Self>> {
+    pub fn rings(
+        self,
+        range: impl Iterator<Item = u32>,
+    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
         range.map(move |r| self.ring(r))
     }
 
@@ -79,18 +91,15 @@ impl Hex {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let rings: Vec<_> = Hex::ZERO.custom_rings(3..10, Direction::Top, true).collect();
+    /// let rings: Vec<Vec<Hex>> = Hex::ZERO.custom_rings(3..10, Direction::Top, true).collect();
     /// assert_eq!(rings.len(), 7);
     /// ```
-    ///
-    /// # Note
-    /// The returned iterator will be of `radius + 1` length
     pub fn custom_rings(
         self,
         range: impl Iterator<Item = u32>,
         start_dir: Direction,
         clockwise: bool,
-    ) -> impl Iterator<Item = Vec<Self>> {
+    ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
         range.map(move |r| self.custom_ring(r, start_dir, clockwise))
     }
 
@@ -418,7 +427,7 @@ impl Hex {
     /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
     /// information
     pub fn cached_rings<const RANGE: usize>(self) -> [Vec<Self>; RANGE] {
-        std::array::from_fn(|r| self.ring(r as u32))
+        std::array::from_fn(|r| self.ring(r as u32).collect())
     }
 
     #[allow(clippy::cast_possible_truncation)]
@@ -456,7 +465,7 @@ impl Hex {
         start_dir: Direction,
         clockwise: bool,
     ) -> [Vec<Self>; RANGE] {
-        std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise))
+        std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise).collect())
     }
 
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
@@ -490,6 +499,10 @@ impl Hex {
     #[must_use]
     /// Counts how many coordinates there are in a ring at the given `range`
     pub const fn ring_count(range: u32) -> usize {
-        6 * range as usize
+        if range == 0 {
+            1
+        } else {
+            6 * range as usize
+        }
     }
 }
