@@ -35,13 +35,10 @@ impl Hex {
             .flat_map(move |dir| std::iter::repeat(dir).take(range as usize))
             .scan(point, move |pos, dir| {
                 let next = *pos + dir;
-                if next == point {
-                    None
-                } else {
-                    *pos = next;
-                    Some(next)
-                }
-            });
+                *pos = next;
+                Some(next)
+            })
+            .take((range as usize * 6).saturating_sub(1));
         ExactSizeHexIterator {
             iter: std::iter::once(point).chain(iter),
             count: Self::ring_count(range),
