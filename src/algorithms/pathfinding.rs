@@ -3,12 +3,12 @@ use std::collections::{BinaryHeap, HashMap};
 
 struct Node {
     coord: Hex,
-    f_score: u32,
+    cost: u32,
 }
 
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
-        self.f_score == other.f_score
+        self.cost == other.cost
     }
 }
 
@@ -16,13 +16,13 @@ impl Eq for Node {}
 
 impl PartialOrd for Node {
     fn partial_cmp(&self, rhs: &Self) -> Option<std::cmp::Ordering> {
-        rhs.f_score.partial_cmp(&self.f_score)
+        rhs.cost.partial_cmp(&self.cost)
     }
 }
 
 impl Ord for Node {
     fn cmp(&self, rhs: &Self) -> std::cmp::Ordering {
-        rhs.f_score.cmp(&self.f_score)
+        rhs.cost.cmp(&self.cost)
     }
 }
 
@@ -56,13 +56,11 @@ pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option
 
     let start_node = Node {
         coord: start,
-        f_score: heuristic(start),
+        cost: heuristic(start),
     };
     let mut open = BinaryHeap::new();
-    let mut g_scores = HashMap::new();
-    g_scores.insert(start, 0);
-    let mut f_scores = HashMap::new();
-    f_scores.insert(start, start_node.f_score);
+    let mut costs = HashMap::new();
+    costs.insert(start, start_node.cost);
     let mut came_from = HashMap::new();
     open.push(start_node);
 
@@ -72,15 +70,13 @@ pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option
         }
         for neighbor in node.coord.all_neighbors() {
             let Some(cost) = cost(neighbor) else { continue };
-            let tmp_cost = g_scores[&node.coord] + cost;
-            if !g_scores.contains_key(&neighbor) || g_scores[&neighbor] > tmp_cost {
+            let neighbor_cost = costs[&node.coord] + cost + heuristic(neighbor);
+            if !costs.contains_key(&neighbor) || costs[&neighbor] > neighbor_cost {
                 came_from.insert(neighbor, node.coord);
-                let f_score = tmp_cost + heuristic(neighbor);
-                g_scores.insert(neighbor, tmp_cost);
-                f_scores.insert(neighbor, f_score);
+                costs.insert(neighbor, neighbor_cost);
                 open.push(Node {
                     coord: neighbor,
-                    f_score,
+                    cost: neighbor_cost,
                 });
             }
         }
