@@ -48,6 +48,10 @@ name = "wrap_map"
 path = "examples/wrap_map.rs"
 
 [[example]]
+name = "a_star"
+path = "examples/a_star.rs"
+
+[[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
 

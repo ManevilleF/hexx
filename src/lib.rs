@@ -128,6 +128,8 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
+/// Basic algorithms
+pub mod algorithms;
 /// Hexagonal range bounds module
 pub mod bounds;
 /// Hexagonal coordinates conversion module

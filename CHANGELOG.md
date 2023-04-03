@@ -11,6 +11,7 @@
   - Now: `hex()`
 * `Hex` won't derive `Debug` or `Hash` on spirv archs (#66)
 * Added `packed` feature to make `Hex` `repr(C)` (#67)
+* Added an `algorithm` module with a `a_star` implementation (#69)
 
 ### ExactSizeIterator
 
@@ -22,6 +23,7 @@
 * `hex_grid` example now uses a 2d mesh and camera (#65)
 * `scroll_map` example now uses a 2d mesh and camera (#65)
 * `wrap_map` example now uses a 2d mesh and camera (#65)
+* Added an interactive `a_star` example (#69)
 
 ## 0.5.3 
 

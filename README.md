@@ -165,6 +165,13 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  This example showcases the `HexMap` struct for looping/wrapping map
 
+![a_star](docs/a_star.png "A star example")
+
+ > `cargo run --example a_star`
+
+ This example showcases the A star example, with an interactive pathfinding between the origin and your cursor.
+ Clicking on tile toggles their availability
+
 ![columns](docs/3d_columns.png "3d columns example")
 
  > `cargo run --example 3d_columns`
