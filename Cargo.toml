@@ -11,7 +11,10 @@ repository = "https://github.com/ManevilleF/hexx"
 exclude = [".github"]
 
 [features]
-default = []
+default = ["algorithms"]
+# HL algoritms
+algorithms = []
+# repr C
 packed = []
 # serde compatibility
 ser_de = ["serde", "glam/serde"]
@@ -50,6 +53,10 @@ path = "examples/wrap_map.rs"
 [[example]]
 name = "a_star"
 path = "examples/a_star.rs"
+
+[[example]]
+name = "fov"
+path = "examples/fov.rs"
 
 [[example]]
 name = "3d_columns"
