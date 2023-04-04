@@ -11,9 +11,12 @@ mod impls;
 /// Test module
 #[cfg(test)]
 mod tests;
+/// Direction way module
+pub(crate) mod way;
 
 pub use diagonal_direction::DiagonalDirection;
 pub use hex_direction::Direction;
+pub use way::DirectionWay;
 
 /// Angle constants used for directions
 pub mod angles {

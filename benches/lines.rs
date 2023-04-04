@@ -4,7 +4,7 @@ use hexx::*;
 pub fn line_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hex line");
     group.significance_level(0.1).sample_size(1_000);
-    let dist = 1_000_000;
+    let dist = 100_000;
 
     group.bench_with_input(BenchmarkId::new("Line", dist), &dist, |b, dist| {
         b.iter(|| {

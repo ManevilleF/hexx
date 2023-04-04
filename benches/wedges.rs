@@ -4,13 +4,25 @@ use hexx::*;
 pub fn wedge_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hex Wedge");
     group.significance_level(0.1).sample_size(1_000);
-    let dist = 1_000_000;
+    let dist = 100_000;
 
     group.bench_with_input(BenchmarkId::new("Wedge", dist), &dist, |b, dist| {
+        b.iter(|| {
+            Hex::wedge(
+                black_box(Hex::ZERO),
+                0..=*dist as u32,
+                DiagonalDirection::Left,
+            )
+        })
+    });
+    group.bench_with_input(BenchmarkId::new("Full Wedge", dist), &dist, |b, dist| {
         b.iter(|| Hex::full_wedge(black_box(Hex::ZERO), *dist as u32, DiagonalDirection::Left))
     });
     group.bench_with_input(BenchmarkId::new("Triangle", dist), &dist, |b, dist| {
         b.iter(|| shapes::triangle(*dist as u32))
+    });
+    group.bench_with_input(BenchmarkId::new("Corner Wedge", dist), &dist, |b, dist| {
+        b.iter(|| Hex::corner_wedge(black_box(Hex::ZERO), 0..=*dist as u32, Direction::Top))
     });
     group.finish();
 }

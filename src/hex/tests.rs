@@ -226,8 +226,8 @@ fn rotation() {
     let neighbors = Hex::ZERO.all_neighbors();
     for elems in neighbors.windows(2) {
         let [next, prev] = [elems[0], elems[1]];
-        let prev_dir = Hex::ZERO.direction_to(prev);
-        let next_dir = Hex::ZERO.direction_to(next);
+        let prev_dir = Hex::ZERO.direction_to(prev).unwrap();
+        let next_dir = Hex::ZERO.direction_to(next).unwrap();
         assert_eq!(prev.right(), next);
         assert_eq!(next.left(), prev);
         assert_eq!(prev_dir.right(), next_dir);
