@@ -4,7 +4,7 @@ use bevy::{
     utils::{HashMap, HashSet},
     window::PrimaryWindow,
 };
-use hexx::{algorithms::field_of_view, *};
+use hexx::{algorithms::range_fov, *};
 
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(14.0);
@@ -61,7 +61,7 @@ fn setup_grid(
         .enumerate()
         .map(|(i, coord)| {
             let pos = layout.hex_to_world_pos(coord);
-            let material = if i % 7 == 0 {
+            let material = if i % 10 == 0 {
                 blocked_coords.insert(coord);
                 blocked_mat.clone()
             } else {
@@ -120,7 +120,7 @@ fn handle_input(
         for entity in &grid.visible_entities {
             commands.entity(*entity).insert(grid.default_mat.clone());
         }
-        let fov = field_of_view(hex_pos, FOV_RADIUS, |h| {
+        let fov = range_fov(hex_pos, FOV_RADIUS, |h| {
             !grid.blocked_coords.contains(&h) && h.ulength() <= MAP_RADIUS
         });
         let entities: HashSet<_> = fov
