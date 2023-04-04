@@ -15,7 +15,7 @@ mod tests;
 pub(crate) use iter::ExactSizeHexIterator;
 pub use iter::HexIterExt;
 
-use crate::{DiagonalDirection, Direction};
+use crate::{DiagonalDirection, Direction, DirectionWay};
 use glam::{IVec2, IVec3, Vec2};
 use std::cmp::{max, min};
 
@@ -625,39 +625,78 @@ impl Hex {
     }
 
     #[must_use]
-    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
+    #[doc(alias = "diagonal_direction_to")]
+    #[deprecated(
+        since = "0.6.0",
+        note = "Prefer `diagonal_way_to` for more accurate result or `main_diagonal_to`"
+    )]
+    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// [`Self::diagonal_way_to`] instead
     pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
+        self.main_diagonal_to(rhs)
+    }
+
+    #[must_use]
+    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// using [`Self::diagonal_way_to`] instead
+    pub fn main_diagonal_to(self, rhs: Self) -> DiagonalDirection {
+        self.diagonal_way_to(rhs).unwrap()
+    }
+
+    #[must_use]
+    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
+    pub fn diagonal_way_to(self, rhs: Self) -> DirectionWay<DiagonalDirection> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
-        let (v, dir) = match xa.max(ya).max(za) {
-            v if v == xa => (x, DiagonalDirection::Right),
-            v if v == ya => (y, DiagonalDirection::BottomLeft),
-            v if v == za => (z, DiagonalDirection::TopLeft),
-            _ => unreachable!(),
-        };
-        if v < 0 {
-            -dir
-        } else {
-            dir
+        match xa.max(ya).max(za) {
+            v if v == xa => {
+                DirectionWay::way_from(x < 0, xa == ya, xa == za, DiagonalDirection::Right)
+            }
+            v if v == ya => {
+                DirectionWay::way_from(y < 0, ya == za, ya == xa, DiagonalDirection::BottomLeft)
+            }
+            _ => DirectionWay::way_from(z < 0, za == xa, za == ya, DiagonalDirection::TopLeft),
         }
     }
 
     #[must_use]
+    #[deprecated(
+        since = "0.6.0",
+        note = "Prefer `way_to` for more accurate result or `main_direction_to"
+    )]
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// using [`Self::way_to`] instead
     pub fn direction_to(self, rhs: Self) -> Direction {
+        self.main_direction_to(rhs)
+    }
+
+    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// using [`Self::way_to`] for accuracy
+    #[must_use]
+    pub fn main_direction_to(self, rhs: Self) -> Direction {
+        self.way_to(rhs).unwrap()
+    }
+
+    #[must_use]
+    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    pub fn way_to(self, rhs: Self) -> DirectionWay<Direction> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [x, y, z] = [y - x, z - y, x - z];
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
-        let (v, dir) = match xa.max(ya).max(za) {
-            v if v == xa => (x, Direction::BottomLeft),
-            v if v == ya => (y, Direction::Top),
-            v if v == za => (z, Direction::BottomRight),
-            _ => unreachable!(),
-        };
-        if v < 0 {
-            -dir
-        } else {
-            dir
+        match xa.max(ya).max(za) {
+            v if v == xa => {
+                DirectionWay::way_from(x < 0, xa == ya, xa == za, Direction::BottomLeft)
+            }
+            v if v == ya => DirectionWay::way_from(y < 0, ya == za, ya == xa, Direction::Top),
+            _ => DirectionWay::way_from(z < 0, za == xa, za == ya, Direction::BottomRight),
         }
     }
 

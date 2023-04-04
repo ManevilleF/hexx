@@ -13,6 +13,31 @@
 * Added `packed` feature to make `Hex` `repr(C)` (#67)
 * Added an `algorithm` module with a `a_star` implementation (#69)
 
+### Directions to
+
+The *direction_to* functions were reworked to avoid a 
+edge case where on some coordinates two directions can be valid (a *tie*).
+
+* Added new `DirectionWay` type
+* Added `Hex::way_to` which returns a `DirectionWay<Direction>`
+* Added `Hex::diagonal_way_to` which returns a `DirectionWay<DiagonalDirection>`
+* Deprecated `Hex::direction_to` in favor of `way_to`
+* Deprecated `Hex::diagonal_to` in favor of `diagonal_way_to`
+
+This type can represent the classic *Single* case (One direction) or the *Tie*. This may
+seem like an over complication, but `DirectionWay<T>` implements `PartialEq<T>`, which means
+you can still do this:
+
+```rust
+let a = hex(1, 0);
+let b = hex(43, 12);
+if a.way_to(b) == Direction::Top {
+    //
+}
+```
+
+But now with accurate results !
+
 ### ExactSizeIterator
 
 * (**BREAKING**) `Hex::ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)

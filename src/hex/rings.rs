@@ -218,7 +218,7 @@ impl Hex {
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
         let range = self.unsigned_distance_to(rhs);
-        let direction = self.diagonal_to(rhs);
+        let direction = self.diagonal_way_to(rhs).unwrap();
         self.custom_full_wedge(range, direction, clockwise)
     }
 
@@ -303,7 +303,7 @@ impl Hex {
         let left = self.wedge(range.clone(), direction.diagonal_left());
         let right = self.wedge(range, direction.diagonal_right());
         left.chain(right)
-            .filter(move |h| self.direction_to(*h) == direction)
+            .filter(move |h| self.way_to(*h) == direction)
     }
 
     /// Retrieves all successive [`Hex`] half ring edges from `self` to `rhs`
@@ -311,7 +311,7 @@ impl Hex {
     /// See also [`Self::corner_wedge_to`] and [`Self::wedge_to`]
     pub fn corner_wedge_to(self, rhs: Self) -> impl Iterator<Item = Self> {
         let range = self.unsigned_distance_to(rhs);
-        self.corner_wedge(0..=range, self.direction_to(rhs))
+        self.corner_wedge(0..=range, self.way_to(rhs).unwrap())
     }
 
     #[allow(clippy::cast_possible_truncation)]

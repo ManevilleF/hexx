@@ -79,8 +79,8 @@
  // Rotate `point_b` around `point_a` by 2 times 60 degrees clockwise
  let rotated = point_b.rotate_right_around(point_a, 2);
  // Find the direction between the two points
- let dir_a = point_a.direction_to(point_b);
- let dir_b = point_b.direction_to(point_a);
+ let dir_a = point_a.main_direction_to(point_b);
+ let dir_b = point_b.main_direction_to(point_a);
  assert!(dir_a == -dir_b);
  // Compute a wedge from `point_a` to `point_b`
  let wedge = point_a.wedge_to(point_b);

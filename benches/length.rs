@@ -9,7 +9,7 @@ const fn old_hex_length(hex: Hex) -> i32 {
 pub fn length_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hex Length");
     group.significance_level(0.1).sample_size(1_000);
-    let dist = 1_000_000;
+    let dist = 100_000;
 
     group.bench_with_input(BenchmarkId::new("Length", dist), &dist, |b, dist| {
         b.iter(|| Hex::length(Hex::splat(*dist)))
