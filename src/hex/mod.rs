@@ -628,13 +628,22 @@ impl Hex {
     #[doc(alias = "diagonal_direction_to")]
     #[deprecated(
         since = "0.6.0",
-        note = "Prefer `diagonal_way_to` for more accurate result"
+        note = "Prefer `diagonal_way_to` for more accurate result or `main_diagonal_to`"
     )]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
     ///
     /// > This method can be innaccurate in case of a *tie* between directions, prefer
     /// [`Self::diagonal_way_to`] instead
     pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
+        self.main_diagonal_to(rhs)
+    }
+
+    #[must_use]
+    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// using [`Self::diagonal_way_to`] instead
+    pub fn main_diagonal_to(self, rhs: Self) -> DiagonalDirection {
         self.diagonal_way_to(rhs).unwrap()
     }
 
@@ -655,12 +664,24 @@ impl Hex {
     }
 
     #[must_use]
-    #[deprecated(since = "0.6.0", note = "Prefer `way_to` for more accurate result")]
+    #[deprecated(
+        since = "0.6.0",
+        note = "Prefer `way_to` for more accurate result or `main_direction_to"
+    )]
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
     ///
     /// > This method can be innaccurate in case of a *tie* between directions, prefer
-    /// [`Self::way_to`] instead
+    /// using [`Self::way_to`] instead
     pub fn direction_to(self, rhs: Self) -> Direction {
+        self.main_direction_to(rhs)
+    }
+
+    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// using [`Self::way_to`] for accuracy
+    #[must_use]
+    pub fn main_direction_to(self, rhs: Self) -> Direction {
         self.way_to(rhs).unwrap()
     }
 
