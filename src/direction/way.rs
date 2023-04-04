@@ -3,6 +3,28 @@ use std::ops::Neg;
 use crate::{DiagonalDirection, Direction};
 
 /// Describes a direction way, which can be a `Single` direction or a `Tie` betwen two directions.
+///
+/// # Comparison
+///
+/// to compare it with its inner [`Direction`] or [`DiagonalDirection`] you can use
+/// `Self::contains` or the [`PartialEq`] implementation:
+///
+/// ```rust
+/// # use hexx::*;
+/// let a = hex(1,4);
+/// let b = hex(6,-2);
+/// let way = a.way_to(b);
+/// let diag_way = a.diagonal_way_to(b);
+/// if way == Direction::Top {
+///   // do something
+/// }
+/// if diag_way == DiagonalDirection::Left {
+///   // do something
+/// }
+/// ```
+///
+/// You can also `unwrap` the way to safely retrieve a single direction, with potential inaccuracy
+/// in case of a `Tie`
 pub enum DirectionWay<T> {
     /// Single direction
     Single(T),
@@ -44,18 +66,6 @@ impl<T> DirectionWay<T> {
             Self::Tie([a, b]) => a.eq(dir) || b.eq(dir),
         }
     }
-
-    #[inline]
-    #[must_use]
-    pub(crate) const fn single(v: T) -> Self {
-        Self::Single(v)
-    }
-
-    #[inline]
-    #[must_use]
-    pub(crate) const fn tie(v: [T; 2]) -> Self {
-        Self::Tie(v)
-    }
 }
 
 impl<T: Way> DirectionWay<T> {
@@ -75,14 +85,14 @@ impl<T: Way> DirectionWay<T> {
 impl<T> From<T> for DirectionWay<T> {
     #[inline]
     fn from(value: T) -> Self {
-        Self::single(value)
+        Self::Single(value)
     }
 }
 
 impl<T> From<[T; 2]> for DirectionWay<T> {
     #[inline]
     fn from(value: [T; 2]) -> Self {
-        Self::tie(value)
+        Self::Tie(value)
     }
 }
 

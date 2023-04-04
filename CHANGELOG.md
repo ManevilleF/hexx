@@ -15,9 +15,14 @@
 
 ### Directions to
 
-The  `Hex::direction_to` and `Hex::diagonal_to` were reworked to avoid a 
+The *direction_to* functions were reworked to avoid a 
 edge case where on some coordinates two directions can be valid (a *tie*).
-From now on those two methods will return a new enum: `DirectionWay`.
+
+* Added new `DirectionWay` type
+* Added `Hex::way_to` which returns a `DirectionWay<Direction>`
+* Added `Hex::diagonal_way_to` which returns a `DirectionWay<DiagonalDirection>`
+* Deprecated `Hex::direction_to` in favor of `way_to`
+* Deprecated `Hex::diagonal_to` in favor of `diagonal_way_to`
 
 This type can represent the classic *Single* case (One direction) or the *Tie*. This may
 seem like an over complication, but `DirectionWay<T>` implements `PartialEq<T>`, which means
@@ -26,12 +31,12 @@ you can still do this:
 ```rust
 let a = hex(1, 0);
 let b = hex(43, 12);
-if a.direction_to == Direction::Top {
+if a.way_to(b) == Direction::Top {
     //
 }
 ```
 
-But now with correct results !
+But now with accurate results !
 
 ### ExactSizeIterator
 

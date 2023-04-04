@@ -626,8 +626,21 @@ impl Hex {
 
     #[must_use]
     #[doc(alias = "diagonal_direction_to")]
+    #[deprecated(
+        since = "0.6.0",
+        note = "Prefer `diagonal_way_to` for more accurate result"
+    )]
+    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// [`Self::diagonal_way_to`] instead
+    pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
+        self.diagonal_way_to(rhs).unwrap()
+    }
+
+    #[must_use]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
-    pub fn diagonal_to(self, rhs: Self) -> DirectionWay<DiagonalDirection> {
+    pub fn diagonal_way_to(self, rhs: Self) -> DirectionWay<DiagonalDirection> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
         match xa.max(ya).max(za) {
@@ -642,8 +655,18 @@ impl Hex {
     }
 
     #[must_use]
+    #[deprecated(since = "0.6.0", note = "Prefer `way_to` for more accurate result")]
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
-    pub fn direction_to(self, rhs: Self) -> DirectionWay<Direction> {
+    ///
+    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// [`Self::way_to`] instead
+    pub fn direction_to(self, rhs: Self) -> Direction {
+        self.way_to(rhs).unwrap()
+    }
+
+    #[must_use]
+    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    pub fn way_to(self, rhs: Self) -> DirectionWay<Direction> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [x, y, z] = [y - x, z - y, x - z];
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
