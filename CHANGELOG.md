@@ -14,9 +14,7 @@
 * Added an `algorithms` module with a `a_star` implementation (#69)
 * Added field of view algorithms in `algorithms`:
   - `range_fov` omni-directional field of view
-  - `dual_fov` directional 120 degrees field of view (`Direction`)
-  - `directional_fov` directional 60 degreed field of view (`Direction`)
-  - `diagonal_fov` directional 60 degrees field of view (`DiagonalDirection`)
+  - `directional_fov` directional 120 degrees field of view (`Direction`)
 
 ### Directions to
 

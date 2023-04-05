@@ -177,8 +177,17 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  > `cargo run --example a_star`
 
- This example showcases the A star example, with an interactive pathfinding between the origin and your cursor.
+ This example showcases the A star algorithm, with an interactive pathfinding between the origin and your cursor.
  Clicking on tile toggles their availability
+
+### Field of view
+
+![fov](docs/fov.png "Field of View example")
+
+ > `cargo run --example fov`
+
+ This example showcases the FOV algorithm, with an interactive range fov around your cursor.
+ Clicking on tile toggles their visibility.
 
 ### 3d columns
 

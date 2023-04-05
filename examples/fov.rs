@@ -121,7 +121,7 @@ fn handle_input(
             commands.entity(*entity).insert(grid.default_mat.clone());
         }
         let fov = range_fov(hex_pos, FOV_RADIUS, |h| {
-            !grid.blocked_coords.contains(&h) && h.ulength() <= MAP_RADIUS
+            grid.blocked_coords.contains(&h) || h.ulength() > MAP_RADIUS
         });
         let entities: HashSet<_> = fov
             .into_iter()
