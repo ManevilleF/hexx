@@ -147,11 +147,15 @@
 
 `hexx` provides interactive examples showcasing various features:
 
+ ### Hex grid
+
 ![hex_grid](docs/hex_grid.png "hex grid example")
 
  > `cargo run --example hex_grid`
 
 This example showcases hex ranges, rings, wedges, rotation, and lines
+
+ ### Scroll Map
 
 ![scroll_map](docs/scroll_map.gif "scroll map example")
 
@@ -159,18 +163,33 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  This example showcases the `HexMap` struct for scrolling maps
 
+### Wrap Map
+
 ![wrap_map](docs/wrap_map.gif "wrap map example")
 
  > `cargo run --example wrap_map`
 
  This example showcases the `HexMap` struct for looping/wrapping map
 
+### A Star pathfinding
+
 ![a_star](docs/a_star.png "A star example")
 
  > `cargo run --example a_star`
 
- This example showcases the A star example, with an interactive pathfinding between the origin and your cursor.
+ This example showcases the A star algorithm, with an interactive pathfinding between the origin and your cursor.
  Clicking on tile toggles their availability
+
+### Field of view
+
+![fov](docs/fov.png "Field of View example")
+
+ > `cargo run --example fov`
+
+ This example showcases the FOV algorithm, with an interactive range fov around your cursor.
+ Clicking on tile toggles their visibility.
+
+### 3d columns
 
 ![columns](docs/3d_columns.png "3d columns example")
 

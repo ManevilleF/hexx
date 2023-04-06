@@ -11,7 +11,10 @@
   - Now: `hex()`
 * `Hex` won't derive `Debug` or `Hash` on spirv archs (#66)
 * Added `packed` feature to make `Hex` `repr(C)` (#67)
-* Added an `algorithm` module with a `a_star` implementation (#69)
+* Added an `algorithms` module with a `a_star` implementation (#69)
+* Added field of view algorithms in `algorithms`:
+  - `range_fov` omni-directional field of view
+  - `directional_fov` directional 120 degrees field of view (`Direction`)
 
 ### Directions to
 
