@@ -5,8 +5,8 @@ use std::collections::{HashMap, HashSet};
 /// This algorithm takes a `cost` function, which calculates and
 /// returns the cost of movement through a given `Hex` tile.
 /// The `cost` function should return an `Option<u32>`.
-/// A tile that returns a computable cost would return Some(cost), whereas
-/// None should be returned for tiles that have no computable cost (i.e. cannot be moved through).
+/// A tile that returns a computable cost would return `Some(cost)`, whereas
+/// `None` should be returned for tiles that have no computable cost (i.e. cannot be moved through).
 ///
 /// # Examples
 ///

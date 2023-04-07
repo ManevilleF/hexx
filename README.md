@@ -191,7 +191,7 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ### Field of movement
 
-![fov](docs/field_of_movement.gif "Field of Movement example")
+![fov](docs/field_of_movement.gif "Field of movement example")
 
  > `cargo run --example field_of_movement`
 
