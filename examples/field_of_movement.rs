@@ -26,6 +26,7 @@ pub fn main() {
         .add_system(handle_input)
         .run();
 }
+
 type Cost = Option<u32>;
 
 #[derive(Debug, Resource)]

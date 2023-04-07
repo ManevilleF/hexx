@@ -8,22 +8,45 @@ use std::collections::{HashMap, HashSet};
 /// A tile that returns a computable cost would return `Some(cost)`, whereas
 /// `None` should be returned for tiles that have no computable cost (i.e. cannot be moved through).
 ///
+/// The field_of_movement algorithm will always add `+ 1` to the computed cost in order to avoid
+/// the possibility of unlimited movement range (i.e. a `Hex` instance will always have a minimum movement `cost` of 1).
+///
 /// # Examples
 ///
-/// - Compute field of movement with no boundaries and some wall tiles that cannot be moved through
+/// - Compute field of movement with no boundaries and some wall tiles that cannot be traversed
 ///
 /// ```rust
 /// # use hexx::*;
-/// # use std::collections::HashSet;
+/// # use std::collections::HashMap;
 /// use hexx::algorithms::field_of_movement;
 ///
-/// let pos = hex(0, 0);
-/// let range = 10;
-/// let blocking_coords: HashSet<Hex> = HashSet::new();
-/// // Add blocking coordinates
-/// // blocking_coords.insert(hex(2, 0));
+/// enum Biome {
+///    Mountain,
+///    Plains,
+///    Forest,
+///    Desert
+/// }
+///
+/// impl Biome {
+///
+///    pub fn cost(&self) -> Option<u32> {
+///       match self {
+///          Self::Mountain => None, // Moutains cannot be traversed
+///          Self::Plains => Some(0),
+///          Self::Forest => Some(1),
+///          Self::Desert => Some(2)
+///       }
+///    }
+/// }
+///
+/// let start = hex(0, 0);
+/// let movement_budget = 5u32;
+/// let mut biomes: HashMap<Hex, Biome> = HashMap::new();
+/// // Set coordinate biomes
+/// // biomes.insert(hex(1, 2), Biome::Mountain);
 /// // ..
-/// let fom = field_of_movement(pos, range, |h| if blocking_coords.contains(&h) {None} else {Some(1)});
+/// let reachable_tiles = field_of_movement(start, movement_budget, |h| biomes.get(&h).and_then(|b| b.cost()));
+/// dbg!(&reachable_tiles);
 /// ```
 pub fn field_of_movement(
     coord: Hex,
@@ -35,9 +58,8 @@ pub fn field_of_movement(
     let mut res = HashSet::new();
     for i in 1..=budget {
         for coord in coord.ring(i) {
-            let coord_cost = if let Some(v) = cost(coord) {
-                v + 1
-            } else {
+            let Some(coord_cost) = cost(coord)
+             else {
                 continue;
             };
 
@@ -50,7 +72,7 @@ pub fn field_of_movement(
                 continue;
             };
 
-            let computed_cost = coord_cost + neighbor_cost;
+            let computed_cost = coord_cost + 1 + neighbor_cost;
             if computed_cost > budget {
                 continue;
             }
