@@ -189,6 +189,14 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
  This example showcases the FOV algorithm, with an interactive range fov around your cursor.
  Clicking on tile toggles their visibility.
 
+### Field of movement
+
+![fov](docs/field_of_movement.gif "Field of Movement example")
+
+ > `cargo run --example field_of_movement`
+
+ This example showcases the field of movement algorithm, interactively displaying the accessible range of movement around the cursor.
+
 ### 3d columns
 
 ![columns](docs/3d_columns.png "3d columns example")

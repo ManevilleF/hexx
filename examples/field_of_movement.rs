@@ -10,7 +10,7 @@ use rand::prelude::*;
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(14.0);
 const MAP_RADIUS: u32 = 20;
-const BUDGET: u32 = 8;
+const BUDGET: u32 = 13;
 
 pub fn main() {
     App::new()

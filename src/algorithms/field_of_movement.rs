@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 /// Computes a field of movement around `coord` given a `budget`.
 /// This algorithm takes a `cost` function, which calculates and
 /// returns the cost of movement through a given `Hex` tile.
-/// The `cost` function should return an Option<u32>.
+/// The `cost` function should return an `Option<u32>`.
 /// A tile that returns a computable cost would return Some(cost), whereas
 /// None should be returned for tiles that have no computable cost (i.e. cannot be moved through).
 ///
@@ -41,14 +41,12 @@ pub fn field_of_movement(
                 continue;
             };
 
-            let neighbor_cost = if let Some(cost) = coord
+            let Some(neighbor_cost) = coord
                 .all_neighbors()
                 .iter()
                 .filter_map(|n| computed_costs.get(n))
                 .min()
-            {
-                cost
-            } else {
+             else {
                 continue;
             };
 
