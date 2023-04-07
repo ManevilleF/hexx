@@ -64,11 +64,11 @@ fn handle_input(
             .into_iter()
             .filter_map(|h| grid.entities.get(&h).map(|&(_, ent)| ent))
             .collect();
-        for (entity, mut trans) in tile_transforms.iter_mut() {
+        for (entity, mut transform) in tile_transforms.iter_mut() {
             if reachable_entities.contains(&entity) {
-                *trans = trans.with_scale(Vec3::splat(0.9));
+                *transform = transform.with_scale(Vec3::splat(0.9));
             } else {
-                *trans = trans.with_scale(Vec3::splat(1.));
+                *transform = transform.with_scale(Vec3::splat(1.));
             }
         }
 
