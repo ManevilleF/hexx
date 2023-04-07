@@ -46,7 +46,6 @@ use std::collections::{HashMap, HashSet};
 /// // biomes.insert(hex(1, 2), Biome::Mountain);
 /// // ..
 /// let reachable_tiles = field_of_movement(start, movement_budget, |h| biomes.get(&h).and_then(|b| b.cost()));
-/// dbg!(&reachable_tiles);
 /// ```
 pub fn field_of_movement(
     coord: Hex,
