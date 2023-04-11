@@ -54,30 +54,22 @@ pub fn field_of_movement(
 ) -> HashSet<Hex> {
     let mut computed_costs = HashMap::new();
     computed_costs.insert(coord, 0);
-    let mut res = HashSet::new();
-    for i in 1..=budget {
-        for coord in coord.ring(i) {
-            let Some(coord_cost) = cost(coord)
-             else {
-                continue;
-            };
-
-            let Some(neighbor_cost) = coord
+    (1..=budget)
+        .flat_map(|i| coord.ring(i))
+        .filter_map(|coord| {
+            let coord_cost = cost(coord)?;
+            let neighbor_cost = coord
                 .all_neighbors()
-                .iter()
-                .filter_map(|n| computed_costs.get(n))
-                .min()
-             else {
-                continue;
-            };
-
+                .into_iter()
+                .filter_map(|n| computed_costs.get(&n))
+                .min()?;
             let computed_cost = coord_cost + 1 + neighbor_cost;
-            if computed_cost > budget {
-                continue;
+            if computed_cost <= budget {
+                computed_costs.insert(coord, computed_cost);
+                Some(coord)
+            } else {
+                None
             }
-            computed_costs.insert(coord, computed_cost);
-            res.insert(coord);
-        }
-    }
-    res
+        })
+        .collect()
 }
