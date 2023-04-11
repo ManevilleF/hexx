@@ -8,7 +8,7 @@ use std::collections::{HashMap, HashSet};
 /// A tile that returns a computable cost would return `Some(cost)`, whereas
 /// `None` should be returned for tiles that have no computable cost (i.e. cannot be moved through).
 ///
-/// The field_of_movement algorithm will always add `+ 1` to the computed cost in order to avoid
+/// The `field_of_movement` algorithm will always add `+ 1` to the computed cost in order to avoid
 /// the possibility of unlimited movement range (i.e. a `Hex` instance will always have a minimum movement `cost` of 1).
 ///
 /// # Examples
