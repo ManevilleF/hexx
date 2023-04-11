@@ -15,6 +15,8 @@
 * Added field of view algorithms in `algorithms`:
   - `range_fov` omni-directional field of view
   - `directional_fov` directional 120 degrees field of view (`Direction`)
+* Added field of movement algorithm in `algorithms`:
+  - `field_of_movement` provides the available range of field of movement given a `budget` of movement and a movement `cost`
 
 ### Directions to
 

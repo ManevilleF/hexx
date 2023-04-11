@@ -38,6 +38,9 @@ default-features = false
 version = "0.4"
 features = ["html_reports"]
 
+[dev-dependencies]
+rand = "0.8"
+
 [[example]]
 name = "hex_grid"
 path = "examples/hex_grid.rs"
@@ -57,6 +60,10 @@ path = "examples/a_star.rs"
 [[example]]
 name = "fov"
 path = "examples/fov.rs"
+
+[[example]]
+name = "field_of_movement"
+path = "examples/field_of_movement.rs"
 
 [[example]]
 name = "3d_columns"
