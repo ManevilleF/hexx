@@ -144,6 +144,8 @@ But now with accurate results !
 * `scroll_map` example now uses a 2d mesh and camera (#65)
 * `wrap_map` example now uses a 2d mesh and camera (#65)
 * Added an interactive `a_star` example (#69)
+* Added an interactive `field_of_view` example (#69)
+* Added an interactive `field_of_movement` example (#69)
 
 ## 0.5.3
 

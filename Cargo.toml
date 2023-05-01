@@ -71,8 +71,8 @@ name = "a_star"
 path = "examples/a_star.rs"
 
 [[example]]
-name = "fov"
-path = "examples/fov.rs"
+name = "field_of_view"
+path = "examples/field_of_view.rs"
 
 [[example]]
 name = "field_of_movement"
