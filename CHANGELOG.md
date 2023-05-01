@@ -70,6 +70,7 @@ until 0.8.0 (#99)
 now take an owned `HexOrientation` as the type is now `Copy` (#95)
 * (**BREAKING**) Removed all functions deprecated in `0.6.0`(#94)
 * Fixed `a_star` algorithm giving inconsisten paths (#96)
+* Bumped `glam` dependency to 0.24
 
 ## 0.6.0
 
@@ -144,8 +145,6 @@ But now with accurate results !
 * `scroll_map` example now uses a 2d mesh and camera (#65)
 * `wrap_map` example now uses a 2d mesh and camera (#65)
 * Added an interactive `a_star` example (#69)
-* Added an interactive `field_of_view` example (#69)
-* Added an interactive `field_of_movement` example (#69)
 
 ## 0.5.3
 
