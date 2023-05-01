@@ -113,10 +113,10 @@ impl Hex {
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
         let [start_dir, end_dir] = if clockwise {
-            let dir = direction.direction_left();
+            let dir = direction.direction_ccw();
             [dir, dir >> 2]
         } else {
-            let dir = direction.direction_right();
+            let dir = direction.direction_cw();
             [dir, dir << 2]
         };
         let p = self + start_dir * radius as i32;
@@ -300,8 +300,8 @@ impl Hex {
         range: impl Iterator<Item = u32> + Clone,
         direction: Direction,
     ) -> impl Iterator<Item = Self> {
-        let left = self.wedge(range.clone(), direction.diagonal_left());
-        let right = self.wedge(range, direction.diagonal_right());
+        let left = self.wedge(range.clone(), direction.diagonal_ccw());
+        let right = self.wedge(range, direction.diagonal_cw());
         left.chain(right)
             .filter(move |h| self.way_to(*h) == direction)
     }

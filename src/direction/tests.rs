@@ -10,24 +10,27 @@ mod hex_directions {
     use super::*;
 
     #[test]
-    fn rotate_left_right() {
+    fn rotate_ccw_cw() {
         for direction in Direction::ALL_DIRECTIONS {
-            assert_eq!(direction, direction.rotate_right(6));
-            assert_eq!(direction, direction.rotate_right(12));
-            assert_eq!(direction, direction.rotate_right(1).rotate_left(1));
-            assert_eq!(direction, direction.rotate_left(1).rotate_right(1));
-            assert_eq!(direction.left(), direction.rotate_left(1));
-            assert_eq!(direction.left().left(), direction.rotate_left(2));
-            assert_eq!(direction.right(), direction.rotate_right(1));
-            assert_eq!(direction.right().right(), direction.rotate_right(2));
+            assert_eq!(direction, direction.rotate_cw(6));
+            assert_eq!(direction, direction.rotate_cw(12));
+            assert_eq!(direction, direction.rotate_cw(1).rotate_ccw(1));
+            assert_eq!(direction, direction.rotate_ccw(1).rotate_cw(1));
+            assert_eq!(direction.counter_clockwise(), direction.rotate_ccw(1));
+            assert_eq!(
+                direction.counter_clockwise().counter_clockwise(),
+                direction.rotate_ccw(2)
+            );
+            assert_eq!(direction.clockwise(), direction.rotate_cw(1));
+            assert_eq!(direction.clockwise().clockwise(), direction.rotate_cw(2));
         }
     }
 
     #[test]
     fn rotations_reverse_each_other() {
         for direction in Direction::ALL_DIRECTIONS {
-            assert_eq!(direction, direction.left().right());
-            assert_eq!(direction, direction.right().left());
+            assert_eq!(direction, direction.counter_clockwise().clockwise());
+            assert_eq!(direction, direction.clockwise().counter_clockwise());
         }
     }
 
@@ -38,8 +41,8 @@ mod hex_directions {
             let mut counter_clockwise_dir = direction;
 
             for _ in 0..6 {
-                clockwise_dir = clockwise_dir.left();
-                counter_clockwise_dir = counter_clockwise_dir.right();
+                clockwise_dir = clockwise_dir.counter_clockwise();
+                counter_clockwise_dir = counter_clockwise_dir.clockwise();
             }
 
             assert_eq!(direction, clockwise_dir);
@@ -114,8 +117,8 @@ mod hex_directions {
     #[test]
     fn diagonal_neighbors() {
         for dir in Direction::ALL_DIRECTIONS {
-            assert_eq!(dir.diagonal_left().direction_right(), dir);
-            assert_eq!(dir.diagonal_right().direction_left(), dir);
+            assert_eq!(dir.diagonal_ccw().direction_cw(), dir);
+            assert_eq!(dir.diagonal_cw().direction_ccw(), dir);
         }
     }
 }
@@ -126,15 +129,15 @@ mod diagonal_direction {
     #[test]
     fn dir_neighbors() {
         for dir in DiagonalDirection::ALL_DIRECTIONS {
-            assert_eq!(dir.direction_left().diagonal_right(), dir);
-            assert_eq!(dir.direction_right().diagonal_left(), dir);
+            assert_eq!(dir.direction_ccw().diagonal_cw(), dir);
+            assert_eq!(dir.direction_cw().diagonal_ccw(), dir);
         }
     }
 
     #[test]
     fn flat_angles_rad() {
         for dir in DiagonalDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_left().angle_flat() - PI / 6.0;
+            let expected = dir.direction_ccw().angle_flat() - PI / 6.0;
             assert!(dir.angle_flat() - expected <= EPSILON);
         }
     }
@@ -142,7 +145,7 @@ mod diagonal_direction {
     #[test]
     fn pointy_angles_rad() {
         for dir in DiagonalDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_left().angle_pointy() - PI / 6.0;
+            let expected = dir.direction_ccw().angle_pointy() - PI / 6.0;
             assert!(dir.angle_pointy() - expected <= EPSILON);
         }
     }
@@ -150,7 +153,7 @@ mod diagonal_direction {
     #[test]
     fn flat_angles_degrees() {
         for dir in DiagonalDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_left().angle_flat_degrees() - 30.0;
+            let expected = dir.direction_ccw().angle_flat_degrees() - 30.0;
             assert!(dir.angle_flat_degrees() - expected <= EPSILON);
         }
     }
@@ -158,7 +161,7 @@ mod diagonal_direction {
     #[test]
     fn pointy_angles_degrees() {
         for dir in DiagonalDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_left().angle_pointy_degrees() - 30.0;
+            let expected = dir.direction_ccw().angle_pointy_degrees() - 30.0;
             assert!(dir.angle_pointy_degrees() - expected <= EPSILON);
         }
     }

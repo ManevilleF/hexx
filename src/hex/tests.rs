@@ -228,61 +228,61 @@ fn rotation() {
         let [next, prev] = [elems[0], elems[1]];
         let prev_dir = Hex::ZERO.way_to(prev).unwrap();
         let next_dir = Hex::ZERO.way_to(next).unwrap();
-        assert_eq!(prev.right(), next);
-        assert_eq!(next.left(), prev);
-        assert_eq!(prev_dir.right(), next_dir);
-        assert_eq!(next_dir.left(), prev_dir);
+        assert_eq!(prev.clockwise(), next);
+        assert_eq!(next.counter_clockwise(), prev);
+        assert_eq!(prev_dir.clockwise(), next_dir);
+        assert_eq!(next_dir.counter_clockwise(), prev_dir);
     }
 }
 
 #[test]
-fn rotate_right() {
+fn rotate_cw() {
     let point = Hex::new(5, 0);
-    let new = point.right();
+    let new = point.clockwise();
     assert_eq!(new, Hex::new(0, 5));
-    assert_eq!(point.rotate_right(1), new);
-    let new = new.right();
+    assert_eq!(point.rotate_cw(1), new);
+    let new = new.clockwise();
     assert_eq!(new, Hex::new(-5, 5));
-    assert_eq!(point.rotate_right(2), new);
-    let new = new.right();
+    assert_eq!(point.rotate_cw(2), new);
+    let new = new.clockwise();
     assert_eq!(new, Hex::new(-5, 0));
-    assert_eq!(point.rotate_right(3), new);
-    let new = new.right();
+    assert_eq!(point.rotate_cw(3), new);
+    let new = new.clockwise();
     assert_eq!(new, Hex::new(0, -5));
-    assert_eq!(point.rotate_right(4), new);
-    let new = new.right();
+    assert_eq!(point.rotate_cw(4), new);
+    let new = new.clockwise();
     assert_eq!(new, Hex::new(5, -5));
-    assert_eq!(point.rotate_right(5), new);
-    let new = new.right();
+    assert_eq!(point.rotate_cw(5), new);
+    let new = new.clockwise();
     assert_eq!(new, point);
-    assert_eq!(point.rotate_right(6), new);
-    assert_eq!(point.rotate_right(7), point.rotate_right(1));
-    assert_eq!(point.rotate_right(10), point.rotate_right(4));
+    assert_eq!(point.rotate_cw(6), new);
+    assert_eq!(point.rotate_cw(7), point.rotate_cw(1));
+    assert_eq!(point.rotate_cw(10), point.rotate_cw(4));
 }
 
 #[test]
-fn rotate_left() {
+fn rotate_ccw() {
     let point = Hex::new(5, 0);
-    let new = point.left();
+    let new = point.counter_clockwise();
     assert_eq!(new, Hex::new(5, -5));
-    assert_eq!(point.rotate_left(1), new);
-    let new = new.left();
+    assert_eq!(point.rotate_ccw(1), new);
+    let new = new.counter_clockwise();
     assert_eq!(new, Hex::new(0, -5));
-    assert_eq!(point.rotate_left(2), new);
-    let new = new.left();
+    assert_eq!(point.rotate_ccw(2), new);
+    let new = new.counter_clockwise();
     assert_eq!(new, Hex::new(-5, 0));
-    assert_eq!(point.rotate_left(3), new);
-    let new = new.left();
+    assert_eq!(point.rotate_ccw(3), new);
+    let new = new.counter_clockwise();
     assert_eq!(new, Hex::new(-5, 5));
-    assert_eq!(point.rotate_left(4), new);
-    let new = new.left();
+    assert_eq!(point.rotate_ccw(4), new);
+    let new = new.counter_clockwise();
     assert_eq!(new, Hex::new(0, 5));
-    assert_eq!(point.rotate_left(5), new);
-    let new = new.left();
+    assert_eq!(point.rotate_ccw(5), new);
+    let new = new.counter_clockwise();
     assert_eq!(new, point);
-    assert_eq!(point.rotate_left(6), new);
-    assert_eq!(point.rotate_left(7), point.rotate_left(1));
-    assert_eq!(point.rotate_left(10), point.rotate_left(4));
+    assert_eq!(point.rotate_ccw(6), new);
+    assert_eq!(point.rotate_ccw(7), point.rotate_ccw(1));
+    assert_eq!(point.rotate_ccw(10), point.rotate_ccw(4));
 }
 
 #[test]

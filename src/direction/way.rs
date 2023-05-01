@@ -6,7 +6,7 @@ use crate::{DiagonalDirection, Direction};
 ///
 /// # Comparison
 ///
-/// to compare it with its inner [`Direction`] or [`DiagonalDirection`] you can use
+/// To compare it with its inner [`Direction`] or [`DiagonalDirection`] you can use
 /// `Self::contains` or the [`PartialEq`] implementation:
 ///
 /// ```rust
@@ -33,8 +33,12 @@ pub enum DirectionWay<T> {
 }
 
 pub trait Way: Copy + Neg<Output = Self> {
+    #[deprecated = "Use ccw"]
     fn left(self) -> Self;
+    fn ccw(self) -> Self;
+    #[deprecated = "Use cw"]
     fn right(self) -> Self;
+    fn cw(self) -> Self;
 }
 
 impl<T: PartialEq> PartialEq<T> for DirectionWay<T> {
@@ -72,10 +76,10 @@ impl<T: Way> DirectionWay<T> {
     #[inline]
     pub(crate) fn way_from(is_neg: bool, eq_left: bool, eq_right: bool, dir: T) -> Self {
         match [is_neg, eq_left, eq_right] {
-            [false, true, _] => Self::Tie([dir, dir.left()]),
-            [true, true, _] => Self::Tie([-dir, (-dir).left()]),
-            [false, _, true] => Self::Tie([dir, dir.right()]),
-            [true, _, true] => Self::Tie([-dir, (-dir).right()]),
+            [false, true, _] => Self::Tie([dir, dir.ccw()]),
+            [true, true, _] => Self::Tie([-dir, (-dir).ccw()]),
+            [false, _, true] => Self::Tie([dir, dir.cw()]),
+            [true, _, true] => Self::Tie([-dir, (-dir).cw()]),
             [true, _, _] => Self::Single(-dir),
             _ => Self::Single(dir),
         }
@@ -98,20 +102,36 @@ impl<T> From<[T; 2]> for DirectionWay<T> {
 
 impl Way for Direction {
     fn left(self) -> Self {
-        self.left()
+        self.counter_clockwise()
+    }
+
+    fn ccw(self) -> Self {
+        self.counter_clockwise()
     }
 
     fn right(self) -> Self {
-        self.right()
+        self.clockwise()
+    }
+
+    fn cw(self) -> Self {
+        self.clockwise()
     }
 }
 
 impl Way for DiagonalDirection {
     fn left(self) -> Self {
-        self.left()
+        self.counter_clockwise()
+    }
+
+    fn ccw(self) -> Self {
+        self.counter_clockwise()
     }
 
     fn right(self) -> Self {
-        self.right()
+        self.clockwise()
+    }
+
+    fn cw(self) -> Self {
+        self.clockwise()
     }
 }

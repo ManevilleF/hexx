@@ -714,6 +714,7 @@ impl Hex {
         Self::DIAGONAL_COORDS.map(|n| self + n)
     }
 
+    #[deprecated = "Use Hex::counter_clockwise"]
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] counter clockwise (by -60 degrees)
@@ -727,37 +728,79 @@ impl Hex {
     /// assert_eq!(p.left(), Hex::new(3, -1));
     /// ```
     pub const fn left(self) -> Self {
+        self.counter_clockwise()
+    }
+
+    #[inline]
+    #[must_use]
+    #[doc(alias = "ccw")]
+    /// Rotates `self` around [`Hex::ZERO`] counter clockwise (by -60 degrees)
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let p = Hex::new(1, 2);
+    /// assert_eq!(p.counter_clockwise(), Hex::new(3, -1));
+    /// ```
+    pub const fn counter_clockwise(self) -> Self {
         Self::new(-self.z(), -self.x)
+    }
+
+    #[deprecated = "Use Hex::ccw_around"]
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around `center` counter clockwise (by -60 degrees)
+    pub const fn left_around(self, center: Self) -> Self {
+        self.ccw_around(center)
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` counter clockwise (by -60 degrees)
-    pub const fn left_around(self, center: Self) -> Self {
-        self.const_sub(center).left().const_add(center)
+    pub const fn ccw_around(self, center: Self) -> Self {
+        self.const_sub(center).counter_clockwise().const_add(center)
+    }
+
+    #[deprecated = "Use Hex::rotate_ccw"]
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around [`Hex::ZERO`] counter clockwise by `m` (by `-60 * m` degrees)
+    pub const fn rotate_left(self, m: u32) -> Self {
+        self.rotate_ccw(m)
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] counter clockwise by `m` (by `-60 * m` degrees)
-    pub const fn rotate_left(self, m: u32) -> Self {
+    pub const fn rotate_ccw(self, m: u32) -> Self {
         match m % 6 {
-            1 => self.left(),
-            2 => self.left().left(),
+            1 => self.counter_clockwise(),
+            2 => self.counter_clockwise().counter_clockwise(),
             3 => self.const_neg(),
-            4 => self.right().right(),
-            5 => self.right(),
+            4 => self.clockwise().clockwise(),
+            5 => self.clockwise(),
             _ => self,
         }
+    }
+
+    #[deprecated = "Use Hex::rotate_ccw_around"]
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m` degrees)
+    pub const fn rotate_left_around(self, center: Self, m: u32) -> Self {
+        self.rotate_ccw_around(center, m)
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m` degrees)
-    pub const fn rotate_left_around(self, center: Self, m: u32) -> Self {
-        self.const_sub(center).rotate_left(m).const_add(center)
+    pub const fn rotate_ccw_around(self, center: Self, m: u32) -> Self {
+        self.const_sub(center).rotate_ccw(m).const_add(center)
     }
 
+    #[deprecated = "Use Hex::clockwise"]
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] clockwise (by 60 degrees)
@@ -771,35 +814,76 @@ impl Hex {
     /// assert_eq!(p.right(), Hex::new(-2, 3));
     /// ```
     pub const fn right(self) -> Self {
+        self.clockwise()
+    }
+
+    #[inline]
+    #[must_use]
+    #[doc(alias = "cw")]
+    /// Rotates `self` around [`Hex::ZERO`] clockwise (by 60 degrees)
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let p = Hex::new(1, 2);
+    /// assert_eq!(p.clockwise(), Hex::new(-2, 3));
+    /// ```
+    pub const fn clockwise(self) -> Self {
         Self::new(-self.y, -self.z())
+    }
+
+    #[deprecated = "Use Hex::cw_around"]
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around `center` clockwise (by 60 degrees)
+    pub const fn right_around(self, center: Self) -> Self {
+        self.cw_around(center)
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` clockwise (by 60 degrees)
-    pub const fn right_around(self, center: Self) -> Self {
-        self.const_sub(center).right().const_add(center)
+    pub const fn cw_around(self, center: Self) -> Self {
+        self.const_sub(center).clockwise().const_add(center)
+    }
+
+    #[deprecated = "Use Hex::rotate_cw"]
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around [`Hex::ZERO`] clockwise by `m` (by `60 * m` degrees)
+    pub const fn rotate_right(self, m: u32) -> Self {
+        self.rotate_cw(m)
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] clockwise by `m` (by `60 * m` degrees)
-    pub const fn rotate_right(self, m: u32) -> Self {
+    pub const fn rotate_cw(self, m: u32) -> Self {
         match m % 6 {
-            1 => self.right(),
-            2 => self.right().right(),
+            1 => self.clockwise(),
+            2 => self.clockwise().clockwise(),
             3 => self.const_neg(),
-            4 => self.left().left(),
-            5 => self.left(),
+            4 => self.counter_clockwise().counter_clockwise(),
+            5 => self.counter_clockwise(),
             _ => self,
         }
+    }
+
+    #[deprecated = "Use Hex::rotate_cw_around"]
+    #[inline]
+    #[must_use]
+    /// Rotates `self` around `center` clockwise by `m` (by `60 * m` degrees)
+    pub const fn rotate_right_around(self, center: Self, m: u32) -> Self {
+        self.rotate_cw_around(center, m)
     }
 
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` clockwise by `m` (by `60 * m` degrees)
-    pub const fn rotate_right_around(self, center: Self, m: u32) -> Self {
-        self.const_sub(center).rotate_right(m).const_add(center)
+    pub const fn rotate_cw_around(self, center: Self, m: u32) -> Self {
+        self.const_sub(center).rotate_cw(m).const_add(center)
     }
 
     #[inline]
@@ -944,7 +1028,11 @@ impl Hex {
     pub const fn wraparound_mirrors(radius: u32) -> [Self; 6] {
         let radius = radius as i32;
         let mirror = Self::new(2 * radius + 1, -radius);
-        let [center, left, right] = [mirror, mirror.left(), mirror.right()];
+        let [center, left, right] = [
+            mirror,
+            mirror.counter_clockwise(),
+            mirror.counter_clockwise(),
+        ];
         [
             left,
             center,

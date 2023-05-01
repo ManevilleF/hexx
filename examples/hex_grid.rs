@@ -149,7 +149,7 @@ fn handle_input(
             // Draw a half ring
             highlighted_hexes.half_ring = Hex::ZERO.ring(coord.ulength() / 2).collect();
             // Draw rotations
-            highlighted_hexes.rotated = (1..6).map(|i| coord.rotate_right(i)).collect();
+            highlighted_hexes.rotated = (1..6).map(|i| coord.rotate_cw(i)).collect();
             // Draw an dual wedge
             highlighted_hexes.dir_wedge = Hex::ZERO.corner_wedge_to(coord / 2).collect();
             for (vec, mat) in [
