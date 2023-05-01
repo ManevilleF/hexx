@@ -113,7 +113,7 @@ fn animate_rings(
     if highlighted_hexes.ring > MAP_RADIUS {
         highlighted_hexes.ring = 0;
     }
-    highlighted_hexes.hexes = Hex::ZERO.ring(highlighted_hexes.ring).collect();
+    highlighted_hexes.hexes = Hex::ZERO.ring(highlighted_hexes.ring);
     // Draw a ring
     for h in &highlighted_hexes.hexes {
         if let Some(e) = map.entities.get(h) {
