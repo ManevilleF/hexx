@@ -1,33 +1,17 @@
+mod column_builder;
+mod plane_builder;
+
 use std::ops::Add;
 
-use crate::{Hex, HexLayout};
+pub use column_builder::ColumnMeshBuilder;
+pub use plane_builder::PlaneMeshBuilder;
+
 use glam::{Quat, Vec2, Vec3};
 
-const BASE_FACING: Vec3 = Vec3::Y;
-const UV_DELTA: Vec2 = Vec2::splat(0.5);
+use crate::{Hex, HexLayout};
 
-/// Builder struct to customize hex column mesh generation
-#[derive(Debug, Clone)]
-pub struct ColumnMeshBuilder<'l> {
-    /// The hexagonal layout, used to compute vertex positions
-    layout: &'l HexLayout,
-    /// Custom hex position, will apply an offset if not [`Hex::ZERO`]
-    pos: Hex,
-    /// Optional custom offset for the mesh vertex positions
-    offset: Option<Vec3>,
-    /// Optional custom facing direction, useful to have the mesh already rotated
-    ///
-    /// By default the mesh is *facing* up (**Y** axis)
-    facing: Option<Vec3>,
-    /// The column height
-    height: Option<f32>,
-    /// Amount of quads to be generated on the sides of the column
-    subdivisions: Option<usize>,
-    /// Should the top hexagonal face be present
-    top_face: bool,
-    /// Should the bottom hexagonal face be present
-    bottom_face: bool,
-}
+pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
+pub(crate) const UV_DELTA: Vec2 = Vec2::splat(0.5);
 
 #[derive(Debug, Clone, Default)]
 /// Mesh information. The `const LEN` attribute ensures that there is the same number of vertices, normals and uvs
@@ -42,136 +26,6 @@ pub struct MeshInfo {
     pub indices: Vec<u16>,
 }
 
-impl<'l> ColumnMeshBuilder<'l> {
-    /// Setup a new builder using the given `layout`
-    #[must_use]
-    pub const fn new(layout: &'l HexLayout) -> Self {
-        Self {
-            layout,
-            pos: Hex::ZERO,
-            facing: None,
-            height: None,
-            subdivisions: None,
-            offset: None,
-            top_face: true,
-            bottom_face: false,
-        }
-    }
-
-    /// Specifies a custom `pos`, which will apply an offset to the whole mesh.
-    ///
-    /// ## Note
-    ///
-    /// It might be more optimal to generate only one mesh at [`Hex::ZERO`] and offset it later
-    /// than have one mesh per hex position
-    #[must_use]
-    pub const fn at(mut self, pos: Hex) -> Self {
-        self.pos = pos;
-        self
-    }
-
-    /// Specify a custom *facing* direction for the mesh, by default the column is vertical (facing
-    /// up)
-    #[must_use]
-    pub const fn facing(mut self, facing: Vec3) -> Self {
-        self.facing = Some(facing);
-        self
-    }
-
-    /// Specify a cusom offset for the whole mesh
-    #[must_use]
-    pub const fn with_offset(mut self, offset: Vec3) -> Self {
-        self.offset = Some(offset);
-        self
-    }
-
-    /// Defines the column height
-    #[must_use]
-    pub const fn with_height(mut self, height: f32) -> Self {
-        self.height = Some(height);
-        self
-    }
-
-    /// Defines the column side quads amount
-    #[must_use]
-    pub const fn with_subdivisions(mut self, subdivisions: usize) -> Self {
-        self.subdivisions = Some(subdivisions);
-        self
-    }
-
-    /// The mesh will include a *bottom* hexagon face
-    #[must_use]
-    pub const fn with_bottom_face(mut self) -> Self {
-        self.bottom_face = true;
-        self
-    }
-
-    /// The mesh will include a *top* hexagon face
-    #[must_use]
-    pub const fn with_top_face(mut self) -> Self {
-        self.top_face = true;
-        self
-    }
-
-    /// The mesh will not include a *bottom* hexagon face
-    #[must_use]
-    pub const fn without_bottom_face(mut self) -> Self {
-        self.bottom_face = false;
-        self
-    }
-
-    /// The mesh will not include a *top* hexagon face
-    #[must_use]
-    pub const fn without_top_face(mut self) -> Self {
-        self.top_face = false;
-        self
-    }
-
-    #[must_use]
-    #[allow(clippy::cast_precision_loss)]
-    #[allow(clippy::many_single_char_names)]
-    /// Comsumes the builder to return the computed mesh data
-    pub fn build(self) -> MeshInfo {
-        let plane = MeshInfo::hexagonal_plane(self.layout, self.pos);
-        let mut mesh = MeshInfo::default();
-        let half_height = self.height.unwrap_or(0.0) / 2.0;
-        if let Some(height) = self.height {
-            let subidivisions = self.subdivisions.unwrap_or(0).max(1);
-            let delta = height / subidivisions as f32;
-            let center = self.layout.hex_to_world_pos(self.pos);
-            let [a, b, c, d, e, f] = self.layout.hex_corners(self.pos);
-            let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
-            for div in 0..subidivisions {
-                let height = delta.mul_add(div as f32, -half_height);
-                for [left, right] in corners {
-                    let normal = left - center + right - center;
-                    let left = Vec3::new(left.x, height, left.y);
-                    let right = Vec3::new(right.x, height, right.y);
-                    let quad =
-                        MeshInfo::quad([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
-                    mesh = mesh + quad;
-                }
-            }
-        };
-        if self.top_face {
-            mesh = mesh + plane.clone().with_offset(Vec3::Y * half_height);
-        }
-        if self.bottom_face {
-            let rotation = Quat::from_rotation_arc(BASE_FACING, -BASE_FACING);
-            let bottom_face = plane.with_offset(Vec3::Y * half_height).rotated(rotation);
-            mesh = mesh + bottom_face;
-        }
-        if let Some(offset) = self.offset {
-            mesh = mesh.with_offset(offset);
-        }
-        if let Some(facing) = self.facing {
-            let facing = facing.normalize();
-            let rotation = Quat::from_rotation_arc(BASE_FACING, facing);
-            mesh = mesh.rotated(rotation);
-        }
-        mesh
-    }
-}
 impl MeshInfo {
     /// Returns a new [`MeshInfo`] but with vertex positions and normals rotated
     #[inline]
@@ -202,6 +56,21 @@ impl MeshInfo {
         }
     }
 
+    /// Merges `rhs` into `self`
+    ///
+    /// # Panics
+    ///
+    /// Will panic if there are more vertices than [`u16::MAX`]
+    pub fn merge_with(&mut self, rhs: Self) {
+        let indices_offset =
+            u16::try_from(self.vertices.len()).expect("MeshInfo has too many vertices");
+        self.vertices.extend(rhs.vertices);
+        self.normals.extend(rhs.normals);
+        self.uvs.extend(rhs.uvs);
+        self.indices
+            .extend(rhs.indices.into_iter().map(|i| i + indices_offset));
+    }
+
     fn quad([left, right]: [Vec3; 2], normal: Vec3, height: f32) -> Self {
         let offset = BASE_FACING * height;
         Self {
@@ -216,6 +85,8 @@ impl MeshInfo {
     }
 
     /// Computes mesh data for an hexagonal plane facing `Vec3::Y`
+    ///
+    /// Prefer using [`PlaneMeshBuilder`] for additional customization
     #[must_use]
     pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
         let center = layout.hex_to_world_pos(hex);
@@ -255,20 +126,20 @@ impl MeshInfo {
 
     /// Computes mesh data for an hexagonal column facing `Vec3::Y` without the bottom face
     #[must_use]
+    #[deprecated(since = "0.6.0", note = "Use ColumnMeshBuilder instead")]
     pub fn partial_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
-        ColumnMeshBuilder::new(layout)
+        ColumnMeshBuilder::new(layout, column_height)
             .at(hex)
-            .with_height(column_height)
+            .without_bottom_face()
             .build()
     }
 
     /// Computes mesh data for an hexagonal column facing `Vec3::Y`
     #[must_use]
+    #[deprecated(since = "0.6.0", note = "Use ColumnMeshBuilder instead")]
     pub fn hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
-        ColumnMeshBuilder::new(layout)
+        ColumnMeshBuilder::new(layout, column_height)
             .at(hex)
-            .with_height(column_height)
-            .with_bottom_face()
             .build()
     }
 
@@ -357,13 +228,7 @@ impl Add for MeshInfo {
     type Output = Self;
 
     fn add(mut self, rhs: Self) -> Self::Output {
-        let indices_offset =
-            u16::try_from(self.vertices.len()).expect("MeshInfo has too many vertices");
-        self.vertices.extend(rhs.vertices);
-        self.normals.extend(rhs.normals);
-        self.uvs.extend(rhs.uvs);
-        self.indices
-            .extend(rhs.indices.into_iter().map(|i| i + indices_offset));
+        self.merge_with(rhs);
         self
     }
 }

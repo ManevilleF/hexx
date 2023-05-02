@@ -123,8 +123,7 @@
 //! - [`MeshInfo::hexagonal_plane`] (7 vertices) useful for 2D games
 //! - [`MeshInfo::cheap_hexagonal_column`] (13 vertices) with merged vertices and useful only for
 //! unlit games
-//! - [`MeshInfo::partial_hexagonal_column`] (31 vertices) without the bottom face
-//! - [`MeshInfo::hexagonal_column`] (38 vertices) with the bottom face
+//! And a [`ColumnMeshBuilder`] struct to construct custom hexagonal columns
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
@@ -150,7 +149,7 @@ pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
 
-pub use glam::{IVec2, IVec3, Vec2};
+pub use glam::{IVec2, IVec3, Vec2, Vec3};
 pub use {
     bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*,
 };

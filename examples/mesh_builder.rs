@@ -39,10 +39,8 @@ fn setup(
         ..default()
     });
     let layout = HexLayout::default();
-    let mesh = ColumnMeshBuilder::new(&layout)
-        .with_height(15.0)
+    let mesh = ColumnMeshBuilder::new(&layout, 15.0)
         .with_subdivisions(5)
-        .with_bottom_face()
         .build();
     let mesh = meshes.add(compute_mesh(mesh));
     let material = materials.add(Color::WHITE.into());

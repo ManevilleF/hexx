@@ -124,7 +124,9 @@ fn animate_rings(
 
 /// Compute a bevy mesh from the layout
 fn hexagonal_column(hex_layout: &HexLayout) -> Mesh {
-    let mesh_info = MeshInfo::partial_hexagonal_column(hex_layout, Hex::ZERO, COLUMN_HEIGHT);
+    let mesh_info = ColumnMeshBuilder::new(hex_layout, COLUMN_HEIGHT)
+        .without_bottom_face()
+        .build();
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());

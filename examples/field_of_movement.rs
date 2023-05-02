@@ -132,7 +132,7 @@ fn setup_grid(
 
 /// Compute a bevy mesh from the layout
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
-    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO).facing(Vec3::Z);
+    let mesh_info = PlaneMeshBuilder::new(hex_layout).facing(Vec3::Z).build();
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
