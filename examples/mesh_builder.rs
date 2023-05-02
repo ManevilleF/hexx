@@ -109,9 +109,9 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
 /// Compute a bevy mesh from the layout
 fn compute_mesh(mesh_info: MeshInfo) -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
-    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
-    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs.to_vec());
+    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs);
     mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
     mesh
 }
