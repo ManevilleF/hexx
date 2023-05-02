@@ -69,6 +69,10 @@ path = "examples/field_of_movement.rs"
 name = "3d_columns"
 path = "examples/3d_columns.rs"
 
+[[example]]
+name = "mesh_builder"
+path = "examples/mesh_builder.rs"
+
 [[bench]]
 name = "length"
 harness = false
