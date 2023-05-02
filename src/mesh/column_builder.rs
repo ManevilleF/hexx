@@ -146,16 +146,16 @@ impl<'l> ColumnMeshBuilder<'l> {
                 let left = Vec3::new(left.x, height, left.y);
                 let right = Vec3::new(right.x, height, right.y);
                 let quad = MeshInfo::quad([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
-                mesh = mesh + quad;
+                mesh.merge_with(quad);
             }
         }
         if self.top_face {
-            mesh = mesh + plane.clone().with_offset(Vec3::Y * self.height);
+            mesh.merge_with(plane.clone().with_offset(Vec3::Y * self.height));
         }
         if self.bottom_face {
             let rotation = Quat::from_rotation_arc(BASE_FACING, -BASE_FACING);
             let bottom_face = plane.rotated(rotation);
-            mesh = mesh + bottom_face;
+            mesh.merge_with(bottom_face);
         }
         if let Some(offset) = self.offset {
             mesh = mesh.with_offset(offset);

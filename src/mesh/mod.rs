@@ -1,8 +1,6 @@
 mod column_builder;
 mod plane_builder;
 
-use std::ops::Add;
-
 pub use column_builder::ColumnMeshBuilder;
 pub use plane_builder::PlaneMeshBuilder;
 
@@ -228,14 +226,5 @@ impl MeshInfo {
             uvs: [Vec2::Y; 13].to_vec(), // TODO: Find decent UV mapping
             indices,
         }
-    }
-}
-
-impl Add for MeshInfo {
-    type Output = Self;
-
-    fn add(mut self, rhs: Self) -> Self::Output {
-        self.merge_with(rhs);
-        self
     }
 }
