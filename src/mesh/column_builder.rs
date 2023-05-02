@@ -7,6 +7,8 @@ use crate::{Hex, HexLayout};
 ///
 /// By default this builder will create a full hexagonal column with all faces and no side
 /// subdivisions.
+/// The mesh will be anchored at the center of the *bottom face*, use offsets to cutomize
+/// anchor/pivot position.
 ///
 /// # Example
 ///
@@ -81,7 +83,22 @@ impl<'l> ColumnMeshBuilder<'l> {
         self
     }
 
-    /// Specify a cusom offset for the whole mesh
+    /// Specify a cusom offset for the whole mesh. This can be used to customize the anchor/pivot
+    /// of the mesh.
+    ///
+    /// # Example
+    ///
+    /// To center the pivot you can offset the mesh by half its height:
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let layout = HexLayout::default();
+    /// let height = 10.0;
+    /// let mesh = ColumnMeshBuilder::new(&layout, height)
+    ///     .with_offset(Vec3::new(0.0, -height / 2.0, 0.0))
+    ///     .build();
+    /// ```
     #[must_use]
     pub const fn with_offset(mut self, offset: Vec3) -> Self {
         self.offset = Some(offset);
@@ -116,7 +133,6 @@ impl<'l> ColumnMeshBuilder<'l> {
     pub fn build(self) -> MeshInfo {
         let plane = MeshInfo::hexagonal_plane(self.layout, self.pos);
         let mut mesh = MeshInfo::default();
-        let half_height = self.height / 2.0;
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
@@ -124,7 +140,7 @@ impl<'l> ColumnMeshBuilder<'l> {
         let [a, b, c, d, e, f] = self.layout.hex_corners(self.pos);
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         for div in 0..subidivisions {
-            let height = delta.mul_add(div as f32, -half_height);
+            let height = delta * div as f32;
             for [left, right] in corners {
                 let normal = left - center + right - center;
                 let left = Vec3::new(left.x, height, left.y);
@@ -134,11 +150,11 @@ impl<'l> ColumnMeshBuilder<'l> {
             }
         }
         if self.top_face {
-            mesh = mesh + plane.clone().with_offset(Vec3::Y * half_height);
+            mesh = mesh + plane.clone().with_offset(Vec3::Y * self.height);
         }
         if self.bottom_face {
             let rotation = Quat::from_rotation_arc(BASE_FACING, -BASE_FACING);
-            let bottom_face = plane.with_offset(Vec3::Y * half_height).rotated(rotation);
+            let bottom_face = plane.rotated(rotation);
             mesh = mesh + bottom_face;
         }
         if let Some(offset) = self.offset {

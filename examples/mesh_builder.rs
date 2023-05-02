@@ -60,6 +60,7 @@ fn setup(
     let layout = HexLayout::default();
     let mesh = ColumnMeshBuilder::new(&layout, params.height)
         .with_subdivisions(params.subdivisions)
+        .with_offset(Vec3::NEG_Y * params.height / 2.0)
         .build();
     let mesh_handle = meshes.add(compute_mesh(mesh));
     let material = materials.add(Color::CYAN.into());
@@ -93,8 +94,9 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     if !params.is_changed() {
         return;
     }
-    let mut new_mesh =
-        ColumnMeshBuilder::new(&info.layout, params.height).with_subdivisions(params.subdivisions);
+    let mut new_mesh = ColumnMeshBuilder::new(&info.layout, params.height)
+        .with_subdivisions(params.subdivisions)
+        .with_offset(Vec3::NEG_Y * params.height / 2.0);
     if !params.top_face {
         new_mesh = new_mesh.without_top_face();
     }

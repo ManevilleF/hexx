@@ -151,10 +151,11 @@ impl MeshInfo {
 
     /// Computes cheap mesh data for an hexagonal column facing `Vec3::Y` without the bottom face.
     ///
-    /// This mesh has only 13 vertices, as no vertex is duplicated. As a consequence the normals will behave strangely.
-    /// The UV mapping will be incorrect
+    /// This mesh has only 13 vertices, as no vertex is duplicated. As a consequence the normals will behave strangely
+    /// and the UV mapping will be incorrect.
     ///
-    /// Use this mesh if you don't care about lighting and texturing.
+    /// Use this mesh if you don't care about lighting and texturing, for example for collision
+    /// shapes.
     #[must_use]
     pub fn cheap_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
         let center = layout.hex_to_world_pos(hex);
