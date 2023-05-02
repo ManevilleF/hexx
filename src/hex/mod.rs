@@ -714,7 +714,7 @@ impl Hex {
         Self::DIAGONAL_COORDS.map(|n| self + n)
     }
 
-    #[deprecated = "Use Hex::counter_clockwise"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::counter_clockwise")]
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] counter clockwise (by -60 degrees)
@@ -748,7 +748,7 @@ impl Hex {
         Self::new(-self.z(), -self.x)
     }
 
-    #[deprecated = "Use Hex::ccw_around"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::ccw_around")]
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` counter clockwise (by -60 degrees)
@@ -763,7 +763,7 @@ impl Hex {
         self.const_sub(center).counter_clockwise().const_add(center)
     }
 
-    #[deprecated = "Use Hex::rotate_ccw"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_ccw")]
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] counter clockwise by `m` (by `-60 * m` degrees)
@@ -785,7 +785,7 @@ impl Hex {
         }
     }
 
-    #[deprecated = "Use Hex::rotate_ccw_around"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_ccw_around")]
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m` degrees)
@@ -800,7 +800,7 @@ impl Hex {
         self.const_sub(center).rotate_ccw(m).const_add(center)
     }
 
-    #[deprecated = "Use Hex::clockwise"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::clockwise")]
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] clockwise (by 60 degrees)
@@ -834,7 +834,7 @@ impl Hex {
         Self::new(-self.y, -self.z())
     }
 
-    #[deprecated = "Use Hex::cw_around"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::cw_around")]
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` clockwise (by 60 degrees)
@@ -849,7 +849,7 @@ impl Hex {
         self.const_sub(center).clockwise().const_add(center)
     }
 
-    #[deprecated = "Use Hex::rotate_cw"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_cw")]
     #[inline]
     #[must_use]
     /// Rotates `self` around [`Hex::ZERO`] clockwise by `m` (by `60 * m` degrees)
@@ -871,7 +871,7 @@ impl Hex {
         }
     }
 
-    #[deprecated = "Use Hex::rotate_cw_around"]
+    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_cw_around")]
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` clockwise by `m` (by `60 * m` degrees)
@@ -1028,11 +1028,7 @@ impl Hex {
     pub const fn wraparound_mirrors(radius: u32) -> [Self; 6] {
         let radius = radius as i32;
         let mirror = Self::new(2 * radius + 1, -radius);
-        let [center, left, right] = [
-            mirror,
-            mirror.counter_clockwise(),
-            mirror.counter_clockwise(),
-        ];
+        let [center, left, right] = [mirror, mirror.counter_clockwise(), mirror.clockwise()];
         [
             left,
             center,

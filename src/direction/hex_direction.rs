@@ -235,7 +235,7 @@ impl Direction {
         }
     }
 
-    #[deprecated = "Use Direction::clockwise"]
+    #[deprecated(since = "0.6.0", note = "Use Direction::clockwise")]
     #[inline]
     #[must_use]
     /// Returns the next direction in clockwise order
@@ -258,7 +258,7 @@ impl Direction {
         }
     }
 
-    #[deprecated = "Use Direction::ccw"]
+    #[deprecated(since = "0.6.0", note = "Use Direction::ccw")]
     #[inline]
     #[must_use]
     /// Returns the next direction in counter clockwise order
@@ -281,7 +281,7 @@ impl Direction {
         }
     }
 
-    #[deprecated = "Use Direction::rotate_ccw"]
+    #[deprecated(since = "0.6.0", note = "Use Direction::rotate_ccw")]
     #[inline]
     #[must_use]
     /// Rotates `self` counter clockwise by `offset` amount.
@@ -317,7 +317,7 @@ impl Direction {
         }
     }
 
-    #[deprecated = "Use Direction::rotate_cw"]
+    #[deprecated(since = "0.6.0", note = "Use Direction::rotate_cw")]
     #[inline]
     #[must_use]
     /// Rotates `self` clockwise by `offset` amount.
@@ -414,7 +414,7 @@ impl Direction {
         self.angle_pointy() - orientation.angle_offset
     }
 
-    #[deprecated = "Use Direction::diagonal_ccw"]
+    #[deprecated(since = "0.6.0", note = "Use Direction::diagonal_ccw")]
     #[inline]
     #[must_use]
     /// Computes the counter clockwise [`DiagonalDirection`] neighbor of self.
@@ -452,7 +452,7 @@ impl Direction {
         }
     }
 
-    #[deprecated = "Use Direction::diagonal_cw"]
+    #[deprecated(since = "0.6.0", note = "Use Direction::diagonal_cw")]
     #[inline]
     #[must_use]
     /// Computes the clockwise [`DiagonalDirection`] neighbor of self.
