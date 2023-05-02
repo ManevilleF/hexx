@@ -56,7 +56,13 @@ impl MeshInfo {
         }
     }
 
-    /// Merges `rhs` into `self`
+    /// Merges `rhs` into `self`.
+    /// All vertices, normals and uvs are appended to `self` and indices are offsetted to maintain
+    /// triangle data.
+    ///
+    /// # Note
+    ///
+    /// This method doesn't merge vertices or tries to remove invisible faces.
     ///
     /// # Panics
     ///
