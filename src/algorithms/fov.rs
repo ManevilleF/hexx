@@ -58,7 +58,7 @@ pub fn directional_fov(
     direction: Direction,
     blocking: impl Fn(Hex) -> bool,
 ) -> HashSet<Hex> {
-    let [a, b] = [direction.diagonal_left(), direction.diagonal_right()];
+    let [a, b] = [direction.diagonal_ccw(), direction.diagonal_cw()];
     coord
         .ring(range)
         .filter(|h| {

@@ -22,7 +22,7 @@ impl Shr<usize> for Direction {
     type Output = Self;
 
     fn shr(self, rhs: usize) -> Self::Output {
-        self.rotate_right(rhs)
+        self.rotate_cw(rhs)
     }
 }
 
@@ -30,7 +30,7 @@ impl Shr<usize> for DiagonalDirection {
     type Output = Self;
 
     fn shr(self, rhs: usize) -> Self::Output {
-        self.rotate_right(rhs)
+        self.rotate_cw(rhs)
     }
 }
 
@@ -38,7 +38,7 @@ impl Shl<usize> for Direction {
     type Output = Self;
 
     fn shl(self, rhs: usize) -> Self::Output {
-        self.rotate_left(rhs)
+        self.rotate_ccw(rhs)
     }
 }
 
@@ -46,7 +46,7 @@ impl Shl<usize> for DiagonalDirection {
     type Output = Self;
 
     fn shl(self, rhs: usize) -> Self::Output {
-        self.rotate_left(rhs)
+        self.rotate_ccw(rhs)
     }
 }
 
