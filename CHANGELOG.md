@@ -48,6 +48,22 @@ But now with accurate results !
 * (**BREAKING**) `Hex::ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
 * (**BREAKING**) `Hex::custom_ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
 
+### Mesh builder (#80)
+
+* Deprecated `MeshInfo::hexagonal_column` and `MeshInfo::partial_hexagonal_column`
+* (**BREAKING**) `MeshInfo` fields use `glam` types instead of arrays of float 
+* Added `ColumnMeshBuilder` to create hex column meshes. This allows more customization options than the previous way:
+  - Rotation
+  - Offset
+  - Sides subdivisions
+* Added `PlaneMeshBuilder` to create hex plane meshes. This allows more customization options than the previous way:
+  - Rotation
+  - Offset
+* (**BREAKING**) Removed `MeshInfo::facing` method.
+* Added `MeshInfo::rotated` method
+* Added `MeshInfo::with_offset` method
+* Added `MeshInfo::merge_with` method to merge two meshes
+
 ### Examples
 
 * `hex_grid` example now uses a 2d mesh and camera (#65)

@@ -40,6 +40,7 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.8"
+bevy-inspector-egui = "0.18"
 
 [[example]]
 name = "hex_grid"
@@ -68,6 +69,10 @@ path = "examples/field_of_movement.rs"
 [[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
+
+[[example]]
+name = "mesh_builder"
+path = "examples/mesh_builder.rs"
 
 [[bench]]
 name = "length"

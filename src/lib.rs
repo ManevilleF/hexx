@@ -104,27 +104,19 @@
 //!```rust
 //! use bevy::prelude::Mesh;
 //! use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
-//! use hexx::{HexLayout, Hex, MeshInfo};
+//! use hexx::MeshInfo;
 //!
-//! pub fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
-//!    // Compute hex plane data for at the origin
-//!    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO);
-//!    // Compute the bevy mesh
+//! pub fn hexagonal_plane(mesh_info: MeshInfo) -> Mesh {
 //!    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-//!    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
-//!    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
-//!    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs.to_vec());
+//!    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices);
+//!    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals);
+//!    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs);
 //!    mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
 //!    mesh
 //! }
 //!```
 //!
-//! The [`MeshInfo`] type provides the following mesh generations:
-//! - [`MeshInfo::hexagonal_plane`] (7 vertices) useful for 2D games
-//! - [`MeshInfo::cheap_hexagonal_column`] (13 vertices) with merged vertices and useful only for
-//! unlit games
-//! - [`MeshInfo::partial_hexagonal_column`] (31 vertices) without the bottom face
-//! - [`MeshInfo::hexagonal_column`] (38 vertices) with the bottom face
+//! The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or [`ColumnMeshBuilder`]
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
@@ -150,7 +142,7 @@ pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
 
-pub use glam::{IVec2, IVec3, Vec2};
+pub use glam::{IVec2, IVec3, Vec2, Vec3};
 pub use {
     bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*,
 };
