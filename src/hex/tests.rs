@@ -382,11 +382,11 @@ fn range() {
     assert_eq!(range.len(), Hex::range_count(16));
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
     println!("{:#?}", range.size_hint());
-    let _ = range.next();
+    range.next();
     println!("{:#?}", range.size_hint());
     assert_eq!(range.len(), Hex::range_count(16) - 1);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
-    let _ = range.next();
+    range.next();
     assert_eq!(range.len(), Hex::range_count(16) - 2);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
 }
