@@ -117,12 +117,9 @@
 ```rust
  use bevy::prelude::Mesh;
  use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
- use hexx::{HexLayout, Hex, MeshInfo};
+ use hexx::MeshInfo;
 
- pub fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
-    // Compute hex plane data for at the origin
-    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO);
-    // Compute the bevy mesh
+ pub fn hexagonal_plane(mesh_info: &MeshInfo) -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
@@ -132,12 +129,7 @@
  }
 ```
 
- The [`MeshInfo`] type provides the following mesh generations:
- - [`MeshInfo::hexagonal_plane`] (7 vertices) useful for 2D games
- - [`MeshInfo::cheap_hexagonal_column`] (13 vertices) with merged vertices and useful only for
- unlit games
- - [`MeshInfo::partial_hexagonal_column`] (31 vertices) without the bottom face
- - [`MeshInfo::hexagonal_column`] (38 vertices) with the bottom face
+ The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or [`ColumnMeshBuilder`]
 
 <!-- cargo-sync-readme end -->
 
@@ -204,3 +196,11 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
  > `cargo run --example 3d_columns`
 
  This example showcases the 3d hexagon columns procedural generation
+
+### Mesh builder 
+
+![columns](docs/mesh_builder.png "Mesh builder example")
+
+ > `cargo run --example mesh_builder`
+
+ This example showcases the hexagon columns procedural generation customization options

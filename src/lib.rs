@@ -104,12 +104,9 @@
 //!```rust
 //! use bevy::prelude::Mesh;
 //! use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
-//! use hexx::{HexLayout, Hex, MeshInfo};
+//! use hexx::MeshInfo;
 //!
-//! pub fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
-//!    // Compute hex plane data for at the origin
-//!    let mesh_info = MeshInfo::hexagonal_plane(hex_layout, Hex::ZERO);
-//!    // Compute the bevy mesh
+//! pub fn hexagonal_plane(mesh_info: &MeshInfo) -> Mesh {
 //!    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
 //!    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices.to_vec());
 //!    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals.to_vec());
@@ -119,11 +116,7 @@
 //! }
 //!```
 //!
-//! The [`MeshInfo`] type provides the following mesh generations:
-//! - [`MeshInfo::hexagonal_plane`] (7 vertices) useful for 2D games
-//! - [`MeshInfo::cheap_hexagonal_column`] (13 vertices) with merged vertices and useful only for
-//! unlit games
-//! And a [`ColumnMeshBuilder`] struct to construct custom hexagonal columns
+//! The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or [`ColumnMeshBuilder`]
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
