@@ -28,23 +28,23 @@ use crate::{Hex, HexLayout};
 #[derive(Debug, Clone)]
 pub struct ColumnMeshBuilder<'l> {
     /// The hexagonal layout, used to compute vertex positions
-    layout: &'l HexLayout,
+    pub layout: &'l HexLayout,
     /// The column height
-    height: f32,
+    pub height: f32,
     /// Custom hex position, will apply an offset if not [`Hex::ZERO`]
-    pos: Hex,
+    pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
-    offset: Option<Vec3>,
+    pub offset: Option<Vec3>,
     /// Optional custom facing direction, useful to have the mesh already rotated
     ///
     /// By default the mesh is *facing* up (**Y** axis)
-    facing: Option<Vec3>,
+    pub facing: Option<Vec3>,
     /// Amount of quads to be generated on the sides of the column
-    subdivisions: Option<usize>,
+    pub subdivisions: Option<usize>,
     /// Should the top hexagonal face be present
-    top_face: bool,
+    pub top_face: bool,
     /// Should the bottom hexagonal face be present
-    bottom_face: bool,
+    pub bottom_face: bool,
 }
 
 impl<'l> ColumnMeshBuilder<'l> {

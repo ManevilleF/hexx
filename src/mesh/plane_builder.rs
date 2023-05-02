@@ -2,19 +2,22 @@ use super::{MeshInfo, BASE_FACING};
 use crate::{Hex, HexLayout};
 use glam::{Quat, Vec3};
 
-/// Builder struct to customize hex plane mesh generation
+/// Builder struct to customize hex plane mesh generation.
+///
+/// The mesh will be anchored at the center of the hexagon, use offsets to cutomize
+/// anchor/pivot position.
 #[derive(Debug, Clone)]
 pub struct PlaneMeshBuilder<'l> {
     /// The hexagonal layout, used to compute vertex positions
-    layout: &'l HexLayout,
+    pub layout: &'l HexLayout,
     /// Custom hex position, will apply an offset if not [`Hex::ZERO`]
-    pos: Hex,
+    pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
-    offset: Option<Vec3>,
+    pub offset: Option<Vec3>,
     /// Optional custom facing direction, useful to have the mesh already rotated
     ///
     /// By default the mesh is *facing* up (**Y** axis)
-    facing: Option<Vec3>,
+    pub facing: Option<Vec3>,
 }
 
 impl<'l> PlaneMeshBuilder<'l> {
