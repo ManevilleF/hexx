@@ -18,7 +18,7 @@ struct HexInfo {
 struct BuilderParams {
     #[inspector(min = 0.0, max = 50.0)]
     pub height: f32,
-    #[inspector(min = 0, max = 50)]
+    #[inspector(min = 1, max = 50)]
     pub subdivisions: usize,
     pub top_face: bool,
     pub bottom_face: bool,
@@ -104,6 +104,7 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
         new_mesh = new_mesh.without_bottom_face();
     }
     let new_mesh = compute_mesh(new_mesh.build());
+    println!("Mesh has {} vertices", new_mesh.count_vertices());
     let mesh = meshes.get_mut(&info.mesh_handle).unwrap();
     *mesh = new_mesh;
 }
