@@ -139,10 +139,10 @@ impl<'l> ColumnMeshBuilder<'l> {
         let center = self.layout.hex_to_world_pos(self.pos);
         let [a, b, c, d, e, f] = self.layout.hex_corners(self.pos);
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
-        for div in 0..subidivisions {
-            let height = delta * div as f32;
-            for [left, right] in corners {
-                let normal = left - center + right - center;
+        for [left, right] in corners {
+            let normal = left - center + right - center;
+            for div in 0..subidivisions {
+                let height = delta * div as f32;
                 let left = Vec3::new(left.x, height, left.y);
                 let right = Vec3::new(right.x, height, right.y);
                 let quad = MeshInfo::quad([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);

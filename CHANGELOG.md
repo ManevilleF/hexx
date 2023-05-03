@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## Unreleased
+## [Unreleased]
+
+## 0.6.0 
 
 * Changed logo (#63)
 * Drop `itertools` dependency (#58)
@@ -17,7 +19,7 @@
   - `directional_fov` directional 120 degrees field of view (`Direction`)
 * Added field of movement algorithm in `algorithms`:
   - `field_of_movement` provides the available range of field of movement given a `budget` of movement and a movement `cost`
-* Renamed rotation functions to follow `cw`/`ccw` terminology (old versions deprecated)
+* Renamed rotation functions to follow `cw`/`ccw` terminology (old versions deprecated) (#78)
 
 ### Directions to
 
@@ -44,10 +46,10 @@ if a.way_to(b) == Direction::Top {
 
 But now with accurate results !
 
-### ExactSizeIterator
+### ExactSizeIterator (#68)
 
-* (**BREAKING**) `Hex::ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
-* (**BREAKING**) `Hex::custom_ring` now returns a `ExactSizeIterator` instead of a `Vec` (#68)
+* (**BREAKING**) `Hex::ring` now returns a `ExactSizeIterator` instead of a `Vec`
+* (**BREAKING**) `Hex::custom_ring` now returns a `ExactSizeIterator` instead of a `Vec`
 
 ### Mesh builder (#80)
 
