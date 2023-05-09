@@ -26,7 +26,7 @@ static FLAT_ORIENTATION: HexOrientation = HexOrientation {
 /// let flat = HexOrientation::flat();
 /// let pointy = HexOrientation::pointy();
 /// ```
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexOrientation {
     /// Matrix used to compute hexagonal coordinates to world/pixel coordinates
