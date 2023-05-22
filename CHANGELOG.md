@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## 0.6.0 
+## 0.6.0
 
 * Changed logo (#63)
 * Drop `itertools` dependency (#58)
@@ -20,10 +20,11 @@
 * Added field of movement algorithm in `algorithms`:
   - `field_of_movement` provides the available range of field of movement given a `budget` of movement and a movement `cost`
 * Renamed rotation functions to follow `cw`/`ccw` terminology (old versions deprecated) (#78)
+* Implemented  `PartialEq` For `HexOrientation` (#83)
 
 ### Directions to
 
-The *direction_to* functions were reworked to avoid a 
+The *direction_to* functions were reworked to avoid a
 edge case where on some coordinates two directions can be valid (a *tie*).
 
 * Added new `DirectionWay` type
@@ -54,7 +55,7 @@ But now with accurate results !
 ### Mesh builder (#80)
 
 * Deprecated `MeshInfo::hexagonal_column` and `MeshInfo::partial_hexagonal_column`
-* (**BREAKING**) `MeshInfo` fields use `glam` types instead of arrays of float 
+* (**BREAKING**) `MeshInfo` fields use `glam` types instead of arrays of float
 * Added `ColumnMeshBuilder` to create hex column meshes. This allows more customization options than the previous way:
   - Rotation
   - Offset
@@ -74,7 +75,7 @@ But now with accurate results !
 * `wrap_map` example now uses a 2d mesh and camera (#65)
 * Added an interactive `a_star` example (#69)
 
-## 0.5.3 
+## 0.5.3
 
 * Improved `README` examples section
 * Added `Hex` swizzle methods:
@@ -89,7 +90,7 @@ But now with accurate results !
 * Improved CI workflow and added a check for a new entry in `CHANGELOG.md`
 * Deprecated `Hex::directions_to`
 
-## 0.5.2 
+## 0.5.2
 
 * `HexMap::all_coords` now returns a `ExactSizeIterator` instead of a simple `Iterator`
 * Added `scroll_map` example
@@ -121,7 +122,7 @@ But now with accurate results !
 * (**BREAKING**) `Hex::custom_ring_edges` now returns an `Iterator` with an `ExactSizeIterator` item instead of a `Vec`
 * (**BREAKING**) `Hex::ring_edges` now returns an `Iterator` with an `ExactSizeIterator` item instead of a `Vec`
 
-### Additions 
+### Additions
 
 * Added `Hex::wedge_count` to count the amount of coordinate in a wedge
 * Added `Hex::full_wedge` which returns an `ExactSizeIterator`
@@ -135,10 +136,10 @@ But now with accurate results !
 * (**BREAKING**) Removed implementation of `DiagonalDirection - usize` to rotate counter clockwise, replaced by the shift left operator `<<`
 * Added `Hex::diagonal_neigbhor`
 * Added `Hex::diagonal_neigbhor_coord`
-* Added `Add<Direction>` and `AddAssign<Direction>` impls for `Hex` 
-* Added `Add<DiagonalDirection>` and `AddAssign<DiagonalDirection>` impls for `Hex` 
-* Added `Sub<Direction>` and `SubAssign<Direction>` impls for `Hex` 
-* Added `Sub<DiagonalDirection>` and `SubAssign<DiagonalDirection>` impls for `Hex` 
+* Added `Add<Direction>` and `AddAssign<Direction>` impls for `Hex`
+* Added `Add<DiagonalDirection>` and `AddAssign<DiagonalDirection>` impls for `Hex`
+* Added `Sub<Direction>` and `SubAssign<Direction>` impls for `Hex`
+* Added `Sub<DiagonalDirection>` and `SubAssign<DiagonalDirection>` impls for `Hex`
 * Added `Mul<i32>` for `Direction` returning its `Hex` vector multiplied
 * Added `Mul<i32>` for `DiagonalDirection` returning its `Hex` vector multiplied
 
@@ -178,7 +179,7 @@ But now with accurate results !
 * Added `Shr` implementations for `Hex`
 * Added `Shl` implementations for `Hex`
 
-## 0.4.0 
+## 0.4.0
 
 ### Directions
 
