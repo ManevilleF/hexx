@@ -258,7 +258,7 @@ impl Direction {
         }
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Direction::ccw")]
+    #[deprecated(since = "0.6.0", note = "Use Direction::counter_clockwise")]
     #[inline]
     #[must_use]
     /// Returns the next direction in counter clockwise order
