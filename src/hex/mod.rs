@@ -967,8 +967,9 @@ impl Hex {
         let radius = range as i32;
         ExactSizeHexIterator {
             iter: (-radius..=radius).flat_map(move |x| {
-                (max(-radius, -x - radius)..=min(radius, radius - x))
-                    .map(move |y| self.const_add(Self::new(x, y)))
+                let y_min = max(-radius, -x - radius);
+                let y_max = min(radius, radius - x);
+                (y_min..=y_max).map(move |y| self.const_add(Self::new(x, y)))
             }),
             count: Self::range_count(range),
         }
@@ -994,7 +995,9 @@ impl Hex {
         let radius = range as i32;
         ExactSizeHexIterator {
             iter: (-radius..=radius).flat_map(move |x| {
-                (max(-radius, -x - radius)..=min(radius, radius - x))
+                let y_min = max(-radius, -x - radius);
+                let y_max = min(radius, radius - x);
+                (y_min..=y_max)
                     .map(move |y| self.const_add(Self::new(x, y)))
                     .filter(move |h| *h != self)
             }),

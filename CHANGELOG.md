@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Added `Hex::xrange` for excluding range coordinates (#88)
+* Implemented  `PartialEq` For `HexOrientation` (#87)
+
 ## 0.6.0
 
 * Changed logo (#63)
@@ -20,7 +23,6 @@
 * Added field of movement algorithm in `algorithms`:
   - `field_of_movement` provides the available range of field of movement given a `budget` of movement and a movement `cost`
 * Renamed rotation functions to follow `cw`/`ccw` terminology (old versions deprecated) (#78)
-* Implemented  `PartialEq` For `HexOrientation` (#83)
 
 ### Directions to
 
