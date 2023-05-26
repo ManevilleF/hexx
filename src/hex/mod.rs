@@ -952,14 +952,56 @@ impl Hex {
     #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range`.
     /// The number of returned coordinates is equal to `Hex::range_count(range)`
+    ///
+    /// > See also [`Hex::xrange`] to retrieve all coordinates excluding `self`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = hex(12, 34);
+    /// assert_eq!(coord.range(0).len(), 1);
+    /// assert_eq!(coord.range(1).len(), 7);
+    /// ```
     pub fn range(self, range: u32) -> impl ExactSizeIterator<Item = Self> {
         let radius = range as i32;
         ExactSizeHexIterator {
             iter: (-radius..=radius).flat_map(move |x| {
-                (max(-radius, -x - radius)..=min(radius, radius - x))
-                    .map(move |y| self.const_add(Self::new(x, y)))
+                let y_min = max(-radius, -x - radius);
+                let y_max = min(radius, radius - x);
+                (y_min..=y_max).map(move |y| self.const_add(Self::new(x, y)))
             }),
             count: Self::range_count(range),
+        }
+    }
+
+    #[allow(clippy::cast_possible_wrap)]
+    #[doc(alias = "excluding_range")]
+    #[must_use]
+    /// Retrieves all [`Hex`] around `self` in a given `range` except `self`.
+    /// The number of returned coordinates is equal to `Hex::range_count(range) - 1`
+    ///
+    /// > See also [`Hex::range`] to retrieve all coordinates including `self`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = hex(12, 34);
+    /// assert_eq!(coord.xrange(0).len(), 0);
+    /// assert_eq!(coord.xrange(1).len(), 6);
+    /// ```
+    pub fn xrange(self, range: u32) -> impl ExactSizeIterator<Item = Self> {
+        let radius = range as i32;
+        ExactSizeHexIterator {
+            iter: (-radius..=radius).flat_map(move |x| {
+                let y_min = max(-radius, -x - radius);
+                let y_max = min(radius, radius - x);
+                (y_min..=y_max)
+                    .map(move |y| self.const_add(Self::new(x, y)))
+                    .filter(move |h| *h != self)
+            }),
+            count: Self::range_count(range).saturating_sub(1),
         }
     }
 
@@ -972,6 +1014,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// assert_eq!(Hex::range_count(15), 721);
+    /// assert_eq!(Hex::range_count(0), 1);
     /// ```
     pub const fn range_count(range: u32) -> usize {
         (3 * range * (range + 1) + 1) as usize
