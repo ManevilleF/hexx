@@ -4,6 +4,10 @@
 
 * Added `Hex::xrange` for excluding range coordinates (#88)
 * Implemented  `PartialEq` For `HexOrientation` (#87)
+* `HexOrientation` is now a two variant enum instead of a struct:
+  * The inner data (matrices and rotation) are now retrievable through either:
+    * `orientation_data()` method
+    * `Deref` implementation
 
 ## 0.6.0
 
@@ -12,17 +16,19 @@
 * (**BREAKING**) Removed deprecated `Hex::directions_to` method (#58)
 * Added `MeshInfo::facing` utils method to rotate hex meshes (#65)
 * Added `hex` utils function to create an `Hex`, making it less boilerplate (#66):
-  - Before: `Hex::new()`
-  - Now: `hex()`
+  * Before: `Hex::new()`
+  * Now: `hex()`
 * `Hex` won't derive `Debug` or `Hash` on spirv archs (#66)
 * Added `packed` feature to make `Hex` `repr(C)` (#67)
 * Added an `algorithms` module with a `a_star` implementation (#69)
 * Added field of view algorithms in `algorithms`:
-  - `range_fov` omni-directional field of view
-  - `directional_fov` directional 120 degrees field of view (`Direction`)
+  * `range_fov` omni-directional field of view
+  * `directional_fov` directional 120 degrees field of view (`Direction`)
 * Added field of movement algorithm in `algorithms`:
-  - `field_of_movement` provides the available range of field of movement given a `budget` of movement and a movement `cost`
-* Renamed rotation functions to follow `cw`/`ccw` terminology (old versions deprecated) (#78)
+  * `field_of_movement` provides the available range of field of movement given
+  a `budget` of movement and a movement `cost`
+* Renamed rotation functions to follow `cw`/`ccw` terminology
+(old versions deprecated) (#78)
 
 ### Directions to
 
@@ -59,12 +65,12 @@ But now with accurate results !
 * Deprecated `MeshInfo::hexagonal_column` and `MeshInfo::partial_hexagonal_column`
 * (**BREAKING**) `MeshInfo` fields use `glam` types instead of arrays of float
 * Added `ColumnMeshBuilder` to create hex column meshes. This allows more customization options than the previous way:
-  - Rotation
-  - Offset
-  - Sides subdivisions
+  * Rotation
+  * Offset
+  * Sides subdivisions
 * Added `PlaneMeshBuilder` to create hex plane meshes. This allows more customization options than the previous way:
-  - Rotation
-  - Offset
+  * Rotation
+  * Offset
 * (**BREAKING**) Removed `MeshInfo::facing` method.
 * Added `MeshInfo::rotated` method
 * Added `MeshInfo::with_offset` method
@@ -252,11 +258,11 @@ But now with accurate results !
 ### Direction
 
 * Added angle methods to `Direction`:
-  - `angle_flat` for radian angle in flat orientation
-  - `angle_flat_degrees` for degrees angle in flat orientation
-  - `angle_pointy` for radian angle in pointy orientation
-  - `angle_pointy_degrees` for degrees angle in pointy orientation
-  - `angle` for radian angle in a given orientation
+  * `angle_flat` for radian angle in flat orientation
+  * `angle_flat_degrees` for degrees angle in flat orientation
+  * `angle_pointy` for radian angle in pointy orientation
+  * `angle_pointy_degrees` for degrees angle in pointy orientation
+  * `angle` for radian angle in a given orientation
 * (**BREAKING**) rotated order of `Direction` enum and `Hex::ALL_NEIGHBORS` by 1 to the left, `TopRight` is now the first as `BottomRight` is now last
 * Added `left` and `right` methods to `Direction` to get the next direction clockwise and counter clockwise
 * Added `rotate_left` and `rotate_right` methods to `Direction` to rotate the direction clockwise and counter clockwise by a custom amount

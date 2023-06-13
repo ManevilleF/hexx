@@ -11,7 +11,7 @@ use glam::Vec2;
 ///
 /// let layout = HexLayout {
 ///     // We want flat topped hexagons
-///     orientation: HexOrientation::flat(),
+///     orientation: HexOrientation::Flat,
 ///     // We define the world space origin equivalent of `Hex::ZERO` in hex space
 ///     origin: Vec2::new(1.0, 2.0),
 ///     // We define the world space size of the hexagons
@@ -88,7 +88,7 @@ mod tests {
     fn flat_corners() {
         let point = Hex::new(0, 0);
         let layout = HexLayout {
-            orientation: HexOrientation::flat(),
+            orientation: HexOrientation::Flat,
             origin: Vec2::ZERO,
             hex_size: Vec2::new(10., 10.),
         };
@@ -110,7 +110,7 @@ mod tests {
     fn pointy_corners() {
         let point = Hex::new(0, 0);
         let layout = HexLayout {
-            orientation: HexOrientation::pointy(),
+            orientation: HexOrientation::Pointy,
             origin: Vec2::ZERO,
             hex_size: Vec2::new(10., 10.),
         };
