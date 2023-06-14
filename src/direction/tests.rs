@@ -75,7 +75,7 @@ mod hex_directions {
             (Bottom, 3.0 * PI / 2.0),
             (BottomRight, 11.0 * PI / 6.0),
         ];
-        let orientation = HexOrientation::flat();
+        let orientation = HexOrientation::Flat;
         for (dir, angle) in expected {
             assert!(dir.angle_flat() - angle <= EPSILON);
             assert!(dir.angle(&orientation) - angle <= EPSILON);
@@ -107,7 +107,7 @@ mod hex_directions {
             (Bottom, 4.0 * PI / 3.0),
             (BottomRight, 5.0 * PI / 3.0),
         ];
-        let orientation = HexOrientation::pointy();
+        let orientation = HexOrientation::Pointy;
         for (dir, angle) in expected {
             assert!(dir.angle_pointy() - angle <= EPSILON);
             assert!(dir.angle(&orientation) - angle <= EPSILON);
