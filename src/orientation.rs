@@ -39,7 +39,7 @@ pub struct HexOrientationData {
     pub(crate) angle_offset: f32,
 }
 
-/// Hexagonal orientation, either [`Pointy`] or [`Flat`]
+/// Hexagonal orientation, either *Pointy-Topped* or *Flat-Topped*
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
 pub enum HexOrientation {
