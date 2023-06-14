@@ -377,7 +377,7 @@ impl Direction {
     ///
     /// See [`Self::angle_pointy`] for *pointy* hexagons
     pub fn angle_flat(self) -> f32 {
-        self.angle_pointy() + DIRECTION_ANGLE_OFFSET
+        self.angle_pointy() + DIRECTION_ANGLE_OFFSET_RAD
     }
 
     #[inline]
@@ -437,8 +437,8 @@ impl Direction {
     /// let direction = Direction::from_flat_angle_degrees(35.0);
     /// assert_eq!(direction, Direction::TopRight);
     /// ```
-    pub fn from_flat_angle_degrees(angle: f32) -> Self {
-        Self::from_pointy_angle_degrees(angle - DIRECTION_ANGLE_OFFSET_DEGREES)
+    pub fn from_pointy_angle_degrees(angle: f32) -> Self {
+        Self::from_flat_angle_degrees(angle + DIRECTION_ANGLE_OFFSET_DEGREES)
     }
 
     #[must_use]
@@ -450,19 +450,19 @@ impl Direction {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = Direction::from_pointy_angle_degrees(35.0);
+    /// let direction = Direction::from_flat_angle_degrees(35.0);
     /// assert_eq!(direction, Direction::Top);
     /// ```
-    pub fn from_pointy_angle_degrees(angle: f32) -> Self {
+    pub fn from_flat_angle_degrees(angle: f32) -> Self {
         let angle = angle % 360.0;
         let angle = if angle < 0.0 { angle + 360.0 } else { angle };
-        let half_sector = (angle / DIRECTION_ANGLE_OFFSET_DEGREES).trunc() as i32;
-        match half_sector {
-            11 | 0 => Self::TopRight,
-            1 | 2 => Self::Top,
-            3 | 4 => Self::TopLeft,
-            5 | 6 => Self::BottomLeft,
-            7 | 8 => Self::Bottom,
+        let sector = (angle / DIRECTION_ANGLE_DEGREES).trunc() as i32;
+        match sector {
+            0 => Self::TopRight,
+            1 => Self::Top,
+            2 => Self::TopLeft,
+            3 => Self::BottomLeft,
+            4 => Self::Bottom,
             _ => Self::BottomRight,
         }
     }
@@ -478,8 +478,8 @@ impl Direction {
     /// let direction = Direction::from_flat_angle_degrees(0.6);
     /// assert_eq!(direction, Direction::TopRight);
     /// ```
-    pub fn from_flat_angle(angle: f32) -> Self {
-        Self::from_pointy_angle(angle - DIRECTION_ANGLE_OFFSET)
+    pub fn from_pointy_angle(angle: f32) -> Self {
+        Self::from_flat_angle(angle + DIRECTION_ANGLE_OFFSET_RAD)
     }
 
     #[must_use]
@@ -491,19 +491,19 @@ impl Direction {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = Direction::from_pointy_angle(0.6);
-    /// assert_eq!(direction, Direction::Top);
+    /// let direction = Direction::from_flat_angle(0.6);
+    /// assert_eq!(direction, Direction::TopRight);
     /// ```
-    pub fn from_pointy_angle(angle: f32) -> Self {
+    pub fn from_flat_angle(angle: f32) -> Self {
         let angle = angle % PI_2;
         let angle = if angle < 0.0 { angle + PI_2 } else { angle };
-        let half_sector = (angle / DIRECTION_ANGLE_OFFSET) as i32;
-        match half_sector {
-            11 | 0 => Self::TopRight,
-            1 | 2 => Self::Top,
-            3 | 4 => Self::TopLeft,
-            5 | 6 => Self::BottomLeft,
-            7 | 8 => Self::Bottom,
+        let sector = (angle / DIRECTION_ANGLE_RAD) as i32;
+        match sector {
+            0 => Self::TopRight,
+            1 => Self::Top,
+            2 => Self::TopLeft,
+            3 => Self::BottomLeft,
+            4 => Self::Bottom,
             _ => Self::BottomRight,
         }
     }
@@ -524,6 +524,25 @@ impl Direction {
         match orientation {
             HexOrientation::Pointy => Self::from_pointy_angle_degrees(angle),
             HexOrientation::Flat => Self::from_flat_angle_degrees(angle),
+        }
+    }
+
+    #[must_use]
+    /// Returns the direction from the given `angle` in radians according the `orientation`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let angle = 0.6;
+    /// assert_eq!(Direction::from_angle(angle, &HexOrientation::Flat), Direction::TopRight);
+    /// assert_eq!(Direction::from_angle(angle, &HexOrientation::Pointy), Direction::Top);
+    /// ```
+    pub fn from_angle(angle: f32, orientation: &HexOrientation) -> Self {
+        match orientation {
+            HexOrientation::Pointy => Self::from_pointy_angle(angle),
+            HexOrientation::Flat => Self::from_flat_angle(angle),
         }
     }
 

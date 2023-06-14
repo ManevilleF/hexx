@@ -191,6 +191,7 @@ mod hex_directions {
 }
 
 mod diagonal_direction {
+    use super::DiagonalDirection::*;
     use super::*;
 
     #[test]
@@ -230,6 +231,74 @@ mod diagonal_direction {
         for dir in DiagonalDirection::ALL_DIRECTIONS {
             let expected = dir.direction_ccw().angle_pointy_degrees() - 30.0;
             assert!(dir.angle_pointy_degrees() - expected <= EPSILON);
+        }
+    }
+
+    #[test]
+    fn direction_angle_from_to() {
+        for dir in DiagonalDirection::ALL_DIRECTIONS {
+            // degs
+            let flat_angle = dir.angle_flat_degrees();
+            assert_eq!(DiagonalDirection::from_flat_angle_degrees(flat_angle), dir);
+            let pointy_angle = dir.angle_pointy_degrees();
+            assert_eq!(
+                DiagonalDirection::from_pointy_angle_degrees(pointy_angle),
+                dir
+            );
+            // rads
+            let flat_angle = dir.angle_flat();
+            assert_eq!(DiagonalDirection::from_flat_angle(flat_angle), dir);
+            let pointy_angle = dir.angle_pointy();
+            assert_eq!(DiagonalDirection::from_pointy_angle(pointy_angle), dir);
+        }
+    }
+
+    #[test]
+    fn from_pointy_angles() {
+        let expected = |angle: f32| {
+            let angle = angle % 360.0;
+            let angle = if angle < 0.0 { angle + 360.0 } else { angle };
+            print!("pos angle = {angle}");
+            match angle {
+                v if v < 60.0 => TopRight,
+                v if v < 120.0 => TopLeft,
+                v if v < 180.0 => Left,
+                v if v < 240.0 => BottomLeft,
+                v if v < 300.0 => BottomRight,
+                _ => Right,
+            }
+        };
+        for angle in -1000..1000 {
+            let angle = angle as f32 + 0.1;
+            let angle_rad = angle.to_radians();
+            let expect = expected(angle);
+            println!("expect = {expect:?}, angle = {angle} ");
+            assert_eq!(DiagonalDirection::from_pointy_angle_degrees(angle), expect);
+            assert_eq!(DiagonalDirection::from_pointy_angle(angle_rad), expect);
+        }
+    }
+
+    #[test]
+    fn from_flat_angles() {
+        let expected = |angle: f32| {
+            let angle = angle % 360.0;
+            let angle = if angle < 0.0 { angle + 360.0 } else { angle };
+            match angle {
+                v if v < 30.0 => Right,
+                v if v < 90.0 => TopRight,
+                v if v < 150.0 => TopLeft,
+                v if v < 210.0 => Left,
+                v if v < 270.0 => BottomLeft,
+                v if v < 330.0 => BottomRight,
+                _ => Right,
+            }
+        };
+        for angle in -1000..1000 {
+            let angle = angle as f32 + 0.1;
+            let angle_rad = angle.to_radians();
+            let expect = expected(angle);
+            assert_eq!(DiagonalDirection::from_flat_angle_degrees(angle), expect);
+            assert_eq!(DiagonalDirection::from_flat_angle(angle_rad), expect);
         }
     }
 }
