@@ -407,6 +407,48 @@ impl Direction {
         Self::POINTY_ANGLES_DEGREES[self as usize]
     }
 
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    /// Returns the direction from the given `angle` in degrees
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let direction = Direction::from_flat_angle_degrees(35.0);
+    /// assert_eq!(direction, Direction::TopRight);
+    /// ```
+    pub fn from_flat_angle_degrees(angle: f32) -> Self {
+        Self::from_pointy_angle_degrees(angle - DIRECTION_ANGLE_OFFSET_DEGREES)
+    }
+
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    /// Returns the direction from the given `angle` in degrees
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let direction = Direction::from_pointy_angle_degrees(35.0);
+    /// assert_eq!(direction, Direction::Top);
+    /// ```
+    pub fn from_pointy_angle_degrees(angle: f32) -> Self {
+        let angle = angle % 360.0;
+        let angle = if angle < 0.0 { angle + 360.0 } else { angle };
+        let half_sector = angle as i32 / 30;
+        match half_sector {
+            11 | 0 => Self::TopRight,
+            1 | 2 => Self::Top,
+            3 | 4 => Self::TopLeft,
+            5 | 6 => Self::BottomLeft,
+            7 | 8 => Self::Bottom,
+            _ => Self::BottomRight,
+        }
+    }
+
     #[inline]
     #[must_use]
     /// Returns the angle in radians of the given direction in the given `orientation`

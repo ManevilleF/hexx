@@ -1,4 +1,8 @@
-#![allow(clippy::enum_glob_use)]
+#![allow(
+    clippy::enum_glob_use,
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss
+)]
 
 use super::*;
 use crate::HexOrientation;
@@ -66,6 +70,36 @@ mod hex_directions {
     }
 
     #[test]
+    fn from_flat_angles_degrees() {
+        let expected = |angle: f32| {
+            let angle = angle % 360.0;
+            let angle = if angle < 0.0 { angle + 360.0 } else { angle };
+            match angle {
+                v if v < 60.0 => TopRight,
+                v if v < 120.0 => Top,
+                v if v < 180.0 => TopLeft,
+                v if v < 240.0 => BottomLeft,
+                v if v < 300.0 => Bottom,
+                _ => BottomRight,
+            }
+        };
+        for angle in -1000..1000 {
+            let angle = angle as f32;
+            assert_eq!(Direction::from_flat_angle_degrees(angle), expected(angle));
+        }
+    }
+
+    #[test]
+    fn direction_angle_from_to() {
+        for dir in Direction::ALL_DIRECTIONS {
+            let flat_angle = dir.angle_flat_degrees();
+            assert_eq!(Direction::from_flat_angle_degrees(flat_angle), dir);
+            let pointy_angle = dir.angle_pointy_degrees();
+            assert_eq!(Direction::from_pointy_angle_degrees(pointy_angle), dir);
+        }
+    }
+
+    #[test]
     fn flat_angles_rad() {
         let expected = [
             (TopRight, PI / 6.0),
@@ -94,6 +128,27 @@ mod hex_directions {
         ];
         for (dir, angle) in expected {
             assert!(dir.angle_pointy_degrees() - angle <= EPSILON);
+        }
+    }
+
+    #[test]
+    fn from_pointy_angles_degrees() {
+        let expected = |angle: f32| {
+            let angle = angle % 360.0;
+            let angle = if angle < 0.0 { angle + 360.0 } else { angle };
+            match angle {
+                v if v < 30.0 => TopRight,
+                v if v < 90.0 => Top,
+                v if v < 150.0 => TopLeft,
+                v if v < 210.0 => BottomLeft,
+                v if v < 270.0 => Bottom,
+                v if v < 330.0 => BottomRight,
+                _ => TopRight,
+            }
+        };
+        for angle in -1000..1000 {
+            let angle = angle as f32;
+            assert_eq!(Direction::from_pointy_angle_degrees(angle), expected(angle));
         }
     }
 
