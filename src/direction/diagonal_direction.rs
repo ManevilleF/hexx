@@ -74,7 +74,7 @@ pub enum DiagonalDirection {
     /// |orientation |radians|degrees|
     /// |------------|-------|-------|
     /// | Flat Top   |  π/3  |  60   |   
-    /// | Flat Top   |  π/6  |  30   |   
+    /// | Pointy Top |  π/6  |  30   |
     ///
     /// ```txt
     ///            x Axis

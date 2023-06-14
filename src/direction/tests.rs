@@ -70,7 +70,7 @@ mod hex_directions {
     }
 
     #[test]
-    fn from_flat_angles_degrees() {
+    fn from_flat_angles() {
         let expected = |angle: f32| {
             let angle = angle % 360.0;
             let angle = if angle < 0.0 { angle + 360.0 } else { angle };
@@ -84,18 +84,27 @@ mod hex_directions {
             }
         };
         for angle in -1000..1000 {
-            let angle = angle as f32;
-            assert_eq!(Direction::from_flat_angle_degrees(angle), expected(angle));
+            let angle = angle as f32 + 0.1;
+            let angle_rad = angle.to_radians();
+            let expect = expected(angle);
+            assert_eq!(Direction::from_flat_angle_degrees(angle), expect);
+            assert_eq!(Direction::from_flat_angle(angle_rad), expect);
         }
     }
 
     #[test]
     fn direction_angle_from_to() {
         for dir in Direction::ALL_DIRECTIONS {
+            // degs
             let flat_angle = dir.angle_flat_degrees();
             assert_eq!(Direction::from_flat_angle_degrees(flat_angle), dir);
             let pointy_angle = dir.angle_pointy_degrees();
             assert_eq!(Direction::from_pointy_angle_degrees(pointy_angle), dir);
+            // rads
+            let flat_angle = dir.angle_flat();
+            assert_eq!(Direction::from_flat_angle(flat_angle), dir);
+            let pointy_angle = dir.angle_pointy();
+            assert_eq!(Direction::from_pointy_angle(pointy_angle), dir);
         }
     }
 
@@ -132,7 +141,7 @@ mod hex_directions {
     }
 
     #[test]
-    fn from_pointy_angles_degrees() {
+    fn from_pointy_angles() {
         let expected = |angle: f32| {
             let angle = angle % 360.0;
             let angle = if angle < 0.0 { angle + 360.0 } else { angle };
@@ -147,8 +156,11 @@ mod hex_directions {
             }
         };
         for angle in -1000..1000 {
-            let angle = angle as f32;
-            assert_eq!(Direction::from_pointy_angle_degrees(angle), expected(angle));
+            let angle = angle as f32 + 0.1;
+            let angle_rad = angle.to_radians();
+            let expect = expected(angle);
+            assert_eq!(Direction::from_pointy_angle_degrees(angle), expect);
+            assert_eq!(Direction::from_pointy_angle(angle_rad), expect);
         }
     }
 
