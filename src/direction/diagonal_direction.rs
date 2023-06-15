@@ -431,7 +431,7 @@ impl DiagonalDirection {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = DiagonalDirection::from_pointy_angle_degrees(35.0);
+    /// let direction = DiagonalDirection::from_flat_angle_degrees(15.0);
     /// assert_eq!(direction, DiagonalDirection::Right);
     /// ```
     pub fn from_flat_angle_degrees(angle: f32) -> Self {
@@ -447,8 +447,8 @@ impl DiagonalDirection {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = DiagonalDirection::from_flat_angle_degrees(35.0);
-    /// assert_eq!(direction, Direction::TopRight);
+    /// let direction = DiagonalDirection::from_pointy_angle_degrees(15.0);
+    /// assert_eq!(direction, DiagonalDirection::TopRight);
     /// ```
     pub fn from_pointy_angle_degrees(angle: f32) -> Self {
         let angle = angle % 360.0;
@@ -473,8 +473,8 @@ impl DiagonalDirection {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = DiagonalDirection::from_pointy_angle_degrees(0.6);
-    /// assert_eq!(direction, Direction::TopRight);
+    /// let direction = DiagonalDirection::from_flat_angle(0.26);
+    /// assert_eq!(direction, DiagonalDirection::Right);
     /// ```
     pub fn from_flat_angle(angle: f32) -> Self {
         Self::from_pointy_angle(angle - DIRECTION_ANGLE_OFFSET_RAD)
@@ -489,8 +489,8 @@ impl DiagonalDirection {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = DiagonalDirection::from_flat_angle(0.6);
-    /// assert_eq!(direction, Direction::Top);
+    /// let direction = DiagonalDirection::from_pointy_angle(0.26);
+    /// assert_eq!(direction, DiagonalDirection::TopRight);
     /// ```
     pub fn from_pointy_angle(angle: f32) -> Self {
         let angle = angle % PI_2;
@@ -515,7 +515,7 @@ impl DiagonalDirection {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let angle = 35.0;
+    /// let angle = 15.0;
     /// assert_eq!(DiagonalDirection::from_angle_degrees(angle, &HexOrientation::Flat), DiagonalDirection::Right);
     /// assert_eq!(DiagonalDirection::from_angle_degrees(angle, &HexOrientation::Pointy), DiagonalDirection::TopRight);
     /// ```
@@ -534,7 +534,7 @@ impl DiagonalDirection {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let angle = 0.6;
+    /// let angle = 0.26;
     /// assert_eq!(DiagonalDirection::from_angle(angle, &HexOrientation::Flat), DiagonalDirection::Right);
     /// assert_eq!(DiagonalDirection::from_angle(angle, &HexOrientation::Pointy), DiagonalDirection::TopRight);
     /// ```

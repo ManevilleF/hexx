@@ -434,8 +434,8 @@ impl Direction {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = Direction::from_flat_angle_degrees(35.0);
-    /// assert_eq!(direction, Direction::TopRight);
+    /// let direction = Direction::from_pointy_angle_degrees(35.0);
+    /// assert_eq!(direction, Direction::Top);
     /// ```
     pub fn from_pointy_angle_degrees(angle: f32) -> Self {
         Self::from_flat_angle_degrees(angle + DIRECTION_ANGLE_OFFSET_DEGREES)
@@ -451,7 +451,7 @@ impl Direction {
     /// # use hexx::*;
     ///
     /// let direction = Direction::from_flat_angle_degrees(35.0);
-    /// assert_eq!(direction, Direction::Top);
+    /// assert_eq!(direction, Direction::TopRight);
     /// ```
     pub fn from_flat_angle_degrees(angle: f32) -> Self {
         let angle = angle % 360.0;
@@ -475,8 +475,8 @@ impl Direction {
     /// ```rust
     /// # use hexx::*;
     ///
-    /// let direction = Direction::from_flat_angle_degrees(0.6);
-    /// assert_eq!(direction, Direction::TopRight);
+    /// let direction = Direction::from_pointy_angle(0.6);
+    /// assert_eq!(direction, Direction::Top);
     /// ```
     pub fn from_pointy_angle(angle: f32) -> Self {
         Self::from_flat_angle(angle + DIRECTION_ANGLE_OFFSET_RAD)
