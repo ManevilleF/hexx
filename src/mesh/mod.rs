@@ -1,8 +1,10 @@
 mod column_builder;
 mod plane_builder;
+mod uv_mapping;
 
 pub use column_builder::ColumnMeshBuilder;
 pub use plane_builder::PlaneMeshBuilder;
+pub use uv_mapping::UVOptions;
 
 use glam::{Quat, Vec2, Vec3};
 
