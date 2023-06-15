@@ -451,8 +451,7 @@ impl DiagonalDirection {
     /// assert_eq!(direction, DiagonalDirection::TopRight);
     /// ```
     pub fn from_pointy_angle_degrees(angle: f32) -> Self {
-        let angle = angle % 360.0;
-        let angle = if angle < 0.0 { angle + 360.0 } else { angle };
+        let angle = angle.rem_euclid(360.0);
         let sector = (angle / DIRECTION_ANGLE_DEGREES).trunc() as i32;
         println!("{angle} - {sector}");
         match sector {
@@ -493,8 +492,7 @@ impl DiagonalDirection {
     /// assert_eq!(direction, DiagonalDirection::TopRight);
     /// ```
     pub fn from_pointy_angle(angle: f32) -> Self {
-        let angle = angle % PI_2;
-        let angle = if angle < 0.0 { angle + PI_2 } else { angle };
+        let angle = angle.rem_euclid(PI_2);
         let sector = (angle / DIRECTION_ANGLE_RAD) as i32;
         println!("{angle} - {sector}");
         match sector {
