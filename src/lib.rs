@@ -86,7 +86,7 @@
 //! // Define your layout
 //! let layout = HexLayout {
 //!    hex_size: Vec2::new(1.0, 1.0),
-//!    orientation: HexOrientation::flat(),
+//!    orientation: HexOrientation::Flat,
 //!    ..Default::default()
 //! };
 //! // Get the hex coordinate at the world position `world_pos`.

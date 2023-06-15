@@ -8,6 +8,21 @@
   * The inner data (matrices and rotation) are now retrievable through either:
     * `orientation_data()` method
     * `Deref` implementation
+* Added conversion from angles for both `Direction` and `DiagonalDirection` (#92):
+  * `Direction::from_angle`
+  * `Direction::from_pointy_angle`
+  * `Direction::from_flat_angle`
+  * `Direction::from_angle_degrees`
+  * `Direction::from_pointy_angle_degrees`
+  * `Direction::from_flat_angle_degrees`
+  * `DiagonalDirection::from_angle`
+  * `DiagonalDirection::from_pointy_angle`
+  * `DiagonalDirection::from_flat_angle`
+  * `DiagonalDirection::from_angle_degrees`
+  * `DiagonalDirection::from_pointy_angle_degrees`
+  * `DiagonalDirection::from_flat_angle_degrees`
+* Added missing `Direction::angle_degrees` method (#92)
+* Added missing `DiagonalDirection::angle_degrees` method (#92)
 
 ## 0.6.0
 

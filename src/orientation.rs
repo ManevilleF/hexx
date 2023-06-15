@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use crate::direction::angles::DIRECTION_ANGLE_OFFSET;
+use crate::direction::angles::DIRECTION_ANGLE_OFFSET_RAD;
 use crate::Direction;
 
 const SQRT_3: f32 = 1.732_050_8;
@@ -9,7 +9,7 @@ const SQRT_3: f32 = 1.732_050_8;
 static POINTY_ORIENTATION: HexOrientationData = HexOrientationData {
     forward_matrix: [SQRT_3, SQRT_3 / 2.0, 0.0, 3.0 / 2.0],
     inverse_matrix: [SQRT_3 / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0],
-    angle_offset: DIRECTION_ANGLE_OFFSET, // 30 degrees
+    angle_offset: DIRECTION_ANGLE_OFFSET_RAD, // 30 degrees
 };
 
 // TODO: make const

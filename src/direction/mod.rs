@@ -23,7 +23,7 @@ pub mod angles {
     use std::f32::consts::PI;
     /// Angle in radian between *flat* and *pointy* top orientations.
     /// Equivalent to 30 degrees
-    pub const DIRECTION_ANGLE_OFFSET: f32 = PI / 6.0;
+    pub const DIRECTION_ANGLE_OFFSET_RAD: f32 = PI / 6.0;
     /// Angle in radian between *flat* and *pointy* top orientations.
     /// Equivalent to π / 6 in radians
     pub const DIRECTION_ANGLE_OFFSET_DEGREES: f32 = 30.0;
@@ -33,4 +33,6 @@ pub mod angles {
     /// Angle in degrees between two adjacent directions counter clockwise.
     /// Equivalent to π / 3 in radians
     pub const DIRECTION_ANGLE_DEGREES: f32 = 60.0;
+    /// π * 2
+    pub const PI_2: f32 = PI * 2.0;
 }
