@@ -279,14 +279,6 @@ impl Hex {
         [self.x, self.y, self.z()]
     }
 
-    #[inline]
-    #[must_use]
-    #[deprecated(since = "0.5.0", note = "Prefer Hex::to_cubic_array")]
-    /// Converts `self` to cubic coordinates an array as `[x, y, z]`
-    pub const fn to_array3(self) -> [i32; 3] {
-        self.to_cubic_array()
-    }
-
     /// Creates a [`Hex`] from the first 2 values in `slice`.
     ///
     /// # Panics
@@ -625,20 +617,6 @@ impl Hex {
     }
 
     #[must_use]
-    #[doc(alias = "diagonal_direction_to")]
-    #[deprecated(
-        since = "0.6.0",
-        note = "Prefer `diagonal_way_to` for more accurate result or `main_diagonal_to`"
-    )]
-    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
-    ///
-    /// > This method can be innaccurate in case of a *tie* between directions, prefer
-    /// [`Self::diagonal_way_to`] instead
-    pub fn diagonal_to(self, rhs: Self) -> DiagonalDirection {
-        self.main_diagonal_to(rhs)
-    }
-
-    #[must_use]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
     ///
     /// > This method can be innaccurate in case of a *tie* between directions, prefer
@@ -661,19 +639,6 @@ impl Hex {
             }
             _ => DirectionWay::way_from(z < 0, za == xa, za == ya, DiagonalDirection::TopLeft),
         }
-    }
-
-    #[must_use]
-    #[deprecated(
-        since = "0.6.0",
-        note = "Prefer `way_to` for more accurate result or `main_direction_to"
-    )]
-    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
-    ///
-    /// > This method can be innaccurate in case of a *tie* between directions, prefer
-    /// using [`Self::way_to`] instead
-    pub fn direction_to(self, rhs: Self) -> Direction {
-        self.main_direction_to(rhs)
     }
 
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
@@ -714,23 +679,6 @@ impl Hex {
         Self::DIAGONAL_COORDS.map(|n| self + n)
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Hex::counter_clockwise")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] counter clockwise (by -60 degrees)
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    ///
-    /// let p = Hex::new(1, 2);
-    /// assert_eq!(p.left(), Hex::new(3, -1));
-    /// ```
-    pub const fn left(self) -> Self {
-        self.counter_clockwise()
-    }
-
     #[inline]
     #[must_use]
     #[doc(alias = "ccw")]
@@ -748,27 +696,11 @@ impl Hex {
         Self::new(-self.z(), -self.x)
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Hex::ccw_around")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around `center` counter clockwise (by -60 degrees)
-    pub const fn left_around(self, center: Self) -> Self {
-        self.ccw_around(center)
-    }
-
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` counter clockwise (by -60 degrees)
     pub const fn ccw_around(self, center: Self) -> Self {
         self.const_sub(center).counter_clockwise().const_add(center)
-    }
-
-    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_ccw")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] counter clockwise by `m` (by `-60 * m` degrees)
-    pub const fn rotate_left(self, m: u32) -> Self {
-        self.rotate_ccw(m)
     }
 
     #[inline]
@@ -785,36 +717,11 @@ impl Hex {
         }
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_ccw_around")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m` degrees)
-    pub const fn rotate_left_around(self, center: Self, m: u32) -> Self {
-        self.rotate_ccw_around(center, m)
-    }
-
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m` degrees)
     pub const fn rotate_ccw_around(self, center: Self, m: u32) -> Self {
         self.const_sub(center).rotate_ccw(m).const_add(center)
-    }
-
-    #[deprecated(since = "0.6.0", note = "Use Hex::clockwise")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] clockwise (by 60 degrees)
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    ///
-    /// let p = Hex::new(1, 2);
-    /// assert_eq!(p.right(), Hex::new(-2, 3));
-    /// ```
-    pub const fn right(self) -> Self {
-        self.clockwise()
     }
 
     #[inline]
@@ -834,27 +741,11 @@ impl Hex {
         Self::new(-self.y, -self.z())
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Hex::cw_around")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around `center` clockwise (by 60 degrees)
-    pub const fn right_around(self, center: Self) -> Self {
-        self.cw_around(center)
-    }
-
     #[inline]
     #[must_use]
     /// Rotates `self` around `center` clockwise (by 60 degrees)
     pub const fn cw_around(self, center: Self) -> Self {
         self.const_sub(center).clockwise().const_add(center)
-    }
-
-    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_cw")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] clockwise by `m` (by `60 * m` degrees)
-    pub const fn rotate_right(self, m: u32) -> Self {
-        self.rotate_cw(m)
     }
 
     #[inline]
@@ -869,14 +760,6 @@ impl Hex {
             5 => self.counter_clockwise(),
             _ => self,
         }
-    }
-
-    #[deprecated(since = "0.6.0", note = "Use Hex::rotate_cw_around")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` around `center` clockwise by `m` (by `60 * m` degrees)
-    pub const fn rotate_right_around(self, center: Self, m: u32) -> Self {
-        self.rotate_cw_around(center, m)
     }
 
     #[inline]
