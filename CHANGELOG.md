@@ -23,6 +23,9 @@
   * `DiagonalDirection::from_flat_angle_degrees`
 * Added missing `Direction::angle_degrees` method (#92)
 * Added missing `DiagonalDirection::angle_degrees` method (#92)
+* Added `UvOptions` for both planet and column mesh builder (#93):
+  * `mesh_builder` example now uses a checker texture and showcases uv options
+  * `ColumnMeshBuilder` has uv options for cap and side faces
 
 ## 0.6.0
 
