@@ -1,6 +1,8 @@
 use super::{MeshInfo, BASE_FACING};
 use crate::{Hex, HexLayout, UVOptions};
-use glam::{Quat, Vec3};
+use glam::{Quat, Vec2, Vec3};
+
+const UV_DELTA: Vec2 = Vec2::splat(0.5);
 
 /// Builder struct to customize hex plane mesh generation.
 ///
@@ -31,7 +33,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             pos: Hex::ZERO,
             facing: None,
             offset: None,
-            uv_options: UVOptions::new(),
+            uv_options: UVOptions::new().with_offset(UV_DELTA),
         }
     }
 

@@ -1,10 +1,7 @@
 use bevy::{
     pbr::wireframe::{Wireframe, WireframePlugin},
     prelude::*,
-    render::{
-        mesh::Indices,
-        render_resource::{AddressMode, PrimitiveTopology, SamplerDescriptor},
-    },
+    render::{mesh::Indices, render_resource::PrimitiveTopology},
 };
 use bevy_inspector_egui::{prelude::*, quick::ResourceInspectorPlugin};
 use hexx::*;
@@ -44,15 +41,7 @@ pub fn main() {
             brightness: 0.1,
             ..default()
         })
-        .add_plugins(DefaultPlugins.set(ImagePlugin {
-            // We set the textures to be repeated
-            default_sampler: SamplerDescriptor {
-                address_mode_u: AddressMode::Repeat,
-                address_mode_v: AddressMode::Repeat,
-                address_mode_w: AddressMode::Repeat,
-                ..Default::default()
-            },
-        }))
+        .add_plugins(DefaultPlugins)
         .add_plugin(WireframePlugin)
         .add_plugin(ResourceInspectorPlugin::<BuilderParams>::default())
         .add_startup_system(setup)
@@ -160,8 +149,15 @@ impl Default for BuilderParams {
             subdivisions: 3,
             top_face: true,
             bottom_face: true,
-            sides_uvs: UVParams::default(),
-            caps_uvs: UVParams::default(),
+            sides_uvs: UVParams {
+                uv_scale_factor: Vec2::new(1.0, 0.3),
+                ..default()
+            },
+            caps_uvs: UVParams {
+                uv_scale_factor: Vec2::splat(0.5),
+                uv_offset: Vec2::splat(0.5),
+                ..default()
+            },
         }
     }
 }
