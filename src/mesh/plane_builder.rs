@@ -2,8 +2,6 @@ use super::{MeshInfo, BASE_FACING};
 use crate::{Hex, HexLayout, UVOptions};
 use glam::{Quat, Vec2, Vec3};
 
-const UV_DELTA: Vec2 = Vec2::splat(0.5);
-
 /// Builder struct to customize hex plane mesh generation.
 ///
 /// The mesh will be anchored at the center of the hexagon, use offsets to cutomize
@@ -25,6 +23,8 @@ pub struct PlaneMeshBuilder<'l> {
 }
 
 impl<'l> PlaneMeshBuilder<'l> {
+    pub(crate) const UV_DELTA: Vec2 = Vec2::splat(0.5);
+
     /// Setup a new builder using the given `layout`
     #[must_use]
     pub const fn new(layout: &'l HexLayout) -> Self {
@@ -33,7 +33,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             pos: Hex::ZERO,
             facing: None,
             offset: None,
-            uv_options: UVOptions::new().with_offset(UV_DELTA),
+            uv_options: UVOptions::new().with_offset(Self::UV_DELTA),
         }
     }
 

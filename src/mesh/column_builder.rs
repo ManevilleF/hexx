@@ -65,7 +65,7 @@ impl<'l> ColumnMeshBuilder<'l> {
             top_face: true,
             bottom_face: true,
             sides_uv_options: UVOptions::new(),
-            caps_uv_options: UVOptions::new(),
+            caps_uv_options: UVOptions::new().with_offset(PlaneMeshBuilder::UV_DELTA),
         }
     }
 
