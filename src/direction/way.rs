@@ -33,11 +33,7 @@ pub enum DirectionWay<T> {
 }
 
 pub trait Way: Copy + Neg<Output = Self> {
-    #[deprecated = "Use ccw"]
-    fn left(self) -> Self;
     fn ccw(self) -> Self;
-    #[deprecated = "Use cw"]
-    fn right(self) -> Self;
     fn cw(self) -> Self;
 }
 
@@ -101,16 +97,8 @@ impl<T> From<[T; 2]> for DirectionWay<T> {
 }
 
 impl Way for Direction {
-    fn left(self) -> Self {
-        self.counter_clockwise()
-    }
-
     fn ccw(self) -> Self {
         self.counter_clockwise()
-    }
-
-    fn right(self) -> Self {
-        self.clockwise()
     }
 
     fn cw(self) -> Self {
@@ -119,16 +107,8 @@ impl Way for Direction {
 }
 
 impl Way for DiagonalDirection {
-    fn left(self) -> Self {
-        self.counter_clockwise()
-    }
-
     fn ccw(self) -> Self {
         self.counter_clockwise()
-    }
-
-    fn right(self) -> Self {
-        self.clockwise()
     }
 
     fn cw(self) -> Self {

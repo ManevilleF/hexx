@@ -235,14 +235,6 @@ impl Direction {
         }
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Direction::clockwise")]
-    #[inline]
-    #[must_use]
-    /// Returns the next direction in clockwise order
-    pub const fn right(self) -> Self {
-        self.clockwise()
-    }
-
     #[inline]
     #[must_use]
     #[doc(alias = "cw")]
@@ -258,14 +250,6 @@ impl Direction {
         }
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Direction::counter_clockwise")]
-    #[inline]
-    #[must_use]
-    /// Returns the next direction in counter clockwise order
-    pub const fn left(self) -> Self {
-        self.counter_clockwise()
-    }
-
     #[inline]
     #[must_use]
     #[doc(alias = "ccw")]
@@ -279,21 +263,6 @@ impl Direction {
             Self::Bottom => Self::BottomRight,
             Self::BottomRight => Self::TopRight,
         }
-    }
-
-    #[deprecated(since = "0.6.0", note = "Use Direction::rotate_ccw")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` counter clockwise by `offset` amount.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    /// assert_eq!(Direction::Top, Direction::Top.rotate_left(6));
-    /// ```
-    pub const fn rotate_left(self, offset: usize) -> Self {
-        self.rotate_ccw(offset)
     }
 
     #[inline]
@@ -315,21 +284,6 @@ impl Direction {
             5 => self.clockwise(),
             _ => self,
         }
-    }
-
-    #[deprecated(since = "0.6.0", note = "Use Direction::rotate_cw")]
-    #[inline]
-    #[must_use]
-    /// Rotates `self` clockwise by `offset` amount.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    /// assert_eq!(Direction::Top, Direction::Top.rotate_right(6));
-    /// ```
-    pub const fn rotate_right(self, offset: usize) -> Self {
-        self.rotate_cw(offset)
     }
 
     #[inline]
@@ -544,22 +498,6 @@ impl Direction {
         }
     }
 
-    #[deprecated(since = "0.6.0", note = "Use Direction::diagonal_ccw")]
-    #[inline]
-    #[must_use]
-    /// Computes the counter clockwise [`DiagonalDirection`] neighbor of self.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    /// let diagonal = Direction::Top.diagonal_left();
-    /// assert_eq!(diagonal, DiagonalDirection::TopLeft);
-    /// ```
-    pub const fn diagonal_left(self) -> DiagonalDirection {
-        self.diagonal_ccw()
-    }
-
     #[inline]
     #[must_use]
     /// Computes the counter clockwise [`DiagonalDirection`] neighbor of self.
@@ -580,22 +518,6 @@ impl Direction {
             Self::Bottom => DiagonalDirection::BottomRight,
             Self::BottomRight => DiagonalDirection::Right,
         }
-    }
-
-    #[deprecated(since = "0.6.0", note = "Use Direction::diagonal_cw")]
-    #[inline]
-    #[must_use]
-    /// Computes the clockwise [`DiagonalDirection`] neighbor of self.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use hexx::*;
-    /// let diagonal = Direction::Top.diagonal_right();
-    /// assert_eq!(diagonal, DiagonalDirection::TopRight);
-    /// ```
-    pub const fn diagonal_right(self) -> DiagonalDirection {
-        self.diagonal_cw()
     }
 
     #[inline]

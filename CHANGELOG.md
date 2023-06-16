@@ -28,6 +28,7 @@
   * `ColumnMeshBuilder` has uv options for cap and side faces
 * (**BREAKING**) All functions taking a `HexOrientation` parameter no longer
 take a borrow (`&HexOrientation`) but a value (#95)
+* (**BREAKING**) Removed all functions deprecated in `0.6.0`
 
 ## 0.6.0
 
