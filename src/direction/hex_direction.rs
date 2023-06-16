@@ -392,7 +392,7 @@ impl Direction {
     #[inline]
     #[must_use]
     /// Returns the angle in radians of the given direction in the given `orientation`
-    pub fn angle(self, orientation: &HexOrientation) -> f32 {
+    pub fn angle(self, orientation: HexOrientation) -> f32 {
         self.angle_pointy() - orientation.angle_offset
     }
 
@@ -419,7 +419,7 @@ impl Direction {
     /// Returns the angle in degrees of the given direction according to its `orientation`
     ///
     /// See [`Self::angle`] for radians angles
-    pub fn angle_degrees(self, orientation: &HexOrientation) -> f32 {
+    pub fn angle_degrees(self, orientation: HexOrientation) -> f32 {
         match orientation {
             HexOrientation::Pointy => self.angle_pointy_degrees(),
             HexOrientation::Flat => self.angle_flat_degrees(),
@@ -515,10 +515,10 @@ impl Direction {
     /// # use hexx::*;
     ///
     /// let angle = 35.0;
-    /// assert_eq!(Direction::from_angle_degrees(angle, &HexOrientation::Flat), Direction::TopRight);
-    /// assert_eq!(Direction::from_angle_degrees(angle, &HexOrientation::Pointy), Direction::Top);
+    /// assert_eq!(Direction::from_angle_degrees(angle, HexOrientation::Flat), Direction::TopRight);
+    /// assert_eq!(Direction::from_angle_degrees(angle, HexOrientation::Pointy), Direction::Top);
     /// ```
-    pub fn from_angle_degrees(angle: f32, orientation: &HexOrientation) -> Self {
+    pub fn from_angle_degrees(angle: f32, orientation: HexOrientation) -> Self {
         match orientation {
             HexOrientation::Pointy => Self::from_pointy_angle_degrees(angle),
             HexOrientation::Flat => Self::from_flat_angle_degrees(angle),
@@ -534,10 +534,10 @@ impl Direction {
     /// # use hexx::*;
     ///
     /// let angle = 0.6;
-    /// assert_eq!(Direction::from_angle(angle, &HexOrientation::Flat), Direction::TopRight);
-    /// assert_eq!(Direction::from_angle(angle, &HexOrientation::Pointy), Direction::Top);
+    /// assert_eq!(Direction::from_angle(angle, HexOrientation::Flat), Direction::TopRight);
+    /// assert_eq!(Direction::from_angle(angle, HexOrientation::Pointy), Direction::Top);
     /// ```
-    pub fn from_angle(angle: f32, orientation: &HexOrientation) -> Self {
+    pub fn from_angle(angle: f32, orientation: HexOrientation) -> Self {
         match orientation {
             HexOrientation::Pointy => Self::from_pointy_angle(angle),
             HexOrientation::Flat => Self::from_flat_angle(angle),

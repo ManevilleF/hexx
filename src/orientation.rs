@@ -70,14 +70,14 @@ impl HexOrientation {
     #[must_use]
     #[inline]
     /// Computes the angle in radians of the given `direction` in the current orientation
-    pub fn direction_angle(&self, direction: Direction) -> f32 {
+    pub fn direction_angle(self, direction: Direction) -> f32 {
         direction.angle(self)
     }
 
     #[must_use]
     #[inline]
     /// Returns the orientation inner data, rotation angle and matrices
-    pub fn orientation_data(&self) -> &'static HexOrientationData {
+    pub fn orientation_data(self) -> &'static HexOrientationData {
         match self {
             Self::Pointy => &POINTY_ORIENTATION,
             Self::Flat => &FLAT_ORIENTATION,
