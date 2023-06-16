@@ -1,5 +1,5 @@
 use super::{MeshInfo, BASE_FACING};
-use crate::{Hex, HexLayout};
+use crate::{Hex, HexLayout, UVOptions};
 use glam::{Quat, Vec3};
 
 /// Builder struct to customize hex plane mesh generation.
@@ -18,6 +18,8 @@ pub struct PlaneMeshBuilder<'l> {
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub facing: Option<Vec3>,
+    /// UV mapping options
+    pub uv_options: UVOptions,
 }
 
 impl<'l> PlaneMeshBuilder<'l> {
@@ -29,6 +31,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             pos: Hex::ZERO,
             facing: None,
             offset: None,
+            uv_options: UVOptions::cap_default(),
         }
     }
 
@@ -52,10 +55,17 @@ impl<'l> PlaneMeshBuilder<'l> {
         self
     }
 
-    /// Specify a cusom offset for the whole mesh
+    /// Specify a custom offset for the whole mesh
     #[must_use]
     pub const fn with_offset(mut self, offset: Vec3) -> Self {
         self.offset = Some(offset);
+        self
+    }
+
+    /// Specify custom UV mapping options
+    #[must_use]
+    pub const fn with_uv_options(mut self, uv_options: UVOptions) -> Self {
+        self.uv_options = uv_options;
         self
     }
 
@@ -71,6 +81,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             let rotation = Quat::from_rotation_arc(BASE_FACING, facing);
             mesh = mesh.rotated(rotation);
         }
+        self.uv_options.alter_uvs(&mut mesh.uvs);
         mesh
     }
 }

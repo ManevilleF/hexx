@@ -1,15 +1,16 @@
 mod column_builder;
 mod plane_builder;
+mod uv_mapping;
 
 pub use column_builder::ColumnMeshBuilder;
 pub use plane_builder::PlaneMeshBuilder;
+pub use uv_mapping::UVOptions;
 
 use glam::{Quat, Vec2, Vec3};
 
 use crate::{Hex, HexLayout};
 
 pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
-pub(crate) const UV_DELTA: Vec2 = Vec2::splat(0.5);
 
 #[derive(Debug, Clone, Default)]
 /// Mesh information. The `const LEN` attribute ensures that there is the same number of vertices, normals and uvs
@@ -90,16 +91,21 @@ impl MeshInfo {
 
     /// Computes mesh data for an hexagonal plane facing `Vec3::Y`
     ///
-    /// Prefer using [`PlaneMeshBuilder`] for additional customization
+    /// # Note
+    ///
+    /// Prefer using [`PlaneMeshBuilder`] for additional customization like:
+    /// * UV options
+    /// * Offsets
+    /// * rotation
+    /// * etc
     #[must_use]
     pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
         let center = layout.hex_to_world_pos(hex);
-        let center = Vec3::new(center.x, 0., center.y);
         let corners = layout.hex_corners(hex);
         let corners_arr = corners.map(|p| Vec3::new(p.x, 0., p.y));
         Self {
             vertices: vec![
-                center,
+                Vec3::new(center.x, 0., center.y),
                 corners_arr[0],
                 corners_arr[1],
                 corners_arr[2],
@@ -108,13 +114,7 @@ impl MeshInfo {
                 corners_arr[5],
             ],
             uvs: vec![
-                UV_DELTA,
-                corners[0] + UV_DELTA,
-                corners[1] + UV_DELTA,
-                corners[2] + UV_DELTA,
-                corners[3] + UV_DELTA,
-                corners[4] + UV_DELTA,
-                corners[5] + UV_DELTA,
+                center, corners[0], corners[1], corners[2], corners[3], corners[4], corners[5],
             ],
             normals: [Vec3::Y; 7].to_vec(),
             indices: vec![

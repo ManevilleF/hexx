@@ -31,11 +31,11 @@ optional = true
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
 version = "0.10"
-features = ["bevy_render", "bevy_pbr", "bevy_sprite", "bevy_core_pipeline", "bevy_asset", "bevy_winit", "x11"]
+features = ["bevy_render", "bevy_pbr", "bevy_sprite", "bevy_core_pipeline", "bevy_asset", "bevy_winit", "x11", "png"]
 default-features = false
 
 [dev-dependencies.criterion]
-version = "0.4"
+version = "0.5"
 features = ["html_reports"]
 
 [dev-dependencies]

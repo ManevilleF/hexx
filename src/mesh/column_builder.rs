@@ -1,7 +1,7 @@
 use glam::{Quat, Vec3};
 
 use super::{MeshInfo, BASE_FACING};
-use crate::{Hex, HexLayout};
+use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 
 /// Builder struct to customize hex column mesh generation.
 ///
@@ -45,6 +45,10 @@ pub struct ColumnMeshBuilder<'l> {
     pub top_face: bool,
     /// Should the bottom hexagonal face be present
     pub bottom_face: bool,
+    /// UV mapping options for the column sides
+    pub sides_uv_options: UVOptions,
+    /// UV mapping options for top and bottom faces
+    pub caps_uv_options: UVOptions,
 }
 
 impl<'l> ColumnMeshBuilder<'l> {
@@ -60,6 +64,8 @@ impl<'l> ColumnMeshBuilder<'l> {
             offset: None,
             top_face: true,
             bottom_face: true,
+            sides_uv_options: UVOptions::quad_default(),
+            caps_uv_options: UVOptions::cap_default(),
         }
     }
 
@@ -70,6 +76,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// It might be more optimal to generate only one mesh at [`Hex::ZERO`] and offset it later
     /// than have one mesh per hex position
     #[must_use]
+    #[inline]
     pub const fn at(mut self, pos: Hex) -> Self {
         self.pos = pos;
         self
@@ -78,6 +85,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Specify a custom *facing* direction for the mesh, by default the column is vertical (facing
     /// up)
     #[must_use]
+    #[inline]
     pub const fn facing(mut self, facing: Vec3) -> Self {
         self.facing = Some(facing);
         self
@@ -100,6 +108,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     ///     .build();
     /// ```
     #[must_use]
+    #[inline]
     pub const fn with_offset(mut self, offset: Vec3) -> Self {
         self.offset = Some(offset);
         self
@@ -107,6 +116,7 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     /// Defines the column side quads amount
     #[must_use]
+    #[inline]
     pub const fn with_subdivisions(mut self, subdivisions: usize) -> Self {
         self.subdivisions = Some(subdivisions);
         self
@@ -114,6 +124,7 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     /// The mesh will not include a *bottom* hexagon face
     #[must_use]
+    #[inline]
     pub const fn without_bottom_face(mut self) -> Self {
         self.bottom_face = false;
         self
@@ -121,8 +132,28 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     /// The mesh will not include a *top* hexagon face
     #[must_use]
+    #[inline]
     pub const fn without_top_face(mut self) -> Self {
         self.top_face = false;
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify custom uv options for the top/bottom caps triangles
+    ///
+    /// Note:
+    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
+    pub const fn with_caps_uv_options(mut self, uv_options: UVOptions) -> Self {
+        self.caps_uv_options = uv_options;
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify custom uv options for the side triangles
+    pub const fn with_sides_uv_options(mut self, uv_options: UVOptions) -> Self {
+        self.sides_uv_options = uv_options;
         self
     }
 
@@ -131,7 +162,10 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[allow(clippy::many_single_char_names)]
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
-        let plane = MeshInfo::hexagonal_plane(self.layout, self.pos);
+        let cap_mesh = PlaneMeshBuilder::new(self.layout)
+            .at(self.pos)
+            .with_uv_options(self.caps_uv_options)
+            .build();
         let mut mesh = MeshInfo::default();
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
@@ -149,12 +183,13 @@ impl<'l> ColumnMeshBuilder<'l> {
                 mesh.merge_with(quad);
             }
         }
+        self.sides_uv_options.alter_uvs(&mut mesh.uvs);
         if self.top_face {
-            mesh.merge_with(plane.clone().with_offset(Vec3::Y * self.height));
+            mesh.merge_with(cap_mesh.clone().with_offset(Vec3::Y * self.height));
         }
         if self.bottom_face {
             let rotation = Quat::from_rotation_arc(BASE_FACING, -BASE_FACING);
-            let bottom_face = plane.rotated(rotation);
+            let bottom_face = cap_mesh.rotated(rotation);
             mesh.merge_with(bottom_face);
         }
         if let Some(offset) = self.offset {
