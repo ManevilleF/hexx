@@ -26,6 +26,8 @@
 * Added `UvOptions` for both planet and column mesh builder (#93):
   * `mesh_builder` example now uses a checker texture and showcases uv options
   * `ColumnMeshBuilder` has uv options for cap and side faces
+* (**BREAKING**) All functions taking a `HexOrientation` parameter no longer
+take a borrow (`&HexOrientation`) but a value (#95)
 
 ## 0.6.0
 
