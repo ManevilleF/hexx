@@ -42,9 +42,9 @@ pub struct ColumnMeshBuilder<'l> {
     /// Amount of quads to be generated on the sides of the column
     pub subdivisions: Option<usize>,
     /// Should the top hexagonal face be present
-    pub top_cap: bool,
+    pub top_face: bool,
     /// Should the bottom hexagonal face be present
-    pub bottom_cap: bool,
+    pub bottom_face: bool,
     /// UV mapping options for the column sides
     pub sides_uv_options: UVOptions,
     /// UV mapping options for top and bottom faces
@@ -62,8 +62,8 @@ impl<'l> ColumnMeshBuilder<'l> {
             facing: None,
             subdivisions: None,
             offset: None,
-            top_cap: true,
-            bottom_cap: true,
+            top_face: true,
+            bottom_face: true,
             sides_uv_options: UVOptions::new(),
             caps_uv_options: UVOptions::new(),
         }
@@ -126,7 +126,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[must_use]
     #[inline]
     pub const fn without_bottom_face(mut self) -> Self {
-        self.bottom_cap = false;
+        self.bottom_face = false;
         self
     }
 
@@ -134,7 +134,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[must_use]
     #[inline]
     pub const fn without_top_face(mut self) -> Self {
-        self.top_cap = false;
+        self.top_face = false;
         self
     }
 
@@ -184,10 +184,10 @@ impl<'l> ColumnMeshBuilder<'l> {
             }
         }
         self.sides_uv_options.alter_uvs(&mut mesh.uvs);
-        if self.top_cap {
+        if self.top_face {
             mesh.merge_with(cap_mesh.clone().with_offset(Vec3::Y * self.height));
         }
-        if self.bottom_cap {
+        if self.bottom_face {
             let rotation = Quat::from_rotation_arc(BASE_FACING, -BASE_FACING);
             let bottom_face = cap_mesh.rotated(rotation);
             mesh.merge_with(bottom_face);
