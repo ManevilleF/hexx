@@ -270,7 +270,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let coord = Hex::new(3, 5);
-    /// let [x, y, z] = coord.to_array3();
+    /// let [x, y, z] = coord.to_cubic_array();
     /// assert_eq!(x, 3);
     /// assert_eq!(y, 5);
     /// assert_eq!(z, -3-5);
