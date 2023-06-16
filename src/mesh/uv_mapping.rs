@@ -81,13 +81,14 @@ impl UVOptions {
     /// Apply the options to `uv`, returning the new value as a [`Vec2`]
     #[must_use]
     pub fn alter_uv(&self, mut uv: Vec2) -> Vec2 {
+        uv = uv * self.scale_factor + self.offset;
         if self.flip_u {
             uv.x = 1.0 - uv.x;
         }
         if self.flip_v {
             uv.y = 1.0 - uv.y;
         }
-        uv * self.scale_factor + self.offset
+        uv
     }
 
     /// Apply the options to all UV coords in `uvs`
