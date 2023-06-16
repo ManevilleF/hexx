@@ -1,4 +1,5 @@
 use bevy::{
+    log,
     prelude::*,
     render::{mesh::Indices, render_resource::PrimitiveTopology},
     utils::{HashMap, HashSet},
@@ -61,7 +62,7 @@ fn setup_grid(
         .map(|(i, coord)| {
             let pos = layout.hex_to_world_pos(coord);
             let material = match coord {
-                c if i % 5 == 0 => {
+                c if i != 0 && i % 5 == 0 => {
                     blocked_coords.insert(c);
                     blocked_mat.clone()
                 }
@@ -117,14 +118,23 @@ fn handle_input(
             return;
         }
         *current = hex_pos;
-        for entity in &grid.path_entities {
-            commands.entity(*entity).insert(grid.default_mat.clone());
+        let path_to_clear: Vec<_> = grid.path_entities.drain().collect();
+        for entity in path_to_clear {
+            commands.entity(entity).insert(grid.default_mat.clone());
         }
         let Some(path) = a_star(Hex::ZERO, hex_pos, |h| {
-            (!grid.blocked_coords.contains(&h)).then_some(0)
-        }) else { return };
+            (grid.entities.contains_key(&h) && !grid.blocked_coords.contains(&h)).then_some(1)
+        }) else {
+            log::info!("No path found");
+            return
+        };
         let entities: HashSet<_> = path
             .into_iter()
+            .inspect(|h| {
+                if grid.blocked_coords.contains(h) {
+                    log::error!("A star picked a blocked coord: {h:?}");
+                }
+            })
             .filter_map(|h| grid.entities.get(&h).copied())
             .collect();
         for entity in &entities {
