@@ -96,6 +96,18 @@ impl UVOptions {
             *uv = self.alter_uv(*uv);
         }
     }
+
+    /// Default values for hexagonal planes or column caps
+    #[must_use]
+    pub const fn cap_default() -> Self {
+        Self::new().with_offset(Vec2::splat(0.5))
+    }
+
+    /// Default values for quads
+    #[must_use]
+    pub const fn quad_default() -> Self {
+        Self::new()
+    }
 }
 
 impl Default for UVOptions {
