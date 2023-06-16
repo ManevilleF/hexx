@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.7.0
+
 * Added `Hex::xrange` for excluding range coordinates (#88)
 * Implemented  `PartialEq` For `HexOrientation` (#87)
 * `HexOrientation` is now a two variant enum instead of a struct:

@@ -7,7 +7,7 @@
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
 [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.6.0/status.svg)](https://deps.rs/crate/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.7.0/status.svg)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
@@ -16,6 +16,7 @@
  > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html).
 
  This lib allows you to:
+
  - Manipulate hexagon coordinates
  - Generate hexagonal maps with custom layouts and orientation
  - Generate hexagon meshes (planes or columns)
@@ -29,24 +30,25 @@
 
  Run `cargo add hexx` in your project or add the following line to your `Cargo.toml`:
 
- - `hexx = "0.6"`
+ - `hexx = "0.7"`
 
  ### Cargo features
 
  `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
  through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
 
- - `hexx = { version = "0.6", features = ["ser_de"] }`
+ - `hexx = { version = "0.7", features = ["ser_de"] }`
 
  By default `Hex` uses rust classic memory layout, if you want to use `hexx` through the FFI or
  have `Hex` be stored without any memory padding, the `packed` feature will make `Hex`
  `repr(C)`. To enable this behaviour add the following line to your `Cargo.toml`:
 
- - `hexx = { version = "0.6", features = ["packed"] }`
+ - `hexx = { version = "0.7", features = ["packed"] }`
 
  ## Features
 
  `hexx` provides the [`Hex`] coordinates with:
+
  - Distances
  - Neighbors and directions
  - Lines
@@ -135,11 +137,11 @@
 
 > See the [examples](examples) for bevy usage
 
- ## Examples
+## Examples
 
 `hexx` provides interactive examples showcasing various features:
 
- ### Hex grid
+### Hex grid
 
 ![hex_grid](docs/hex_grid.png "hex grid example")
 
@@ -147,7 +149,7 @@
 
 This example showcases hex ranges, rings, wedges, rotation, and lines
 
- ### Scroll Map
+### Scroll Map
 
 ![scroll_map](docs/scroll_map.gif "scroll map example")
 
@@ -197,7 +199,7 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  This example showcases the 3d hexagon columns procedural generation
 
-### Mesh builder 
+### Mesh builder
 
 ![columns](docs/mesh_builder.png "Mesh builder example")
 
