@@ -77,7 +77,7 @@
  // Compute a ring from `point_a` containing `point_b`
  let ring: Vec<Hex> = point_a.ring(dist).collect();
  // Rotate `point_b` around `point_a` by 2 times 60 degrees clockwise
- let rotated = point_b.rotate_right_around(point_a, 2);
+ let rotated = point_b.rotate_cw_around(point_a, 2);
  // Find the direction between the two points
  let dir_a = point_a.main_direction_to(point_b);
  let dir_b = point_b.main_direction_to(point_a);

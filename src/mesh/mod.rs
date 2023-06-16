@@ -128,25 +128,6 @@ impl MeshInfo {
         }
     }
 
-    /// Computes mesh data for an hexagonal column facing `Vec3::Y` without the bottom face
-    #[must_use]
-    #[deprecated(since = "0.6.0", note = "Use ColumnMeshBuilder instead")]
-    pub fn partial_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
-        ColumnMeshBuilder::new(layout, column_height)
-            .at(hex)
-            .without_bottom_face()
-            .build()
-    }
-
-    /// Computes mesh data for an hexagonal column facing `Vec3::Y`
-    #[must_use]
-    #[deprecated(since = "0.6.0", note = "Use ColumnMeshBuilder instead")]
-    pub fn hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
-        ColumnMeshBuilder::new(layout, column_height)
-            .at(hex)
-            .build()
-    }
-
     /// Computes cheap mesh data for an hexagonal column facing `Vec3::Y` without the bottom face.
     ///
     /// This mesh has only 13 vertices, as no vertex is duplicated. As a consequence the normals will behave strangely
