@@ -1,4 +1,5 @@
 use bevy::{
+    input::mouse::MouseMotion,
     pbr::wireframe::{Wireframe, WireframePlugin},
     prelude::*,
     render::{mesh::Indices, render_resource::PrimitiveTopology},
@@ -92,13 +93,20 @@ fn setup(
     });
 }
 
-fn animate(info: Res<HexInfo>, mut transforms: Query<&mut Transform>, time: Res<Time>) {
-    let delta_time = time.delta_seconds() / 2.0;
-    let mut transform = transforms.get_mut(info.mesh_entity).unwrap();
-    transform.rotate_x(delta_time);
-    transform.rotate_y(delta_time);
-    transform.rotate_local_y(delta_time);
-    transform.rotate_z(delta_time);
+fn animate(
+    info: Res<HexInfo>,
+    mut transforms: Query<&mut Transform>,
+    mut motion_evr: EventReader<MouseMotion>,
+    buttons: Res<Input<MouseButton>>,
+    time: Res<Time>,
+) {
+    if buttons.pressed(MouseButton::Left) {
+        for event in motion_evr.iter() {
+            let mut transform = transforms.get_mut(info.mesh_entity).unwrap();
+            transform.rotate_y(event.delta.x * time.delta_seconds());
+            transform.rotate_x(event.delta.y * time.delta_seconds());
+        }
+    }
 }
 
 fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {
