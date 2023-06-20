@@ -22,9 +22,9 @@
 //! ### Cargo features
 //!
 //! `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
-//! through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
+//! through the `serde` feature gate. To enable it add the following line to your `Cargo.toml`:
 //!
-//! - `hexx = { version = "0.7", features = ["ser_de"] }`
+//! - `hexx = { version = "0.7", features = ["serde"] }`
 //!
 //! By default `Hex` uses rust classic memory layout, if you want to use `hexx` through the FFI or
 //! have `Hex` be stored without any memory padding, the `packed` feature will make `Hex`
@@ -137,6 +137,7 @@ pub mod hex;
 pub mod hex_map;
 /// Hexagonal layout module
 pub mod layout;
+#[cfg(feature = "mesh")]
 /// Mesh generation utils module
 pub mod mesh;
 /// Hexagon oritentation module
@@ -144,7 +145,7 @@ pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
 
-pub use glam::{IVec2, IVec3, Vec2, Vec3};
-pub use {
-    bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, mesh::*, orientation::*,
-};
+pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
+#[cfg(feature = "mesh")]
+pub use mesh::*;
+pub use {bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, orientation::*};

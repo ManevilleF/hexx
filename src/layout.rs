@@ -23,7 +23,7 @@ use glam::Vec2;
 /// let hex_pos = layout.world_pos_to_hex(Vec2::new(1.23, 45.678));
 /// ```
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexLayout {
     /// The hexagonal orientation of the layout (usually "flat" or "pointy")
     pub orientation: HexOrientation,

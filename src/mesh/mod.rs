@@ -13,7 +13,36 @@ use crate::{Hex, HexLayout};
 pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 
 #[derive(Debug, Clone, Default)]
-/// Mesh information. The `const LEN` attribute ensures that there is the same number of vertices, normals and uvs
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Hexagonal mesh information.
+///
+/// # Usage
+///
+/// Use:
+/// * [`ColumnMeshBuilder`] for 3d hexagonal column meshes
+/// * [`PlaneMeshBuilder`] for hexagonal plane meshes
+///
+/// The mesh info has some customization options:
+///
+/// ```rust
+/// # use hexx::*;
+///
+/// let layout = HexLayout::default();
+/// // Build the mesh info
+/// let info: MeshInfo = ColumnMeshBuilder::new(&layout, 2.0).build();
+/// // Customize the generated mesh
+/// let info = info.rotated(Quat::IDENTITY).with_offset(Vec3::new(12.0, 34.2, -43.54));
+/// ```
+///
+/// ## Merging
+///
+/// `MeshInfo` can be merged with other meshes using `Self::merge_with`.
+/// Don't forget to offset the meshes in the mesh builder using:
+/// * [`ColumnMeshBuilder::at`]
+/// * [`PlaneMeshBuilder::at`]
+/// * [`Self::with_offset`] for a custom offset
+///
+/// Otherwise you might end up with meshes at the same coordinates
 pub struct MeshInfo {
     /// All vertices positions information (`Vertex_Position` attribute)
     pub vertices: Vec<Vec3>,

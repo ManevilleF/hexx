@@ -5,7 +5,7 @@ use crate::Hex;
 ///
 /// [doubled]: https://www.redblobgames.com/grids/hexagons/#coordinates-doubled
 #[derive(Debug, Clone, Copy, Default)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DoubledHexMode {
     /// Doubles column values
     #[default]
@@ -19,7 +19,7 @@ pub enum DoubledHexMode {
 ///
 /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
 #[derive(Debug, Clone, Copy, Default)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OffsetHexMode {
     /// Vertical layout, shoves even columns down
     EvenColumns,

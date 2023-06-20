@@ -20,7 +20,7 @@ use crate::{Hex, HexBounds};
 ///
 /// [wraparound]: https://www.redblobgames.com/grids/hexagons/#wraparound
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexMap {
     /// The bounds of the map
     bounds: HexBounds,
