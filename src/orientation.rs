@@ -29,7 +29,7 @@ static FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
 /// let pointy = HexOrientation::pointy();
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexOrientationData {
     /// Matrix used to compute hexagonal coordinates to world/pixel coordinates
     pub(crate) forward_matrix: [f32; 4],
@@ -41,7 +41,7 @@ pub struct HexOrientationData {
 
 /// Hexagonal orientation, either *Pointy-Topped* or *Flat-Topped*
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Default)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum HexOrientation {
     /// *Pointy* orientation, means that the hexagons are *pointy-topped*
     Pointy,

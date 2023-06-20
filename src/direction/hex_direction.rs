@@ -43,7 +43,7 @@ use crate::{DiagonalDirection, HexOrientation};
 /// ```
 #[repr(u8)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Direction {
     #[default]
     /// Direction to (1, -1)

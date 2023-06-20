@@ -11,13 +11,17 @@ repository = "https://github.com/ManevilleF/hexx"
 exclude = [".github"]
 
 [features]
-default = ["algorithms"]
+default = ["algorithms", "mesh"]
 # HL algoritms
 algorithms = []
+# 3d Mesh features
+mesh = []
 # repr C
 packed = []
 # serde compatibility
-ser_de = ["serde", "glam/serde"]
+serde = ["dep:serde", "glam/serde"]
+# Old serde compat feature
+ser_de = ["serde"]
 
 [dependencies]
 glam = "0.23"

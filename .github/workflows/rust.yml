@@ -66,6 +66,8 @@ jobs:
         run: cargo clippy --all --tests -- -D warnings
       - name: Run clippy all features check
         run: cargo clippy --all-features --all --tests -- -D warnings
+      - name: Run clippy no default features check
+        run: cargo clippy --no-default-features --all --tests -- -D warnings
 
   rustdoc:
     needs: [build, fmt]

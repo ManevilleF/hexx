@@ -13,7 +13,7 @@ use crate::Hex;
 /// let bounds: HexBounds = iter.collect();
 /// ```
 #[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HexBounds {
     /// bounds center
     pub center: Hex,

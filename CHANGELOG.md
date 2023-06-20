@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* Renamed `ser_de` feature to `serde`. The `ser_de` feature is still available
+* Added extra documentation to `MeshInfo`
+* Moved the mesh module under a `mesh` feature gate, enabled by default
+
 ## 0.7.0
 
 * Added `Hex::xrange` for excluding range coordinates (#88)

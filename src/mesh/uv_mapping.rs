@@ -1,7 +1,7 @@
 use glam::Vec2;
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Struct containing options for UV mapping.
 ///
 /// # Usage
