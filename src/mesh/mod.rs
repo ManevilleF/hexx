@@ -41,6 +41,7 @@ pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 /// * [`ColumnMeshBuilder::at`]
 /// * [`PlaneMeshBuilder::at`]
 /// * [`Self::with_offset`] for a custom offset
+///
 /// Otherwise you might end up with meshes at the same coordinates
 pub struct MeshInfo {
     /// All vertices positions information (`Vertex_Position` attribute)

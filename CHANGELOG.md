@@ -2,9 +2,9 @@
 
 ## [Unreleased]
 
-* Renamed `ser_de` feature to `serde`. The `ser_de` feature is still available
-* Added extra documentation to `MeshInfo`
-* Moved the mesh module under a `mesh` feature gate, enabled by default
+* Renamed `ser_de` feature to `serde`. The `ser_de` feature is still available (#99)
+* Added extra documentation to `MeshInfo` (#99)
+* Moved the mesh module under a `mesh` feature gate, enabled by default (#99)
 
 ## 0.7.0
 
