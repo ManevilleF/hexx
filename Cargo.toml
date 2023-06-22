@@ -22,6 +22,8 @@ packed = []
 serde = ["dep:serde", "glam/serde"]
 # Old serde compat feature
 ser_de = ["serde"]
+# Adds Bevy Reflection support
+bevy_reflect = ["dep:bevy_reflect"]
 
 [dependencies]
 glam = "0.23"
@@ -30,6 +32,11 @@ glam = "0.23"
 version = "1"
 default-features = false
 features = ["derive"]
+optional = true
+
+[dependencies.bevy_reflect]
+version = "0.10"
+default-features = false
 optional = true
 
 # For lib.rs doctests and examples

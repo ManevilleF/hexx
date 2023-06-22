@@ -41,6 +41,7 @@ use crate::{Direction, HexOrientation};
 #[repr(u8)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect, bevy_reflect::FromReflect))]
 pub enum DiagonalDirection {
     #[default]
     /// Direction to (2, -1)
