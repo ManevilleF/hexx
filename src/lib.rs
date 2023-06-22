@@ -35,7 +35,7 @@
 //! `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect) through the
 //! `bevy_reflect` feature. To enable it add the following line to your `Cargo.toml`:
 //!
-//! - `hexx = { version = "0.8", features = ["bevy_reflect"] }`
+//! - `hexx = { version = "0.7", features = ["bevy_reflect"] }`
 //!
 //! ## Features
 //!
