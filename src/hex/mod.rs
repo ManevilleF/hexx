@@ -47,7 +47,10 @@ use std::cmp::{max, min};
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug, Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "packed", repr(C))]
-#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect, bevy_reflect::FromReflect))]
+#[cfg_attr(
+    feature = "bevy_reflect",
+    derive(bevy_reflect::Reflect, bevy_reflect::FromReflect)
+)]
 pub struct Hex {
     /// `x` axial coordinate (sometimes called `q` or `i`)
     pub x: i32,
