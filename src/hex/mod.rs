@@ -45,7 +45,7 @@ use std::cmp::{max, min};
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
 #[derive(Copy, Clone, Default, Eq, PartialEq)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug, Hash))]
-#[cfg_attr(feature = "ser_de", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "packed", repr(C))]
 pub struct Hex {
     /// `x` axial coordinate (sometimes called `q` or `i`)
