@@ -15,11 +15,13 @@ default = ["algorithms", "mesh"]
 # HL algoritms
 algorithms = []
 # 3d Mesh features
-mesh = []
+mesh = ["serde?/std"]
 # repr C
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
+# Old serde compat feature
+ser_de = ["serde"]
 
 [dependencies]
 glam = "0.23"
