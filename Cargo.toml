@@ -20,8 +20,6 @@ mesh = []
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
-# Old serde compat feature
-ser_de = ["serde"]
 
 [dependencies]
 glam = "0.23"
