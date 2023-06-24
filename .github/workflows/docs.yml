@@ -1,0 +1,26 @@
+name: Docs 
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  changelog-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce changelog
+        uses: dangoslen/changelog-enforcer@v3
+        with:
+          missingUpdateErrorMessage: Please add an entry to the CHANGELOG documenting your changes
+
+  readme-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - name: install cargo-sync-readme
+        run: cargo install cargo-sync-readme
+      - name: Check README sync
+        run: cargo sync-readme --check

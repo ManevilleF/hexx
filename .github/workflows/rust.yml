@@ -82,12 +82,3 @@ jobs:
       - name: Run rustdoc
         run: cargo rustdoc --all-features -- -D warnings
 
-  checks:
-    if: github.event_name == 'pull_request' && github.base_ref == 'main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Enforce changelog
-        uses: dangoslen/changelog-enforcer@v3
-        with:
-          missingUpdateErrorMessage: Please add an entry to the CHANGELOG documenting your changes
-
