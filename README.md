@@ -35,9 +35,9 @@
  ### Cargo features
 
  `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
- through the `ser_de` feature gate. To enable it add the following line to your `Cargo.toml`:
+ through the `serde` feature gate. To enable it add the following line to your `Cargo.toml`:
 
- - `hexx = { version = "0.7", features = ["ser_de"] }`
+ - `hexx = { version = "0.7", features = ["serde"] }`
 
  By default `Hex` uses rust classic memory layout, if you want to use `hexx` through the FFI or
  have `Hex` be stored without any memory padding, the `packed` feature will make `Hex`
