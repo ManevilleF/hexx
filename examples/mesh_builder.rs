@@ -5,6 +5,7 @@ use bevy::{
     render::{mesh::Indices, render_resource::PrimitiveTopology},
 };
 use bevy_inspector_egui::{prelude::*, quick::ResourceInspectorPlugin};
+use glam::vec2;
 use hexx::*;
 
 #[derive(Debug, Resource)]
@@ -12,13 +13,6 @@ struct HexInfo {
     pub layout: HexLayout,
     pub mesh_entity: Entity,
     pub mesh_handle: Handle<Mesh>,
-}
-
-#[derive(Debug, Reflect)]
-struct UVParams {
-    pub uv_offset: Vec2,
-    pub uv_scale_factor: Vec2,
-    pub uv_flip: BVec2,
 }
 
 #[derive(Debug, Resource, Reflect, InspectorOptions)]
@@ -30,8 +24,8 @@ struct BuilderParams {
     pub subdivisions: usize,
     pub top_face: bool,
     pub bottom_face: bool,
-    pub sides_uvs: UVParams,
-    pub caps_uvs: UVParams,
+    pub sides_uvs: UVOptions,
+    pub caps_uvs: UVOptions,
 }
 
 pub fn main() {
@@ -118,18 +112,8 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     let mut new_mesh = ColumnMeshBuilder::new(&info.layout, params.height)
         .with_subdivisions(params.subdivisions)
         .with_offset(Vec3::NEG_Y * params.height / 2.0)
-        .with_caps_uv_options(UVOptions {
-            scale_factor: params.caps_uvs.uv_scale_factor,
-            flip_u: params.caps_uvs.uv_flip.x,
-            flip_v: params.caps_uvs.uv_flip.y,
-            offset: params.caps_uvs.uv_offset,
-        })
-        .with_sides_uv_options(UVOptions {
-            scale_factor: params.sides_uvs.uv_scale_factor,
-            flip_u: params.sides_uvs.uv_flip.x,
-            flip_v: params.sides_uvs.uv_flip.y,
-            offset: params.sides_uvs.uv_offset,
-        });
+        .with_caps_uv_options(params.caps_uvs.clone())
+        .with_sides_uv_options(params.sides_uvs.clone());
     if !params.top_face {
         new_mesh = new_mesh.without_top_face();
     }
@@ -159,25 +143,8 @@ impl Default for BuilderParams {
             subdivisions: 3,
             top_face: true,
             bottom_face: true,
-            sides_uvs: UVParams {
-                uv_scale_factor: Vec2::new(1.0, 0.3),
-                ..default()
-            },
-            caps_uvs: UVParams {
-                uv_scale_factor: Vec2::splat(0.5),
-                uv_offset: Vec2::splat(0.5),
-                ..default()
-            },
-        }
-    }
-}
-
-impl Default for UVParams {
-    fn default() -> Self {
-        Self {
-            uv_offset: Vec2::default(),
-            uv_flip: BVec2::default(),
-            uv_scale_factor: Vec2::ONE,
+            sides_uvs: UVOptions::quad_default().with_scale_factor(vec2(1.0, 0.3)),
+            caps_uvs: UVOptions::cap_default().with_scale_factor(vec2(0.5, 0.5)),
         }
     }
 }

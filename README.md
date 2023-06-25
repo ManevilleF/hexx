@@ -45,6 +45,11 @@
 
  - `hexx = { version = "0.7", features = ["packed"] }`
 
+ `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect) through the
+ `bevy_reflect` feature. To enable it add the following line to your `Cargo.toml`:
+
+ - `hexx = { version = "0.7", features = ["bevy_reflect"] }`
+
  ## Features
 
  `hexx` provides the [`Hex`] coordinates with:
@@ -203,6 +208,6 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ![columns](docs/mesh_builder.png "Mesh builder example")
 
- > `cargo run --example mesh_builder`
+ > `cargo run --example mesh_builder --features bevy_reflect`
 
  This example showcases the hexagon columns procedural generation customization options

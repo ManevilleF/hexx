@@ -85,6 +85,7 @@ path = "examples/3d_columns.rs"
 [[example]]
 name = "mesh_builder"
 path = "examples/mesh_builder.rs"
+required-features = ["bevy_reflect"]
 
 [[bench]]
 name = "length"
