@@ -37,6 +37,7 @@ optional = true
 [dependencies.bevy_reflect]
 version = "0.10"
 default-features = false
+features = ["glam"]
 optional = true
 
 # For lib.rs doctests and examples
