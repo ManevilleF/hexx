@@ -42,6 +42,10 @@ pub struct HexOrientationData {
 /// Hexagonal orientation, either *Pointy-Topped* or *Flat-Topped*
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+    feature = "bevy_reflect",
+    derive(bevy_reflect::Reflect, bevy_reflect::FromReflect)
+)]
 pub enum HexOrientation {
     /// *Pointy* orientation, means that the hexagons are *pointy-topped*
     Pointy,

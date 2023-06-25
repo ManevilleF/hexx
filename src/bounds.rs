@@ -14,6 +14,10 @@ use crate::Hex;
 /// ```
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+    feature = "bevy_reflect",
+    derive(bevy_reflect::Reflect, bevy_reflect::FromReflect)
+)]
 pub struct HexBounds {
     /// bounds center
     pub center: Hex,

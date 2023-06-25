@@ -14,6 +14,10 @@ pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(
+    feature = "bevy_reflect",
+    derive(bevy_reflect::Reflect, bevy_reflect::FromReflect)
+)]
 /// Hexagonal mesh information.
 ///
 /// # Usage

@@ -5,6 +5,7 @@
 * Renamed `ser_de` feature to `serde`. The `ser_de` feature is still available (#99)
 * Added extra documentation to `MeshInfo` (#99)
 * Moved the mesh module under a `mesh` feature gate, enabled by default (#99)
+* Added Bevy Reflection support with `bevy_reflect` feature (#100)
 * Fixed `serde` compilation error introduced in #99
 
 ## 0.7.0
