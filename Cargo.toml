@@ -87,6 +87,10 @@ name = "mesh_builder"
 path = "examples/mesh_builder.rs"
 required-features = ["bevy_reflect"]
 
+[[example]]
+name = "chunks"
+path = "examples/chunks.rs"
+
 [[bench]]
 name = "length"
 harness = false

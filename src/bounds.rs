@@ -55,7 +55,7 @@ impl HexBounds {
     #[doc(alias = "len")]
     /// Returns the number of hexagons in bounds
     pub const fn hex_count(&self) -> usize {
-        Hex::range_count(self.radius)
+        Hex::range_count(self.radius) as usize
     }
 
     #[doc(alias = "all_items")]
@@ -73,6 +73,29 @@ impl HexBounds {
             [self, rhs]
         };
         start.all_coords().filter(move |h| end.is_in_bounds(*h))
+    }
+
+    /// Wraps `coord`, returning a new coodinate inside of the bounds.
+    ///
+    /// > This allows for seamless *wraparound* hexagonal maps.
+    /// > See this [article] for more information.
+    ///
+    /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
+    #[must_use]
+    pub fn wrap_local(&self, coord: Hex) -> Hex {
+        let coord = coord - self.center;
+        coord.wrap_in_range(self.radius)
+    }
+
+    /// Wraps `coord`, returning a new coodinate inside of the bounds.
+    ///
+    /// > This allows for seamless *wraparound* hexagonal maps.
+    /// > See this [article] for more information.
+    ///
+    /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
+    #[must_use]
+    pub fn wrap(&self, coord: Hex) -> Hex {
+        self.wrap_local(coord) + self.center
     }
 }
 

@@ -379,15 +379,15 @@ fn range_count() {
 fn range() {
     let point = Hex::new(13, -54);
     let mut range = point.range(16);
-    assert_eq!(range.len(), Hex::range_count(16));
+    assert_eq!(range.len(), Hex::range_count(16) as usize);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
     println!("{:#?}", range.size_hint());
     range.next();
     println!("{:#?}", range.size_hint());
-    assert_eq!(range.len(), Hex::range_count(16) - 1);
+    assert_eq!(range.len(), Hex::range_count(16) as usize - 1);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
     range.next();
-    assert_eq!(range.len(), Hex::range_count(16) - 2);
+    assert_eq!(range.len(), Hex::range_count(16) as usize - 2);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
 }
 

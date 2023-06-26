@@ -29,7 +29,7 @@ pub fn main() {
 struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub layout: HexLayout,
-    pub wrap_map: HexMap,
+    pub bounds: HexBounds,
 }
 
 /// 3D Orthogrpahic camera setup
@@ -48,8 +48,8 @@ fn setup_grid(
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
 
-    let wrap_map = HexMap::new(MAP_RADIUS);
-    let entities = wrap_map
+    let bounds = HexBounds::new(Hex::ZERO, MAP_RADIUS);
+    let entities = bounds
         .all_coords()
         .map(|hex| {
             let v = 1.0 - (hex.length() as f32 / MAP_RADIUS as f32);
@@ -70,7 +70,7 @@ fn setup_grid(
     commands.insert_resource(HexGrid {
         entities,
         layout,
-        wrap_map,
+        bounds,
     })
 }
 
@@ -84,8 +84,8 @@ fn handle_input(
     if let Some(pos) = window.cursor_position() {
         let pos = pos - Vec2::new(window.width(), window.height()) / 2.0;
         let hex_pos = grid.layout.world_pos_to_hex(pos);
-        for h in hex_pos.range(grid.wrap_map.bounds().radius) {
-            let wrapped = grid.wrap_map.wrapped_hex(h);
+        for h in hex_pos.range(grid.bounds.radius) {
+            let wrapped = grid.bounds.wrap(h);
             let pos = grid.layout.hex_to_world_pos(h);
             commands
                 .entity(grid.entities[&wrapped])

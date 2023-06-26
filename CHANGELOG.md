@@ -2,6 +2,28 @@
 
 ## [Unreleased]
 
+* Added [hexmod](https://observablehq.com/@sanderevers/hexmod-representation)
+representation support:
+  * `Hex::to_hexmod_coordinates`
+  * `Hex::from_hexmod_coordinates`
+* Added resolution system ([source](https://observablehq.com/@sanderevers/hexagon-tiling-of-an-hexagonal-grid))
+  * `Hex::to_lower_res` returns the coordinates of a *big* hexagon containing the
+    given hexagon, effectively reducing its resolution
+  * `Hex::to_higher_res` returns the center coordinate of a *big* hexagon in a
+    higher resolution
+  * `Hex::to_local` returns the coordinate of an hexagon relative to the center
+    of its lower resolution (bigger) hexagon
+* (**BREAKING**) Removed `HexMap` utility struct:
+  * The previous wrapping method was using 6 mirrors, which is not efficient withi
+    large maps. The new resolution system allows finding relative positions in
+    bounds in a much easier way
+  * If you were using `HexMap`, you can use `HexBounds` instead
+* Added wrapping methods for `HexBounds`:
+  * `HexBounds::wrap` which is the equivalent of `HexMap::wrapped_hex`
+  * `HexBounds::wrap_local` which returns the local wrap coordinate relative to
+  the bounds
+* (**BREAKING**) `Hex::range_count` now returns a `u32` instead of a `usize`
+
 ## 0.7.1
 
 * Renamed `ser_de` feature to `serde`. The `ser_de` feature will remain available

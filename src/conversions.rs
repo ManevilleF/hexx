@@ -63,6 +63,42 @@ impl Hex {
         }
     }
 
+    /// Converts `self` to [hexmod] coordinates according to the given `range`
+    ///
+    /// [hexmod]: https://observablehq.com/@sanderevers/hexmod-representation
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_possible_wrap)]
+    pub const fn to_hexmod_coordinates(self, range: u32) -> u32 {
+        let area = Self::range_count(range) as i32;
+        let shift = Self::shift(range) as i32;
+        (self.y + shift * self.x).rem_euclid(area) as u32
+    }
+
+    /// Converts [hexmod] to [axial] coordinates according to the given `range`
+    ///
+    /// # Note
+    ///
+    /// The resulting coordinate will be wrong if `coord` is not a valid hexmod
+    /// value in the given `range`.
+    /// `coord` should be lesser or equal to `3 * range * (range + 1) + 1`
+    ///
+    /// [hexmod]: https://observablehq.com/@sanderevers/hexmod-representation
+    /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
+    #[must_use]
+    #[allow(clippy::cast_possible_wrap)]
+    pub const fn from_hexmod_coordinates(coord: u32, range: u32) -> Self {
+        let shift = Self::shift(range) as i32;
+        let range = range as i32;
+        let coord = coord as i32;
+        let ms = (coord + range) / shift;
+        let mcs = (coord + 2 * range) / (shift - 1);
+        Self::new(
+            ms * (range + 1) + mcs * -range,
+            coord + ms * (-2 * range - 1) + mcs * (-range - 1),
+        )
+    }
+
     /// Converts [doubled] to [axial] coordinates according to the given `mode`.
     ///
     /// [doubled]: https://www.redblobgames.com/grids/hexagons/#coordinates-doubled
@@ -98,7 +134,7 @@ mod tests {
 
     #[test]
     fn doubled_coordinates() {
-        for hex in Hex::ZERO.range(10) {
+        for hex in Hex::ZERO.range(20) {
             for mode in [DoubledHexMode::DoubledWidth, DoubledHexMode::DoubledHeight] {
                 let doubled = hex.to_doubled_coordinates(mode);
                 let converted = Hex::from_doubled_coordinates(doubled, mode);
@@ -109,7 +145,7 @@ mod tests {
 
     #[test]
     fn offset_coordinates() {
-        for hex in Hex::ZERO.range(10) {
+        for hex in Hex::ZERO.range(20) {
             for mode in [
                 OffsetHexMode::OddRows,
                 OffsetHexMode::OddColumns,
@@ -120,6 +156,16 @@ mod tests {
                 let converted = Hex::from_offset_coordinates(offset, mode);
                 assert_eq!(converted, hex);
             }
+        }
+    }
+
+    #[test]
+    fn hexmod_coordinates() {
+        let range = 20;
+        for hex in Hex::ZERO.range(range) {
+            let hexmod = hex.to_hexmod_coordinates(range);
+            let converted = Hex::from_hexmod_coordinates(hexmod, range);
+            assert_eq!(converted, hex);
         }
     }
 }

@@ -52,9 +52,12 @@
 //! - Rotation
 //! - Symmetry
 //! - Vector operations
-//! - Conversions to other coordinate systems
-//!
-//! And the [`HexMap`] utility, for *wraparound* (seamless) hexagonal maps
+//! - Conversions to other coordinate systems:
+//!     - Cubic coordinates
+//!     - Offset coordinates
+//!     - Doubled coordinates
+//!     - Hexmod coordinates
+//! - Multiple hex resolution
 //!
 //! ## Basic usage
 //!
@@ -138,8 +141,6 @@ pub mod conversions;
 pub mod direction;
 /// Hexagonal coordinates module
 pub mod hex;
-/// Wraparound hex grid module
-pub mod hex_map;
 /// Hexagonal layout module
 pub mod layout;
 #[cfg(feature = "mesh")]
@@ -153,4 +154,4 @@ pub mod shapes;
 pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
 #[cfg(feature = "mesh")]
 pub use mesh::*;
-pub use {bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, orientation::*};
+pub use {bounds::*, conversions::*, direction::*, hex::*, layout::*, orientation::*};
