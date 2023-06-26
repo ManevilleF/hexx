@@ -1,7 +1,7 @@
 //! Hexagonal tools lib in rust.
 //!
-//! > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html).
-//! > And [Sander Evers](https://sanderevers.github.io/) work
+//! > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html)
+//! > and [Sander Evers](https://sanderevers.github.io/) work
 //!
 //! This lib allows you to:
 //!
@@ -114,6 +114,7 @@
 //! In practice this means that you may convert a coordinate to a different resolution:
 //! - To a lower resolution, meaning retrieving a *parent* coordinate
 //! - to a higher resolution, meaning retrieving the center *child* coordinate
+//!
 //! Resolutions are abstract, the only useful information is the resolution **radius**.
 //!
 //! For example, if you use a big grid, with a radius of a 100, you might want to
