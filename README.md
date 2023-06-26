@@ -142,7 +142,7 @@
 
  // Our big grid with hundreds of hexagons
  let big_grid = Hex::ZERO.range(MAP_RADIUS);
- ```rust
+ ```
 
  You may define a smaller grid you will then divide to a higher resolution
 
@@ -164,7 +164,7 @@
          assert_eq!(coord.to_lower_res(CHUNK_RADIUS), chunk);
      }
  }
- ```rust
+ ```
 
  An other usage could be to draw an infinite hex grid, with different resolutions
  displayed, dynamically changing according to user zoom level.
