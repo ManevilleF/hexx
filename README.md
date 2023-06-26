@@ -238,7 +238,8 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  > `cargo run --example fov`
 
- This example showcases the FOV algorithm, with an interactive range fov around your cursor.
+ This example showcases the FOV algorithm, with an interactive range fov around
+ your cursor.
  Clicking on tile toggles their visibility.
 
 ### Field of movement
@@ -247,7 +248,8 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  > `cargo run --example field_of_movement`
 
- This example showcases the field of movement algorithm, interactively displaying the accessible range of movement around the cursor.
+ This example showcases the field of movement algorithm, interactively displaying
+ the accessible range of movement around the cursor.
 
 ### 3d columns
 
@@ -271,4 +273,14 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  > `cargo run --example chunks`
 
- This example showcases the hexagon resolution system, allowing to tile coordinates in evenly sized chunks
+ This example showcases the hexagon resolution system, allowing to tile coordinates
+ in evenly sized chunks
+
+### Merged Chunks
+
+![merged_chunks](docs/merged_columns.png "Merged Chunks example")
+
+ > `cargo run --example merged_columns --features bevy_reflect`
+
+ This example showcases how to build a simple hex chunk system with each chunk
+ being a single mesh
