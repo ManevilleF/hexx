@@ -91,7 +91,10 @@ fn setup_grid(
         let mesh = children.fold(MeshInfo::default(), |mut mesh, c| {
             let [min, max] = settings.column_heights;
             let height = rng.gen_range(min..=max);
-            let info = ColumnMeshBuilder::new(&layout, height).at(c).build();
+            let info = ColumnMeshBuilder::new(&layout, height)
+                .at(c)
+                .without_bottom_face()
+                .build();
             mesh.merge_with(info);
             mesh
         });
