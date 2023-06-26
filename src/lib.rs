@@ -1,6 +1,7 @@
 //! Hexagonal tools lib in rust.
 //!
 //! > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html).
+//! > And [Sander Evers](https://sanderevers.github.io/) work
 //!
 //! This lib allows you to:
 //!
@@ -106,6 +107,54 @@
 //! let point = hex(123, 45);
 //! let world_pos = layout.hex_to_world_pos(point);
 //!```
+//!
+//! ## Resolutions and chunks
+//!
+//! [`Hex`] support multi-resolution coordinates.
+//! In practice this means that you may convert a coordinate to a different resolution:
+//! - To a lower resolution, meaning retrieving a *parent* coordinate
+//! - to a higher resolution, meaning retrieving the center *child* coordinate
+//! Resolutions are abstract, the only useful information is the resolution **radius**.
+//!
+//! For example, if you use a big grid, with a radius of a 100, you might want to
+//! split that grid evenly in larger hexagons containing a 10 radius of coordinates
+//! and maybe do operations locally inside of these chunks.
+//!
+//! So instead of using a big range directly:
+//!
+//! ```rust
+//! use hexx::*;
+//!
+//! const MAP_RADIUS: u32 = 100;
+//!
+//! // Our big grid with hundreds of hexagons
+//! let big_grid = Hex::ZERO.range(MAP_RADIUS);
+//! ```
+//!
+//! You may define a smaller grid you will then divide to a higher resolution
+//!
+//! ```rust
+//! use hexx::*;
+//!
+//! const CHUNK_RADIUS: u32 = 10;
+//! const MAP_RADIUS: u32 = 20;
+//!
+//! let chunks = Hex::ZERO.range(MAP_RADIUS);
+//! for chunk in chunks {
+//!     // We can retrieve the center of that chunk by increasing the resolution
+//!     let center = chunk.to_higher_res(CHUNK_RADIUS);
+//!     // And retrieve the other coordinates in the chunk
+//!     let children = center.range(CHUNK_RADIUS);
+//!     // We can retrieve the chunk coordinates from any coordinate..
+//!     for coord in children {
+//!         // .. by reducing the resolution
+//!         assert_eq!(coord.to_lower_res(CHUNK_RADIUS), chunk);
+//!     }
+//! }
+//! ```
+//!
+//! An other usage could be to draw an infinite hex grid, with different resolutions
+//! displayed, dynamically changing according to user zoom level.
 //!
 //! ## Usage in [Bevy](https://bevyengine.org/)
 //!

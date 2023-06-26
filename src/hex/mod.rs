@@ -932,17 +932,15 @@ impl Hex {
         let area = Self::range_count(radius) as f32;
         let shift = Self::shift(radius) as i32;
         let [x, y, z] = [
-            (y + shift * x) as f32 / area,
-            (z + shift * y) as f32 / area,
-            (x + shift * z) as f32 / area,
-        ]
-        .map(|v| v.floor() as i32);
+            ((y + shift * x) as f32 / area).floor() as i32,
+            ((z + shift * y) as f32 / area).floor() as i32,
+            ((x + shift * z) as f32 / area).floor() as i32,
+        ];
         let [x, y] = [
-            (1 + x - y) as f32 / 3.0,
-            (1 + y - z) as f32 / 3.0,
-            // (1 + z - x) as f32 / 3.0, -- z
-        ]
-        .map(|v| v.floor() as i32);
+            ((1 + x - y) as f32 / 3.0).floor() as i32,
+            ((1 + y - z) as f32 / 3.0).floor() as i32,
+            // ((1 + z - x) as f32 / 3.0).floor() as i32, -- z
+        ];
         // debug_assert_eq!(z, -x - y);
         Self::new(x, y)
     }

@@ -501,3 +501,16 @@ fn spiral_range() {
         assert!(spiral.contains(hex));
     }
 }
+
+#[test]
+fn resolutions() {
+    for res_radius in 0..=20 {
+        for c in hex(4, 5).range(20) {
+            let center_child = c.to_higher_res(res_radius);
+            assert_eq!(center_child.to_local(res_radius), Hex::ZERO);
+            for child in center_child.range(res_radius) {
+                assert_eq!(child.to_lower_res(res_radius), c);
+            }
+        }
+    }
+}
