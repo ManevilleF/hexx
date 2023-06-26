@@ -65,9 +65,12 @@
  - Rotation
  - Symmetry
  - Vector operations
- - Conversions to other coordinate systems
-
- And the [`HexMap`] utility, for *wraparound* (seamless) hexagonal maps
+ - Conversions to other coordinate systems:
+     - Cubic coordinates
+     - Offset coordinates
+     - Doubled coordinates
+     - Hexmod coordinates
+ - Multiple hex resolution
 
  ## Basic usage
 
@@ -206,8 +209,16 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ### Mesh builder
 
-![columns](docs/mesh_builder.png "Mesh builder example")
+![mesh](docs/mesh_builder.png "Mesh builder example")
 
  > `cargo run --example mesh_builder --features bevy_reflect`
 
  This example showcases the hexagon columns procedural generation customization options
+
+### Chunks
+
+![chunks](docs/chunks.png "Chunks example")
+
+ > `cargo run --example chunks`
+
+ This example showcases the hexagon resolution system, allowing to tile coordinates in evenly sized chunks
