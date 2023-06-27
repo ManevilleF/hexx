@@ -102,10 +102,13 @@ impl HexBounds {
         start.all_coords().filter(move |h| end.is_in_bounds(*h))
     }
 
-    /// Wraps `coord`, returning a new coodinate inside of the bounds.
+    /// Wraps `coord`, returning a new local coodinate inside of the bounds,
+    /// relative to the `center`.
     ///
     /// > This allows for seamless *wraparound* hexagonal maps.
     /// > See this [article] for more information.
+    ///
+    ///  > See also [`Self::wrap`] for global wrapping
     ///
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     #[must_use]
@@ -118,6 +121,8 @@ impl HexBounds {
     ///
     /// > This allows for seamless *wraparound* hexagonal maps.
     /// > See this [article] for more information.
+    ///
+    ///  > See also [`Self::wrap_local`] for local wrapping
     ///
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     #[must_use]

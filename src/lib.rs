@@ -108,6 +108,24 @@
 //! let world_pos = layout.hex_to_world_pos(point);
 //!```
 //!
+//! ## Wrapping
+//!
+//! [`HexBounds`] defines a bounding hexagon around a center coordinate.
+//! It can be used for boundary and interesection checks but also for wrapping
+//! coordinates.
+//! Coordinate wrapping transform a point outside of the bounds to a point inside.
+//! This allows for seamless or repeating [wraparound](https://www.redblobgames.com/grids/hexagons/#wraparound) maps.
+//!
+//! ```rust
+//! use hexx::*;
+//!
+//! let center = hex(23, -45);
+//! let radius = 5;
+//! let bounds = HexBounds::new(center, radius);
+//! let outside_coord = hex(12345, 98765);
+//! let wrapped_coord = bounds.wrap(outside_coord);
+//! ```
+//!
 //! ## Resolutions and chunks
 //!
 //! [`Hex`] support multi-resolution coordinates.
