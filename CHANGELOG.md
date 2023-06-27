@@ -23,6 +23,9 @@ representation support:
   * `HexBounds::wrap_local` which returns the local wrap coordinate relative to
   the bounds
 * (**BREAKING**) `Hex::range_count` now returns a `u32` instead of a `usize`
+* Added examples
+  * `chunks` showcasing the new resolution system
+  * `merged_columns` showcasing a simple chunk system with merged meshes
 
 ## 0.7.1
 
