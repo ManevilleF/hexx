@@ -136,7 +136,9 @@
  let radius = 5;
  let bounds = HexBounds::new(center, radius);
  let outside_coord = hex(12345, 98765);
+ assert!(!bounds.is_in_bounds(outside_coord));
  let wrapped_coord = bounds.wrap(outside_coord);
+ assert!(bounds.is_in_bounds(wrapped_coord));
  ```
 
  ## Resolutions and chunks
