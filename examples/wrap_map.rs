@@ -29,7 +29,7 @@ pub fn main() {
 struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub layout: HexLayout,
-    pub wrap_map: HexMap,
+    pub bounds: HexBounds,
     pub default_mat: Handle<ColorMaterial>,
     pub selected_mat: Handle<ColorMaterial>,
 }
@@ -51,8 +51,8 @@ fn setup_grid(
     let mesh = meshes.add(hexagonal_plane(&layout));
     let default_mat = materials.add(Color::WHITE.into());
     let selected_mat = materials.add(Color::RED.into());
-    let wrap_map = HexMap::new(MAP_RADIUS);
-    let entities = wrap_map
+    let bounds = HexBounds::new(Hex::ZERO, MAP_RADIUS);
+    let entities = bounds
         .all_coords()
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
@@ -70,7 +70,7 @@ fn setup_grid(
     commands.insert_resource(HexGrid {
         entities,
         layout,
-        wrap_map,
+        bounds,
         default_mat,
         selected_mat,
     })
@@ -90,7 +90,7 @@ fn handle_input(
         if hex_pos == *current_hex {
             return;
         }
-        let wrapped = grid.wrap_map.wrapped_hex(hex_pos);
+        let wrapped = grid.bounds.wrap(hex_pos);
         commands
             .entity(grid.entities[&current_hex])
             .insert(grid.default_mat.clone());

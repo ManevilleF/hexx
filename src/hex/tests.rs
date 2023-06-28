@@ -379,15 +379,15 @@ fn range_count() {
 fn range() {
     let point = Hex::new(13, -54);
     let mut range = point.range(16);
-    assert_eq!(range.len(), Hex::range_count(16));
+    assert_eq!(range.len(), Hex::range_count(16) as usize);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
     println!("{:#?}", range.size_hint());
     range.next();
     println!("{:#?}", range.size_hint());
-    assert_eq!(range.len(), Hex::range_count(16) - 1);
+    assert_eq!(range.len(), Hex::range_count(16) as usize - 1);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
     range.next();
-    assert_eq!(range.len(), Hex::range_count(16) - 2);
+    assert_eq!(range.len(), Hex::range_count(16) as usize - 2);
     assert_eq!(range.size_hint(), (range.len(), Some(range.len())));
 }
 
@@ -499,5 +499,18 @@ fn spiral_range() {
     assert_eq!(spiral.len(), expected.len());
     for hex in &expected {
         assert!(spiral.contains(hex));
+    }
+}
+
+#[test]
+fn resolutions() {
+    for res_radius in 0..=20 {
+        for c in hex(4, 5).range(20) {
+            let center_child = c.to_higher_res(res_radius);
+            assert_eq!(center_child.to_local(res_radius), Hex::ZERO);
+            for child in center_child.range(res_radius) {
+                assert_eq!(child.to_lower_res(res_radius), c);
+            }
+        }
     }
 }

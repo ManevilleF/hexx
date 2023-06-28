@@ -858,7 +858,7 @@ impl Hex {
                 let y_max = min(radius, radius - x);
                 (y_min..=y_max).map(move |y| self.const_add(Self::new(x, y)))
             }),
-            count: Self::range_count(range),
+            count: Self::range_count(range) as usize,
         }
     }
 
@@ -888,8 +888,127 @@ impl Hex {
                     .map(move |y| self.const_add(Self::new(x, y)))
                     .filter(move |h| *h != self)
             }),
-            count: Self::range_count(range).saturating_sub(1),
+            count: Self::range_count(range).saturating_sub(1) as usize,
         }
+    }
+
+    /// Computes the coordinate of a lower resolution hexagon containing `self`
+    /// of a given `radius`.
+    /// The lower resolution coordinate can be considered *parent* of
+    /// the contained higher resolution coordinates.
+    /// The `radius` can be thought of as a *chunk size*, as if the grid was split
+    /// in hexagonal chunks of that radius. The returned value are the coordinates
+    /// of that chunk, in its own coordinates system.
+    ///
+    /// See the [source] documentation for more information
+    ///
+    /// > See also [`Self::to_higher_res`] and [`Self::to_local`]
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// // We define a coordinate
+    /// let coord = hex(23, 45);
+    /// // We take its *parent* in a coordinate system of size 5
+    /// let parent = coord.to_lower_res(5);
+    /// // We can then retrieve the center of that parent in the same system as `coord`
+    /// let center = parent.to_higher_res(5);
+    /// // Therefore the distance between the parent center and `coord` should be lower than 5
+    /// assert!(coord.distance_to(center) <= 5);
+    /// ```
+    ///
+    /// [source]: https://observablehq.com/@sanderevers/hexagon-tiling-of-an-hexagonal-grid
+    #[must_use]
+    #[allow(
+        clippy::cast_possible_wrap,
+        clippy::cast_precision_loss,
+        clippy::cast_possible_truncation
+    )]
+    #[doc(alias = "downscale")]
+    pub fn to_lower_res(self, radius: u32) -> Self {
+        let [x, y, z] = self.to_cubic_array();
+        let area = Self::range_count(radius) as f32;
+        let shift = Self::shift(radius) as i32;
+        let [x, y, z] = [
+            ((y + shift * x) as f32 / area).floor() as i32,
+            ((z + shift * y) as f32 / area).floor() as i32,
+            ((x + shift * z) as f32 / area).floor() as i32,
+        ];
+        let [x, y] = [
+            ((1 + x - y) as f32 / 3.0).floor() as i32,
+            ((1 + y - z) as f32 / 3.0).floor() as i32,
+            // ((1 + z - x) as f32 / 3.0).floor() as i32, -- z
+        ];
+        // debug_assert_eq!(z, -x - y);
+        Self::new(x, y)
+    }
+
+    /// Computes the center coordinates of `self` in a higher resolution system
+    /// of a given `radius`.
+    /// The higher resolution coordinate can be considered as a *child* of
+    /// `self` as it is contained by it in a lower resolution coordinates system.
+    /// The `radius` can be thought of as a *chunk size*, as if the grid was split
+    /// in hexagonal chunks of that radius. The returned value are the coordinates
+    /// of the center that chunk, in a higher resolution coordinates system.
+    ///
+    /// See the [source] documentation for more information
+    ///
+    /// > See also [`Self::to_lower_res`] and [`Self::to_local`]
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// // We define a coordinate
+    /// let coord = hex(23, 45);
+    /// // We take its *parent* in a coordinate system of size 5
+    /// let parent = coord.to_lower_res(5);
+    /// // We can then retrieve the center of that parent in the same system as `coord`
+    /// let center = parent.to_higher_res(5);
+    /// // Therefore the distance between the parent center and `coord` should be lower than 5
+    /// assert!(coord.distance_to(center) <= 5);
+    /// ```
+    ///
+    /// [source]: https://observablehq.com/@sanderevers/hexagon-tiling-of-an-hexagonal-grid
+    #[must_use]
+    #[allow(clippy::cast_possible_wrap)]
+    #[doc(alias = "upscale")]
+    pub const fn to_higher_res(self, radius: u32) -> Self {
+        let range = radius as i32;
+        let [x, y, z] = self.to_cubic_array();
+        Self::new(x * (range + 1) - range * z, y * (range + 1) - range * x)
+    }
+
+    /// Computes the local coordinates of `self` in a lower resolution coordinates
+    /// system relative to its containing *parent* hexagon
+    ///
+    ///
+    /// See the [source] documentation for more information
+    ///
+    /// > See also [`Self::to_lower_res`] and [`Self::to_local`]
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// // We define a coordinate
+    /// let coord = hex(23, 45);
+    /// // We can then retrieve the center of that hexagon in a higher res of size 5
+    /// let center = coord.to_higher_res(5);
+    /// // Therefore, the local coordinates of `center` relative to `coord` should be zero
+    /// assert_eq!(center.to_local(5), Hex::ZERO);
+    /// ```
+    ///
+    /// [source]: https://observablehq.com/@sanderevers/hexagon-tiling-of-an-hexagonal-grid
+    #[must_use]
+    pub fn to_local(self, radius: u32) -> Self {
+        let upscale = self.to_lower_res(radius);
+        let center = upscale.to_higher_res(radius);
+        self.const_sub(center)
     }
 
     #[inline]
@@ -903,8 +1022,17 @@ impl Hex {
     /// assert_eq!(Hex::range_count(15), 721);
     /// assert_eq!(Hex::range_count(0), 1);
     /// ```
-    pub const fn range_count(range: u32) -> usize {
-        (3 * range * (range + 1) + 1) as usize
+    pub const fn range_count(range: u32) -> u32 {
+        3 * range * (range + 1) + 1
+    }
+
+    /// Shift constant used for [hexmod] operations
+    ///
+    /// [hexmod]: https://observablehq.com/@sanderevers/hexmod-representation
+    #[inline]
+    #[must_use]
+    pub(crate) const fn shift(range: u32) -> u32 {
+        3 * range + 2
     }
 
     #[must_use]
@@ -912,60 +1040,11 @@ impl Hex {
     /// this allows for seamless *wraparound* hexagonal maps.
     /// See this [article] for more information.
     ///
-    /// Use [`HexMap`] for improved wrapping
+    /// Use [`HexBounds`] for custom wrapping
     ///
-    /// [`HexMap`]: crate::HexMap
+    /// [`HexBounds`]: crate::HexBounds
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
-    pub fn wrap_in_range(self, radius: u32) -> Self {
-        self.wrap_with(radius, &Self::wraparound_mirrors(radius))
-    }
-
-    #[must_use]
-    /// Wraps `self` in an hex range around the origin ([`Hex::ZERO`]) using custom mirrors.
-    ///
-    /// # Panics
-    ///
-    /// Will panic with invalid `mirrors`
-    /// Prefer using [`Self::wrap_in_range`] or [`HexMap`] for safe wrapping.
-    ///
-    /// [`HexMap`]: crate::HexMap
-    pub fn wrap_with(self, radius: u32, mirrors: &[Self; 6]) -> Self {
-        if self.ulength() <= radius {
-            return self;
-        }
-        let mut res = self;
-        while res.ulength() > radius {
-            let mut mirrors = mirrors.to_vec();
-            mirrors.sort_unstable_by_key(|m| res.distance_to(*m));
-            res -= mirrors[0];
-        }
-        res
-    }
-
-    /// Computes the 6 mirror centers of the origin for hexagonal *wraparound* maps
-    /// of given `radius`.
-    ///
-    /// # Notes
-    /// * See [`Self::wrap_with`] for a usage
-    /// * Use [`HexMap`] for improved wrapping
-    /// * See this [article] for more information.
-    ///
-    /// [`HexMap`]: crate::HexMap
-    /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
-    #[inline]
-    #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
-    pub const fn wraparound_mirrors(radius: u32) -> [Self; 6] {
-        let radius = radius as i32;
-        let mirror = Self::new(2 * radius + 1, -radius);
-        let [center, left, right] = [mirror, mirror.counter_clockwise(), mirror.clockwise()];
-        [
-            left,
-            center,
-            right,
-            left.const_neg(),   // -left
-            center.const_neg(), // -center
-            right.const_neg(),  // -right
-        ]
+    pub fn wrap_in_range(self, range: u32) -> Self {
+        self.to_local(range)
     }
 }

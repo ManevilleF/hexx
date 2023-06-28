@@ -87,6 +87,15 @@ name = "mesh_builder"
 path = "examples/mesh_builder.rs"
 required-features = ["bevy_reflect"]
 
+[[example]]
+name = "chunks"
+path = "examples/chunks.rs"
+
+[[example]]
+name = "merged_columns"
+path = "examples/merged_columns.rs"
+required-features = ["bevy_reflect"]
+
 [[bench]]
 name = "length"
 harness = false

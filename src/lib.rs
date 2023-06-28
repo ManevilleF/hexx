@@ -1,6 +1,7 @@
 //! Hexagonal tools lib in rust.
 //!
-//! > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html).
+//! > Inspired by this [`RedBlobGames` article](https://www.redblobgames.com/grids/hexagons/implementation.html)
+//! > and [Sander Evers](https://sanderevers.github.io/) work
 //!
 //! This lib allows you to:
 //!
@@ -52,9 +53,12 @@
 //! - Rotation
 //! - Symmetry
 //! - Vector operations
-//! - Conversions to other coordinate systems
-//!
-//! And the [`HexMap`] utility, for *wraparound* (seamless) hexagonal maps
+//! - Conversions to other coordinate systems:
+//!     - Cubic coordinates
+//!     - Offset coordinates
+//!     - Doubled coordinates
+//!     - Hexmod coordinates
+//! - Multiple hex resolution
 //!
 //! ## Basic usage
 //!
@@ -104,6 +108,75 @@
 //! let world_pos = layout.hex_to_world_pos(point);
 //!```
 //!
+//! ## Wrapping
+//!
+//! [`HexBounds`] defines a bounding hexagon around a center coordinate.
+//! It can be used for boundary and interesection checks but also for wrapping
+//! coordinates.
+//! Coordinate wrapping transform a point outside of the bounds to a point inside.
+//! This allows for seamless or repeating [wraparound](https://www.redblobgames.com/grids/hexagons/#wraparound) maps.
+//!
+//! ```rust
+//! use hexx::*;
+//!
+//! let center = hex(23, -45);
+//! let radius = 5;
+//! let bounds = HexBounds::new(center, radius);
+//! let outside_coord = hex(12345, 98765);
+//! assert!(!bounds.is_in_bounds(outside_coord));
+//! let wrapped_coord = bounds.wrap(outside_coord);
+//! assert!(bounds.is_in_bounds(wrapped_coord));
+//! ```
+//!
+//! ## Resolutions and chunks
+//!
+//! [`Hex`] support multi-resolution coordinates.
+//! In practice this means that you may convert a coordinate to a different resolution:
+//! - To a lower resolution, meaning retrieving a *parent* coordinate
+//! - to a higher resolution, meaning retrieving the center *child* coordinate
+//!
+//! Resolutions are abstract, the only useful information is the resolution **radius**.
+//!
+//! For example, if you use a big grid, with a radius of a 100, you might want to
+//! split that grid evenly in larger hexagons containing a 10 radius of coordinates
+//! and maybe do operations locally inside of these chunks.
+//!
+//! So instead of using a big range directly:
+//!
+//! ```rust
+//! use hexx::*;
+//!
+//! const MAP_RADIUS: u32 = 100;
+//!
+//! // Our big grid with hundreds of hexagons
+//! let big_grid = Hex::ZERO.range(MAP_RADIUS);
+//! ```
+//!
+//! You may define a smaller grid you will then divide to a higher resolution
+//!
+//! ```rust
+//! use hexx::*;
+//!
+//! const CHUNK_RADIUS: u32 = 10;
+//! const MAP_RADIUS: u32 = 20;
+//!
+//! let chunks = Hex::ZERO.range(MAP_RADIUS);
+//! for chunk in chunks {
+//!     // We can retrieve the center of that chunk by increasing the resolution
+//!     let center = chunk.to_higher_res(CHUNK_RADIUS);
+//!     // And retrieve the other coordinates in the chunk
+//!     let children = center.range(CHUNK_RADIUS);
+//!     // We can retrieve the chunk coordinates from any coordinate..
+//!     for coord in children {
+//!         // .. by reducing the resolution
+//!         assert_eq!(coord.to_lower_res(CHUNK_RADIUS), chunk);
+//!     }
+//! }
+//! ```
+//!
+//! An other usage could be to draw an infinite hex grid, with different resolutions
+//! displayed, dynamically changing according to user zoom level.
+//!
 //! ## Usage in [Bevy](https://bevyengine.org/)
 //!
 //! If you want to generate 3D hexagonal mesh and use it in [bevy](bevyengine.org) you may do it this way:
@@ -138,8 +211,6 @@ pub mod conversions;
 pub mod direction;
 /// Hexagonal coordinates module
 pub mod hex;
-/// Wraparound hex grid module
-pub mod hex_map;
 /// Hexagonal layout module
 pub mod layout;
 #[cfg(feature = "mesh")]
@@ -153,4 +224,4 @@ pub mod shapes;
 pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
 #[cfg(feature = "mesh")]
 pub use mesh::*;
-pub use {bounds::*, conversions::*, direction::*, hex::*, hex_map::*, layout::*, orientation::*};
+pub use {bounds::*, conversions::*, direction::*, hex::*, layout::*, orientation::*};
