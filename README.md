@@ -7,7 +7,7 @@
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
 [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.7.1/status.svg)](https://deps.rs/crate/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.8.0/status.svg)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
