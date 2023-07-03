@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.8.0
+
 * Added [hexmod](https://observablehq.com/@sanderevers/hexmod-representation)
 representation support:
   * `Hex::to_hexmod_coordinates`
