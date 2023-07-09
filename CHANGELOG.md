@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* Bumped `glam` dependency to 0.24
+* Bumped `bevy_reflect` optional dependency to 0.11
+* Bumped `bevy` dev dependency to 0.11
+
 ## 0.8.0
 
 * Added [hexmod](https://observablehq.com/@sanderevers/hexmod-representation)
@@ -70,7 +74,6 @@ until 0.8.0 (#99)
 now take an owned `HexOrientation` as the type is now `Copy` (#95)
 * (**BREAKING**) Removed all functions deprecated in `0.6.0`(#94)
 * Fixed `a_star` algorithm giving inconsisten paths (#96)
-* Bumped `glam` dependency to 0.24
 
 ## 0.6.0
 
