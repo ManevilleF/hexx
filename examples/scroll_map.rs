@@ -19,9 +19,8 @@ pub fn main() {
             }),
             ..default()
         }))
-        .add_startup_system(setup_camera)
-        .add_startup_system(setup_grid)
-        .add_system(handle_input)
+        .add_systems(Startup, (setup_camera, setup_grid))
+        .add_systems(Update, handle_input)
         .run();
 }
 

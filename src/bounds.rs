@@ -31,10 +31,7 @@ use crate::Hex;
 /// [wraparound]: https://www.redblobgames.com/grids/hexagons/#wraparound
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(
-    feature = "bevy_reflect",
-    derive(bevy_reflect::Reflect, bevy_reflect::FromReflect)
-)]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct HexBounds {
     /// bounds center
     pub center: Hex,

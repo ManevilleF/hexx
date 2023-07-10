@@ -21,10 +21,10 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup_camera)
-        .add_system(setup_grid)
-        .add_plugin(ResourceInspectorPlugin::<MapSettings>::default())
-        .add_plugin(WorldInspectorPlugin::default())
+        .add_plugins(ResourceInspectorPlugin::<MapSettings>::default())
+        .add_plugins(WorldInspectorPlugin::default())
+        .add_systems(Startup, setup_camera)
+        .add_systems(Update, setup_grid)
         .run();
 }
 

@@ -26,10 +26,7 @@ use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 ///     .build();
 /// ```
 #[derive(Debug, Clone)]
-#[cfg_attr(
-    feature = "bevy_reflect",
-    derive(bevy_reflect::Reflect, bevy_reflect::FromReflect)
-)]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct ColumnMeshBuilder<'l> {
     /// The hexagonal layout, used to compute vertex positions
     pub layout: &'l HexLayout,
