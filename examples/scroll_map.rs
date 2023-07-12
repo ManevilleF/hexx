@@ -81,7 +81,7 @@ fn handle_input(
 ) {
     let window = windows.single();
     if let Some(pos) = window.cursor_position() {
-        let pos = pos - Vec2::new(window.width(), window.height()) / 2.0;
+        let pos = Vec2::new(pos.x - window.width() / 2.0, window.height() / 2.0 - pos.y);
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         for h in hex_pos.range(grid.bounds.radius) {
             let wrapped = grid.bounds.wrap(h);

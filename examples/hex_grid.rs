@@ -112,7 +112,7 @@ fn handle_input(
 ) {
     let window = windows.single();
     if let Some(pos) = window.cursor_position() {
-        let pos = pos - Vec2::new(window.width(), window.height()) / 2.0;
+        let pos = Vec2::new(pos.x - window.width() / 2.0, window.height() / 2.0 - pos.y);
         let coord = map.layout.world_pos_to_hex(pos);
         if let Some(entity) = map.entities.get(&coord).copied() {
             if coord == highlighted_hexes.selected {
