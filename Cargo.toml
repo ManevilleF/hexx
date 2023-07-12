@@ -53,7 +53,7 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.8"
-bevy-inspector-egui = "0.18"
+bevy-inspector-egui = "0.19"
 
 [[example]]
 name = "hex_grid"
