@@ -7,10 +7,7 @@ use glam::{Quat, Vec3};
 /// The mesh will be anchored at the center of the hexagon, use offsets to cutomize
 /// anchor/pivot position.
 #[derive(Debug, Clone)]
-#[cfg_attr(
-    feature = "bevy_reflect",
-    derive(bevy_reflect::Reflect, bevy_reflect::FromReflect)
-)]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct PlaneMeshBuilder<'l> {
     /// The hexagonal layout, used to compute vertex positions
     pub layout: &'l HexLayout,

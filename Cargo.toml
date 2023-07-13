@@ -9,6 +9,7 @@ keywords = ["hexagon", "bestagon", "bevy", "geometry"]
 categories = ["game-development", "mathematics"]
 repository = "https://github.com/ManevilleF/hexx"
 exclude = [".github"]
+resolver = "2"
 
 [features]
 default = ["algorithms", "mesh"]
@@ -26,7 +27,7 @@ ser_de = ["serde"]
 bevy_reflect = ["dep:bevy_reflect"]
 
 [dependencies]
-glam = "0.23"
+glam = "0.24"
 
 [dependencies.serde]
 version = "1"
@@ -35,15 +36,28 @@ features = ["derive"]
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.10"
+version = "0.11"
 default-features = false
 features = ["glam"]
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.10"
-features = ["bevy_render", "bevy_pbr", "bevy_sprite", "bevy_core_pipeline", "bevy_asset", "bevy_winit", "x11", "png"]
+version = "0.11"
+features = [
+  "bevy_asset",
+  "bevy_winit",
+  "bevy_core_pipeline",
+  "bevy_pbr",
+  "bevy_render",
+  "bevy_sprite",
+  "png",
+  "x11",
+  # The following features are required because of https://github.com/bevyengine/bevy/discussions/9100
+  "ktx2",
+  "zstd",
+  "tonemapping_luts",
+]
 default-features = false
 
 [dev-dependencies.criterion]
@@ -52,7 +66,7 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.8"
-bevy-inspector-egui = "0.18"
+bevy-inspector-egui = "0.19"
 
 [[example]]
 name = "hex_grid"
@@ -71,8 +85,8 @@ name = "a_star"
 path = "examples/a_star.rs"
 
 [[example]]
-name = "fov"
-path = "examples/fov.rs"
+name = "field_of_view"
+path = "examples/field_of_view.rs"
 
 [[example]]
 name = "field_of_movement"

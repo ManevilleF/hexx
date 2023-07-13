@@ -23,9 +23,8 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup_camera)
-        .add_startup_system(setup_grid)
-        .add_system(animate_rings.run_if(on_timer(TIME_STEP)))
+        .add_systems(Startup, (setup_camera, setup_grid))
+        .add_systems(Update, animate_rings.run_if(on_timer(TIME_STEP)))
         .run();
 }
 

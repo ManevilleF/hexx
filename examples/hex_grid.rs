@@ -19,9 +19,8 @@ pub fn main() {
             }),
             ..default()
         }))
-        .add_startup_system(setup_camera)
-        .add_startup_system(setup_grid)
-        .add_system(handle_input)
+        .add_systems(Startup, (setup_camera, setup_grid))
+        .add_systems(Update, handle_input)
         .run();
 }
 
@@ -113,7 +112,7 @@ fn handle_input(
 ) {
     let window = windows.single();
     if let Some(pos) = window.cursor_position() {
-        let pos = pos - Vec2::new(window.width(), window.height()) / 2.0;
+        let pos = Vec2::new(pos.x - window.width() / 2.0, window.height() / 2.0 - pos.y);
         let coord = map.layout.world_pos_to_hex(pos);
         if let Some(entity) = map.entities.get(&coord).copied() {
             if coord == highlighted_hexes.selected {

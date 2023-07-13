@@ -249,8 +249,8 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  > `cargo run --example a_star`
 
- This example showcases the A star algorithm, with an interactive pathfinding between the origin and your cursor.
- Clicking on tile toggles their availability
+ This example showcases the A star algorithm, with an interactive pathfinding
+ between the origin and your cursor. Clicking on tile toggles their availability
 
 ### Field of view
 
@@ -266,7 +266,7 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ![fov](docs/field_of_movement.gif "Field of movement example")
 
- > `cargo run --example field_of_movement`
+ > `cargo run --example field_of_view`
 
  This example showcases the field of movement algorithm, interactively displaying
  the accessible range of movement around the cursor.

@@ -37,12 +37,11 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugin(WireframePlugin)
-        .add_plugin(ResourceInspectorPlugin::<BuilderParams>::default())
-        .add_plugin(ResourceInspectorPlugin::<AmbientLight>::default())
-        .add_startup_system(setup)
-        .add_system(animate)
-        .add_system(update_mesh)
+        .add_plugins(WireframePlugin)
+        .add_plugins(ResourceInspectorPlugin::<BuilderParams>::default())
+        .add_plugins(ResourceInspectorPlugin::<AmbientLight>::default())
+        .add_systems(Startup, setup)
+        .add_systems(Update, (animate, update_mesh))
         .run();
 }
 

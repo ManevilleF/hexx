@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+* Bumped `glam` dependency to 0.24
+* Bumped `bevy_reflect` optional dependency to 0.11
+* Bumped `bevy` dev dependency to 0.11
+* Renamed `fov` example to `field_of_view`
+
 ## 0.8.0
 
 * Added [hexmod](https://observablehq.com/@sanderevers/hexmod-representation)
