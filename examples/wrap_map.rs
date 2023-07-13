@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use bevy::{
     prelude::*,
     render::{mesh::Indices, render_resource::PrimitiveTopology},
@@ -91,7 +93,7 @@ fn handle_input(
         }
         let wrapped = grid.bounds.wrap(hex_pos);
         commands
-            .entity(grid.entities[&current_hex])
+            .entity(grid.entities[current_hex.deref()])
             .insert(grid.default_mat.clone());
         commands
             .entity(grid.entities[&wrapped])

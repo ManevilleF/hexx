@@ -44,7 +44,20 @@ optional = true
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
 version = "0.11"
-features = ["bevy_render", "bevy_pbr", "bevy_sprite", "bevy_core_pipeline", "bevy_asset", "bevy_winit", "x11", "png"]
+features = [
+  "bevy_asset",
+  "bevy_winit",
+  "bevy_core_pipeline",
+  "bevy_pbr",
+  "bevy_render",
+  "bevy_sprite",
+  "png",
+  "x11",
+  # The following features are required because of https://github.com/bevyengine/bevy/discussions/9100
+  "ktx2",
+  "zstd",
+  "tonemapping_luts",
+]
 default-features = false
 
 [dev-dependencies.criterion]
