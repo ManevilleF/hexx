@@ -2,10 +2,15 @@
 
 ## [Unreleased]
 
+## 0.9.0
+
 * Bumped `glam` dependency to 0.24
 * Bumped `bevy_reflect` optional dependency to 0.11
 * Bumped `bevy` dev dependency to 0.11
 * Renamed `fov` example to `field_of_view`
+* Removed deprecated methods:
+  * `HexOrientation::flat()` deprecated since 0.7.0 in favor of `HexOrientation::Flat`
+  * `HexOrientation::pointy()` deprecated since 0.7.0 in favor of `HexOrientation::Pointy`
 
 ## 0.8.0
 
