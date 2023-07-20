@@ -19,14 +19,18 @@ static FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
     angle_offset: 0.0, // 0 degrees
 };
 
-/// Hexagonal orientation, either `pointy` or `flat`
+/// [`HexOrientation`] inner data, retrieved by [`HexOrientation::orientation_data`].
+///
+/// This struct stored a forward and inverse matrix, for pixel/hex conversion and an angle offset
 ///
 /// # Usage
 ///
 /// ```rust
 /// # use hexx::*;
-/// let flat = HexOrientation::flat();
-/// let pointy = HexOrientation::pointy();
+/// let flat = HexOrientation::Flat;
+/// let pointy = HexOrientation::Pointy;
+/// let flat_data = flat.orientation_data();
+/// let pointy_data = pointy.orientation_data();
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -52,22 +56,6 @@ pub enum HexOrientation {
 }
 
 impl HexOrientation {
-    #[inline]
-    #[must_use]
-    #[deprecated(since = "0.7.0", note = "Use HexOrientation::Pointy instead")]
-    /// "Pointy top" hexagonal orientation⬢
-    pub const fn pointy() -> Self {
-        Self::Pointy
-    }
-
-    #[inline]
-    #[must_use]
-    #[deprecated(since = "0.7.0", note = "Use HexOrientation::Flat instead")]
-    /// "Flat top" hexagonal orientation
-    pub const fn flat() -> Self {
-        Self::Flat
-    }
-
     #[must_use]
     #[inline]
     /// Computes the angle in radians of the given `direction` in the current orientation

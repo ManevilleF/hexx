@@ -7,7 +7,7 @@
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
 [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.8.0/status.svg)](https://deps.rs/crate/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.9.0/status.svg)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
@@ -31,25 +31,25 @@
 
  Run `cargo add hexx` in your project or add the following line to your `Cargo.toml`:
 
- - `hexx = "0.8"`
+ - `hexx = "0.9"`
 
  ### Cargo features
 
  `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
  through the `serde` feature gate. To enable it add the following line to your `Cargo.toml`:
 
- - `hexx = { version = "0.8", features = ["serde"] }`
+ - `hexx = { version = "0.9", features = ["serde"] }`
 
  By default `Hex` uses rust classic memory layout, if you want to use `hexx` through the FFI or
  have `Hex` be stored without any memory padding, the `packed` feature will make `Hex`
  `repr(C)`. To enable this behaviour add the following line to your `Cargo.toml`:
 
- - `hexx = { version = "0.8", features = ["packed"] }`
+ - `hexx = { version = "0.9", features = ["packed"] }`
 
  `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect) through the
  `bevy_reflect` feature. To enable it add the following line to your `Cargo.toml`:
 
- - `hexx = { version = "0.8", features = ["bevy_reflect"] }`
+ - `hexx = { version = "0.9", features = ["bevy_reflect"] }`
 
  ## Features
 
