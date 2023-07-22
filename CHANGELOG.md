@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-* Fixed column mesh normals not being normalized
+* Fixed column mesh normals not being normalized (#108, #109)
 
 ## 0.9.0
 
