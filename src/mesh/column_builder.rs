@@ -175,7 +175,7 @@ impl<'l> ColumnMeshBuilder<'l> {
         let [a, b, c, d, e, f] = self.layout.hex_corners(self.pos);
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         for [left, right] in corners {
-            let normal = left - center + right - center;
+            let normal = (left - center + right - center).normalize();
             for div in 0..subidivisions {
                 let height = delta * div as f32;
                 let left = Vec3::new(left.x, height, left.y);
