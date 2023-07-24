@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.9.1
+
 * Fixed column mesh normals not being normalized (#108, #109)
 
 ## 0.9.0
