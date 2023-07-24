@@ -1,5 +1,7 @@
 mod column_builder;
 mod plane_builder;
+#[cfg(test)]
+mod tests;
 mod uv_mapping;
 
 pub use column_builder::ColumnMeshBuilder;

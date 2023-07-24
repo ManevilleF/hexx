@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Fixed column mesh normals not being normalized (#108, #109)
+
 ## 0.9.0
 
 * Bumped `glam` dependency to 0.24
