@@ -81,12 +81,16 @@ fn setup_grid(
 fn handle_input(
     mut commands: Commands,
     windows: Query<&Window, With<PrimaryWindow>>,
+    cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<HexGrid>,
     mut current_hex: Local<Hex>,
 ) {
     let window = windows.single();
-    if let Some(pos) = window.cursor_position() {
-        let pos = Vec2::new(pos.x - window.width() / 2.0, window.height() / 2.0 - pos.y);
+    let (camera, cam_transform) = cameras.single();
+    if let Some(pos) = window
+        .cursor_position()
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+    {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         if hex_pos == *current_hex {
             return;

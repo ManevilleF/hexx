@@ -93,12 +93,16 @@ fn handle_input(
     mut commands: Commands,
     buttons: Res<Input<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
+    cameras: Query<(&Camera, &GlobalTransform)>,
     mut current: Local<Hex>,
     mut grid: ResMut<HexGrid>,
 ) {
     let window = windows.single();
-    if let Some(pos) = window.cursor_position() {
-        let pos = Vec2::new(pos.x - window.width() / 2.0, window.height() / 2.0 - pos.y);
+    let (camera, cam_transform) = cameras.single();
+    if let Some(pos) = window
+        .cursor_position()
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+    {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else { return };
         if buttons.just_pressed(MouseButton::Left) {
