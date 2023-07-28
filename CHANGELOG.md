@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.9.2
+
 * Fixed some documentation on `Direction` (#111)
 * Improved `Hex::round` function and performance (#111)
 * `hex_grid` example now shows the hexagon coordinates (#111)
