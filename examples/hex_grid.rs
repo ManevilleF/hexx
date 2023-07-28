@@ -8,7 +8,7 @@ use hexx::shapes;
 use hexx::*;
 
 /// World size of the hexagons (outer radius)
-const HEX_SIZE: Vec2 = Vec2::splat(8.0);
+const HEX_SIZE: Vec2 = Vec2::splat(13.0);
 
 pub fn main() {
     App::new()
@@ -76,15 +76,29 @@ fn setup_grid(
     let mesh = hexagonal_plane(&layout);
     let mesh_handle = meshes.add(mesh);
 
-    let entities = shapes::flat_rectangle([-40, 40, -35, 35])
+    let entities = shapes::flat_rectangle([-26, 26, -23, 23])
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
                 .spawn(ColorMesh2dBundle {
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0).with_scale(Vec3::splat(0.9)),
+                    transform: Transform::from_xyz(pos.x, pos.y, 0.0).with_scale(Vec3::splat(0.95)),
                     mesh: mesh_handle.clone().into(),
                     material: default_material.clone(),
                     ..default()
+                })
+                .with_children(|b| {
+                    b.spawn(Text2dBundle {
+                        text: Text::from_section(
+                            format!("{},{}", hex.x, hex.y),
+                            TextStyle {
+                                font_size: 8.0,
+                                color: Color::BLACK,
+                                ..default()
+                            },
+                        ),
+                        transform: Transform::from_xyz(0.0, 0.0, 10.0),
+                        ..default()
+                    });
                 })
                 .id();
             (hex, id)
