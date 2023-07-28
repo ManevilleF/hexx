@@ -23,6 +23,8 @@ static FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
 ///
 /// This struct stored a forward and inverse matrix, for pixel/hex conversion and an angle offset
 ///
+/// See [this article](https://www.redblobgames.com/grids/hexagons/#hex-to-pixel-axial) for more information
+///
 /// # Usage
 ///
 /// ```rust

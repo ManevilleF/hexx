@@ -53,10 +53,10 @@ impl HexLayout {
     pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
         let matrix = self.orientation.inverse_matrix;
         let point = (pos - self.origin) / self.hex_size;
-        Hex::round((
+        Hex::round([
             matrix[0].mul_add(point.x, matrix[1] * point.y),
             matrix[2].mul_add(point.x, matrix[3] * point.y),
-        ))
+        ])
     }
 
     #[allow(clippy::cast_precision_loss)]

@@ -183,7 +183,7 @@ impl Mul<f32> for Hex {
     #[inline]
     #[allow(clippy::cast_precision_loss)]
     fn mul(self, rhs: f32) -> Self::Output {
-        Self::round((self.x as f32 * rhs, self.y as f32 * rhs))
+        Self::round([self.x as f32 * rhs, self.y as f32 * rhs])
     }
 }
 
