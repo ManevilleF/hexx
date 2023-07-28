@@ -395,6 +395,8 @@ impl Hex {
     /// Rounds floating point coordinates to [`Hex`].
     /// This method is used for operations like multiplications and divisions with floating point
     /// numbers.
+    /// See the original author Jacob Rus's [article](https://observablehq.com/@jrus/hexround) for
+    /// more details
     ///
     /// # Example
     ///
@@ -407,12 +409,11 @@ impl Hex {
     /// ```
     pub fn round((mut x, mut y): (f32, f32)) -> Self {
         let (mut x_r, mut y_r) = (x.round(), y.round());
-        x -= x.round(); // remainder
-        y -= y.round(); // remainder
-        if x * x >= y * y {
+        x -= x_r;
+        y -= y_r;
+        if x.abs() >= y.abs() {
             x_r += 0.5_f32.mul_add(y, x).round();
-        }
-        if x * x < y * y {
+        } else {
             y_r += 0.5_f32.mul_add(x, y).round();
         }
         Self::new(x_r as i32, y_r as i32)
