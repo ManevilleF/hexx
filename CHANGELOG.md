@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* Fixed some documentation on `Direction` (#111)
+* Improved `Hex::round` function and performance (#111)
+* `hex_grid` example now shows the hexagon coordinates (#111)
+
 ## 0.9.1
 
 * Fixed column mesh normals not being normalized (#108, #109)
