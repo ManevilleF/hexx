@@ -4,7 +4,9 @@
 
 * Examples use camera viewport to retrieve cursor world position (#112)
 * (**BREAKING**) `Hex::round` now takes a `[f32; 2]` parameter instead of
-`(f32, f32)`
+`(f32, f32)` (#112)
+* (**BREAKING**) `HexLayout` hex to world/pixel/screen now correctly renders the
+`y` axis *down* making it consistent with `Direction` (#110, #112)
 
 ## 0.9.2
 

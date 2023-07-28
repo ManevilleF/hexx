@@ -42,7 +42,7 @@ impl HexLayout {
         let matrix = self.orientation.forward_matrix;
         Vec2::new(
             matrix[0].mul_add(hex.x() as f32, matrix[1] * hex.y() as f32),
-            matrix[2].mul_add(hex.x() as f32, matrix[3] * hex.y() as f32),
+            -matrix[2].mul_add(hex.x() as f32, matrix[3] * hex.y() as f32),
         ) * self.hex_size
             + self.origin
     }
@@ -54,8 +54,8 @@ impl HexLayout {
         let matrix = self.orientation.inverse_matrix;
         let point = (pos - self.origin) / self.hex_size;
         Hex::round([
-            matrix[0].mul_add(point.x, matrix[1] * point.y),
-            matrix[2].mul_add(point.x, matrix[3] * point.y),
+            matrix[0].mul_add(point.x, matrix[1] * -point.y),
+            matrix[2].mul_add(point.x, matrix[3] * -point.y),
         ])
     }
 
