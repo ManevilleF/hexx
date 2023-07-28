@@ -195,17 +195,18 @@ pub enum Direction {
 
 impl Direction {
     /// All 6 hexagonal directions matching [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
+    ///
     /// ```txt
     ///            x Axis
     ///            ___
     ///           /   \
-    ///       +--+  2  +--+
-    ///      / 3  \___/  1 \
+    ///       +--+  1  +--+
+    ///      / 2  \___/  0 \
     ///      \    /   \    /
     ///       +--+     +--+
     ///      /    \___/    \
-    ///      \ 4  /   \  0 /
-    ///       +--+  5  +--+   y Axis
+    ///      \ 3  /   \  5 /
+    ///       +--+  4  +--+   y Axis
     ///           \___/
     /// ```
     pub const ALL_DIRECTIONS: [Self; 6] = [
