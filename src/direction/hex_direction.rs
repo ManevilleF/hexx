@@ -4,6 +4,9 @@ use crate::{DiagonalDirection, HexOrientation};
 
 /// All 6 possible directions in hexagonal space.
 ///
+/// The naming of the variants is based on the standard orientation of both axis
+/// but you can invert them in your [`HexLayout`]
+///
 /// ```txt
 ///            x Axis
 ///            ___
@@ -41,6 +44,8 @@ use crate::{DiagonalDirection, HexOrientation};
 /// assert_eq!(direction >> 1, Direction::TopRight);
 /// assert_eq!(direction << 1, Direction::TopLeft);
 /// ```
+///
+/// [`HexLayout`]: crate::HexLayout
 #[repr(u8)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

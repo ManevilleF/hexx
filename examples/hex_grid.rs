@@ -62,6 +62,7 @@ fn setup_grid(
 ) {
     let layout = HexLayout {
         hex_size: HEX_SIZE,
+        invert_y: true,
         ..default()
     };
     // materials
