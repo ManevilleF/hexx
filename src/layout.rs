@@ -86,9 +86,10 @@ impl HexLayout {
     }
 
     #[inline]
+    /// Returns a signum axis coefficient, allowing for inverted axis
     const fn axis_scale(&self) -> Vec2 {
         let x = if self.invert_x { -1.0 } else { 1.0 };
-        let y = if self.invert_y { -1.0 } else { 1.0 };
+        let y = if self.invert_y { 1.0 } else { -1.0 };
         Vec2::new(x, y)
     }
 }
