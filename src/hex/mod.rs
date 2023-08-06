@@ -90,9 +90,9 @@ impl Hex {
     pub const Y: Self = Self::new(0, 1);
     /// -Y (-R) axis (0, -1)
     pub const NEG_Y: Self = Self::new(0, -1);
-    /// Z (S) axis (0, -1, **1**)
-    pub const Z: Self = Self::new(0, -1);
-    /// -Z (S) axis (0, 1, **-1**)
+    /// Arbitrary cubic Z (S) axis (0, -1, **1**)
+    pub const Z: Self = Self::NEG_Y;
+    /// Arbitrary cubic -Z (S) axis (0, 1, **-1**)
     pub const NEG_Z: Self = Self::Y;
 
     /// The unit axes.
@@ -402,13 +402,13 @@ impl Hex {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let [x, y] = [0.6, 10.2];
-    /// let coord = Hex::round((x, y));
+    /// let point = [0.6, 10.2];
+    /// let coord = Hex::round(point);
     /// assert_eq!(coord.x, 1);
     /// assert_eq!(coord.y, 10);
     /// ```
-    pub fn round((mut x, mut y): (f32, f32)) -> Self {
-        let (mut x_r, mut y_r) = (x.round(), y.round());
+    pub fn round([mut x, mut y]: [f32; 2]) -> Self {
+        let [mut x_r, mut y_r] = [x.round(), y.round()];
         x -= x_r;
         y -= y_r;
         if x.abs() >= y.abs() {

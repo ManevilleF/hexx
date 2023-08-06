@@ -17,15 +17,15 @@ impl From<[i32; 2]> for Hex {
 
 impl From<(f32, f32)> for Hex {
     #[inline]
-    fn from(v: (f32, f32)) -> Self {
-        Self::round(v)
+    fn from((a, b): (f32, f32)) -> Self {
+        Self::round([a, b])
     }
 }
 
 impl From<[f32; 2]> for Hex {
     #[inline]
-    fn from([x, y]: [f32; 2]) -> Self {
-        Self::round((x, y))
+    fn from(v: [f32; 2]) -> Self {
+        Self::round(v)
     }
 }
 
@@ -39,7 +39,7 @@ impl From<Hex> for IVec2 {
 impl From<Vec2> for Hex {
     #[inline]
     fn from(value: Vec2) -> Self {
-        Self::round((value.x, value.y))
+        Self::from(value.to_array())
     }
 }
 

@@ -121,12 +121,16 @@ fn setup_grid(
 fn handle_input(
     mut commands: Commands,
     windows: Query<&Window, With<PrimaryWindow>>,
+    cameras: Query<(&Camera, &GlobalTransform)>,
     map: Res<Map>,
     mut highlighted_hexes: Local<HighlightedHexes>,
 ) {
     let window = windows.single();
-    if let Some(pos) = window.cursor_position() {
-        let pos = Vec2::new(pos.x - window.width() / 2.0, window.height() / 2.0 - pos.y);
+    let (camera, cam_transform) = cameras.single();
+    if let Some(pos) = window
+        .cursor_position()
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+    {
         let coord = map.layout.world_pos_to_hex(pos);
         if let Some(entity) = map.entities.get(&coord).copied() {
             if coord == highlighted_hexes.selected {

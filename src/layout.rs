@@ -4,6 +4,12 @@ use glam::Vec2;
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel* coordinate system
 /// and the hexagonal coordinate system.
 ///
+/// # Axis
+///
+/// By default, the [`Hex`] `y` axis is pointing down and the `x` axis is pointing right
+/// but you have the option to invert them using `invert_x` and `invert_y`
+/// This may be useful depending on the coordinate system of your display.
+///
 /// # Example
 ///
 /// ```rust
@@ -15,7 +21,11 @@ use glam::Vec2;
 ///     // We define the world space origin equivalent of `Hex::ZERO` in hex space
 ///     origin: Vec2::new(1.0, 2.0),
 ///     // We define the world space size of the hexagons
-///     hex_size: Vec2::new(1.0, 1.0)
+///     hex_size: Vec2::new(1.0, 1.0),
+///     // We invert the y axis
+///     invert_y: true,
+///     // But not the x axis
+///     invert_x: false
 /// };
 /// // You can now find the world positon (center) of any given hexagon
 /// let world_pos = layout.hex_to_world_pos(Hex::ZERO);
@@ -32,6 +42,10 @@ pub struct HexLayout {
     pub origin: Vec2,
     /// The size of individual hexagons in world/pixel space. The size can be irregular
     pub hex_size: Vec2,
+    /// If set to `true`, the `Hex` `x` axis will be inverted
+    pub invert_x: bool,
+    /// If set to `true`, the `Hex` `y` axis will be inverted
+    pub invert_y: bool,
 }
 
 impl HexLayout {
@@ -44,6 +58,7 @@ impl HexLayout {
             matrix[0].mul_add(hex.x() as f32, matrix[1] * hex.y() as f32),
             matrix[2].mul_add(hex.x() as f32, matrix[3] * hex.y() as f32),
         ) * self.hex_size
+            * self.axis_scale()
             + self.origin
     }
 
@@ -52,11 +67,11 @@ impl HexLayout {
     /// Computes world/pixel coordinates `pos` into hexagonal coordinates
     pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
         let matrix = self.orientation.inverse_matrix;
-        let point = (pos - self.origin) / self.hex_size;
-        Hex::round((
+        let point = (pos - self.origin) * self.axis_scale() / self.hex_size;
+        Hex::round([
             matrix[0].mul_add(point.x, matrix[1] * point.y),
             matrix[2].mul_add(point.x, matrix[3] * point.y),
-        ))
+        ])
     }
 
     #[allow(clippy::cast_precision_loss)]
@@ -69,6 +84,14 @@ impl HexLayout {
             center + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
         })
     }
+
+    #[inline]
+    /// Returns a signum axis coefficient, allowing for inverted axis
+    const fn axis_scale(&self) -> Vec2 {
+        let x = if self.invert_x { -1.0 } else { 1.0 };
+        let y = if self.invert_y { 1.0 } else { -1.0 };
+        Vec2::new(x, y)
+    }
 }
 
 impl Default for HexLayout {
@@ -77,6 +100,8 @@ impl Default for HexLayout {
             orientation: HexOrientation::default(),
             origin: Vec2::ZERO,
             hex_size: Vec2::ONE,
+            invert_x: false,
+            invert_y: false,
         }
     }
 }
@@ -92,6 +117,7 @@ mod tests {
             orientation: HexOrientation::Flat,
             origin: Vec2::ZERO,
             hex_size: Vec2::new(10., 10.),
+            ..Default::default()
         };
         let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
@@ -114,6 +140,7 @@ mod tests {
             orientation: HexOrientation::Pointy,
             origin: Vec2::ZERO,
             hex_size: Vec2::new(10., 10.),
+            ..Default::default()
         };
         let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(

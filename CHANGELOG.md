@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+* Examples use camera viewport to retrieve cursor world position (#112)
+* (**BREAKING**) `Hex::round` now takes a `[f32; 2]` parameter instead of
+`(f32, f32)` (#112)
+* `HexLayout` now has the option to invert `Hex` x and y axis (#110, #112)
+* (**BREAKING**) `Hex::y` axis now correctly points towards the negative world/
+pixel/screen `y` coordinates
+
 ## 0.9.2
 
 * Fixed some documentation on `Direction` (#111)
