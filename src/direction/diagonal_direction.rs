@@ -1,3 +1,5 @@
+use std::f32::consts::TAU;
+
 #[allow(clippy::wildcard_imports)]
 use super::angles::*;
 use crate::{Direction, HexOrientation};
@@ -447,7 +449,7 @@ impl DiagonalDirection {
     /// assert_eq!(direction, DiagonalDirection::TopRight);
     /// ```
     pub fn from_pointy_angle(angle: f32) -> Self {
-        let angle = angle.rem_euclid(PI_2);
+        let angle = angle.rem_euclid(TAU);
         let sector = (angle / DIRECTION_ANGLE_RAD) as i32;
         println!("{angle} - {sector}");
         match sector {

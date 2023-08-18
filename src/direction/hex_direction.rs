@@ -1,3 +1,5 @@
+use std::f32::consts::TAU;
+
 #[allow(clippy::wildcard_imports)]
 use super::angles::*;
 use crate::{DiagonalDirection, HexOrientation};
@@ -455,7 +457,7 @@ impl Direction {
     /// assert_eq!(direction, Direction::TopRight);
     /// ```
     pub fn from_flat_angle(angle: f32) -> Self {
-        let angle = angle.rem_euclid(PI_2);
+        let angle = angle.rem_euclid(TAU);
         let sector = (angle / DIRECTION_ANGLE_RAD) as i32;
         match sector {
             0 => Self::TopRight,
