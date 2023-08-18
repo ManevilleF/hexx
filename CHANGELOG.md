@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Use of built-in rust f32 consts instead of custom ones (#113)
+
 ## 0.10.0
 
 * Examples use camera viewport to retrieve cursor world position (#112)
