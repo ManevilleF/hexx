@@ -201,7 +201,8 @@ pub enum Direction {
 }
 
 impl Direction {
-    /// All 6 hexagonal directions matching [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
+    /// All 6 hexagonal directions matching
+    /// [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
     ///
     /// ```txt
     ///            x Axis
@@ -345,7 +346,8 @@ impl Direction {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in radians of the given direction for *pointy* hexagons
+    /// Returns the angle in radians of the given direction for *pointy*
+    /// hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub const fn angle_pointy(self) -> f32 {
@@ -354,14 +356,16 @@ impl Direction {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in radians of the given direction in the given `orientation`
+    /// Returns the angle in radians of the given direction in the given
+    /// `orientation`
     pub fn angle(self, orientation: HexOrientation) -> f32 {
         self.angle_pointy() - orientation.angle_offset
     }
 
     #[inline]
     #[must_use]
-    /// Returns the angle in degrees of the given direction for *pointy* hexagons
+    /// Returns the angle in degrees of the given direction for *pointy*
+    /// hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_flat_degrees(self) -> f32 {
@@ -370,7 +374,8 @@ impl Direction {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in degrees of the given direction for *pointy* hexagons
+    /// Returns the angle in degrees of the given direction for *pointy*
+    /// hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub const fn angle_pointy_degrees(self) -> f32 {
@@ -379,7 +384,8 @@ impl Direction {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in degrees of the given direction according to its `orientation`
+    /// Returns the angle in degrees of the given direction according to its
+    /// `orientation`
     ///
     /// See [`Self::angle`] for radians angles
     pub fn angle_degrees(self, orientation: HexOrientation) -> f32 {
@@ -470,7 +476,8 @@ impl Direction {
     }
 
     #[must_use]
-    /// Returns the direction from the given `angle` in degrees according the `orientation`
+    /// Returns the direction from the given `angle` in degrees according the
+    /// `orientation`
     ///
     /// # Example
     ///
@@ -478,8 +485,14 @@ impl Direction {
     /// # use hexx::*;
     ///
     /// let angle = 35.0;
-    /// assert_eq!(Direction::from_angle_degrees(angle, HexOrientation::Flat), Direction::TopRight);
-    /// assert_eq!(Direction::from_angle_degrees(angle, HexOrientation::Pointy), Direction::Top);
+    /// assert_eq!(
+    ///     Direction::from_angle_degrees(angle, HexOrientation::Flat),
+    ///     Direction::TopRight
+    /// );
+    /// assert_eq!(
+    ///     Direction::from_angle_degrees(angle, HexOrientation::Pointy),
+    ///     Direction::Top
+    /// );
     /// ```
     pub fn from_angle_degrees(angle: f32, orientation: HexOrientation) -> Self {
         match orientation {
@@ -489,7 +502,8 @@ impl Direction {
     }
 
     #[must_use]
-    /// Returns the direction from the given `angle` in radians according the `orientation`
+    /// Returns the direction from the given `angle` in radians according the
+    /// `orientation`
     ///
     /// # Example
     ///
@@ -497,8 +511,14 @@ impl Direction {
     /// # use hexx::*;
     ///
     /// let angle = 0.6;
-    /// assert_eq!(Direction::from_angle(angle, HexOrientation::Flat), Direction::TopRight);
-    /// assert_eq!(Direction::from_angle(angle, HexOrientation::Pointy), Direction::Top);
+    /// assert_eq!(
+    ///     Direction::from_angle(angle, HexOrientation::Flat),
+    ///     Direction::TopRight
+    /// );
+    /// assert_eq!(
+    ///     Direction::from_angle(angle, HexOrientation::Pointy),
+    ///     Direction::Top
+    /// );
     /// ```
     pub fn from_angle(angle: f32, orientation: HexOrientation) -> Self {
         match orientation {

@@ -4,8 +4,8 @@ use glam::{Quat, Vec3};
 
 /// Builder struct to customize hex plane mesh generation.
 ///
-/// The mesh will be anchored at the center of the hexagon, use offsets to cutomize
-/// anchor/pivot position.
+/// The mesh will be anchored at the center of the hexagon, use offsets to
+/// cutomize anchor/pivot position.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct PlaneMeshBuilder<'l> {
@@ -15,7 +15,8 @@ pub struct PlaneMeshBuilder<'l> {
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
-    /// Optional custom facing direction, useful to have the mesh already rotated
+    /// Optional custom facing direction, useful to have the mesh already
+    /// rotated
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub facing: Option<Vec3>,
@@ -40,16 +41,16 @@ impl<'l> PlaneMeshBuilder<'l> {
     ///
     /// ## Note
     ///
-    /// It might be more optimal to generate only one mesh at [`Hex::ZERO`] and offset it later
-    /// than have one mesh per hex position
+    /// It might be more optimal to generate only one mesh at [`Hex::ZERO`] and
+    /// offset it later than have one mesh per hex position
     #[must_use]
     pub const fn at(mut self, pos: Hex) -> Self {
         self.pos = pos;
         self
     }
 
-    /// Specify a custom *facing* direction for the mesh, by default the column is vertical (facing
-    /// up)
+    /// Specify a custom *facing* direction for the mesh, by default the column
+    /// is vertical (facing up)
     #[must_use]
     pub const fn facing(mut self, facing: Vec3) -> Self {
         self.facing = Some(facing);

@@ -30,7 +30,8 @@ pub trait HexIterExt: Iterator {
     #[doc(alias = "centroid")]
     fn center(self) -> Hex;
 
-    /// Method which takes an iterator and finds the bounds containing all elements.
+    /// Method which takes an iterator and finds the bounds containing all
+    /// elements.
     ///
     /// This method will return ([`Hex::ZERO`], 0) on an empty iterator
     ///

@@ -6,14 +6,17 @@ use std::collections::{HashMap, HashSet};
 /// returns the cost of movement through a given `Hex` tile.
 /// The `cost` function should return an `Option<u32>`.
 /// A tile that returns a computable cost would return `Some(cost)`, whereas
-/// `None` should be returned for tiles that have no computable cost (i.e. cannot be moved through).
+/// `None` should be returned for tiles that have no computable cost (i.e.
+/// cannot be moved through).
 ///
-/// The `field_of_movement` algorithm will always add `+ 1` to the computed cost in order to avoid
-/// the possibility of unlimited movement range (i.e. a `Hex` instance will always have a minimum movement `cost` of 1).
+/// The `field_of_movement` algorithm will always add `+ 1` to the computed cost
+/// in order to avoid the possibility of unlimited movement range (i.e. a `Hex`
+/// instance will always have a minimum movement `cost` of 1).
 ///
 /// # Examples
 ///
-/// - Compute field of movement with no boundaries and some wall tiles that cannot be traversed
+/// - Compute field of movement with no boundaries and some wall tiles that
+///   cannot be traversed
 ///
 /// ```rust
 /// # use hexx::*;
@@ -21,22 +24,21 @@ use std::collections::{HashMap, HashSet};
 /// use hexx::algorithms::field_of_movement;
 ///
 /// enum Biome {
-///    Mountain,
-///    Plains,
-///    Forest,
-///    Desert
+///     Mountain,
+///     Plains,
+///     Forest,
+///     Desert,
 /// }
 ///
 /// impl Biome {
-///
-///    pub fn cost(&self) -> Option<u32> {
-///       match self {
-///          Self::Mountain => None, // Moutains cannot be traversed
-///          Self::Plains => Some(0),
-///          Self::Forest => Some(1),
-///          Self::Desert => Some(2)
-///       }
-///    }
+///     pub fn cost(&self) -> Option<u32> {
+///         match self {
+///             Self::Mountain => None, // Moutains cannot be traversed
+///             Self::Plains => Some(0),
+///             Self::Forest => Some(1),
+///             Self::Desert => Some(2),
+///         }
+///     }
 /// }
 ///
 /// let start = hex(0, 0);
@@ -45,7 +47,9 @@ use std::collections::{HashMap, HashSet};
 /// // Set coordinate biomes
 /// // biomes.insert(hex(1, 2), Biome::Mountain);
 /// // ..
-/// let reachable_tiles = field_of_movement(start, movement_budget, |h| biomes.get(&h).and_then(|b| b.cost()));
+/// let reachable_tiles = field_of_movement(start, movement_budget, |h| {
+///     biomes.get(&h).and_then(|b| b.cost())
+/// });
 /// ```
 pub fn field_of_movement(
     coord: Hex,

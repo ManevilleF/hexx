@@ -6,12 +6,10 @@
 
 use super::*;
 use crate::HexOrientation;
-use std::f32::consts::PI;
-use std::f32::EPSILON;
+use std::f32::{consts::PI, EPSILON};
 
 mod hex_directions {
-    use super::Direction::*;
-    use super::*;
+    use super::{Direction::*, *};
 
     #[test]
     fn rotate_ccw_cw() {
@@ -191,8 +189,7 @@ mod hex_directions {
 }
 
 mod diagonal_direction {
-    use super::DiagonalDirection::*;
-    use super::*;
+    use super::{DiagonalDirection::*, *};
 
     #[test]
     fn dir_neighbors() {

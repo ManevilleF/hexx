@@ -17,8 +17,8 @@ impl From<[i32; 2]> for Hex {
 
 impl From<(f32, f32)> for Hex {
     #[inline]
-    fn from((a, b): (f32, f32)) -> Self {
-        Self::round([a, b])
+    fn from(v: (f32, f32)) -> Self {
+        Self::round(v.into())
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::Hex;
 
-/// Layout mode for [doubled] coordinates conversion. See [`Hex::to_doubled_coordinates`] and
-/// [`Hex::from_doubled_coordinates`].
+/// Layout mode for [doubled] coordinates conversion. See
+/// [`Hex::to_doubled_coordinates`] and [`Hex::from_doubled_coordinates`].
 ///
 /// [doubled]: https://www.redblobgames.com/grids/hexagons/#coordinates-doubled
 #[derive(Debug, Clone, Copy, Default)]
@@ -14,8 +14,8 @@ pub enum DoubledHexMode {
     DoubledHeight,
 }
 
-/// Layout mode for [offset] coordinates conversion. See [`Hex::to_offset_coordinates`] and
-/// [`Hex::from_offset_coordinates`].
+/// Layout mode for [offset] coordinates conversion. See
+/// [`Hex::to_offset_coordinates`] and [`Hex::from_offset_coordinates`].
 ///
 /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
 #[derive(Debug, Clone, Copy, Default)]

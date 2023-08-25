@@ -1,14 +1,15 @@
 use crate::{Direction, Hex, HexOrientation};
 use glam::Vec2;
 
-/// Hexagonal layout. This type is the bridge between your *world*/*pixel* coordinate system
-/// and the hexagonal coordinate system.
+/// Hexagonal layout. This type is the bridge between your *world*/*pixel*
+/// coordinate system and the hexagonal coordinate system.
 ///
 /// # Axis
 ///
-/// By default, the [`Hex`] `y` axis is pointing down and the `x` axis is pointing right
-/// but you have the option to invert them using `invert_x` and `invert_y`
-/// This may be useful depending on the coordinate system of your display.
+/// By default, the [`Hex`] `y` axis is pointing down and the `x` axis is
+/// pointing right but you have the option to invert them using `invert_x` and
+/// `invert_y` This may be useful depending on the coordinate system of your
+/// display.
 ///
 /// # Example
 ///
@@ -25,7 +26,7 @@ use glam::Vec2;
 ///     // We invert the y axis
 ///     invert_y: true,
 ///     // But not the x axis
-///     invert_x: false
+///     invert_x: false,
 /// };
 /// // You can now find the world positon (center) of any given hexagon
 /// let world_pos = layout.hex_to_world_pos(Hex::ZERO);
@@ -38,9 +39,11 @@ use glam::Vec2;
 pub struct HexLayout {
     /// The hexagonal orientation of the layout (usually "flat" or "pointy")
     pub orientation: HexOrientation,
-    /// The origin of the hexagonal representation in world/pixel space, usually [`Vec2::ZERO`]
+    /// The origin of the hexagonal representation in world/pixel space, usually
+    /// [`Vec2::ZERO`]
     pub origin: Vec2,
-    /// The size of individual hexagons in world/pixel space. The size can be irregular
+    /// The size of individual hexagons in world/pixel space. The size can be
+    /// irregular
     pub hex_size: Vec2,
     /// If set to `true`, the `Hex` `x` axis will be inverted
     pub invert_x: bool,
@@ -76,7 +79,8 @@ impl HexLayout {
 
     #[allow(clippy::cast_precision_loss)]
     #[must_use]
-    /// Retrieves all 6 corner coordinates of the given hexagonal coordinates `hex`
+    /// Retrieves all 6 corner coordinates of the given hexagonal coordinates
+    /// `hex`
     pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
         let center = self.hex_to_world_pos(hex);
         Direction::ALL_DIRECTIONS.map(|dir| {

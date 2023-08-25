@@ -5,14 +5,14 @@ impl Hex {
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from `start_dir` and loop counter clockwise around `self`
-    /// unless `clockwise` is set to `true`.
+    /// The returned coordinates start from `start_dir` and loop counter
+    /// clockwise around `self` unless `clockwise` is set to `true`.
     ///
     /// > If you only need the coordinates see [`Self::ring`]
     ///
     /// # Note
-    /// The returned iterator will have `6 * range` ([`Self::ring_count`]) items, unless `range` is
-    /// 0 which will return `self`
+    /// The returned iterator will have `6 * range` ([`Self::ring_count`])
+    /// items, unless `range` is 0 which will return `self`
     pub fn custom_ring(
         self,
         range: u32,
@@ -47,19 +47,21 @@ impl Hex {
 
     #[must_use]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and loop around `self` counter clockwise.
+    /// The returned coordinates start from [`Direction::TopRight`] and loop
+    /// around `self` counter clockwise.
     ///
     /// > See [`Self::custom_ring`] for more options.
     ///
     /// # Note
-    /// The returned iterator will have `6 * range` ([`Self::ring_count`]) items, unless `range` is
-    /// 0 which will return `self`
+    /// The returned iterator will have `6 * range` ([`Self::ring_count`])
+    /// items, unless `range` is 0 which will return `self`
     pub fn ring(self, range: u32) -> impl ExactSizeIterator<Item = Self> {
         self.custom_ring(range, Direction::TopRight, false)
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and loop around `self` counter clockwise.
+    /// The returned coordinates start from [`Direction::TopRight`] and loop
+    /// around `self` counter clockwise.
     ///
     /// See [`Self::custom_rings`] for more options.
     /// If you only need the coordinates see [`Self::spiral_range`].
@@ -76,16 +78,19 @@ impl Hex {
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
-    /// The returned coordinates start from `start_dir` and loop around `self` counter clockwise
-    /// unless `clockwise` is set to true.
+    /// The returned coordinates start from `start_dir` and loop around `self`
+    /// counter clockwise unless `clockwise` is set to true.
     ///
-    /// If you only need the coordinates see [`Self::spiral_range`] or [`Self::rings`].
+    /// If you only need the coordinates see [`Self::spiral_range`] or
+    /// [`Self::rings`].
     ///
     /// # Example
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let rings: Vec<Vec<Hex>> = Hex::ZERO.custom_rings(3..10, Direction::Top, true).collect();
+    /// let rings: Vec<Vec<Hex>> = Hex::ZERO
+    ///     .custom_rings(3..10, Direction::Top, true)
+    ///     .collect();
     /// assert_eq!(rings.len(), 7);
     /// ```
     pub fn custom_rings(
@@ -99,8 +104,9 @@ impl Hex {
 
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
-    /// Retrieves one [`Hex`] ring edge around `self` in a given `radius` and `direction`.
-    /// The returned coordinates are sorted counter clockwise unless `clockwise` is set to `true`.
+    /// Retrieves one [`Hex`] ring edge around `self` in a given `radius` and
+    /// `direction`. The returned coordinates are sorted counter clockwise
+    /// unless `clockwise` is set to `true`.
     ///
     /// If you only need the coordinates see [`Self::ring_edge`].
     ///
@@ -127,8 +133,9 @@ impl Hex {
     }
 
     #[must_use]
-    /// Retrieves one [`Hex`] ring edge around `self` in a given `radius` and `direction`.
-    /// The returned coordinates are sorted counter clockwise around `self`.
+    /// Retrieves one [`Hex`] ring edge around `self` in a given `radius` and
+    /// `direction`. The returned coordinates are sorted counter clockwise
+    /// around `self`.
     ///
     /// See [`Self::custom_ring_edge`] for more options.
     ///
@@ -142,15 +149,18 @@ impl Hex {
         self.custom_ring_edge(radius, direction, false)
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in given `ranges` and
-    /// `direction`.
-    /// The returned edges coordinates are sorted counter clockwise around `self`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in given
+    /// `ranges` and `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around
+    /// `self`.
     ///
     /// # Example
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let edges: Vec<_> = Hex::ZERO.ring_edges(3..10, DiagonalDirection::Right).collect();
+    /// let edges: Vec<_> = Hex::ZERO
+    ///     .ring_edges(3..10, DiagonalDirection::Right)
+    ///     .collect();
     /// assert_eq!(edges.len(), 7);
     /// ```
     ///
@@ -164,16 +174,18 @@ impl Hex {
         ranges.map(move |r| self.ring_edge(r, direction))
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in given `ranges` and
-    /// `direction`.
-    /// The returned edges coordinates are sorted counter clockwise around `self` unless
-    /// `clockwise` is set to `true`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in given
+    /// `ranges` and `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around
+    /// `self` unless `clockwise` is set to `true`.
     ///
     /// # Example
     ///
     /// ```rust
     /// # use hexx::*;
-    /// let edges: Vec<_> = Hex::ZERO.custom_ring_edges(3..10, DiagonalDirection::Right, true).collect();
+    /// let edges: Vec<_> = Hex::ZERO
+    ///     .custom_ring_edges(3..10, DiagonalDirection::Right, true)
+    ///     .collect();
     /// assert_eq!(edges.len(), 7);
     /// ```
     ///
@@ -188,10 +200,10 @@ impl Hex {
         ranges.map(move |r| self.custom_ring_edge(r, direction, clockwise))
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in given `ranges` and
-    /// `direction`.
-    /// The returned edges coordinates are sorted counter clockwise around `self` unless
-    /// `clockwise` is set to `true`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in given
+    /// `ranges` and `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around
+    /// `self` unless `clockwise` is set to `true`.
     ///
     /// See also [`Self::custom_ring_edges`]
     /// If you only need the coordinates see [`Self::wedge`]
@@ -207,8 +219,8 @@ impl Hex {
     }
 
     /// Retrieves all successive [`Hex`] ring edges from `self` to `rhs`
-    /// The returned edges coordinates are sorted counter clockwise around `self` unless
-    /// `clockwise` is set to `true`.
+    /// The returned edges coordinates are sorted counter clockwise around
+    /// `self` unless `clockwise` is set to `true`.
     ///
     /// See also [`Self::custom_ring_edges`] and [`Self::wedge_to`]
     #[must_use]
@@ -222,9 +234,9 @@ impl Hex {
         self.custom_full_wedge(range, direction, clockwise)
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and `direction`
-    /// The returned edges coordinates are sorted counter clockwise around `self` unless
-    /// `clockwise` is set to `true`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given
+    /// `range` and `direction` The returned edges coordinates are sorted
+    /// counter clockwise around `self` unless `clockwise` is set to `true`.
     ///
     /// See also [`Self::custom_wedge`] and [`Self::full_wedge`]
     #[must_use]
@@ -256,9 +268,10 @@ impl Hex {
         range * (range + 3) / 2 + 1
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and
-    /// `direction`.
-    /// The returned edges coordinates are sorted counter clockwise around `self`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given
+    /// `range` and `direction`.
+    /// The returned edges coordinates are sorted counter clockwise around
+    /// `self`.
     ///
     /// See also [`Self::custom_ring_edges`] and [`Self::custom_wedge`]
     pub fn wedge(
@@ -278,8 +291,9 @@ impl Hex {
         self.custom_wedge_to(rhs, false)
     }
 
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `range` and `direction`
-    /// The returned edges coordinates are sorted counter clockwise around `self`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given
+    /// `range` and `direction` The returned edges coordinates are sorted
+    /// counter clockwise around `self`.
     ///
     /// See also [`Self::custom_full_wedge`] and [`Self::wedge`]
     #[must_use]
@@ -291,8 +305,8 @@ impl Hex {
         self.custom_full_wedge(range, direction, false)
     }
 
-    /// Retrieves all successive [`Hex`] half ring edges around `self` in a given `range` and
-    /// `direction`.
+    /// Retrieves all successive [`Hex`] half ring edges around `self` in a
+    /// given `range` and `direction`.
     ///
     /// See also [`Self::corner_wedge_to`] and [`Self::wedge`]
     pub fn corner_wedge(
@@ -316,18 +330,20 @@ impl Hex {
 
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` and `direction`
-    /// as an array of edges.
-    /// The returned edges coordinates are sorted counter clockwise around `self` unless
-    /// `clockwise` is set to `true`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given
+    /// `RANGE` and `direction` as an array of edges.
+    /// The returned edges coordinates are sorted counter clockwise around
+    /// `self` unless `clockwise` is set to `true`.
     ///
     /// See also [`Self::cached_ring_edges`]
-    /// If you only need the coordinates see [`Self::ring_edges`] or [`Self::wedge`].
+    /// If you only need the coordinates see [`Self::ring_edges`] or
+    /// [`Self::wedge`].
     ///
     /// # Usage
     ///
-    /// This function's objective is to pre-compute edges around a coordinate, the returned array
-    /// can be used as a cache to avoid extra computation.
+    /// This function's objective is to pre-compute edges around a coordinate,
+    /// the returned array can be used as a cache to avoid extra
+    /// computation.
     ///
     /// ## Example
     ///
@@ -357,17 +373,20 @@ impl Hex {
 
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    /// Retrieves all successive [`Hex`] ring edges around `self` in a given `RANGE` and
-    /// `direction` as an array of edges.
-    /// The returned edges coordinates are sorted counter clockwise around `self`.
+    /// Retrieves all successive [`Hex`] ring edges around `self` in a given
+    /// `RANGE` and `direction` as an array of edges.
+    /// The returned edges coordinates are sorted counter clockwise around
+    /// `self`.
     ///
     /// See also [`Self::cached_custom_ring_edges`]
-    /// If you only need the coordinates see [`Self::ring_edges`] or [`Self::wedge`].
+    /// If you only need the coordinates see [`Self::ring_edges`] or
+    /// [`Self::wedge`].
     ///
     /// # Usage
     ///
-    /// This function's objective is to pre-compute edges around a coordinate, the returned array
-    /// can be used as a cache to avoid extra computation.
+    /// This function's objective is to pre-compute edges around a coordinate,
+    /// the returned array can be used as a cache to avoid extra
+    /// computation.
     ///
     /// ## Example
     ///
@@ -393,17 +412,20 @@ impl Hex {
 
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
-    /// rings.
-    /// The returned rings start from [`Direction::TopRight`] and loop around `self` counter clockwise.
+    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
+    /// as an array of rings.
+    /// The returned rings start from [`Direction::TopRight`] and loop around
+    /// `self` counter clockwise.
     ///
     /// See also [`Self::cached_custom_rings`]
-    /// If you only need the coordinates see [`Self::range`] or [`Self::spiral_range`].
+    /// If you only need the coordinates see [`Self::range`] or
+    /// [`Self::spiral_range`].
     ///
     /// # Usage
     ///
-    /// This function's objective is to pre-compute rings around a coordinate, the returned array
-    /// can be used as a cache to avoid extra computation.
+    /// This function's objective is to pre-compute rings around a coordinate,
+    /// the returned array can be used as a cache to avoid extra
+    /// computation.
     ///
     /// ## Example
     ///
@@ -426,18 +448,20 @@ impl Hex {
 
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE` as an array of
-    /// rings.
-    /// The returned rings start from `start_dir`] and loop around `self` counter clockwise unless
-    /// `clockwise` is set to `true`.
+    /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
+    /// as an array of rings.
+    /// The returned rings start from `start_dir`] and loop around `self`
+    /// counter clockwise unless `clockwise` is set to `true`.
     ///
     /// See also [`Self::cached_rings`]
-    /// If you only need the coordinates see [`Self::range`] or [`Self::custom_spiral_range`].
+    /// If you only need the coordinates see [`Self::range`] or
+    /// [`Self::custom_spiral_range`].
     ///
     /// # Usage
     ///
-    /// This function's objective is to pre-compute rings around a coordinate, the returned array
-    /// can be used as a cache to avoid extra computation.
+    /// This function's objective is to pre-compute rings around a coordinate,
+    /// the returned array can be used as a cache to avoid extra
+    /// computation.
     ///
     /// ## Example
     ///
@@ -462,8 +486,9 @@ impl Hex {
         std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise).collect())
     }
 
-    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
-    /// starting from `start_dir` and looping counter clockwise unless `clockwise` is set to `true`, forming a spiral
+    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as
+    /// successive rings, starting from `start_dir` and looping counter
+    /// clockwise unless `clockwise` is set to `true`, forming a spiral
     ///
     /// If you only need the coordinates see [`Self::spiral_range`].
     ///
@@ -478,8 +503,9 @@ impl Hex {
         self.custom_rings(range, start_dir, clockwise).flatten()
     }
 
-    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as successive rings,
-    /// starting from [`Direction::TopRight`] and looping counter clockwise, forming a spiral.
+    /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as
+    /// successive rings, starting from [`Direction::TopRight`] and looping
+    /// counter clockwise, forming a spiral.
     ///
     /// See [`Self::custom_spiral_range`] for more options
     ///

@@ -23,23 +23,26 @@ use std::cmp::{max, min};
 ///
 /// # Why Axial ?
 ///
-/// Axial coordinates allow to compute and use *cubic* coordinates with less storage,
-/// and allow:
+/// Axial coordinates allow to compute and use *cubic* coordinates with less
+/// storage, and allow:
 /// - Vector operations
 /// - Rotations
 /// - Symmetry
 /// - Simple algorithms
 ///
-/// when *offset* and *doubled* coordinates don't. Furthermore, it makes the [`Hex`] behave like
-/// classic 2D coordinates ([`IVec2`]) and therefore more user friendly.
+/// when *offset* and *doubled* coordinates don't. Furthermore, it makes the
+/// [`Hex`] behave like classic 2D coordinates ([`IVec2`]) and therefore more
+/// user friendly.
 ///
 /// Check out this [comparison] article for more information.
 ///
 /// # Conversions
 ///
 ///  * Cubic: use [`Self::z`] to compute the third axis
-///  * Offset: use [`Self::from_offset_coordinates`] and [`Self::to_offset_coordinates`]
-///  * Doubled: use [`Self::from_doubled_coordinates`] and [`Self::to_doubled_coordinates`]
+///  * Offset: use [`Self::from_offset_coordinates`] and
+///    [`Self::to_offset_coordinates`]
+///  * Doubled: use [`Self::from_doubled_coordinates`] and
+///    [`Self::to_doubled_coordinates`]
 ///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
@@ -66,7 +69,7 @@ pub struct Hex {
 /// let coord = hex(3, 5);
 /// assert_eq!(coord.x, 3);
 /// assert_eq!(coord.y, 5);
-/// assert_eq!(coord.z(), -3-5);
+/// assert_eq!(coord.z(), -3 - 5);
 /// ```
 pub const fn hex(x: i32, y: i32) -> Hex {
     Hex::new(x, y)
@@ -157,7 +160,7 @@ impl Hex {
     /// let coord = Hex::new(3, 5);
     /// assert_eq!(coord.x, 3);
     /// assert_eq!(coord.y, 5);
-    /// assert_eq!(coord.z(), -3-5);
+    /// assert_eq!(coord.z(), -3 - 5);
     /// ```
     pub const fn new(x: i32, y: i32) -> Self {
         Self { x, y }
@@ -174,7 +177,7 @@ impl Hex {
     /// let coord = Hex::splat(3);
     /// assert_eq!(coord.x, 3);
     /// assert_eq!(coord.y, 3);
-    /// assert_eq!(coord.z(), -3-3);
+    /// assert_eq!(coord.z(), -3 - 3);
     /// ```
     pub const fn splat(v: i32) -> Self {
         Self { x: v, y: v }
@@ -186,8 +189,8 @@ impl Hex {
     ///
     /// # Panics
     ///
-    /// Will panic if the coordinates are invalid, meaning that the sum of coordinates is not equal
-    /// to zero
+    /// Will panic if the coordinates are invalid, meaning that the sum of
+    /// coordinates is not equal to zero
     ///
     /// # Example
     ///
@@ -274,7 +277,7 @@ impl Hex {
     /// let [x, y, z] = coord.to_cubic_array();
     /// assert_eq!(x, 3);
     /// assert_eq!(y, 5);
-    /// assert_eq!(z, -3-5);
+    /// assert_eq!(z, -3 - 5);
     /// ```
     pub const fn to_cubic_array(self) -> [i32; 3] {
         [self.x, self.y, self.z()]
@@ -305,8 +308,9 @@ impl Hex {
     #[must_use]
     #[inline]
     /// Converts `self` to an [`IVec2`].
-    /// This operation is a direct mapping of coordinates, no hex to square coordinates are
-    /// performed. To convert hex coordinates to world space use [`HexLayout`]
+    /// This operation is a direct mapping of coordinates, no hex to square
+    /// coordinates are performed. To convert hex coordinates to world space
+    /// use [`HexLayout`]
     ///
     /// [`HexLayout`]: crate::HexLayout
     pub const fn as_ivec2(self) -> IVec2 {
@@ -349,7 +353,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Negates the coordinate, giving its reflection (symmetry) around the origin.
+    /// Negates the coordinate, giving its reflection (symmetry) around the
+    /// origin.
     ///
     /// [`Hex`] implements [`Neg`] (`-` operator) but this method is `const`.
     ///
@@ -393,8 +398,8 @@ impl Hex {
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
     /// Rounds floating point coordinates to [`Hex`].
-    /// This method is used for operations like multiplications and divisions with floating point
-    /// numbers.
+    /// This method is used for operations like multiplications and divisions
+    /// with floating point numbers.
     /// See the original author Jacob Rus's [article](https://observablehq.com/@jrus/hexround) for
     /// more details
     ///
@@ -437,9 +442,11 @@ impl Hex {
             y: self.y.abs(),
         }
     }
-    /// Returns a vector containing the minimum values for each element of `self` and `rhs`.
+    /// Returns a vector containing the minimum values for each element of
+    /// `self` and `rhs`.
     ///
-    /// In other words this computes `[self.x.min(rhs.x), self.y.min(rhs.y), ..]`.
+    /// In other words this computes `[self.x.min(rhs.x), self.y.min(rhs.y),
+    /// ..]`.
     #[inline]
     #[must_use]
     pub fn min(self, rhs: Self) -> Self {
@@ -449,9 +456,11 @@ impl Hex {
         }
     }
 
-    /// Returns a vector containing the maximum values for each element of `self` and `rhs`.
+    /// Returns a vector containing the maximum values for each element of
+    /// `self` and `rhs`.
     ///
-    /// In other words this computes `[self.x.max(rhs.x), self.y.max(rhs.y), ..]`.
+    /// In other words this computes `[self.x.max(rhs.x), self.y.max(rhs.y),
+    /// ..]`.
     #[inline]
     #[must_use]
     pub fn max(self, rhs: Self) -> Self {
@@ -486,7 +495,8 @@ impl Hex {
     #[must_use]
     #[doc(alias = "magnitude")]
     /// Computes coordinates length as a signed integer.
-    /// The lenght of a [`Hex`] coordinate is equal to its distance from the origin.
+    /// The lenght of a [`Hex`] coordinate is equal to its distance from the
+    /// origin.
     ///
     /// See [`Self::ulength`] for the unsigned version
     ///
@@ -511,7 +521,8 @@ impl Hex {
     #[must_use]
     #[doc(alias = "unsigned_length")]
     /// Computes coordinates length as an unsigned integer
-    /// The lenght of a [`Hex`] coordinate is equal to its distance from the origin.
+    /// The lenght of a [`Hex`] coordinate is equal to its distance from the
+    /// origin.
     ///
     /// See [`Self::length`] for the signed version
     ///
@@ -538,7 +549,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `rhs` in hexagonal space as a signed integer
+    /// Computes the distance from `self` to `rhs` in hexagonal space as a
+    /// signed integer
     ///
     /// See [`Self::unsigned_distance_to`] for the unsigned version
     pub const fn distance_to(self, rhs: Self) -> i32 {
@@ -547,7 +559,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `rhs` in hexagonal space as an unsigned integer
+    /// Computes the distance from `self` to `rhs` in hexagonal space as an
+    /// unsigned integer
     ///
     /// See [`Self::distance_to`] for the signed version
     pub const fn unsigned_distance_to(self, rhs: Self) -> u32 {
@@ -556,14 +569,16 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Retrieves the hexagonal neighbor coordinates matching the given `direction`
+    /// Retrieves the hexagonal neighbor coordinates matching the given
+    /// `direction`
     pub const fn neighbor_coord(direction: Direction) -> Self {
         Self::NEIGHBORS_COORDS[direction as usize]
     }
 
     #[inline]
     #[must_use]
-    /// Retrieves the diagonal neighbor coordinates matching the given `direction`
+    /// Retrieves the diagonal neighbor coordinates matching the given
+    /// `direction`
     pub const fn diagonal_neighbor_coord(direction: DiagonalDirection) -> Self {
         Self::DIAGONAL_COORDS[direction as usize]
     }
@@ -586,7 +601,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Retrieves the diagonal neighbor coordinates matching the given `direction`
+    /// Retrieves the diagonal neighbor coordinates matching the given
+    /// `direction`
     ///
     /// # Example
     ///
@@ -602,8 +618,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Retrieves the direction of the given neighbor. Will return `None` if `other` is not a neighbor
-    /// of `self`
+    /// Retrieves the direction of the given neighbor. Will return `None` if
+    /// `other` is not a neighbor of `self`
     ///
     /// # Example
     ///
@@ -621,7 +637,8 @@ impl Hex {
     #[must_use]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
     ///
-    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// > This method can be innaccurate in case of a *tie* between directions,
+    /// > prefer
     /// using [`Self::diagonal_way_to`] instead
     pub fn main_diagonal_to(self, rhs: Self) -> DiagonalDirection {
         self.diagonal_way_to(rhs).unwrap()
@@ -645,7 +662,8 @@ impl Hex {
 
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
     ///
-    /// > This method can be innaccurate in case of a *tie* between directions, prefer
+    /// > This method can be innaccurate in case of a *tie* between directions,
+    /// > prefer
     /// using [`Self::way_to`] for accuracy
     #[must_use]
     pub fn main_direction_to(self, rhs: Self) -> Direction {
@@ -707,7 +725,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] counter clockwise by `m` (by `-60 * m` degrees)
+    /// Rotates `self` around [`Hex::ZERO`] counter clockwise by `m` (by `-60 *
+    /// m` degrees)
     pub const fn rotate_ccw(self, m: u32) -> Self {
         match m % 6 {
             1 => self.counter_clockwise(),
@@ -721,7 +740,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m` degrees)
+    /// Rotates `self` around `center` counter clockwise by `m` (by `-60 * m`
+    /// degrees)
     pub const fn rotate_ccw_around(self, center: Self, m: u32) -> Self {
         self.const_sub(center).rotate_ccw(m).const_add(center)
     }
@@ -752,7 +772,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Rotates `self` around [`Hex::ZERO`] clockwise by `m` (by `60 * m` degrees)
+    /// Rotates `self` around [`Hex::ZERO`] clockwise by `m` (by `60 * m`
+    /// degrees)
     pub const fn rotate_cw(self, m: u32) -> Self {
         match m % 6 {
             1 => self.clockwise(),
@@ -820,11 +841,12 @@ impl Hex {
         }
     }
 
-    /// Performs a linear interpolation between `self` and `rhs` based on the value `s`.
+    /// Performs a linear interpolation between `self` and `rhs` based on the
+    /// value `s`.
     ///
-    /// When `s` is `0.0`, the result will be equal to `self`.  When `s` is `1.0`, the result
-    /// will be equal to `rhs`. When `s` is outside of range `[0, 1]`, the result is linearly
-    /// extrapolated.
+    /// When `s` is `0.0`, the result will be equal to `self`.  When `s` is
+    /// `1.0`, the result will be equal to `rhs`. When `s` is outside of
+    /// range `[0, 1]`, the result is linearly extrapolated.
     #[doc(alias = "mix")]
     #[inline]
     #[must_use]
@@ -864,7 +886,8 @@ impl Hex {
     #[doc(alias = "excluding_range")]
     #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range` except `self`.
-    /// The number of returned coordinates is equal to `Hex::range_count(range) - 1`
+    /// The number of returned coordinates is equal to `Hex::range_count(range)
+    /// - 1`
     ///
     /// > See also [`Hex::range`] to retrieve all coordinates including `self`
     ///
@@ -894,9 +917,9 @@ impl Hex {
     /// of a given `radius`.
     /// The lower resolution coordinate can be considered *parent* of
     /// the contained higher resolution coordinates.
-    /// The `radius` can be thought of as a *chunk size*, as if the grid was split
-    /// in hexagonal chunks of that radius. The returned value are the coordinates
-    /// of that chunk, in its own coordinates system.
+    /// The `radius` can be thought of as a *chunk size*, as if the grid was
+    /// split in hexagonal chunks of that radius. The returned value are the
+    /// coordinates of that chunk, in its own coordinates system.
     ///
     /// See the [source] documentation for more information
     ///
@@ -946,10 +969,11 @@ impl Hex {
     /// Computes the center coordinates of `self` in a higher resolution system
     /// of a given `radius`.
     /// The higher resolution coordinate can be considered as a *child* of
-    /// `self` as it is contained by it in a lower resolution coordinates system.
-    /// The `radius` can be thought of as a *chunk size*, as if the grid was split
-    /// in hexagonal chunks of that radius. The returned value are the coordinates
-    /// of the center that chunk, in a higher resolution coordinates system.
+    /// `self` as it is contained by it in a lower resolution coordinates
+    /// system. The `radius` can be thought of as a *chunk size*, as if the
+    /// grid was split in hexagonal chunks of that radius. The returned
+    /// value are the coordinates of the center that chunk, in a higher
+    /// resolution coordinates system.
     ///
     /// See the [source] documentation for more information
     ///
@@ -980,8 +1004,8 @@ impl Hex {
         Self::new(x * (range + 1) - range * z, y * (range + 1) - range * x)
     }
 
-    /// Computes the local coordinates of `self` in a lower resolution coordinates
-    /// system relative to its containing *parent* hexagon
+    /// Computes the local coordinates of `self` in a lower resolution
+    /// coordinates system relative to its containing *parent* hexagon
     ///
     ///
     /// See the [source] documentation for more information

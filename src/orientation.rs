@@ -1,7 +1,6 @@
 use std::ops::Deref;
 
-use crate::direction::angles::DIRECTION_ANGLE_OFFSET_RAD;
-use crate::Direction;
+use crate::{direction::angles::DIRECTION_ANGLE_OFFSET_RAD, Direction};
 
 const SQRT_3: f32 = 1.732_050_8;
 
@@ -19,9 +18,11 @@ static FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
     angle_offset: 0.0, // 0 degrees
 };
 
-/// [`HexOrientation`] inner data, retrieved by [`HexOrientation::orientation_data`].
+/// [`HexOrientation`] inner data, retrieved by
+/// [`HexOrientation::orientation_data`].
 ///
-/// This struct stored a forward and inverse matrix, for pixel/hex conversion and an angle offset
+/// This struct stored a forward and inverse matrix, for pixel/hex conversion
+/// and an angle offset
 ///
 /// See [this article](https://www.redblobgames.com/grids/hexagons/#hex-to-pixel-axial) for more information
 ///
@@ -60,7 +61,8 @@ pub enum HexOrientation {
 impl HexOrientation {
     #[must_use]
     #[inline]
-    /// Computes the angle in radians of the given `direction` in the current orientation
+    /// Computes the angle in radians of the given `direction` in the current
+    /// orientation
     pub fn direction_angle(self, direction: Direction) -> f32 {
         direction.angle(self)
     }

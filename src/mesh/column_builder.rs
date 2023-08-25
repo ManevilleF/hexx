@@ -5,10 +5,10 @@ use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 
 /// Builder struct to customize hex column mesh generation.
 ///
-/// By default this builder will create a full hexagonal column with all faces and no side
-/// subdivisions.
-/// The mesh will be anchored at the center of the *bottom face*, use offsets to cutomize
-/// anchor/pivot position.
+/// By default this builder will create a full hexagonal column with all faces
+/// and no side subdivisions.
+/// The mesh will be anchored at the center of the *bottom face*, use offsets to
+/// cutomize anchor/pivot position.
 ///
 /// # Example
 ///
@@ -36,7 +36,8 @@ pub struct ColumnMeshBuilder<'l> {
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
-    /// Optional custom facing direction, useful to have the mesh already rotated
+    /// Optional custom facing direction, useful to have the mesh already
+    /// rotated
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub facing: Option<Vec3>,
@@ -74,8 +75,8 @@ impl<'l> ColumnMeshBuilder<'l> {
     ///
     /// ## Note
     ///
-    /// It might be more optimal to generate only one mesh at [`Hex::ZERO`] and offset it later
-    /// than have one mesh per hex position
+    /// It might be more optimal to generate only one mesh at [`Hex::ZERO`] and
+    /// offset it later than have one mesh per hex position
     #[must_use]
     #[inline]
     pub const fn at(mut self, pos: Hex) -> Self {
@@ -83,8 +84,8 @@ impl<'l> ColumnMeshBuilder<'l> {
         self
     }
 
-    /// Specify a custom *facing* direction for the mesh, by default the column is vertical (facing
-    /// up)
+    /// Specify a custom *facing* direction for the mesh, by default the column
+    /// is vertical (facing up)
     #[must_use]
     #[inline]
     pub const fn facing(mut self, facing: Vec3) -> Self {
@@ -92,8 +93,8 @@ impl<'l> ColumnMeshBuilder<'l> {
         self
     }
 
-    /// Specify a cusom offset for the whole mesh. This can be used to customize the anchor/pivot
-    /// of the mesh.
+    /// Specify a cusom offset for the whole mesh. This can be used to customize
+    /// the anchor/pivot of the mesh.
     ///
     /// # Example
     ///

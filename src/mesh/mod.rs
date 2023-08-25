@@ -34,7 +34,9 @@ pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 /// // Build the mesh info
 /// let info: MeshInfo = ColumnMeshBuilder::new(&layout, 2.0).build();
 /// // Customize the generated mesh
-/// let info = info.rotated(Quat::IDENTITY).with_offset(Vec3::new(12.0, 34.2, -43.54));
+/// let info = info
+///     .rotated(Quat::IDENTITY)
+///     .with_offset(Vec3::new(12.0, 34.2, -43.54));
 /// ```
 ///
 /// ## Merging
@@ -49,7 +51,8 @@ pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 pub struct MeshInfo {
     /// All vertices positions information (`Vertex_Position` attribute)
     pub vertices: Vec<Vec3>,
-    /// Normals for each vertex (You might need to swap `y` and `z`) (`Vertex_Normal` attribute)
+    /// Normals for each vertex (You might need to swap `y` and `z`)
+    /// (`Vertex_Normal` attribute)
     pub normals: Vec<Vec3>,
     /// UV coordinates of each vertex (`Vertex_Uv` attribute)
     pub uvs: Vec<Vec2>,
@@ -88,8 +91,8 @@ impl MeshInfo {
     }
 
     /// Merges `rhs` into `self`.
-    /// All vertices, normals and uvs are appended to `self` and indices are offsetted to maintain
-    /// triangle data.
+    /// All vertices, normals and uvs are appended to `self` and indices are
+    /// offsetted to maintain triangle data.
     ///
     /// # Note
     ///
@@ -160,13 +163,15 @@ impl MeshInfo {
         }
     }
 
-    /// Computes cheap mesh data for an hexagonal column facing `Vec3::Y` without the bottom face.
+    /// Computes cheap mesh data for an hexagonal column facing `Vec3::Y`
+    /// without the bottom face.
     ///
-    /// This mesh has only 13 vertices, as no vertex is duplicated. As a consequence the normals will behave strangely
-    /// and the UV mapping will be incorrect.
+    /// This mesh has only 13 vertices, as no vertex is duplicated. As a
+    /// consequence the normals will behave strangely and the UV mapping
+    /// will be incorrect.
     ///
-    /// Use this mesh if you don't care about lighting and texturing, for example for collision
-    /// shapes.
+    /// Use this mesh if you don't care about lighting and texturing, for
+    /// example for collision shapes.
     #[must_use]
     pub fn cheap_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
         let center = layout.hex_to_world_pos(hex);
@@ -177,7 +182,7 @@ impl MeshInfo {
             corners.map(|p| Vec3::new(p.x, 0., p.y)),
         );
 
-        let quad_normals = vec![
+        let quad_normals = [
             (top_corners[0] - center_top),
             (top_corners[1] - center_top),
             (top_corners[2] - center_top),

@@ -1,11 +1,10 @@
-use bevy::prelude::*;
-use bevy::render::mesh::Indices;
-use bevy::render::render_resource::PrimitiveTopology;
-use bevy::time::common_conditions::on_timer;
-use hexx::shapes;
-use hexx::*;
-use std::collections::HashMap;
-use std::time::Duration;
+use bevy::{
+    prelude::*,
+    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    time::common_conditions::on_timer,
+};
+use hexx::{shapes, *};
+use std::{collections::HashMap, time::Duration};
 
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(1.0);
