@@ -177,7 +177,7 @@ impl MeshInfo {
             corners.map(|p| Vec3::new(p.x, 0., p.y)),
         );
 
-        let quad_normals = vec![
+        let quad_normals = [
             (top_corners[0] - center_top),
             (top_corners[1] - center_top),
             (top_corners[2] - center_top),
