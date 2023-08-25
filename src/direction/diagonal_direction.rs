@@ -5,6 +5,7 @@ use super::angles::*;
 use crate::{Direction, HexOrientation};
 
 /// All 6 possible diagonal directions in hexagonal space.
+///
 /// ```txt
 ///            x Axis
 ///           \___/
@@ -194,7 +195,9 @@ pub enum DiagonalDirection {
 
 impl DiagonalDirection {
     /// All 6 diagonal directions matching
-    /// [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS) ```txt
+    /// [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS)
+    ///
+    /// ```txt
     ///            x Axis
     ///           \___/
     ///      \ 2  /   \ 1  /

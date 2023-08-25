@@ -4,6 +4,7 @@
 
 * Use of built-in rust f32 consts instead of custom ones (#113)
 * Fix clippy warnings of rust 1.72.0 (#114)
+* Added rustfmt config file (#114)
 
 ## 0.10.0
 
