@@ -193,8 +193,8 @@ pub enum DiagonalDirection {
 }
 
 impl DiagonalDirection {
-    /// All 6 diagonal directions matching [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS)
-    /// ```txt
+    /// All 6 diagonal directions matching
+    /// [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS) ```txt
     ///            x Axis
     ///           \___/
     ///      \ 2  /   \ 1  /
@@ -336,7 +336,8 @@ impl DiagonalDirection {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in radians of the given direction for *pointy* hexagons
+    /// Returns the angle in radians of the given direction for *pointy*
+    /// hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_pointy(self) -> f32 {
@@ -345,7 +346,8 @@ impl DiagonalDirection {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in degrees of the given direction for *pointy* hexagons
+    /// Returns the angle in degrees of the given direction for *pointy*
+    /// hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub const fn angle_flat_degrees(self) -> f32 {
@@ -354,7 +356,8 @@ impl DiagonalDirection {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in degrees of the given direction for *pointy* hexagons
+    /// Returns the angle in degrees of the given direction for *pointy*
+    /// hexagons
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_pointy_degrees(self) -> f32 {
@@ -363,14 +366,16 @@ impl DiagonalDirection {
 
     #[inline]
     #[must_use]
-    /// Returns the angle in radians of the given direction in the given `orientation`
+    /// Returns the angle in radians of the given direction in the given
+    /// `orientation`
     pub fn angle(self, orientation: HexOrientation) -> f32 {
         self.angle_pointy() - orientation.angle_offset
     }
 
     #[inline]
     #[must_use]
-    /// Returns the angle in degrees of the given direction according to its `orientation`
+    /// Returns the angle in degrees of the given direction according to its
+    /// `orientation`
     ///
     /// See [`Self::angle`] for radians angles
     pub fn angle_degrees(self, orientation: HexOrientation) -> f32 {
@@ -463,7 +468,8 @@ impl DiagonalDirection {
     }
 
     #[must_use]
-    /// Returns the direction from the given `angle` in degrees according the `orientation`
+    /// Returns the direction from the given `angle` in degrees according the
+    /// `orientation`
     ///
     /// # Example
     ///
@@ -471,8 +477,14 @@ impl DiagonalDirection {
     /// # use hexx::*;
     ///
     /// let angle = 15.0;
-    /// assert_eq!(DiagonalDirection::from_angle_degrees(angle, HexOrientation::Flat), DiagonalDirection::Right);
-    /// assert_eq!(DiagonalDirection::from_angle_degrees(angle, HexOrientation::Pointy), DiagonalDirection::TopRight);
+    /// assert_eq!(
+    ///     DiagonalDirection::from_angle_degrees(angle, HexOrientation::Flat),
+    ///     DiagonalDirection::Right
+    /// );
+    /// assert_eq!(
+    ///     DiagonalDirection::from_angle_degrees(angle, HexOrientation::Pointy),
+    ///     DiagonalDirection::TopRight
+    /// );
     /// ```
     pub fn from_angle_degrees(angle: f32, orientation: HexOrientation) -> Self {
         match orientation {
@@ -482,7 +494,8 @@ impl DiagonalDirection {
     }
 
     #[must_use]
-    /// Returns the direction from the given `angle` in radians according the `orientation`
+    /// Returns the direction from the given `angle` in radians according the
+    /// `orientation`
     ///
     /// # Example
     ///
@@ -490,8 +503,14 @@ impl DiagonalDirection {
     /// # use hexx::*;
     ///
     /// let angle = 0.26;
-    /// assert_eq!(DiagonalDirection::from_angle(angle, HexOrientation::Flat), DiagonalDirection::Right);
-    /// assert_eq!(DiagonalDirection::from_angle(angle, HexOrientation::Pointy), DiagonalDirection::TopRight);
+    /// assert_eq!(
+    ///     DiagonalDirection::from_angle(angle, HexOrientation::Flat),
+    ///     DiagonalDirection::Right
+    /// );
+    /// assert_eq!(
+    ///     DiagonalDirection::from_angle(angle, HexOrientation::Pointy),
+    ///     DiagonalDirection::TopRight
+    /// );
     /// ```
     pub fn from_angle(angle: f32, orientation: HexOrientation) -> Self {
         match orientation {

@@ -36,9 +36,10 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 }
 
 /// Performs A star pathfinding between `start` and `end`.
-/// The `cost` parameter should give the cost of each coordinate (`Some`) or indicate the
-/// coordinate is not included in the pathfinding (`None`).
-/// This function already takes care of heuristics based on the distance between `start` and `end`.
+/// The `cost` parameter should give the cost of each coordinate (`Some`) or
+/// indicate the coordinate is not included in the pathfinding (`None`).
+/// This function already takes care of heuristics based on the distance between
+/// `start` and `end`.
 ///
 /// # Examples
 ///
@@ -55,7 +56,9 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 /// // Add forbidden coordinates
 /// // forbidden_coords.insert(hex(2, 0));
 /// // ..
-/// let path = a_star(start, end, |h| (!forbidden_coords.contains(&h)).then_some(0));
+/// let path = a_star(start, end, |h| {
+///     (!forbidden_coords.contains(&h)).then_some(0)
+/// });
 /// ```
 /// - Compute a A star with no boundaries and some biome costs
 ///
@@ -65,22 +68,21 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 /// use hexx::algorithms::a_star;
 ///
 /// enum Biome {
-///    Mountain,
-///    Plains,
-///    Forest,
-///    Desert
+///     Mountain,
+///     Plains,
+///     Forest,
+///     Desert,
 /// }
 ///
 /// impl Biome {
-///
-///    pub fn cost(&self) -> Option<u32> {
-///       match self {
-///          Self::Mountain => None, // Moutains are not included in pathfinding
-///          Self::Plains => Some(0),
-///          Self::Forest => Some(1),
-///          Self::Desert => Some(2)
-///       }
-///    }
+///     pub fn cost(&self) -> Option<u32> {
+///         match self {
+///             Self::Mountain => None, // Moutains are not included in pathfinding
+///             Self::Plains => Some(0),
+///             Self::Forest => Some(1),
+///             Self::Desert => Some(2),
+///         }
+///     }
 /// }
 ///
 /// let start = hex(0, 0);

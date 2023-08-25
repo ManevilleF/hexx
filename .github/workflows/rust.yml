@@ -24,7 +24,7 @@ jobs:
         run: cargo build --no-default-features --verbose
 
   examples:
-    needs: [build, fmt]
+    needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -33,7 +33,7 @@ jobs:
         run: cargo build --examples --verbose
 
   tests:
-    needs: [build, fmt]
+    needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,7 +42,7 @@ jobs:
         run: cargo test --tests --all-features
 
   doctest:
-    needs: [build, fmt]
+    needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -54,12 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
       - name: Check Formatting
         run: cargo fmt --all -- --check
 
   clippy:
-    needs: [build, fmt]
+    needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -74,11 +74,10 @@ jobs:
         run: cargo clippy --no-default-features --all --tests -- -D warnings
 
   rustdoc:
-    needs: [build, fmt]
+    needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - name: Run rustdoc
         run: cargo rustdoc --all-features -- -D warnings
-

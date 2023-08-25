@@ -105,7 +105,9 @@ fn handle_input(
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
-        let Some(entity) = grid.entities.get(&hex_pos).copied() else { return };
+        let Some(entity) = grid.entities.get(&hex_pos).copied() else {
+            return;
+        };
         if buttons.just_pressed(MouseButton::Left) {
             if grid.blocked_coords.contains(&hex_pos) {
                 grid.blocked_coords.remove(&hex_pos);
@@ -129,7 +131,7 @@ fn handle_input(
             (grid.entities.contains_key(&h) && !grid.blocked_coords.contains(&h)).then_some(1)
         }) else {
             log::info!("No path found");
-            return
+            return;
         };
         let entities: HashSet<_> = path
             .into_iter()

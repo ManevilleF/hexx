@@ -36,8 +36,8 @@ pub fn hexagon(center: Hex, radius: u32) -> impl ExactSizeIterator<Item = Hex> {
 /// Generates a rectangle with the given bounds for "pointy topped" hexagons.
 ///
 /// The function takes four offsets as `[left, right, top, bottom]`.
-/// The generations goes `left` to `right` and `top` to `bottom`, therefore `right` must be greater
-/// than `left` and `bottom` must be greater than `top`.
+/// The generations goes `left` to `right` and `top` to `bottom`, therefore
+/// `right` must be greater than `left` and `bottom` must be greater than `top`.
 #[must_use]
 #[allow(clippy::cast_sign_loss)]
 pub fn pointy_rectangle(
@@ -56,8 +56,8 @@ pub fn pointy_rectangle(
 /// Generates a rectangle with the given bounds for "flat topped" hexagons
 ///
 /// The function takes four offsets as `[left, right, top, bottom]`.
-/// The generations goes `left` to `right` and `top` to `bottom`, therefore `right` must be greater
-/// than `left` and `bottom` must be greater than `top`.
+/// The generations goes `left` to `right` and `top` to `bottom`, therefore
+/// `right` must be greater than `left` and `bottom` must be greater than `top`.
 #[must_use]
 #[allow(clippy::cast_sign_loss)]
 pub fn flat_rectangle([left, right, top, bottom]: [i32; 4]) -> impl ExactSizeIterator<Item = Hex> {

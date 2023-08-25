@@ -2,8 +2,8 @@ use crate::{Direction, Hex};
 use std::collections::HashSet;
 
 /// Computes a field of view around `coord` in a given `range`.
-/// This algorithm takes in account coordinates *visibility* through the `blocking` argument.
-/// (*Blocking* coordinates should return `true`)
+/// This algorithm takes in account coordinates *visibility* through the
+/// `blocking` argument. (*Blocking* coordinates should return `true`)
 ///
 /// # Examples
 ///
@@ -29,14 +29,15 @@ pub fn range_fov(coord: Hex, range: u32, blocking: impl Fn(Hex) -> bool) -> Hash
         .collect()
 }
 
-/// Computes a field of view around `coord` in a given `range` towards `direction` with 120 degrees
-/// vision.
-/// This algorithm takes in account coordinates *visibility* through the `blocking` argument.
-/// (*Blocking* coordinates should return `true`)
+/// Computes a field of view around `coord` in a given `range` towards
+/// `direction` with 120 degrees vision.
+/// This algorithm takes in account coordinates *visibility* through the
+/// `blocking` argument. (*Blocking* coordinates should return `true`)
 ///
 /// # Examples
 ///
-/// - Compute drectional field of view with no boundaries and some blocking tiles
+/// - Compute drectional field of view with no boundaries and some blocking
+///   tiles
 ///
 /// ```rust
 /// # use hexx::*;

@@ -1,10 +1,13 @@
 use std::ops::Range;
 
-use bevy::prelude::*;
-use bevy::render::mesh::Indices;
-use bevy::render::render_resource::PrimitiveTopology;
-use bevy_inspector_egui::quick::{ResourceInspectorPlugin, WorldInspectorPlugin};
-use bevy_inspector_egui::InspectorOptions;
+use bevy::{
+    prelude::*,
+    render::{mesh::Indices, render_resource::PrimitiveTopology},
+};
+use bevy_inspector_egui::{
+    quick::{ResourceInspectorPlugin, WorldInspectorPlugin},
+    InspectorOptions,
+};
 use hexx::*;
 use rand::{thread_rng, Rng};
 
@@ -70,7 +73,8 @@ fn setup_grid(
         hex_size: settings.hex_size,
         ..default()
     };
-    // Materials shouldn't be added to assets every time, this is just to keep the example simple
+    // Materials shouldn't be added to assets every time, this is just to keep the
+    // example simple
     let materials = COLORS.map(|c| materials.add(c.into()));
 
     let map_entity = commands

@@ -9,32 +9,37 @@
 //! - Generate hexagonal maps with custom layouts and orientation
 //! - Generate hexagon meshes (planes or columns)
 //!
-//! I made the choice to use *Axial Coordinates* for performance and utility reasons,
-//! but the [`Hex`] type has conversion utilities with *cubic*, *doubled* and *offset* coordinates.
+//! I made the choice to use *Axial Coordinates* for performance and utility
+//! reasons, but the [`Hex`] type has conversion utilities with *cubic*,
+//! *doubled* and *offset* coordinates.
 //!
 //! > See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates)
 //!
 //! ## Installation
 //!
-//! Run `cargo add hexx` in your project or add the following line to your `Cargo.toml`:
+//! Run `cargo add hexx` in your project or add the following line to your
+//! `Cargo.toml`:
 //!
 //! - `hexx = "0.10"`
 //!
 //! ### Cargo features
 //!
 //! `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
-//! through the `serde` feature gate. To enable it add the following line to your `Cargo.toml`:
+//! through the `serde` feature gate. To enable it add the following line to
+//! your `Cargo.toml`:
 //!
 //! - `hexx = { version = "0.10", features = ["serde"] }`
 //!
-//! By default `Hex` uses rust classic memory layout, if you want to use `hexx` through the FFI or
-//! have `Hex` be stored without any memory padding, the `packed` feature will make `Hex`
-//! `repr(C)`. To enable this behaviour add the following line to your `Cargo.toml`:
+//! By default `Hex` uses rust classic memory layout, if you want to use `hexx`
+//! through the FFI or have `Hex` be stored without any memory padding, the
+//! `packed` feature will make `Hex` `repr(C)`. To enable this behaviour add the
+//! following line to your `Cargo.toml`:
 //!
 //! - `hexx = { version = "0.10", features = ["packed"] }`
 //!
 //! `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect) through the
-//! `bevy_reflect` feature. To enable it add the following line to your `Cargo.toml`:
+//! `bevy_reflect` feature. To enable it add the following line to your
+//! `Cargo.toml`:
 //!
 //! - `hexx = { version = "0.10", features = ["bevy_reflect"] }`
 //!
@@ -84,21 +89,21 @@
 //! let wedge = point_a.wedge_to(point_b);
 //! // Get the average value of the wedge
 //! let avg = wedge.average();
-//!```
+//! ```
 //!
 //! ## Layout usage
 //!
-//! [`HexLayout`] is the bridge between your world/screen/pixel coordinate system and the hexagonal
-//! coordinates system.
+//! [`HexLayout`] is the bridge between your world/screen/pixel coordinate
+//! system and the hexagonal coordinates system.
 //!
 //!```rust
 //! use hexx::*;
 //!
 //! // Define your layout
 //! let layout = HexLayout {
-//!    hex_size: Vec2::new(1.0, 1.0),
-//!    orientation: HexOrientation::Flat,
-//!    ..Default::default()
+//!     hex_size: Vec2::new(1.0, 1.0),
+//!     orientation: HexOrientation::Flat,
+//!     ..Default::default()
 //! };
 //! // Get the hex coordinate at the world position `world_pos`.
 //! let world_pos = Vec2::new(53.52, 189.28);
@@ -106,15 +111,15 @@
 //! // Get the world position of `point`
 //! let point = hex(123, 45);
 //! let world_pos = layout.hex_to_world_pos(point);
-//!```
+//! ```
 //!
 //! ## Wrapping
 //!
 //! [`HexBounds`] defines a bounding hexagon around a center coordinate.
 //! It can be used for boundary and interesection checks but also for wrapping
 //! coordinates.
-//! Coordinate wrapping transform a point outside of the bounds to a point inside.
-//! This allows for seamless or repeating [wraparound](https://www.redblobgames.com/grids/hexagons/#wraparound) maps.
+//! Coordinate wrapping transform a point outside of the bounds to a point
+//! inside. This allows for seamless or repeating [wraparound](https://www.redblobgames.com/grids/hexagons/#wraparound) maps.
 //!
 //! ```rust
 //! use hexx::*;
@@ -131,15 +136,17 @@
 //! ## Resolutions and chunks
 //!
 //! [`Hex`] support multi-resolution coordinates.
-//! In practice this means that you may convert a coordinate to a different resolution:
+//! In practice this means that you may convert a coordinate to a different
+//! resolution:
 //! - To a lower resolution, meaning retrieving a *parent* coordinate
 //! - to a higher resolution, meaning retrieving the center *child* coordinate
 //!
-//! Resolutions are abstract, the only useful information is the resolution **radius**.
+//! Resolutions are abstract, the only useful information is the resolution
+//! **radius**.
 //!
-//! For example, if you use a big grid, with a radius of a 100, you might want to
-//! split that grid evenly in larger hexagons containing a 10 radius of coordinates
-//! and maybe do operations locally inside of these chunks.
+//! For example, if you use a big grid, with a radius of a 100, you might want
+//! to split that grid evenly in larger hexagons containing a 10 radius of
+//! coordinates and maybe do operations locally inside of these chunks.
 //!
 //! So instead of using a big range directly:
 //!
@@ -174,29 +181,33 @@
 //! }
 //! ```
 //!
-//! An other usage could be to draw an infinite hex grid, with different resolutions
-//! displayed, dynamically changing according to user zoom level.
+//! An other usage could be to draw an infinite hex grid, with different
+//! resolutions displayed, dynamically changing according to user zoom level.
 //!
 //! ## Usage in [Bevy](https://bevyengine.org/)
 //!
-//! If you want to generate 3D hexagonal mesh and use it in [bevy](bevyengine.org) you may do it this way:
+//! If you want to generate 3D hexagonal mesh and use it in
+//! [bevy](bevyengine.org) you may do it this way:
 //!
 //!```rust
-//! use bevy::prelude::Mesh;
-//! use bevy::render::{mesh::Indices, render_resource::PrimitiveTopology};
+//! use bevy::{
+//!     prelude::Mesh,
+//!     render::{mesh::Indices, render_resource::PrimitiveTopology},
+//! };
 //! use hexx::MeshInfo;
 //!
 //! pub fn hexagonal_plane(mesh_info: MeshInfo) -> Mesh {
-//!    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-//!    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices);
-//!    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals);
-//!    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs);
-//!    mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
-//!    mesh
+//!     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
+//!     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices);
+//!     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals);
+//!     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs);
+//!     mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
+//!     mesh
 //! }
-//!```
+//! ```
 //!
-//! The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or [`ColumnMeshBuilder`]
+//! The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or
+//! [`ColumnMeshBuilder`]
 #![forbid(unsafe_code)]
 #![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
@@ -221,7 +232,12 @@ pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
 
+pub use bounds::*;
+pub use conversions::*;
+pub use direction::*;
 pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
+pub use hex::*;
+pub use layout::*;
 #[cfg(feature = "mesh")]
 pub use mesh::*;
-pub use {bounds::*, conversions::*, direction::*, hex::*, layout::*, orientation::*};
+pub use orientation::*;
