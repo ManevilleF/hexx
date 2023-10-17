@@ -2,10 +2,9 @@
 
 ## [Unreleased]
 
-* Reduced verteice and tri count of mesh generation (#119)
+## 0.11.0
 
-## 0.10.1
-
+* Reduced vertice and tri count of mesh generation (#119)
 * Use of built-in rust f32 consts instead of custom ones (#113)
 * Fix clippy warnings of rust 1.72.0 (#114)
 * Added rustfmt config file (#114)
