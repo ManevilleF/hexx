@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Reduced verteice and tri count of mesh generation (#119)
+
 ## 0.10.1
 
 * Use of built-in rust f32 consts instead of custom ones (#113)
