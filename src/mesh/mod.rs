@@ -124,7 +124,8 @@ impl MeshInfo {
         }
     }
 
-    /// Computes mesh data for an hexagonal plane facing `Vec3::Y`
+    /// Computes mesh data for an hexagonal plane facing `Vec3::Y` with 6
+    /// vertices and 4 triangles
     ///
     /// # Note
     ///
@@ -135,12 +136,10 @@ impl MeshInfo {
     /// * etc
     #[must_use]
     pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
-        let center = layout.hex_to_world_pos(hex);
         let corners = layout.hex_corners(hex);
         let corners_arr = corners.map(|p| Vec3::new(p.x, 0., p.y));
         Self {
             vertices: vec![
-                Vec3::new(center.x, 0., center.y),
                 corners_arr[0],
                 corners_arr[1],
                 corners_arr[2],
@@ -149,16 +148,14 @@ impl MeshInfo {
                 corners_arr[5],
             ],
             uvs: vec![
-                center, corners[0], corners[1], corners[2], corners[3], corners[4], corners[5],
+                corners[0], corners[1], corners[2], corners[3], corners[4], corners[5],
             ],
-            normals: [Vec3::Y; 7].to_vec(),
+            normals: [Vec3::Y; 6].to_vec(),
             indices: vec![
-                1, 0, 2, // 1
-                2, 0, 3, // 2
-                3, 0, 4, // 3
-                4, 0, 5, // 4
-                5, 0, 6, // 5
-                6, 0, 1, // 6
+                0, 2, 1, // Top tri
+                3, 5, 4, // Bot tri
+                0, 5, 3, // Mid Quad
+                3, 2, 0, // Mid Quad
             ],
         }
     }
