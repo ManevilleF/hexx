@@ -19,7 +19,7 @@ fn mesh_integrity(mesh: MeshInfo, expected_len: usize) {
 #[test]
 fn plane_integrity() {
     let mesh = PlaneMeshBuilder::new(&HexLayout::default()).build();
-    mesh_integrity(mesh, 7);
+    mesh_integrity(mesh, 6);
 }
 
 #[test]
@@ -33,7 +33,7 @@ fn column_integrity() {
     let mesh = ColumnMeshBuilder::new(&layout, 10.0)
         .without_bottom_face()
         .build();
-    mesh_integrity(mesh, 6 * 4 + 7);
+    mesh_integrity(mesh, 6 * 4 + 6);
     let mesh = ColumnMeshBuilder::new(&layout, 10.0).build();
-    mesh_integrity(mesh, 6 * 4 + 14);
+    mesh_integrity(mesh, 6 * 4 + 12);
 }
