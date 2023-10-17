@@ -9,6 +9,7 @@
 * Fix clippy warnings of rust 1.72.0 (#114)
 * Added rustfmt config file (#114)
 * Fixed `PartialOrd` impl for `a_star` `Node`
+* Bumped `bevy_inspector_egui` dev dependency to 0.20
 
 ## 0.10.0
 
