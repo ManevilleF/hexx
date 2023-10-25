@@ -3,7 +3,10 @@
 ## [Unreleased]
 
 * Added `PlaneMeshBuilder::with_scale` option to scale generated mesh (#121)
+* Added `PlaneMeshBuilder::with_rotation` option to rotate generated mesh (#121)
 * Added `ColumnMeshBuilder::with_scale` option to scale generated mesh (#121)
+* Added `ColumnMeshBuilder::with_rotation` option to rotate generated mesh (#121)
+* Mesh transformation follow the SRT order of operations (#121)
 
 ## 0.11.0
 
