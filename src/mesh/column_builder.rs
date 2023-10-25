@@ -183,13 +183,14 @@ impl<'l> ColumnMeshBuilder<'l> {
             .with_uv_options(self.caps_uv_options)
             .build();
         // We store the offset to match the `self.pos`
-        let mut offset = self.layout.hex_to_world_pos(self.pos).extend(0.0);
+        let pos = self.layout.hex_to_world_pos(self.pos);
+        let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // We create the final mesh
         let mut mesh = MeshInfo::default();
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
-        let [a, b, c, d, e, f] = self.layout.hex_corners(self.pos);
+        let [a, b, c, d, e, f] = self.layout.hex_corners(Hex::ZERO);
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         for [left, right] in corners {
             let normal = (left + right).normalize();

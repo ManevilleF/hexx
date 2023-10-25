@@ -91,7 +91,8 @@ impl<'l> PlaneMeshBuilder<'l> {
         // We compute the mesh at the origin to allow scaling
         let mut mesh = MeshInfo::hexagonal_plane(self.layout, Hex::ZERO);
         // We store the offset to match the `self.pos`
-        let mut offset = self.layout.hex_to_world_pos(self.pos).extend(0.0);
+        let pos = self.layout.hex_to_world_pos(self.pos);
+        let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // We apply optional scale
         if let Some(scale) = self.scale {
             mesh.vertices.iter_mut().for_each(|p| *p *= scale);
