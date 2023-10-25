@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Added `PlaneMeshBuilder::with_scale` option to scale generated mesh (#121)
+* Added `ColumnMeshBuilder::with_scale` option to scale generated mesh (#121)
+
 ## 0.11.0
 
 * Reduced vertice and tri count of mesh generation (#119)

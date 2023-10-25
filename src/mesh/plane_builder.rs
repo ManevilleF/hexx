@@ -15,8 +15,12 @@ pub struct PlaneMeshBuilder<'l> {
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
+    /// Optional custom scale factor for the mesh vertex positions
+    pub scale: Option<Vec3>,
     /// Optional custom facing direction, useful to have the mesh already
-    /// rotated
+    /// rotated.
+    ///
+    /// Note that the `scale` factor will be applied before the rotation
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub facing: Option<Vec3>,
@@ -33,6 +37,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             pos: Hex::ZERO,
             facing: None,
             offset: None,
+            scale: None,
             uv_options: UVOptions::cap_default(),
         }
     }
@@ -51,6 +56,8 @@ impl<'l> PlaneMeshBuilder<'l> {
 
     /// Specify a custom *facing* direction for the mesh, by default the column
     /// is vertical (facing up)
+    ///
+    /// Note that the `scale` factor will be applied before the rotation
     #[must_use]
     pub const fn facing(mut self, facing: Vec3) -> Self {
         self.facing = Some(facing);
@@ -64,6 +71,13 @@ impl<'l> PlaneMeshBuilder<'l> {
         self
     }
 
+    /// Specify a custom scale factor for the whole mesh
+    #[must_use]
+    pub const fn with_scale(mut self, scale: Vec3) -> Self {
+        self.scale = Some(scale);
+        self
+    }
+
     /// Specify custom UV mapping options
     #[must_use]
     pub const fn with_uv_options(mut self, uv_options: UVOptions) -> Self {
@@ -74,10 +88,19 @@ impl<'l> PlaneMeshBuilder<'l> {
     /// Comsumes the builder to return the computed mesh data
     #[must_use]
     pub fn build(self) -> MeshInfo {
-        let mut mesh = MeshInfo::hexagonal_plane(self.layout, self.pos);
-        if let Some(offset) = self.offset {
-            mesh = mesh.with_offset(offset);
+        // We compute the mesh at the origin to allow scaling
+        let mut mesh = MeshInfo::hexagonal_plane(self.layout, Hex::ZERO);
+        // We store the offset to match the `self.pos`
+        let mut offset = self.layout.hex_to_world_pos(self.pos).extend(0.0);
+        // We apply optional scale
+        if let Some(scale) = self.scale {
+            mesh.vertices.iter_mut().for_each(|p| *p *= scale);
         }
+        // We offset the vertex positions
+        if let Some(custom_offset) = self.offset {
+            offset += custom_offset;
+        }
+        mesh = mesh.with_offset(offset);
         if let Some(facing) = self.facing {
             let facing = facing.normalize();
             let rotation = Quat::from_rotation_arc(BASE_FACING, facing);

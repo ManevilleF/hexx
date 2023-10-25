@@ -36,8 +36,12 @@ pub struct ColumnMeshBuilder<'l> {
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
+    /// Optional custom scale factor for the mesh vertex positions
+    pub scale: Option<Vec3>,
     /// Optional custom facing direction, useful to have the mesh already
     /// rotated
+    ///
+    /// Note that the `scale` factor will be applied before the rotation
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub facing: Option<Vec3>,
@@ -64,6 +68,7 @@ impl<'l> ColumnMeshBuilder<'l> {
             facing: None,
             subdivisions: None,
             offset: None,
+            scale: None,
             top_face: true,
             bottom_face: true,
             sides_uv_options: UVOptions::quad_default(),
@@ -86,6 +91,8 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     /// Specify a custom *facing* direction for the mesh, by default the column
     /// is vertical (facing up)
+    ///
+    /// Note that the `scale` factor will be applied before the rotation
     #[must_use]
     #[inline]
     pub const fn facing(mut self, facing: Vec3) -> Self {
@@ -113,6 +120,13 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[inline]
     pub const fn with_offset(mut self, offset: Vec3) -> Self {
         self.offset = Some(offset);
+        self
+    }
+
+    /// Specify a custom scale factor for the whole mesh
+    #[must_use]
+    pub const fn with_scale(mut self, scale: Vec3) -> Self {
+        self.scale = Some(scale);
         self
     }
 
@@ -164,19 +178,21 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[allow(clippy::many_single_char_names)]
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
+        // We compute the mesh at the origin to allow scaling
         let cap_mesh = PlaneMeshBuilder::new(self.layout)
-            .at(self.pos)
             .with_uv_options(self.caps_uv_options)
             .build();
+        // We store the offset to match the `self.pos`
+        let mut offset = self.layout.hex_to_world_pos(self.pos).extend(0.0);
+        // We create the final mesh
         let mut mesh = MeshInfo::default();
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
-        let center = self.layout.hex_to_world_pos(self.pos);
         let [a, b, c, d, e, f] = self.layout.hex_corners(self.pos);
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         for [left, right] in corners {
-            let normal = (left - center + right - center).normalize();
+            let normal = (left + right).normalize();
             for div in 0..subidivisions {
                 let height = delta * div as f32;
                 let left = Vec3::new(left.x, height, left.y);
@@ -194,14 +210,21 @@ impl<'l> ColumnMeshBuilder<'l> {
             let bottom_face = cap_mesh.rotated(rotation);
             mesh.merge_with(bottom_face);
         }
-        if let Some(offset) = self.offset {
-            mesh = mesh.with_offset(offset);
+        // We apply optional scale
+        if let Some(scale) = self.scale {
+            mesh.vertices.iter_mut().for_each(|p| *p *= scale);
         }
+        // We rotate the mesh to face the given direction
         if let Some(facing) = self.facing {
             let facing = facing.normalize();
             let rotation = Quat::from_rotation_arc(BASE_FACING, facing);
             mesh = mesh.rotated(rotation);
         }
+        // We offset the vertex positions after scaling and rotating
+        if let Some(custom_offset) = self.offset {
+            offset += custom_offset;
+        }
+        mesh = mesh.with_offset(offset);
         mesh
     }
 }
