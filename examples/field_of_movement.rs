@@ -119,7 +119,7 @@ fn setup_grid(
                 .spawn(ColorMesh2dBundle {
                     mesh: mesh.clone().into(),
                     material,
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0).with_scale(Vec3::splat(1.)),
+                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
                     ..default()
                 })
                 .id();

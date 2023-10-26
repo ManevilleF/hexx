@@ -94,7 +94,11 @@ fn setup_grid(
         // We compute the merged mesh with all children columns
         let mesh = children.fold(MeshInfo::default(), |mut mesh, c| {
             let [min, max] = settings.column_heights;
-            let height = rng.gen_range(min..=max);
+            let height = if min < max {
+                rng.gen_range(min..=max)
+            } else {
+                min
+            };
             let info = ColumnMeshBuilder::new(&layout, height)
                 .at(c)
                 .without_bottom_face()

@@ -70,7 +70,7 @@ fn setup_grid(
                 .spawn(ColorMesh2dBundle {
                     mesh: mesh.clone().into(),
                     material,
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0).with_scale(Vec3::splat(0.9)),
+                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
                     ..default()
                 })
                 .id();
@@ -141,7 +141,10 @@ fn handle_input(
 
 /// Compute a bevy mesh from the layout
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
-    let mesh_info = PlaneMeshBuilder::new(hex_layout).facing(Vec3::Z).build();
+    let mesh_info = PlaneMeshBuilder::new(hex_layout)
+        .facing(Vec3::Z)
+        .with_scale(Vec3::splat(0.9))
+        .build();
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices);
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals);

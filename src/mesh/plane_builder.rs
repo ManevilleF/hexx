@@ -6,6 +6,16 @@ use glam::{Quat, Vec3};
 ///
 /// The mesh will be anchored at the center of the hexagon, use offsets to
 /// cutomize anchor/pivot position.
+///
+/// # Note
+///
+/// Transform operations (Scale, Rotate, Translate) through the methods
+///
+/// - Scale: [`Self::with_scale`]
+/// - Rotate: [`Self::with_rotation`], [`Self::facing`]
+/// - Translate: [`Self::with_offset`], [`Self::at`]
+///
+/// Are executed in that order, or **SRT**
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct PlaneMeshBuilder<'l> {
@@ -15,11 +25,13 @@ pub struct PlaneMeshBuilder<'l> {
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
-    /// Optional custom facing direction, useful to have the mesh already
+    /// Optional custom scale factor for the mesh vertex positions
+    pub scale: Option<Vec3>,
+    /// Optional custom rotation, useful to have the mesh already
     /// rotated
     ///
     /// By default the mesh is *facing* up (**Y** axis)
-    pub facing: Option<Vec3>,
+    pub rotation: Option<Quat>,
     /// UV mapping options
     pub uv_options: UVOptions,
 }
@@ -31,8 +43,9 @@ impl<'l> PlaneMeshBuilder<'l> {
         Self {
             layout,
             pos: Hex::ZERO,
-            facing: None,
+            rotation: None,
             offset: None,
+            scale: None,
             uv_options: UVOptions::cap_default(),
         }
     }
@@ -51,9 +64,20 @@ impl<'l> PlaneMeshBuilder<'l> {
 
     /// Specify a custom *facing* direction for the mesh, by default the column
     /// is vertical (facing up)
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `facing` is zero length
     #[must_use]
-    pub const fn facing(mut self, facing: Vec3) -> Self {
-        self.facing = Some(facing);
+    pub fn facing(mut self, facing: Vec3) -> Self {
+        self.rotation = Some(Quat::from_rotation_arc(BASE_FACING, facing.normalize()));
+        self
+    }
+
+    /// Specify a custom rotation for the whole mesh
+    #[must_use]
+    pub const fn with_rotation(mut self, rotation: Quat) -> Self {
+        self.rotation = Some(rotation);
         self
     }
 
@@ -61,6 +85,13 @@ impl<'l> PlaneMeshBuilder<'l> {
     #[must_use]
     pub const fn with_offset(mut self, offset: Vec3) -> Self {
         self.offset = Some(offset);
+        self
+    }
+
+    /// Specify a custom scale factor for the whole mesh
+    #[must_use]
+    pub const fn with_scale(mut self, scale: Vec3) -> Self {
+        self.scale = Some(scale);
         self
     }
 
@@ -74,14 +105,22 @@ impl<'l> PlaneMeshBuilder<'l> {
     /// Comsumes the builder to return the computed mesh data
     #[must_use]
     pub fn build(self) -> MeshInfo {
-        let mut mesh = MeshInfo::hexagonal_plane(self.layout, self.pos);
-        if let Some(offset) = self.offset {
-            mesh = mesh.with_offset(offset);
+        // We compute the mesh at the origin to allow scaling
+        let mut mesh = MeshInfo::hexagonal_plane(self.layout, Hex::ZERO);
+        // We store the offset to match the `self.pos`
+        let pos = self.layout.hex_to_world_pos(self.pos);
+        let mut offset = Vec3::new(pos.x, 0.0, pos.y);
+        // **S** - We apply optional scale
+        if let Some(scale) = self.scale {
+            mesh.vertices.iter_mut().for_each(|p| *p *= scale);
         }
-        if let Some(facing) = self.facing {
-            let facing = facing.normalize();
-            let rotation = Quat::from_rotation_arc(BASE_FACING, facing);
+        // **R** - We rotate the mesh to face the given direction
+        if let Some(rotation) = self.rotation {
             mesh = mesh.rotated(rotation);
+        }
+        // **T** - We offset the vertex positions after scaling and rotating
+        if let Some(custom_offset) = self.offset {
+            offset += custom_offset;
         }
         self.uv_options.alter_uvs(&mut mesh.uvs);
         mesh

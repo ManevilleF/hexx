@@ -25,6 +25,16 @@ use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 ///     .without_top_face()
 ///     .build();
 /// ```
+///
+/// # Note
+///
+/// Transform operations (Scale, Rotate, Translate) through the methods
+///
+/// - Scale: [`Self::with_scale`]
+/// - Rotate: [`Self::with_rotation`], [`Self::facing`]
+/// - Translate: [`Self::with_offset`], [`Self::at`]
+///
+/// Are executed in that order, or **SRT**
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct ColumnMeshBuilder<'l> {
@@ -36,11 +46,13 @@ pub struct ColumnMeshBuilder<'l> {
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
-    /// Optional custom facing direction, useful to have the mesh already
+    /// Optional custom scale factor for the mesh vertex positions
+    pub scale: Option<Vec3>,
+    /// Optional rotation quaternion, useful to have the mesh already
     /// rotated
     ///
     /// By default the mesh is *facing* up (**Y** axis)
-    pub facing: Option<Vec3>,
+    pub rotation: Option<Quat>,
     /// Amount of quads to be generated on the sides of the column
     pub subdivisions: Option<usize>,
     /// Should the top hexagonal face be present
@@ -61,9 +73,10 @@ impl<'l> ColumnMeshBuilder<'l> {
             layout,
             height,
             pos: Hex::ZERO,
-            facing: None,
+            rotation: None,
             subdivisions: None,
             offset: None,
+            scale: None,
             top_face: true,
             bottom_face: true,
             sides_uv_options: UVOptions::quad_default(),
@@ -86,10 +99,21 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     /// Specify a custom *facing* direction for the mesh, by default the column
     /// is vertical (facing up)
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `facing` is zero length
     #[must_use]
     #[inline]
-    pub const fn facing(mut self, facing: Vec3) -> Self {
-        self.facing = Some(facing);
+    pub fn facing(mut self, facing: Vec3) -> Self {
+        self.rotation = Some(Quat::from_rotation_arc(BASE_FACING, facing));
+        self
+    }
+
+    /// Specify a custom rotation for the whole mesh
+    #[must_use]
+    pub const fn with_rotation(mut self, rotation: Quat) -> Self {
+        self.rotation = Some(rotation);
         self
     }
 
@@ -113,6 +137,13 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[inline]
     pub const fn with_offset(mut self, offset: Vec3) -> Self {
         self.offset = Some(offset);
+        self
+    }
+
+    /// Specify a custom scale factor for the whole mesh
+    #[must_use]
+    pub const fn with_scale(mut self, scale: Vec3) -> Self {
+        self.scale = Some(scale);
         self
     }
 
@@ -164,19 +195,22 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[allow(clippy::many_single_char_names)]
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
+        // We compute the mesh at the origin to allow scaling
         let cap_mesh = PlaneMeshBuilder::new(self.layout)
-            .at(self.pos)
             .with_uv_options(self.caps_uv_options)
             .build();
+        // We store the offset to match the `self.pos`
+        let pos = self.layout.hex_to_world_pos(self.pos);
+        let mut offset = Vec3::new(pos.x, 0.0, pos.y);
+        // We create the final mesh
         let mut mesh = MeshInfo::default();
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
-        let center = self.layout.hex_to_world_pos(self.pos);
-        let [a, b, c, d, e, f] = self.layout.hex_corners(self.pos);
+        let [a, b, c, d, e, f] = self.layout.hex_corners(Hex::ZERO);
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         for [left, right] in corners {
-            let normal = (left - center + right - center).normalize();
+            let normal = (left + right).normalize();
             for div in 0..subidivisions {
                 let height = delta * div as f32;
                 let left = Vec3::new(left.x, height, left.y);
@@ -194,14 +228,19 @@ impl<'l> ColumnMeshBuilder<'l> {
             let bottom_face = cap_mesh.rotated(rotation);
             mesh.merge_with(bottom_face);
         }
-        if let Some(offset) = self.offset {
-            mesh = mesh.with_offset(offset);
+        // **S** - We apply optional scale
+        if let Some(scale) = self.scale {
+            mesh.vertices.iter_mut().for_each(|p| *p *= scale);
         }
-        if let Some(facing) = self.facing {
-            let facing = facing.normalize();
-            let rotation = Quat::from_rotation_arc(BASE_FACING, facing);
+        // **R** - We rotate the mesh to face the given direction
+        if let Some(rotation) = self.rotation {
             mesh = mesh.rotated(rotation);
         }
+        // **T** - We offset the vertex positions after scaling and rotating
+        if let Some(custom_offset) = self.offset {
+            offset += custom_offset;
+        }
+        mesh = mesh.with_offset(offset);
         mesh
     }
 }

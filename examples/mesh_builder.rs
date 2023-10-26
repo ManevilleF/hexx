@@ -26,6 +26,7 @@ struct BuilderParams {
     pub bottom_face: bool,
     pub sides_uvs: UVOptions,
     pub caps_uvs: UVOptions,
+    pub scale: Vec3,
 }
 
 pub fn main() {
@@ -111,6 +112,7 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     let mut new_mesh = ColumnMeshBuilder::new(&info.layout, params.height)
         .with_subdivisions(params.subdivisions)
         .with_offset(Vec3::NEG_Y * params.height / 2.0)
+        .with_scale(params.scale)
         .with_caps_uv_options(params.caps_uvs.clone())
         .with_sides_uv_options(params.sides_uvs.clone());
     if !params.top_face {
@@ -144,6 +146,7 @@ impl Default for BuilderParams {
             bottom_face: true,
             sides_uvs: UVOptions::quad_default().with_scale_factor(vec2(1.0, 0.3)),
             caps_uvs: UVOptions::cap_default().with_scale_factor(vec2(0.5, 0.5)),
+            scale: Vec3::ONE,
         }
     }
 }
