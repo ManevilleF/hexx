@@ -495,7 +495,7 @@ impl Hex {
     #[must_use]
     #[doc(alias = "magnitude")]
     /// Computes coordinates length as a signed integer.
-    /// The lenght of a [`Hex`] coordinate is equal to its distance from the
+    /// The length of a [`Hex`] coordinate is equal to its distance from the
     /// origin.
     ///
     /// See [`Self::ulength`] for the unsigned version
@@ -521,7 +521,7 @@ impl Hex {
     #[must_use]
     #[doc(alias = "unsigned_length")]
     /// Computes coordinates length as an unsigned integer
-    /// The lenght of a [`Hex`] coordinate is equal to its distance from the
+    /// The length of a [`Hex`] coordinate is equal to its distance from the
     /// origin.
     ///
     /// See [`Self::length`] for the signed version
