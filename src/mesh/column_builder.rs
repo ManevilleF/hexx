@@ -31,7 +31,7 @@ use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 /// Transform operations (Scale, Rotate, Translate) through the methods
 ///
 /// - Scale: [`Self::with_scale`]
-/// - Rotate": [`Self::with_rotation`], [`Self::facing`]
+/// - Rotate: [`Self::with_rotation`], [`Self::facing`]
 /// - Translate: [`Self::with_offset`], [`Self::at`]
 ///
 /// Are executed in that order, or **SRT**
@@ -50,8 +50,6 @@ pub struct ColumnMeshBuilder<'l> {
     pub scale: Option<Vec3>,
     /// Optional rotation quaternion, useful to have the mesh already
     /// rotated
-    ///
-    /// Note that the `scale` factor will be applied before the rotation
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub rotation: Option<Quat>,

@@ -12,7 +12,7 @@ use glam::{Quat, Vec3};
 /// Transform operations (Scale, Rotate, Translate) through the methods
 ///
 /// - Scale: [`Self::with_scale`]
-/// - Rotate": [`Self::with_rotation`], [`Self::facing`]
+/// - Rotate: [`Self::with_rotation`], [`Self::facing`]
 /// - Translate: [`Self::with_offset`], [`Self::at`]
 ///
 /// Are executed in that order, or **SRT**
