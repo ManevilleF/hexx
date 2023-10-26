@@ -886,8 +886,8 @@ impl Hex {
     #[doc(alias = "excluding_range")]
     #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range` except `self`.
-    /// The number of returned coordinates is equal to `Hex::range_count(range)
-    /// - 1`
+    /// The number of returned coordinates is equal to
+    /// `Hex::range_count(range) - 1`
     ///
     /// > See also [`Hex::range`] to retrieve all coordinates including `self`
     ///
