@@ -267,7 +267,7 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ![fov](docs/fov.png "Field of View example")
 
- > `cargo run --example fov`
+ > `cargo run --example field_of_view`
 
  This example showcases the FOV algorithm, with an interactive range fov around
  your cursor.
@@ -277,7 +277,7 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ![fov](docs/field_of_movement.gif "Field of movement example")
 
- > `cargo run --example field_of_view`
+ > `cargo run --example field_of_movement`
 
  This example showcases the field of movement algorithm, interactively displaying
  the accessible range of movement around the cursor.
