@@ -97,7 +97,7 @@ fn animate(
     time: Res<Time>,
 ) {
     if buttons.pressed(MouseButton::Left) {
-        for event in motion_evr.iter() {
+        for event in motion_evr.read() {
             let mut transform = transforms.get_mut(info.mesh_entity).unwrap();
             transform.rotate_y(event.delta.x * time.delta_seconds());
             transform.rotate_x(event.delta.y * time.delta_seconds());
@@ -129,12 +129,11 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
 
 /// Compute a bevy mesh from the layout
 fn compute_mesh(mesh_info: MeshInfo) -> Mesh {
-    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs);
-    mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
-    mesh
+    Mesh::new(PrimitiveTopology::TriangleList)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+        .with_indices(Some(Indices::U16(mesh_info.indices)))
 }
 
 impl Default for BuilderParams {

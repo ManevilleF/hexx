@@ -62,10 +62,9 @@ fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
         .with_scale(Vec3::splat(0.9))
         .facing(Vec3::Z)
         .build();
-    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs);
-    mesh.set_indices(Some(Indices::U16(mesh_info.indices)));
-    mesh
+    Mesh::new(PrimitiveTopology::TriangleList)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+        .with_indices(Some(Indices::U16(mesh_info.indices)))
 }
