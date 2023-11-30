@@ -91,7 +91,7 @@ fn setup_grid(
                         text: Text::from_section(
                             format!("{},{}", hex.x, hex.y),
                             TextStyle {
-                                font_size: 8.0,
+                                font_size: 7.0,
                                 color: Color::BLACK,
                                 ..default()
                             },
