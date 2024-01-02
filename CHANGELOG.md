@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* (**BREAKING**) `a_star` `cost` function parameter now takes two adjacent `Hex`
+nodes instead of one, allowing for more use cases (#130, #128)
 * Bumped `bevy_inspector_egui` dependency (#129)
 
 ## 0.12.0
