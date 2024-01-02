@@ -127,7 +127,7 @@ fn handle_input(
         for entity in path_to_clear {
             commands.entity(entity).insert(grid.default_mat.clone());
         }
-        let Some(path) = a_star(Hex::ZERO, hex_pos, |h| {
+        let Some(path) = a_star(Hex::ZERO, hex_pos, |_, h| {
             (grid.entities.contains_key(&h) && !grid.blocked_coords.contains(&h)).then_some(1)
         }) else {
             log::info!("No path found");

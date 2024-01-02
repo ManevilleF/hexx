@@ -41,6 +41,13 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 /// This function already takes care of heuristics based on the distance between
 /// `start` and `end`.
 ///
+/// # Arguments
+///
+/// * `start` - start node
+/// * `end` - destination node
+/// * `cost` - cost function taking a node pair (`a` -> `b`) and returning the
+/// logical cost to go from `a` to `b`
+///
 /// # Examples
 ///
 /// - Compute a A star with no boundaries and some forbidden tiles
@@ -56,8 +63,8 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 /// // Add forbidden coordinates
 /// // forbidden_coords.insert(hex(2, 0));
 /// // ..
-/// let path = a_star(start, end, |h| {
-///     (!forbidden_coords.contains(&h)).then_some(0)
+/// let path = a_star(start, end, |_, b| {
+///     (!forbidden_coords.contains(&b)).then_some(0)
 /// });
 /// ```
 /// - Compute a A star with no boundaries and some biome costs
@@ -91,16 +98,18 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 /// // Set coordinate biomes
 /// // biomes.insert(hex(1, 2), Biome::Mountain);
 /// // ..
-/// let path = a_star(start, end, |h| biomes.get(&h).and_then(|b| b.cost()));
+/// let path = a_star(start, end, |_, b| {
+///     biomes.get(&b).and_then(|biome| biome.cost())
+/// });
 /// ```
-pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option<Vec<Hex>> {
+pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex, Hex) -> Option<u32>) -> Option<Vec<Hex>> {
     let heuristic = |h: Hex| h.unsigned_distance_to(end);
 
     // We return early if the end is not included
-    cost(end)?;
+    cost(end, end)?;
     let start_node = Node {
         coord: start,
-        score: heuristic(start) + cost(start)?,
+        score: heuristic(start) + cost(start, start)?,
     };
     let mut open = BinaryHeap::new();
     open.push(start_node);
@@ -114,7 +123,7 @@ pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex) -> Option<u32>) -> Option
         }
         let current_cost = costs[&node.coord];
         for neighbor in node.coord.all_neighbors() {
-            let Some(cost) = cost(neighbor) else { continue };
+            let Some(cost) = cost(node.coord, neighbor) else { continue };
             let neighbor_cost = current_cost + cost;
             if !costs.contains_key(&neighbor) || costs[&neighbor] > neighbor_cost {
                 came_from.insert(neighbor, node.coord);
