@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Bumped `bevy_inspector_egui` dependency (#129)
+
 ## 0.12.0
 
 * Added `PlaneMeshBuilder::with_scale` option to scale generated mesh (#121)
