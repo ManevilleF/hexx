@@ -123,7 +123,9 @@ pub fn a_star(start: Hex, end: Hex, cost: impl Fn(Hex, Hex) -> Option<u32>) -> O
         }
         let current_cost = costs[&node.coord];
         for neighbor in node.coord.all_neighbors() {
-            let Some(cost) = cost(node.coord, neighbor) else { continue };
+            let Some(cost) = cost(node.coord, neighbor) else {
+                continue;
+            };
             let neighbor_cost = current_cost + cost;
             if !costs.contains_key(&neighbor) || costs[&neighbor] > neighbor_cost {
                 came_from.insert(neighbor, node.coord);
