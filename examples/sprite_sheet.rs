@@ -94,7 +94,9 @@ fn handle_input(
         if !buttons.just_pressed(MouseButton::Left) {
             return;
         }
-        let Ok(mut sprite) = tiles.get_mut(entity) else { return };
+        let Ok(mut sprite) = tiles.get_mut(entity) else {
+            return;
+        };
         sprite.index = (sprite.index + 1) % (7 * 6);
     }
 }
