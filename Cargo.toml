@@ -112,6 +112,10 @@ name = "merged_columns"
 path = "examples/merged_columns.rs"
 required-features = ["bevy_reflect"]
 
+[[example]]
+name = "sprite_sheet"
+path = "examples/sprite_sheet.rs"
+
 [[bench]]
 name = "length"
 harness = false
