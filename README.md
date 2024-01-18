@@ -314,3 +314,11 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
  This example showcases how to build a simple hex chunk system with each chunk
  being a single mesh
+
+### Sprite Sheet
+
+![sprite_sheet](docs/sprite_sheet.png "Sprite Sheet example")
+
+ > `cargo run --example sprite_sheet`
+
+ This example showcases how to use hexx with 2D sprite sheet.

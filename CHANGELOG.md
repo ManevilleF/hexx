@@ -5,6 +5,8 @@
 * (**BREAKING**) `a_star` `cost` function parameter now takes two adjacent `Hex`
 nodes instead of one, allowing for more use cases (#130, #128)
 * Bumped `bevy_inspector_egui` dependency (#129)
+* Added a `sprite_sheet` bevy example (#135)
+* Added `HexLayout::rect_size` method (#135)
 
 ## 0.12.0
 

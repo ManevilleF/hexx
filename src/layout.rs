@@ -1,4 +1,4 @@
-use crate::{Direction, Hex, HexOrientation};
+use crate::{Direction, Hex, HexOrientation, SQRT_3};
 use glam::Vec2;
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
@@ -95,6 +95,18 @@ impl HexLayout {
         let x = if self.invert_x { -1.0 } else { 1.0 };
         let y = if self.invert_y { 1.0 } else { -1.0 };
         Vec2::new(x, y)
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the size of the bounding box/rect of an hexagon
+    /// This uses both the `hex_size` and `orientation` of the layout.
+    pub fn rect_size(&self) -> Vec2 {
+        self.hex_size
+            * match self.orientation {
+                HexOrientation::Pointy => Vec2::new(SQRT_3, 2.0),
+                HexOrientation::Flat => Vec2::new(2.0, SQRT_3),
+            }
     }
 }
 

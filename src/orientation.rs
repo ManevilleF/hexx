@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use crate::{direction::angles::DIRECTION_ANGLE_OFFSET_RAD, Direction};
 
-const SQRT_3: f32 = 1.732_050_8;
+pub(crate) const SQRT_3: f32 = 1.732_050_8;
 
 // TODO: make const
 static POINTY_ORIENTATION: HexOrientationData = HexOrientationData {
