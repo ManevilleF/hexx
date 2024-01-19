@@ -7,6 +7,9 @@ mod impls;
 mod iter;
 /// Hex ring utils
 mod rings;
+#[cfg(feature = "simd")]
+/// simd operations
+mod simd;
 /// swizzle utils
 mod siwzzle;
 #[cfg(test)]

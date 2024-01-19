@@ -2,6 +2,34 @@ use crate::{Hex, HexBounds};
 
 /// Extension trait for iterators of [`Hex`]
 pub trait HexIterExt: Iterator {
+    /// Method which takes an iterator and finds the min value according to
+    /// [`Hex::min`]
+    ///
+    /// This method will return `None` on an empty iterator
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let max = Hex::ZERO.range(10).min();
+    /// assert_eq!(max, hex(-10, -10));
+    /// ```
+    fn min(self) -> Option<Hex>;
+
+    /// Method which takes an iterator and finds the max value according to
+    /// [`Hex::max`]
+    ///
+    /// This method will return `None` on an empty iterator
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let max = Hex::ZERO.range(10).max();
+    /// assert_eq!(max, hex(10, 10));
+    /// ```
+    fn max(self) -> Option<Hex>;
+
     /// Method which takes an iterator and finds the mean (average) value.
     ///
     /// This method will return [`Hex::ZERO`] on an empty iterator
@@ -65,6 +93,14 @@ impl<I: Iterator<Item = Hex>> HexIterExt for I {
 
     fn bounds(self) -> HexBounds {
         self.collect()
+    }
+
+    fn min(self) -> Option<Hex> {
+        self.reduce(Hex::min)
+    }
+
+    fn max(self) -> Option<Hex> {
+        self.reduce(Hex::max)
     }
 }
 

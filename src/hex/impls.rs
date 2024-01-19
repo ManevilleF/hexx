@@ -74,15 +74,61 @@ impl AddAssign<DiagonalDirection> for Hex {
     }
 }
 
+#[cfg(not(feature = "simd"))]
 impl Sum for Hex {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(Self::ZERO, Self::const_add)
     }
 }
 
+#[cfg(feature = "simd")]
+impl Sum for Hex {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        let mut batch = [Self::ZERO; 8];
+        let mut count = 0;
+        let mut sum = Self::ZERO;
+
+        for item in iter {
+            batch[count] = item;
+            count += 1;
+            if count == 7 {
+                sum += Self::simd_sum8(batch);
+                batch = [Self::ZERO; 8];
+                count = 0;
+            }
+        }
+
+        sum += Self::simd_sum8(batch);
+        sum
+    }
+}
+
+#[cfg(not(feature = "simd"))]
 impl<'a> Sum<&'a Self> for Hex {
     fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
         iter.fold(Self::ZERO, |a, &b| Self::const_add(a, b))
+    }
+}
+
+#[cfg(feature = "simd")]
+impl<'a> Sum<&'a Self> for Hex {
+    fn sum<I: Iterator<Item = &'a Self>>(iter: I) -> Self {
+        let mut batch = [Self::ZERO; 8];
+        let mut count = 0;
+        let mut sum = Self::ZERO;
+
+        for item in iter {
+            batch[count] = *item;
+            count += 1;
+            if count == 7 {
+                sum += Self::simd_sum8(batch);
+                batch = [Self::ZERO; 8];
+                count = 0;
+            }
+        }
+
+        sum += Self::simd_sum8(batch);
+        sum
     }
 }
 
@@ -527,5 +573,22 @@ impl Shl for Hex {
             x: self.x.shl(rhs.x),
             y: self.y.shl(rhs.y),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[cfg(feature = "simd")]
+    #[test]
+    fn simd_sum_works() {
+        use super::*;
+
+        let origin = Hex::new(10, -10);
+        let simd_sum: Hex = origin.range(33).sum();
+        let real_sum = origin.range(33).fold(Hex::ZERO, |a, b| a + b);
+
+        println!("{simd_sum:?} vs {real_sum:?}");
+        assert_eq!(simd_sum, real_sum);
     }
 }

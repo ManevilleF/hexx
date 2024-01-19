@@ -7,6 +7,19 @@ nodes instead of one, allowing for more use cases (#130, #128)
 * Bumped `bevy_inspector_egui` dependency (#129)
 * Added a `sprite_sheet` bevy example (#135)
 * Added `HexLayout::rect_size` method (#135)
+* (**BREAKING**) Dropped legacy `ser_de` feature, use `serde` insted
+* Added new methods for `Hex` iterators:
+  * `min` which computes the minimum value
+  * `max` which computes the max value
+* Added experimental SIMD support behind `simd` feature:
+  * The `Sum` implementation will use SIMD
+  * Added the following functions:
+    * `Hex::simd_add4`
+    * `Hex::simd_add8`
+    * `Hex::simd_min4`
+    * `Hex::simd_min8`
+    * `Hex::simd_max4`
+    * `Hex::simd_max8`
 
 ## 0.12.0
 

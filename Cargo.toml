@@ -21,8 +21,8 @@ mesh = ["serde?/std"]
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
-# Old serde compat feature
-ser_de = ["serde"]
+# Experimental simd support
+simd = ["dep:wide"]
 # Adds Bevy Reflection support
 bevy_reflect = ["dep:bevy_reflect"]
 
@@ -39,6 +39,10 @@ optional = true
 version = "0.12"
 default-features = false
 features = ["glam"]
+optional = true
+
+[dependencies.wide]
+version = "0.7"
 optional = true
 
 # For lib.rs doctests and examples
@@ -131,6 +135,11 @@ harness = false
 [[bench]]
 name = "rings"
 harness = false
+
+[[bench]]
+name = "simd"
+harness = false
+required-features = ["simd"]
 
 [profile.dev]
 opt-level = 1

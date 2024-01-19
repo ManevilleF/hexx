@@ -37,11 +37,15 @@
 
  ### Cargo features
 
+ * `serde`
+
  `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
  through the `serde` feature gate. To enable it add the following line to
  your `Cargo.toml`:
 
  - `hexx = { version = "0.12", features = ["serde"] }`
+
+ * `packed`
 
  By default `Hex` uses rust classic memory layout, if you want to use `hexx`
  through the FFI or have `Hex` be stored without any memory padding, the
@@ -49,6 +53,32 @@
  following line to your `Cargo.toml`:
 
  - `hexx = { version = "0.12", features = ["packed"] }`
+
+ * `algorithms`
+
+ > Enabled by default
+
+ Enables the `algorithms` module containing basic implementation of
+ pathfinding algorithms
+
+ - `hexx = { version = "0.12", features = ["algorithms"]}`
+
+ * `mesh`
+
+ > Enabled by default
+
+ Enables the `mesh` module containing the mesh builder types, to construct
+ procedural hexagon planes and columns
+
+ - `hexx = { version = "0.12", features = ["mesh"] }`
+
+ * `simd` (**Experimental**)
+
+ Enables simd operations using the [wide](https://docs.rs/wide/latest/wide/index.html) crate
+
+ - `hexx = { version = "0.12", features = ["simd"] }`
+
+ * `bevy_reflect`
 
  `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect) through the
  `bevy_reflect` feature. To enable it add the following line to your
