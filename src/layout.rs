@@ -54,15 +54,23 @@ pub struct HexLayout {
 impl HexLayout {
     #[allow(clippy::cast_precision_loss)]
     #[must_use]
-    /// Computes hexagonal coordinates `hex` into world/pixel coordinates
-    pub fn hex_to_world_pos(&self, hex: Hex) -> Vec2 {
+    /// Computes fractional hexagonal coordinates `hex` into world/pixel coordinates
+    pub fn fractional_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
         let matrix = self.orientation.forward_matrix;
+
         Vec2::new(
-            matrix[0].mul_add(hex.x() as f32, matrix[1] * hex.y() as f32),
-            matrix[2].mul_add(hex.x() as f32, matrix[3] * hex.y() as f32),
+            matrix[0].mul_add(hex.x, matrix[1] * hex.y),
+            matrix[2].mul_add(hex.x, matrix[3] * hex.y),
         ) * self.hex_size
             * self.axis_scale()
             + self.origin
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    #[must_use]
+    /// Computes hexagonal coordinates `hex` into world/pixel coordinates
+    pub fn hex_to_world_pos(&self, hex: Hex) -> Vec2 {
+        self.fractional_hex_to_world_pos(vec2(hex.x as f32, hex.y as f32))
     }
 
     #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
