@@ -1,5 +1,5 @@
 use crate::{Direction, Hex, HexOrientation, SQRT_3};
-use glam::Vec2;
+use glam::{Vec2, vec2};
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
 /// coordinate system and the hexagonal coordinate system.
@@ -67,14 +67,22 @@ impl HexLayout {
 
     #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
     #[must_use]
-    /// Computes world/pixel coordinates `pos` into hexagonal coordinates
-    pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
+    /// Computes world/pixel coordinates `pos` into fractional hexagonal coordinates
+    pub fn world_pos_to_fractional_hex(&self, pos: Vec2) -> Vec2 {
         let matrix = self.orientation.inverse_matrix;
         let point = (pos - self.origin) * self.axis_scale() / self.hex_size;
-        Hex::round([
+        vec2(
             matrix[0].mul_add(point.x, matrix[1] * point.y),
             matrix[2].mul_add(point.x, matrix[3] * point.y),
-        ])
+        )
+    }
+
+    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
+    #[must_use]
+    /// Computes world/pixel coordinates `pos` into hexagonal coordinates
+    pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
+        let fract = self.world_pos_to_fractional_hex(pos);
+        Hex::round([fract.x, fract.y])
     }
 
     #[allow(clippy::cast_precision_loss)]
