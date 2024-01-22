@@ -52,17 +52,21 @@ pub struct HexLayout {
 }
 
 impl HexLayout {
-    #[allow(clippy::cast_precision_loss)]
     #[must_use]
     /// Computes hexagonal coordinates `hex` into world/pixel coordinates
     pub fn hex_to_world_pos(&self, hex: Hex) -> Vec2 {
+        self.hex_to_center_aligned_world_pos(hex) + self.origin
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    #[must_use]
+    pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Hex) -> Vec2 {
         let matrix = self.orientation.forward_matrix;
         Vec2::new(
             matrix[0].mul_add(hex.x() as f32, matrix[1] * hex.y() as f32),
             matrix[2].mul_add(hex.x() as f32, matrix[3] * hex.y() as f32),
         ) * self.hex_size
             * self.axis_scale()
-            + self.origin
     }
 
     #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
@@ -77,15 +81,19 @@ impl HexLayout {
         ])
     }
 
-    #[allow(clippy::cast_precision_loss)]
     #[must_use]
     /// Retrieves all 6 corner coordinates of the given hexagonal coordinates
     /// `hex`
     pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
         let center = self.hex_to_world_pos(hex);
+        self.center_aligned_hex_corners().map(|c| c + center)
+    }
+
+    #[must_use]
+    pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
         Direction::ALL_DIRECTIONS.map(|dir| {
             let angle = dir.angle_pointy() + self.orientation.angle_offset;
-            center + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
+            Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
         })
     }
 

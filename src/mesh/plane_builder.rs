@@ -34,6 +34,8 @@ pub struct PlaneMeshBuilder<'l> {
     pub rotation: Option<Quat>,
     /// UV mapping options
     pub uv_options: UVOptions,
+    /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
+    pub center_aligned: bool,
 }
 
 impl<'l> PlaneMeshBuilder<'l> {
@@ -47,6 +49,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             offset: None,
             scale: None,
             uv_options: UVOptions::cap_default(),
+            center_aligned: false,
         }
     }
 
@@ -102,13 +105,26 @@ impl<'l> PlaneMeshBuilder<'l> {
         self
     }
 
+    #[must_use]
+    #[inline]
+    /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
+    /// around `(0.0, 0.0)`.
+    pub const fn center_aligned(mut self) -> Self {
+        self.center_aligned = true;
+        self
+    }
+
     /// Comsumes the builder to return the computed mesh data
     #[must_use]
     pub fn build(self) -> MeshInfo {
-        // We compute the mesh at the origin to allow scaling
-        let mut mesh = MeshInfo::hexagonal_plane(self.layout, Hex::ZERO);
+        // We compute the mesh at the origin and no offset to allow scaling
+        let mut mesh = MeshInfo::center_aligned_hexagonal_plane(self.layout);
         // We store the offset to match the `self.pos`
-        let pos = self.layout.hex_to_world_pos(self.pos);
+        let pos = if self.center_aligned {
+            self.layout.hex_to_center_aligned_world_pos(self.pos)
+        } else {
+            self.layout.hex_to_world_pos(self.pos)
+        };
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // **S** - We apply optional scale
         if let Some(scale) = self.scale {
@@ -122,6 +138,7 @@ impl<'l> PlaneMeshBuilder<'l> {
         if let Some(custom_offset) = self.offset {
             offset += custom_offset;
         }
+        mesh = mesh.with_offset(offset);
         self.uv_options.alter_uvs(&mut mesh.uvs);
         mesh
     }
