@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use super::{MeshInfo, BASE_FACING};
 use crate::{Hex, HexLayout, UVOptions};
 use glam::{Quat, Vec3};
@@ -22,7 +20,7 @@ use glam::{Quat, Vec3};
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct PlaneMeshBuilder<'l> {
     /// The hexagonal layout, used to compute vertex positions
-    pub layout: Cow<'l, HexLayout>,
+    pub layout: &'l HexLayout,
     /// Custom hex position, will apply an offset if not [`Hex::ZERO`]
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
@@ -36,6 +34,8 @@ pub struct PlaneMeshBuilder<'l> {
     pub rotation: Option<Quat>,
     /// UV mapping options
     pub uv_options: UVOptions,
+    /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
+    pub center_aligned: bool,
 }
 
 impl<'l> PlaneMeshBuilder<'l> {
@@ -43,12 +43,13 @@ impl<'l> PlaneMeshBuilder<'l> {
     #[must_use]
     pub const fn new(layout: &'l HexLayout) -> Self {
         Self {
-            layout: Cow::Borrowed(layout),
+            layout,
             pos: Hex::ZERO,
             rotation: None,
             offset: None,
             scale: None,
             uv_options: UVOptions::cap_default(),
+            center_aligned: false,
         }
     }
 
@@ -108,19 +109,22 @@ impl<'l> PlaneMeshBuilder<'l> {
     #[inline]
     /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
     /// around `(0.0, 0.0)`.
-    pub fn center_aligned(mut self) -> Self {
-        let new_layout = self.layout.as_ref().clone().no_offset();
-        self.layout = Cow::Owned(new_layout);
+    pub const fn center_aligned(mut self) -> Self {
+        self.center_aligned = true;
         self
     }
 
     /// Comsumes the builder to return the computed mesh data
     #[must_use]
     pub fn build(self) -> MeshInfo {
-        // We compute the mesh at the origin to allow scaling
-        let mut mesh = MeshInfo::hexagonal_plane(&self.layout, Hex::ZERO);
+        // We compute the mesh at the origin and no offset to allow scaling
+        let mut mesh = MeshInfo::center_aligned_hexagonal_plane(self.layout);
         // We store the offset to match the `self.pos`
-        let pos = self.layout.hex_to_world_pos(self.pos);
+        let pos = if self.center_aligned {
+            self.layout.hex_to_center_aligned_world_pos(self.pos)
+        } else {
+            self.layout.hex_to_world_pos(self.pos)
+        };
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // **S** - We apply optional scale
         if let Some(scale) = self.scale {
