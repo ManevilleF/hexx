@@ -48,7 +48,6 @@ fn setup_grid(
 ) {
     let layout = HexLayout {
         hex_size: HEX_SIZE,
-        origin: (50.0, -40.0).into(),
         ..default()
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
