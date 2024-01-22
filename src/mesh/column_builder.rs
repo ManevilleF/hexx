@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use glam::{Quat, Vec3};
 
 use super::{MeshInfo, BASE_FACING};
@@ -39,7 +41,7 @@ use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct ColumnMeshBuilder<'l> {
     /// The hexagonal layout, used to compute vertex positions
-    pub layout: &'l HexLayout,
+    pub layout: Cow<'l, HexLayout>,
     /// The column height
     pub height: f32,
     /// Custom hex position, will apply an offset if not [`Hex::ZERO`]
@@ -70,7 +72,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[must_use]
     pub const fn new(layout: &'l HexLayout, height: f32) -> Self {
         Self {
-            layout,
+            layout: Cow::Borrowed(layout),
             height,
             pos: Hex::ZERO,
             rotation: None,
@@ -191,13 +193,24 @@ impl<'l> ColumnMeshBuilder<'l> {
     }
 
     #[must_use]
+    #[inline]
+    /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
+    /// around `(0.0, 0.0)`.
+    pub fn center_aligned(mut self) -> Self {
+        let new_layout = self.layout.as_ref().clone().no_offset();
+        self.layout = Cow::Owned(new_layout);
+        self
+    }
+
+    #[must_use]
     #[allow(clippy::cast_precision_loss)]
     #[allow(clippy::many_single_char_names)]
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
         // We compute the mesh at the origin to allow scaling
-        let cap_mesh = PlaneMeshBuilder::new(self.layout)
+        let cap_mesh = PlaneMeshBuilder::new(&self.layout)
             .with_uv_options(self.caps_uv_options)
+            .center_aligned()
             .build();
         // We store the offset to match the `self.pos`
         let pos = self.layout.hex_to_world_pos(self.pos);

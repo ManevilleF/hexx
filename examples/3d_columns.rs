@@ -124,6 +124,7 @@ fn hexagonal_column(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = ColumnMeshBuilder::new(hex_layout, COLUMN_HEIGHT)
         .without_bottom_face()
         .with_scale(Vec3::splat(0.9))
+        .center_aligned()
         .build();
     Mesh::new(PrimitiveTopology::TriangleList)
         .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)

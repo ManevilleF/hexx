@@ -108,6 +108,15 @@ impl HexLayout {
                 HexOrientation::Flat => Vec2::new(2.0, SQRT_3),
             }
     }
+
+    /// Consumes `self` and returns a new layout with an `origin` set to (0.0,
+    /// 0.0)
+    pub(crate) const fn no_offset(self) -> Self {
+        Self {
+            origin: Vec2::ZERO,
+            ..self
+        }
+    }
 }
 
 impl Default for HexLayout {

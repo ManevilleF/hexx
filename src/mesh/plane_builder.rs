@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::{MeshInfo, BASE_FACING};
 use crate::{Hex, HexLayout, UVOptions};
 use glam::{Quat, Vec3};
@@ -20,7 +22,7 @@ use glam::{Quat, Vec3};
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct PlaneMeshBuilder<'l> {
     /// The hexagonal layout, used to compute vertex positions
-    pub layout: &'l HexLayout,
+    pub layout: Cow<'l, HexLayout>,
     /// Custom hex position, will apply an offset if not [`Hex::ZERO`]
     pub pos: Hex,
     /// Optional custom offset for the mesh vertex positions
@@ -41,7 +43,7 @@ impl<'l> PlaneMeshBuilder<'l> {
     #[must_use]
     pub const fn new(layout: &'l HexLayout) -> Self {
         Self {
-            layout,
+            layout: Cow::Borrowed(layout),
             pos: Hex::ZERO,
             rotation: None,
             offset: None,
@@ -102,11 +104,21 @@ impl<'l> PlaneMeshBuilder<'l> {
         self
     }
 
+    #[must_use]
+    #[inline]
+    /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
+    /// around `(0.0, 0.0)`.
+    pub fn center_aligned(mut self) -> Self {
+        let new_layout = self.layout.as_ref().clone().no_offset();
+        self.layout = Cow::Owned(new_layout);
+        self
+    }
+
     /// Comsumes the builder to return the computed mesh data
     #[must_use]
     pub fn build(self) -> MeshInfo {
         // We compute the mesh at the origin to allow scaling
-        let mut mesh = MeshInfo::hexagonal_plane(self.layout, Hex::ZERO);
+        let mut mesh = MeshInfo::hexagonal_plane(&self.layout, Hex::ZERO);
         // We store the offset to match the `self.pos`
         let pos = self.layout.hex_to_world_pos(self.pos);
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
@@ -122,6 +134,7 @@ impl<'l> PlaneMeshBuilder<'l> {
         if let Some(custom_offset) = self.offset {
             offset += custom_offset;
         }
+        mesh = mesh.with_offset(offset);
         self.uv_options.alter_uvs(&mut mesh.uvs);
         mesh
     }
