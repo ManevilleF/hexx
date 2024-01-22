@@ -9,6 +9,7 @@ nodes instead of one, allowing for more use cases (#130, #128)
 * Added `HexLayout::rect_size` method (#135)
 * Added `ColumnMeshBuilder::center_aligned` option (#139)
 * Added `PlaneMeshBuilder::center_aligned` option (#139)
+* Deprecated `MeshInfo::hexagonal_plane` in favor of `PlaneMeshBuilder` (#139)
 
 ## 0.12.0
 
