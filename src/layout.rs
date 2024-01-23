@@ -68,6 +68,18 @@ impl HexLayout {
         })
     }
 
+    #[must_use]
+    /// Computes hexagonal coordinates `hex` into world/pixel coordinates
+    pub fn hex_to_world_pos(&self, hex: Hex) -> Vec2 {
+        self.fractional_hex_to_world_pos(hex.as_vec2())
+    }
+
+    #[must_use]
+    /// Computes fractional hexagonal coordinates `hex` into world/pixel coordinates
+    pub fn fractional_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
+        self.hex_to_center_aligned_world_pos(hex) + self.origin
+    }
+
     #[allow(clippy::cast_precision_loss)]
     #[must_use]
     pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Vec2) -> Vec2 {
@@ -77,19 +89,6 @@ impl HexLayout {
             matrix[2].mul_add(hex.x, matrix[3] * hex.y),
         ) * self.hex_size
             * self.axis_scale()
-    }
-
-    #[must_use]
-    /// Computes hexagonal coordinates `hex` into world/pixel coordinates
-    pub fn hex_to_world_pos(&self, hex: Hex) -> Vec2 {
-        self.fractional_hex_to_world_pos(vec2(hex.x as f32, hex.y as f32))
-    }
-
-    #[allow(clippy::cast_precision_loss)]
-    #[must_use]
-    /// Computes fractional hexagonal coordinates `hex` into world/pixel coordinates
-    pub fn fractional_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
-        self.fractional_hex_to_world_pos(vec2(hex.x as f32, hex.y as f32)) + self.origin
     }
 
     #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]

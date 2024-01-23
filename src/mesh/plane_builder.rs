@@ -121,7 +121,8 @@ impl<'l> PlaneMeshBuilder<'l> {
         let mut mesh = MeshInfo::center_aligned_hexagonal_plane(self.layout);
         // We store the offset to match the `self.pos`
         let pos = if self.center_aligned {
-            self.layout.hex_to_center_aligned_world_pos(self.pos)
+            self.layout
+                .hex_to_center_aligned_world_pos(self.pos.as_vec2())
         } else {
             self.layout.hex_to_world_pos(self.pos)
         };
