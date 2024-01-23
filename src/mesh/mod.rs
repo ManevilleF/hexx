@@ -135,8 +135,35 @@ impl MeshInfo {
     /// * rotation
     /// * etc
     #[must_use]
+    #[deprecated(since = "0.13.0", note = "Use `PlaneMeshBuilder` instead")]
     pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
         let corners = layout.hex_corners(hex);
+        let corners_arr = corners.map(|p| Vec3::new(p.x, 0., p.y));
+        Self {
+            vertices: vec![
+                corners_arr[0],
+                corners_arr[1],
+                corners_arr[2],
+                corners_arr[3],
+                corners_arr[4],
+                corners_arr[5],
+            ],
+            uvs: vec![
+                corners[0], corners[1], corners[2], corners[3], corners[4], corners[5],
+            ],
+            normals: [Vec3::Y; 6].to_vec(),
+            indices: vec![
+                0, 2, 1, // Top tri
+                3, 5, 4, // Bot tri
+                0, 5, 3, // Mid Quad
+                3, 2, 0, // Mid Quad
+            ],
+        }
+    }
+
+    #[must_use]
+    pub(crate) fn center_aligned_hexagonal_plane(layout: &HexLayout) -> Self {
+        let corners = layout.center_aligned_hex_corners();
         let corners_arr = corners.map(|p| Vec3::new(p.x, 0., p.y));
         Self {
             vertices: vec![

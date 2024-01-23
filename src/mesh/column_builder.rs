@@ -63,6 +63,8 @@ pub struct ColumnMeshBuilder<'l> {
     pub sides_uv_options: UVOptions,
     /// UV mapping options for top and bottom faces
     pub caps_uv_options: UVOptions,
+    /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
+    pub center_aligned: bool,
 }
 
 impl<'l> ColumnMeshBuilder<'l> {
@@ -81,6 +83,7 @@ impl<'l> ColumnMeshBuilder<'l> {
             bottom_face: true,
             sides_uv_options: UVOptions::quad_default(),
             caps_uv_options: UVOptions::cap_default(),
+            center_aligned: false,
         }
     }
 
@@ -191,6 +194,15 @@ impl<'l> ColumnMeshBuilder<'l> {
     }
 
     #[must_use]
+    #[inline]
+    /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
+    /// around `(0.0, 0.0)`.
+    pub const fn center_aligned(mut self) -> Self {
+        self.center_aligned = true;
+        self
+    }
+
+    #[must_use]
     #[allow(clippy::cast_precision_loss)]
     #[allow(clippy::many_single_char_names)]
     /// Comsumes the builder to return the computed mesh data
@@ -198,9 +210,14 @@ impl<'l> ColumnMeshBuilder<'l> {
         // We compute the mesh at the origin to allow scaling
         let cap_mesh = PlaneMeshBuilder::new(self.layout)
             .with_uv_options(self.caps_uv_options)
+            .center_aligned()
             .build();
         // We store the offset to match the `self.pos`
-        let pos = self.layout.hex_to_world_pos(self.pos);
+        let pos = if self.center_aligned {
+            self.layout.hex_to_center_aligned_world_pos(self.pos)
+        } else {
+            self.layout.hex_to_world_pos(self.pos)
+        };
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // We create the final mesh
         let mut mesh = MeshInfo::default();

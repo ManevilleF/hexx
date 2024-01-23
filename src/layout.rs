@@ -1,5 +1,5 @@
 use crate::{Direction, Hex, HexOrientation, SQRT_3};
-use glam::{Vec2, vec2};
+use glam::{vec2, Vec2};
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
 /// coordinate system and the hexagonal coordinate system.
@@ -52,25 +52,44 @@ pub struct HexLayout {
 }
 
 impl HexLayout {
+    #[must_use]
+    /// Retrieves all 6 corner coordinates of the given hexagonal coordinates
+    /// `hex`
+    pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
+        let center = self.hex_to_world_pos(hex);
+        self.center_aligned_hex_corners().map(|c| c + center)
+    }
+
+    #[must_use]
+    pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
+        Direction::ALL_DIRECTIONS.map(|dir| {
+            let angle = dir.angle_pointy() + self.orientation.angle_offset;
+            Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
+        })
+    }
+
     #[allow(clippy::cast_precision_loss)]
     #[must_use]
-    /// Computes fractional hexagonal coordinates `hex` into world/pixel coordinates
-    pub fn fractional_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
+    pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Vec2) -> Vec2 {
         let matrix = self.orientation.forward_matrix;
-
         Vec2::new(
             matrix[0].mul_add(hex.x, matrix[1] * hex.y),
             matrix[2].mul_add(hex.x, matrix[3] * hex.y),
         ) * self.hex_size
             * self.axis_scale()
-            + self.origin
     }
 
-    #[allow(clippy::cast_precision_loss)]
     #[must_use]
     /// Computes hexagonal coordinates `hex` into world/pixel coordinates
     pub fn hex_to_world_pos(&self, hex: Hex) -> Vec2 {
         self.fractional_hex_to_world_pos(vec2(hex.x as f32, hex.y as f32))
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    #[must_use]
+    /// Computes fractional hexagonal coordinates `hex` into world/pixel coordinates
+    pub fn fractional_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
+        self.fractional_hex_to_world_pos(vec2(hex.x as f32, hex.y as f32)) + self.origin
     }
 
     #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
@@ -91,18 +110,6 @@ impl HexLayout {
     pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
         let fract = self.world_pos_to_fractional_hex(pos);
         Hex::round([fract.x, fract.y])
-    }
-
-    #[allow(clippy::cast_precision_loss)]
-    #[must_use]
-    /// Retrieves all 6 corner coordinates of the given hexagonal coordinates
-    /// `hex`
-    pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
-        let center = self.hex_to_world_pos(hex);
-        Direction::ALL_DIRECTIONS.map(|dir| {
-            let angle = dir.angle_pointy() + self.orientation.angle_offset;
-            center + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
-        })
     }
 
     #[inline]

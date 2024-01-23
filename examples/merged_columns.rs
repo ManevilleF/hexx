@@ -102,6 +102,7 @@ fn setup_grid(
             let info = ColumnMeshBuilder::new(&layout, height)
                 .at(c)
                 .without_bottom_face()
+                .center_aligned()
                 .build();
             mesh.merge_with(info);
             mesh
