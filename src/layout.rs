@@ -53,32 +53,46 @@ pub struct HexLayout {
 
 impl HexLayout {
     #[must_use]
+    #[inline]
     /// Computes hexagonal coordinates `hex` into world/pixel coordinates
     pub fn hex_to_world_pos(&self, hex: Hex) -> Vec2 {
         self.hex_to_center_aligned_world_pos(hex) + self.origin
     }
 
-    #[allow(clippy::cast_precision_loss)]
     #[must_use]
+    #[inline]
+    /// Computes hexagonal coordinates `hex` into world/pixel coordinates but
+    /// ignoring [`HexLayout::origin`]
     pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Hex) -> Vec2 {
-        let matrix = self.orientation.forward_matrix;
-        Vec2::new(
-            matrix[0].mul_add(hex.x() as f32, matrix[1] * hex.y() as f32),
-            matrix[2].mul_add(hex.x() as f32, matrix[3] * hex.y() as f32),
-        ) * self.hex_size
-            * self.axis_scale()
+        let [x, y] = self.orientation.forward(hex.to_array_f32());
+        Vec2::new(x, y) * self.hex_size * self.axis_scale()
+    }
+
+    #[must_use]
+    #[inline]
+    /// Computes fractional hexagonal coordinates `hex` into world/pixel
+    /// coordinates
+    pub fn fract_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
+        let [x, y] = self.orientation.forward(hex.to_array());
+        Vec2::new(x, y) * self.hex_size * self.axis_scale() + self.origin
+    }
+
+    #[must_use]
+    #[inline]
+    /// Computes world/pixel coordinates `pos` into hexagonal coordinates
+    pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
+        let p = self.world_pos_to_fract_hex(pos).to_array();
+        Hex::round(p)
     }
 
     #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
     #[must_use]
-    /// Computes world/pixel coordinates `pos` into hexagonal coordinates
-    pub fn world_pos_to_hex(&self, pos: Vec2) -> Hex {
-        let matrix = self.orientation.inverse_matrix;
+    /// Computes world/pixel coordinates `pos` into fractional hexagonal
+    /// coordinates
+    pub fn world_pos_to_fract_hex(&self, pos: Vec2) -> Vec2 {
         let point = (pos - self.origin) * self.axis_scale() / self.hex_size;
-        Hex::round([
-            matrix[0].mul_add(point.x, matrix[1] * point.y),
-            matrix[2].mul_add(point.x, matrix[3] * point.y),
-        ])
+        let [x, y] = self.orientation.inverse(point.to_array());
+        Vec2::new(x, y)
     }
 
     #[must_use]

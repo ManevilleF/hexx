@@ -2,13 +2,33 @@
 
 ## [Unreleased]
 
+### algorithms
+
 * (**BREAKING**) `a_star` `cost` function parameter now takes two adjacent `Hex`
 nodes instead of one, allowing for more use cases (#130, #128)
+
+### Dependencies
+
 * Bumped `bevy_inspector_egui` dependency (#129)
+
+### Examples
+
 * Added a `sprite_sheet` bevy example (#135)
+
+### Additions
+
 * Added `HexLayout::rect_size` method (#135)
 * Added `ColumnMeshBuilder::center_aligned` option (#139)
 * Added `PlaneMeshBuilder::center_aligned` option (#139)
+* Added `Hex::to_array_f32` utility method (#141)
+* Added `Hex::to_cubic_array_f32` utility method (#141)
+* Added `HexLayout::fract_hex_to_world_pos` method (#141, #138, #140)
+* Added `HexLayout::world_pos_to_fract_hex` method (#141, #138, #140)
+* Added `HexOrientationData::forward` method (#141)
+* Added `HexOrientationData::inverse` method (#141)
+
+### Deprecation
+
 * Deprecated `MeshInfo::hexagonal_plane` in favor of `PlaneMeshBuilder` (#139)
 
 ## 0.12.0

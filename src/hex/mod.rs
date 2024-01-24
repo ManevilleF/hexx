@@ -267,7 +267,15 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Converts `self` to cubic coordinates an array as `[x, y, z]`
+    #[allow(clippy::cast_precision_loss)]
+    /// Converts `self` to an [`f32`] array as `[x, y]`
+    pub const fn to_array_f32(self) -> [f32; 2] {
+        [self.x as f32, self.y as f32]
+    }
+
+    #[inline]
+    #[must_use]
+    /// Converts `self` to cubic coordinates array as `[x, y, z]`
     ///
     /// # Example
     ///
@@ -281,6 +289,14 @@ impl Hex {
     /// ```
     pub const fn to_cubic_array(self) -> [i32; 3] {
         [self.x, self.y, self.z()]
+    }
+
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    /// Converts `self` to cubic [`f32`] coordinates array as `[x, y, z]`
+    pub const fn to_cubic_array_f32(self) -> [f32; 3] {
+        [self.x as f32, self.y as f32, self.z() as f32]
     }
 
     /// Creates a [`Hex`] from the first 2 values in `slice`.

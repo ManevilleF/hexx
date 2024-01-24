@@ -85,3 +85,29 @@ impl Deref for HexOrientation {
         self.orientation_data()
     }
 }
+
+impl HexOrientationData {
+    #[must_use]
+    #[inline]
+    /// Applies `matrix` to a point defined by `x` and `y`
+    fn matrix_op(matrix: [f32; 4], [x, y]: [f32; 2]) -> [f32; 2] {
+        [
+            matrix[0].mul_add(x, matrix[1] * y),
+            matrix[2].mul_add(x, matrix[3] * y),
+        ]
+    }
+
+    #[must_use]
+    #[inline]
+    /// Applies the orientation `forward_matrix` to a point `p`
+    pub fn forward(&self, p: [f32; 2]) -> [f32; 2] {
+        Self::matrix_op(self.forward_matrix, p)
+    }
+
+    #[must_use]
+    #[inline]
+    /// Applies the orientation `inverse_matrix` to a point `p`
+    pub fn inverse(&self, p: [f32; 2]) -> [f32; 2] {
+        Self::matrix_op(self.inverse_matrix, p)
+    }
+}
