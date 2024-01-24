@@ -99,14 +99,14 @@ impl HexOrientationData {
 
     #[must_use]
     #[inline]
-    /// Applies [`Self::forward_matrix`] to a point `p`
+    /// Applies the orientation `forward_matrix` to a point `p`
     pub fn forward(&self, p: [f32; 2]) -> [f32; 2] {
         Self::matrix_op(self.forward_matrix, p)
     }
 
     #[must_use]
     #[inline]
-    /// Applies [`Self::inverse_matrix`] to a point `p`
+    /// Applies the orientation `inverse_matrix` to a point `p`
     pub fn inverse(&self, p: [f32; 2]) -> [f32; 2] {
         Self::matrix_op(self.inverse_matrix, p)
     }
