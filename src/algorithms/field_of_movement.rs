@@ -87,12 +87,8 @@ pub fn field_of_movement(
             loop_again = res.is_none() || res != Some(computed_cost);
         }
     }
-    (1..=budget)
-        .flat_map(|i| &cached_rings[i as usize])
-        .filter_map(|coord| {
-            computed_costs
-                .get(coord)
-                .and_then(|&c| (c <= budget).then_some(*coord))
-        })
+    computed_costs
+        .into_iter()
+        .filter_map(|(coord, cost)| (cost <= budget).then_some(coord))
         .collect()
 }
