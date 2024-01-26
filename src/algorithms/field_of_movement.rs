@@ -13,6 +13,11 @@ use std::collections::{HashMap, HashSet};
 /// in order to avoid the possibility of unlimited movement range (i.e. a `Hex`
 /// instance will always have a minimum movement `cost` of 1).
 ///
+/// # Warning
+///
+/// The implementation of this function is pretty naive and has a high
+/// complexity. It is not suitable for production use
+///
 /// # Examples
 ///
 /// - Compute field of movement with no boundaries and some wall tiles that
@@ -58,22 +63,31 @@ pub fn field_of_movement(
 ) -> HashSet<Hex> {
     let mut computed_costs = HashMap::new();
     computed_costs.insert(coord, 0);
-    (1..=budget)
-        .flat_map(|i| coord.ring(i))
-        .filter_map(|coord| {
-            let coord_cost = cost(coord)?;
-            let neighbor_cost = coord
+
+    // Optimization
+    let cached_rings: Vec<_> = coord.rings(0..=budget).collect();
+
+    let mut loop_again = true;
+    while loop_again {
+        loop_again = false;
+        for &coord in (1..=budget).flat_map(|i| &cached_rings[i as usize]) {
+            let Some(coord_cost) = cost(coord) else { continue };
+            let Some(neighbor_cost) = coord
                 .all_neighbors()
                 .into_iter()
                 .filter_map(|n| computed_costs.get(&n))
-                .min()?;
+                .min() else { continue; };
             let computed_cost = coord_cost + 1 + neighbor_cost;
-            if computed_cost <= budget {
-                computed_costs.insert(coord, computed_cost);
-                Some(coord)
-            } else {
-                None
-            }
+            let res = computed_costs.insert(coord, computed_cost);
+            loop_again = res.is_none() || res != Some(computed_cost);
+        }
+    }
+    (1..=budget)
+        .flat_map(|i| &cached_rings[i as usize])
+        .filter_map(|coord| {
+            computed_costs
+                .get(coord)
+                .and_then(|&c| (c <= budget).then_some(*coord))
         })
         .collect()
 }
