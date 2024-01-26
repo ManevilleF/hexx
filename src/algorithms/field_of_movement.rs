@@ -1,5 +1,8 @@
 use crate::Hex;
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    usize,
+};
 
 /// Computes a field of movement around `coord` given a `budget`.
 /// This algorithm takes a `cost` function, which calculates and
@@ -61,16 +64,16 @@ pub fn field_of_movement(
     budget: u32,
     cost: impl Fn(Hex) -> Option<u32>,
 ) -> HashSet<Hex> {
-    let mut computed_costs = HashMap::new();
+    let mut computed_costs = HashMap::with_capacity(Hex::range_count(budget) as usize);
     computed_costs.insert(coord, 0);
 
     // Optimization
-    let cached_rings: Vec<_> = coord.rings(0..=budget).collect();
+    let rings: Vec<_> = coord.rings(1..=budget).flatten().collect();
 
     let mut loop_again = true;
     while loop_again {
         loop_again = false;
-        for &coord in (1..=budget).flat_map(|i| &cached_rings[i as usize]) {
+        for &coord in &rings {
             let Some(coord_cost) = cost(coord) else {
                 continue;
             };
@@ -84,7 +87,9 @@ pub fn field_of_movement(
             };
             let computed_cost = coord_cost + 1 + neighbor_cost;
             let res = computed_costs.insert(coord, computed_cost);
-            loop_again = res.is_none() || res != Some(computed_cost);
+            if res.is_none() || res != Some(computed_cost) {
+                loop_again = true;
+            }
         }
     }
     computed_costs
