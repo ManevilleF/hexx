@@ -71,12 +71,17 @@ pub fn field_of_movement(
     while loop_again {
         loop_again = false;
         for &coord in (1..=budget).flat_map(|i| &cached_rings[i as usize]) {
-            let Some(coord_cost) = cost(coord) else { continue };
+            let Some(coord_cost) = cost(coord) else {
+                continue;
+            };
             let Some(neighbor_cost) = coord
                 .all_neighbors()
                 .into_iter()
                 .filter_map(|n| computed_costs.get(&n))
-                .min() else { continue; };
+                .min()
+            else {
+                continue;
+            };
             let computed_cost = coord_cost + 1 + neighbor_cost;
             let res = computed_costs.insert(coord, computed_cost);
             loop_again = res.is_none() || res != Some(computed_cost);

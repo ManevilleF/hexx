@@ -6,6 +6,7 @@
 
 * (**BREAKING**) `a_star` `cost` function parameter now takes two adjacent `Hex`
 nodes instead of one, allowing for more use cases (#130, #128)
+* Fixed `field_of_movement` algorithm (#142, #127)
 
 ### Dependencies
 
