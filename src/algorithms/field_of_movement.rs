@@ -87,7 +87,7 @@ pub fn field_of_movement(
             };
             let computed_cost = coord_cost + 1 + neighbor_cost;
             let res = computed_costs.insert(coord, computed_cost);
-            if res.is_none() || res != Some(computed_cost) {
+            if !loop_again && (res.is_none() || res != Some(computed_cost)) {
                 loop_again = true;
             }
         }
