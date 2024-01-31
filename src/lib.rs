@@ -231,12 +231,19 @@ pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
 
-pub use bounds::*;
+#[doc(inline)]
+pub use bounds::HexBounds;
+#[doc(inline)]
 pub use conversions::*;
+#[doc(inline)]
 pub use direction::*;
+#[doc(hidden)]
 pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
-pub use hex::*;
-pub use layout::*;
+#[doc(inline)]
+pub use hex::{hex, Hex, HexIterExt};
+#[doc(inline)]
+pub use layout::HexLayout;
 #[cfg(feature = "mesh")]
 pub use mesh::*;
-pub use orientation::*;
+#[doc(inline)]
+pub use orientation::HexOrientation;
