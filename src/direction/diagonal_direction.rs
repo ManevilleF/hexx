@@ -47,7 +47,7 @@ use crate::{Direction, HexOrientation};
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub enum DiagonalDirection {
     #[default]
-    /// Direction to (2, -1)
+    /// Direction to (2, -1) or (2, -1, -1)
     ///
     /// Angles:
     ///
@@ -71,7 +71,7 @@ pub enum DiagonalDirection {
     /// ```
     #[doc(alias = "East")]
     Right = 0,
-    /// Direction to (1, -2)
+    /// Direction to (1, -2) or (1, -2, 1)
     ///
     /// Angles:
     ///
@@ -95,7 +95,7 @@ pub enum DiagonalDirection {
     /// ```
     #[doc(alias = "NorthEast")]
     TopRight = 1,
-    /// Direction to (-1, -1)
+    /// Direction to (-1, -1) or (-1, -1, 2)
     ///
     /// Angles:
     ///
@@ -119,7 +119,7 @@ pub enum DiagonalDirection {
     /// ```
     #[doc(alias = "NorthWest")]
     TopLeft = 2,
-    /// Direction to (-2, 1)
+    /// Direction to (-2, 1) or (-2, 1, 1)
     ///
     /// Angles:
     ///
@@ -143,7 +143,7 @@ pub enum DiagonalDirection {
     /// ```
     #[doc(alias = "West")]
     Left = 3,
-    /// Direction to (-1, 2)
+    /// Direction to (-1, 2) or (-1, 2, -1)
     ///
     /// Angles:
     ///
@@ -167,7 +167,7 @@ pub enum DiagonalDirection {
     /// ```
     #[doc(alias = "SouthWest")]
     BottomLeft = 4,
-    /// Direction to (1, 1)
+    /// Direction to (1, 1) or (1, 1, -2)
     ///
     /// Angles:
     ///
@@ -194,6 +194,19 @@ pub enum DiagonalDirection {
 }
 
 impl DiagonalDirection {
+    /// Direction towards `X, -Y, Z`
+    pub const X_NEG_Y_Z: Self = Self::TopRight;
+    /// Direction towards `X, -Y, -Z`
+    pub const X_NEG_Y_NEG_Z: Self = Self::Right;
+    /// Direction towards `X, Y, -Z`
+    pub const X_Y: Self = Self::BottomRight;
+    /// Direction towards `-X, Y, -Z`
+    pub const NEG_X_Y_NEG_Z: Self = Self::BottomLeft;
+    /// Direction towards `-X, Y, Z`
+    pub const NEG_X_Y_Z: Self = Self::Left;
+    /// Direction towards `-X, Y, Z`
+    pub const NEG_X_NEG_Y: Self = Self::TopLeft;
+
     /// All 6 diagonal directions matching
     /// [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS)
     ///
