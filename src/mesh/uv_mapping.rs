@@ -16,6 +16,13 @@ use glam::{BVec2, Vec2};
 ///     .flip_u()
 ///     .with_scale_factor(vec2(1.0, 2.0));
 /// ```    
+///
+/// # Order of operations
+///
+/// - [`Self::flip`]
+/// - [`Self::scale_factor`]
+/// - [`Self::offset`]
+/// - [`Self::rect`]
 pub struct UVOptions {
     /// The scale factor for the UV coordinates.
     /// * the `x` value applies to `u`

@@ -32,7 +32,7 @@ nodes instead of one, allowing for more use cases (#130, #128)
 
 * `ColumnMeshBuilder` now accepts custom `UvOptions` for each 6 sides (#143)
   * Added `ColumnMeshBuilder::with_multi_sides_uv_options` method (#143)
-* `UVoptions` changes:
+* `UVOptions` changes:
   * (**BREAKING**) changed `flip_x` and `flip_y` fields to `flip` BVec2 (#143)
   * Added `rect` field, to remap the coordinates in specific sections (#143)
   * Added `with_rect` builder method (#143)
