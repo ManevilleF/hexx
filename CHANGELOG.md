@@ -15,6 +15,7 @@ nodes instead of one, allowing for more use cases (#130, #128)
 ### Examples
 
 * Added a `sprite_sheet` bevy example (#135)
+* Improved `mesh_builder` example (#143)
 
 ### Additions
 
@@ -37,7 +38,6 @@ nodes instead of one, allowing for more use cases (#130, #128)
   * Added `rect` field, to remap the coordinates in specific sections (#143)
   * Added `with_rect` builder method (#143)
   * Changed the order of operations in `alter_uvs` (#143)
-* Improved `mesh_builder` example (#143)
 * (**BREAKING**) Fixed quad generation which had upside down uvs (#143)
 
 ### Deprecation
