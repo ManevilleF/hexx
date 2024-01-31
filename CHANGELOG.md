@@ -28,6 +28,8 @@ nodes instead of one, allowing for more use cases (#130, #128)
 * Added `HexLayout::world_pos_to_fract_hex` method (#141, #138, #140)
 * Added `HexOrientationData::forward` method (#141)
 * Added `HexOrientationData::inverse` method (#141)
+* Added coordinate expressive const values for `Direction` (#144)
+* Added coordinate expressive const values for `DiagonalDirection` (#144)
 
 ### Mesh generation
 

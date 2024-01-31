@@ -201,6 +201,19 @@ pub enum Direction {
 }
 
 impl Direction {
+    /// Direction towards `X`
+    pub const X: Self = Self::BottomRight;
+    /// Direction towards `Y`
+    pub const Y: Self = Self::Bottom;
+    /// Direction towards `-X`
+    pub const NEG_X: Self = Self::TopLeft;
+    /// Direction towards `-Y`
+    pub const NEG_Y: Self = Self::Top;
+    /// Direction towards `-X, Y`
+    pub const NEG_X_Y: Self = Self::BottomLeft;
+    /// Direction towards `X, -Y`
+    pub const X_NEG_Y: Self = Self::TopRight;
+
     /// All 6 hexagonal directions matching
     /// [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
     ///
