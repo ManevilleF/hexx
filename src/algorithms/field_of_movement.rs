@@ -67,16 +67,17 @@ pub fn field_of_movement(
     let mut computed_costs = HashMap::with_capacity(Hex::range_count(budget) as usize);
     computed_costs.insert(coord, 0);
 
-    // Optimization
-    let rings: Vec<_> = coord.rings(1..=budget).flatten().collect();
+    // We cache the rings and costs
+    let rings: Vec<(Hex, u32)> = coord
+        .rings(1..=budget)
+        .flatten()
+        .filter_map(|h| cost(h).map(|c| (h, c)))
+        .collect();
 
     let mut loop_again = true;
     while loop_again {
         loop_again = false;
-        for &coord in &rings {
-            let Some(coord_cost) = cost(coord) else {
-                continue;
-            };
+        for (coord, coord_cost) in &rings {
             let Some(neighbor_cost) = coord
                 .all_neighbors()
                 .into_iter()
@@ -86,7 +87,7 @@ pub fn field_of_movement(
                 continue;
             };
             let computed_cost = coord_cost + 1 + neighbor_cost;
-            let res = computed_costs.insert(coord, computed_cost);
+            let res = computed_costs.insert(*coord, computed_cost);
             if !loop_again && (res.is_none() || res != Some(computed_cost)) {
                 loop_again = true;
             }
