@@ -1,6 +1,6 @@
-use glam::Vec2;
+use glam::{BVec2, Vec2};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 /// Struct containing options for UV mapping.
@@ -16,19 +16,41 @@ use glam::Vec2;
 ///     .flip_u()
 ///     .with_scale_factor(vec2(1.0, 2.0));
 /// ```    
+///
+/// # Order of operations
+///
+/// - [`Self::flip`]
+/// - [`Self::scale_factor`]
+/// - [`Self::offset`]
+/// - [`Self::rect`]
 pub struct UVOptions {
     /// The scale factor for the UV coordinates.
     /// * the `x` value applies to `u`
     /// * the `y` value applies to `v`
     pub scale_factor: Vec2,
-    /// Flag indicating whether to flip the UV coordinates along the U-axis.
-    pub flip_u: bool,
-    /// Flag indicating whether to flip the UV coordinates along the V-axis.
-    pub flip_v: bool,
+    /// Flag indicating whether to flip the UV
+    /// * the `x` value applies to `u`
+    /// * the `y` value applies to `v`
+    pub flip: BVec2,
     /// The offset value of the UV coordinates.
     /// * the `x` value applies to `u`
     /// * the `y` value applies to `v`
     pub offset: Vec2,
+    /// Subsection of the texture the UV coordinates for remapping.
+    ///
+    /// Defaults to (0,0) -> (1, 1)
+    pub rect: Rect,
+}
+
+/// 2d rect, with remapping utilities
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct Rect {
+    /// minimum coordinate
+    pub min: Vec2,
+    /// maximum coordinate
+    pub max: Vec2,
 }
 
 impl UVOptions {
@@ -37,9 +59,9 @@ impl UVOptions {
     pub const fn new() -> Self {
         Self {
             scale_factor: Vec2::ONE,
-            flip_u: false,
-            flip_v: false,
+            flip: BVec2::FALSE,
             offset: Vec2::ZERO,
+            rect: Rect::new(),
         }
     }
 
@@ -63,11 +85,20 @@ impl UVOptions {
         self
     }
 
+    /// Defines a custom section of the texture for remapping.
+    /// The UV coordinate will be mapped between `min` and `max`.
+    #[must_use]
+    #[inline]
+    pub const fn with_rect(mut self, min: Vec2, max: Vec2) -> Self {
+        self.rect = Rect { min, max };
+        self
+    }
+
     /// The `u` value will be flipped
     #[must_use]
     #[inline]
     pub const fn flip_u(mut self) -> Self {
-        self.flip_u = true;
+        self.flip.x = true;
         self
     }
 
@@ -75,20 +106,27 @@ impl UVOptions {
     #[must_use]
     #[inline]
     pub const fn flip_v(mut self) -> Self {
-        self.flip_v = true;
+        self.flip.y = true;
         self
     }
 
     /// Apply the options to `uv`, returning the new value as a [`Vec2`]
+    ///
+    /// Are applied in order:
+    /// - [`Self::flip`]
+    /// - [`Self::scale_factor`]
+    /// - [`Self::offset`]
+    /// - [`Self::rect`]
     #[must_use]
     pub fn alter_uv(&self, mut uv: Vec2) -> Vec2 {
-        uv = uv * self.scale_factor + self.offset;
-        if self.flip_u {
+        if self.flip.x {
             uv.x = 1.0 - uv.x;
         }
-        if self.flip_v {
+        if self.flip.y {
             uv.y = 1.0 - uv.y;
         }
+        uv = uv * self.scale_factor + self.offset;
+        uv = self.rect.remap(uv);
         uv
     }
 
@@ -113,6 +151,36 @@ impl UVOptions {
 }
 
 impl Default for UVOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Remaps `value` (0.0..1.0) to (min..max)
+#[inline]
+fn remap(value: f32, min: f32, max: f32) -> f32 {
+    (max - min).mul_add(value, min)
+}
+
+impl Rect {
+    #[inline]
+    const fn new() -> Self {
+        Self {
+            min: Vec2::ZERO,
+            max: Vec2::ONE,
+        }
+    }
+    /// Remaps `value` (0.0..1.0) to the rect
+    #[inline]
+    fn remap(&self, value: Vec2) -> Vec2 {
+        Vec2::new(
+            remap(value.x, self.min.x, self.max.x),
+            remap(value.y, self.min.y, self.max.y),
+        )
+    }
+}
+
+impl Default for Rect {
     fn default() -> Self {
         Self::new()
     }

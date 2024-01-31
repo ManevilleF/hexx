@@ -6,7 +6,7 @@ mod uv_mapping;
 
 pub use column_builder::ColumnMeshBuilder;
 pub use plane_builder::PlaneMeshBuilder;
-pub use uv_mapping::UVOptions;
+pub use uv_mapping::{Rect, UVOptions};
 
 use glam::{Quat, Vec2, Vec3};
 
@@ -116,7 +116,7 @@ impl MeshInfo {
         Self {
             vertices: vec![left, left + offset, right + offset, right],
             normals: [normal; 4].to_vec(),
-            uvs: vec![Vec2::ZERO, Vec2::X, Vec2::ONE, Vec2::Y],
+            uvs: vec![Vec2::Y, Vec2::ZERO, Vec2::X, Vec2::ONE],
             indices: vec![
                 1, 2, 3, // Tri 1
                 3, 0, 1, // Tri 2

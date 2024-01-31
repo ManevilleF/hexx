@@ -4,7 +4,8 @@ use bevy::{
     prelude::*,
     render::{mesh::Indices, render_resource::PrimitiveTopology},
 };
-use bevy_inspector_egui::{prelude::*, quick::ResourceInspectorPlugin};
+use bevy_egui::{egui, EguiContext, EguiPlugin};
+use bevy_inspector_egui::bevy_inspector;
 use glam::vec2;
 use hexx::*;
 
@@ -15,23 +16,35 @@ struct HexInfo {
     pub mesh_handle: Handle<Mesh>,
 }
 
-#[derive(Debug, Resource, Reflect, InspectorOptions)]
-#[reflect(Resource, InspectorOptions)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+enum SideUVMode {
+    Global,
+    Multi,
+}
+
+impl SideUVMode {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Self::Global => "Global",
+            Self::Multi => "Multi",
+        }
+    }
+}
+
+#[derive(Debug, Resource)]
 struct BuilderParams {
-    #[inspector(min = 0.0, max = 50.0)]
     pub height: f32,
-    #[inspector(min = 1, max = 50)]
     pub subdivisions: usize,
     pub top_face: bool,
     pub bottom_face: bool,
-    pub sides_uvs: UVOptions,
-    pub caps_uvs: UVOptions,
     pub scale: Vec3,
+    pub sides_uvs_mode: SideUVMode,
+    pub sides_uvs: [UVOptions; 6],
+    pub caps_uvs: UVOptions,
 }
 
 pub fn main() {
     App::new()
-        .register_type::<BuilderParams>()
         .init_resource::<BuilderParams>()
         .insert_resource(AmbientLight {
             brightness: 0.3,
@@ -39,11 +52,67 @@ pub fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugins(WireframePlugin)
-        .add_plugins(ResourceInspectorPlugin::<BuilderParams>::default())
-        .add_plugins(ResourceInspectorPlugin::<AmbientLight>::default())
+        .add_plugins(EguiPlugin)
+        .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Update, (animate, update_mesh))
+        .add_systems(Update, (show_ui, animate, update_mesh))
         .run();
+}
+
+fn show_ui(world: &mut World) {
+    world.resource_scope(|world, mut params: Mut<BuilderParams>| {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+            return;
+        };
+        let mut egui_context = egui_context.clone();
+        egui::SidePanel::left("Mesh settings").show(egui_context.get_mut(), |ui| {
+            ui.heading("Global");
+            egui::Grid::new("Grid").num_columns(2).show(ui, |ui| {
+                ui.label("Column Height");
+                ui.add(egui::DragValue::new(&mut params.height).clamp_range(1.0..=50.0));
+                ui.end_row();
+                ui.label("Side Subdivisions");
+                ui.add(egui::DragValue::new(&mut params.subdivisions).clamp_range(0..=50));
+                ui.end_row();
+                ui.label("Top Face");
+                ui.add(egui::Checkbox::without_text(&mut params.top_face));
+                ui.end_row();
+                ui.label("Bottom Face");
+                ui.add(egui::Checkbox::without_text(&mut params.bottom_face));
+                ui.end_row();
+                ui.label("Scale");
+                bevy_inspector::ui_for_value(&mut params.scale, ui, world);
+                ui.end_row();
+            });
+            ui.separator();
+            ui.heading("Caps UV options");
+            bevy_inspector::ui_for_value(&mut params.caps_uvs, ui, world);
+            ui.separator();
+            ui.heading("Sides UV options");
+            ui.horizontal(|ui| {
+                egui::ComboBox::from_id_source("Side Uv mode")
+                    .selected_text(params.sides_uvs_mode.label())
+                    .show_ui(ui, |ui| {
+                        let option = SideUVMode::Global;
+                        ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
+                        let option = SideUVMode::Multi;
+                        ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
+                    })
+            });
+            egui::ScrollArea::vertical().show(ui, |ui| match params.sides_uvs_mode {
+                SideUVMode::Global => {
+                    if bevy_inspector::ui_for_value(&mut params.sides_uvs[0], ui, world) {
+                        params.sides_uvs = [params.sides_uvs[0]; 6];
+                    }
+                    true
+                }
+                SideUVMode::Multi => bevy_inspector::ui_for_value(&mut params.sides_uvs, ui, world),
+            });
+        });
+        egui::Window::new("AmbientLight").show(egui_context.get_mut(), |ui| {
+            bevy_inspector::ui_for_resource::<AmbientLight>(world, ui);
+        });
+    });
 }
 
 /// 3D Orthogrpahic camera setup
@@ -113,8 +182,11 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
         .with_subdivisions(params.subdivisions)
         .with_offset(Vec3::NEG_Y * params.height / 2.0)
         .with_scale(params.scale)
-        .with_caps_uv_options(params.caps_uvs.clone())
-        .with_sides_uv_options(params.sides_uvs.clone());
+        .with_caps_uv_options(params.caps_uvs)
+        .with_multi_sides_uv_options(match params.sides_uvs_mode {
+            SideUVMode::Global => [params.sides_uvs[0]; 6],
+            SideUVMode::Multi => params.sides_uvs,
+        });
     if !params.top_face {
         new_mesh = new_mesh.without_top_face();
     }
@@ -143,8 +215,9 @@ impl Default for BuilderParams {
             subdivisions: 3,
             top_face: true,
             bottom_face: true,
-            sides_uvs: UVOptions::quad_default().with_scale_factor(vec2(1.0, 0.3)),
-            caps_uvs: UVOptions::cap_default().with_scale_factor(vec2(0.5, 0.5)),
+            sides_uvs_mode: SideUVMode::Global,
+            sides_uvs: [UVOptions::quad_default().with_scale_factor(vec2(0.3, 1.0)); 6],
+            caps_uvs: UVOptions::cap_default().with_scale_factor(vec2(0.3, 0.3)),
             scale: Vec3::ONE,
         }
     }
