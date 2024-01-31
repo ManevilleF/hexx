@@ -38,6 +38,7 @@ nodes instead of one, allowing for more use cases (#130, #128)
   * Added `with_rect` builder method (#143)
   * Changed the order of operations in `alter_uvs` (#143)
 * Improved `mesh_builder` example (#143)
+* Fixed quad generation which had upside down uvs (#143)
 
 ### Deprecation
 
