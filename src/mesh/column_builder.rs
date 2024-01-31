@@ -60,7 +60,7 @@ pub struct ColumnMeshBuilder<'l> {
     /// Should the bottom hexagonal face be present
     pub bottom_face: bool,
     /// UV mapping options for the column sides
-    pub sides_uv_options: UVOptions,
+    pub sides_uv_options: [UVOptions; 6],
     /// UV mapping options for top and bottom faces
     pub caps_uv_options: UVOptions,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
@@ -81,7 +81,7 @@ impl<'l> ColumnMeshBuilder<'l> {
             scale: None,
             top_face: true,
             bottom_face: true,
-            sides_uv_options: UVOptions::quad_default(),
+            sides_uv_options: [UVOptions::quad_default(); 6],
             caps_uv_options: UVOptions::cap_default(),
             center_aligned: false,
         }
@@ -187,8 +187,20 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     #[must_use]
     #[inline]
-    /// Specify custom uv options for the side triangles
+    /// Specify custom global uv options for the side quad triangles.
+    ///
+    /// To customize each side quad, prefer [`Self::with_multi_sides_uv_options`]
     pub const fn with_sides_uv_options(mut self, uv_options: UVOptions) -> Self {
+        self.sides_uv_options = [uv_options; 6];
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify custom uv options for each of the side quad triangles.
+    ///
+    /// For a global setting prefer [`Self::with_sides_uv_options`]
+    pub const fn with_multi_sides_uv_options(mut self, uv_options: [UVOptions; 6]) -> Self {
         self.sides_uv_options = uv_options;
         self
     }
@@ -226,17 +238,19 @@ impl<'l> ColumnMeshBuilder<'l> {
         let delta = self.height / subidivisions as f32;
         let [a, b, c, d, e, f] = self.layout.hex_corners(Hex::ZERO);
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
-        for [left, right] in corners {
+        (0..6).for_each(|side| {
+            let [left, right] = corners[side];
             let normal = (left + right).normalize();
             for div in 0..subidivisions {
                 let height = delta * div as f32;
                 let left = Vec3::new(left.x, height, left.y);
                 let right = Vec3::new(right.x, height, right.y);
-                let quad = MeshInfo::quad([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
+                let mut quad =
+                    MeshInfo::quad([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
+                self.sides_uv_options[side].alter_uvs(&mut quad.uvs);
                 mesh.merge_with(quad);
             }
-        }
-        self.sides_uv_options.alter_uvs(&mut mesh.uvs);
+        });
         if self.top_face {
             mesh.merge_with(cap_mesh.clone().with_offset(Vec3::Y * self.height));
         }

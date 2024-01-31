@@ -9,7 +9,8 @@ nodes instead of one, allowing for more use cases (#130, #128)
 
 ### Dependencies
 
-* Bumped `bevy_inspector_egui` dependency (#129)
+* Bumped `bevy_inspector_egui` dev dependency (#129)
+* Added `bevy_egui` dev dependency (#143)
 
 ### Examples
 
@@ -26,6 +27,17 @@ nodes instead of one, allowing for more use cases (#130, #128)
 * Added `HexLayout::world_pos_to_fract_hex` method (#141, #138, #140)
 * Added `HexOrientationData::forward` method (#141)
 * Added `HexOrientationData::inverse` method (#141)
+
+### Mesh generation
+
+* `ColumnMeshBuilder` now accepts custom `UvOptions` for each 6 sides (#143)
+  * Added `ColumnMeshBuilder::with_multi_sides_uv_options` method (#143)
+* `UVoptions` changes:
+  * (**BREAKING**) changed `flip_x` and `flip_y` fields to `flip` BVec2 (#143)
+  * Added `rect` field, to remap the coordinates in specific sections (#143)
+  * Added `with_rect` builder method (#143)
+  * Changed the order of operations in `alter_uvs` (#143)
+* Improved `mesh_builder` example (#143)
 
 ### Deprecation
 
