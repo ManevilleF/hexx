@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.13.0
+
 ### algorithms
 
 * (**BREAKING**) `a_star` `cost` function parameter now takes two adjacent `Hex`

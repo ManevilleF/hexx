@@ -1,6 +1,6 @@
 [package]
 name = "hexx"
-version = "0.12.0"
+version = "0.13.0"
 edition = "2021"
 authors = ["Felix de Maneville <felix.maneville@gmail.com>"]
 description = "Hexagonal utilities"
