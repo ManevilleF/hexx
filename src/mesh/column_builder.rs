@@ -189,7 +189,8 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[inline]
     /// Specify custom global uv options for the side quad triangles.
     ///
-    /// To customize each side quad, prefer [`Self::with_multi_sides_uv_options`]
+    /// To customize each side quad, prefer
+    /// [`Self::with_multi_sides_uv_options`]
     pub const fn with_sides_uv_options(mut self, uv_options: UVOptions) -> Self {
         self.sides_uv_options = [uv_options; 6];
         self
