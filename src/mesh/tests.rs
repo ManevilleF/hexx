@@ -7,13 +7,12 @@ fn mesh_integrity(mesh: MeshInfo, expected_len: usize) {
     for normal in mesh.normals {
         assert!(normal.is_normalized());
     }
-    // TODO: Enable this
-    // for uv in mesh.uvs {
-    //     assert!(uv.x >= 0.0);
-    //     assert!(uv.y >= 0.0);
-    //     assert!(uv.x <= 1.0);
-    //     assert!(uv.y <= 1.0);
-    // }
+    for uv in mesh.uvs {
+        assert!(uv.x >= 0.0);
+        assert!(uv.y >= 0.0);
+        assert!(uv.x <= 1.0);
+        assert!(uv.y <= 1.0);
+    }
 }
 
 #[test]

@@ -42,14 +42,18 @@ pub struct UVOptions {
     pub rect: Rect,
 }
 
-/// 2d rect, with remapping utilities
+/// 2D rect, with remapping utilities
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Rect {
     /// minimum coordinate
+    /// * the `x` value applies to `u`
+    /// * the `y` value applies to `v`
     pub min: Vec2,
     /// maximum coordinate
+    /// * the `x` value applies to `u`
+    /// * the `y` value applies to `v`
     pub max: Vec2,
 }
 
@@ -61,7 +65,7 @@ impl UVOptions {
             scale_factor: Vec2::ONE,
             flip: BVec2::FALSE,
             offset: Vec2::ZERO,
-            rect: Rect::new(),
+            rect: Rect::new_uv(),
         }
     }
 
@@ -139,14 +143,23 @@ impl UVOptions {
 
     /// Default values for hexagonal planes or column caps
     #[must_use]
+    #[deprecated(since = "0.14.0", note = "Use `UVOptions::new` instead")]
     pub const fn cap_default() -> Self {
-        Self::new().with_offset(Vec2::splat(0.5))
+        Self::new()
     }
 
     /// Default values for quads
     #[must_use]
+    #[deprecated(since = "0.14.0", note = "Use `UVOptions::new` instead")]
     pub const fn quad_default() -> Self {
         Self::new()
+    }
+
+    /// This function maps `p` to be normalized and between 0 and 1
+    #[inline]
+    pub(crate) fn wrap_uv(p: Vec2) -> Vec2 {
+        let p = p.try_normalize().unwrap_or(p);
+        (p / 2.0) + Vec2::splat(0.5)
     }
 }
 
@@ -164,7 +177,8 @@ fn remap(value: f32, min: f32, max: f32) -> f32 {
 
 impl Rect {
     #[inline]
-    const fn new() -> Self {
+    #[must_use]
+    pub(crate) const fn new_uv() -> Self {
         Self {
             min: Vec2::ZERO,
             max: Vec2::ONE,
@@ -172,7 +186,8 @@ impl Rect {
     }
     /// Remaps `value` (0.0..1.0) to the rect
     #[inline]
-    fn remap(&self, value: Vec2) -> Vec2 {
+    #[must_use]
+    pub(crate) fn remap(&self, value: Vec2) -> Vec2 {
         Vec2::new(
             remap(value.x, self.min.x, self.max.x),
             remap(value.y, self.min.y, self.max.y),
@@ -182,6 +197,6 @@ impl Rect {
 
 impl Default for Rect {
     fn default() -> Self {
-        Self::new()
+        Self::new_uv()
     }
 }

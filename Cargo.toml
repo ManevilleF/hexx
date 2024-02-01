@@ -10,6 +10,7 @@ categories = ["game-development", "mathematics"]
 repository = "https://github.com/ManevilleF/hexx"
 exclude = [".github"]
 resolver = "2"
+rust-version = "1.72.1"
 
 [features]
 default = ["algorithms", "mesh"]
@@ -55,10 +56,10 @@ features = [
   "default_font",
   "png",
   "x11",
-  # The following features are required because of https://github.com/bevyengine/bevy/discussions/9100
-  "ktx2",
-  "zstd",
   "tonemapping_luts",
+  "bevy_gizmos",
+  # Faster compilation
+  "dynamic_linking",
 ]
 default-features = false
 

@@ -4,15 +4,15 @@ use crate::{direction::angles::DIRECTION_ANGLE_OFFSET_RAD, Direction};
 
 pub(crate) const SQRT_3: f32 = 1.732_050_8;
 
-// TODO: make const
-static POINTY_ORIENTATION: HexOrientationData = HexOrientationData {
+/// Pointy orientation matrices and offset
+const POINTY_ORIENTATION: HexOrientationData = HexOrientationData {
     forward_matrix: [SQRT_3, SQRT_3 / 2.0, 0.0, 3.0 / 2.0],
     inverse_matrix: [SQRT_3 / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0],
     angle_offset: DIRECTION_ANGLE_OFFSET_RAD, // 30 degrees
 };
 
-// TODO: make const
-static FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
+/// Flat orientation matrices and offset
+const FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
     forward_matrix: [3.0 / 2.0, 0.0, SQRT_3 / 2.0, SQRT_3],
     inverse_matrix: [2.0 / 3.0, 0.0, -1.0 / 3.0, SQRT_3 / 3.0],
     angle_offset: 0.0, // 0 degrees
@@ -70,7 +70,7 @@ impl HexOrientation {
     #[must_use]
     #[inline]
     /// Returns the orientation inner data, rotation angle and matrices
-    pub fn orientation_data(self) -> &'static HexOrientationData {
+    pub const fn orientation_data(self) -> &'static HexOrientationData {
         match self {
             Self::Pointy => &POINTY_ORIENTATION,
             Self::Flat => &FLAT_ORIENTATION,

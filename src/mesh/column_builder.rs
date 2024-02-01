@@ -81,8 +81,8 @@ impl<'l> ColumnMeshBuilder<'l> {
             scale: None,
             top_face: true,
             bottom_face: true,
-            sides_uv_options: [UVOptions::quad_default(); 6],
-            caps_uv_options: UVOptions::cap_default(),
+            sides_uv_options: [UVOptions::new(); 6],
+            caps_uv_options: UVOptions::new(),
             center_aligned: false,
         }
     }

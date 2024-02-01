@@ -48,7 +48,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             rotation: None,
             offset: None,
             scale: None,
-            uv_options: UVOptions::cap_default(),
+            uv_options: UVOptions::new(),
             center_aligned: false,
         }
     }

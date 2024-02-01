@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: build
         run: cargo build --verbose
@@ -27,7 +27,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: build examples
         run: cargo build --examples --verbose
@@ -36,7 +36,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Run tests
         run: cargo test --tests --all-features
@@ -45,7 +45,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Run doctests
         run: cargo test --doc --all-features
@@ -53,7 +53,7 @@ jobs:
   fmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: "rustfmt"
@@ -62,12 +62,18 @@ jobs:
 
   clippy:
     needs: [ build, fmt ]
+    strategy:
+      matrix:
+        version:
+          - stable
+          - 1.72.1 # MSRV
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Cargo clippy installation
-        run: rustup component add clippy
+        with:
+          toolchain: ${{ matrix.version }}
+          components: clippy
       - name: Run clippy default check
         run: cargo clippy --all --tests -- -D warnings
       - name: Run clippy all features check
@@ -79,7 +85,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Run rustdoc
         run: cargo rustdoc --all-features -- -D warnings
