@@ -17,10 +17,8 @@ impl From<[i32; 2]> for Hex {
 
 impl From<(f32, f32)> for Hex {
     #[inline]
-    // We allow this lint to avoid bumping MSRV
-    #[allow(clippy::tuple_array_conversions)]
-    fn from((x, y): (f32, f32)) -> Self {
-        Self::round([x, y])
+    fn from(v: (f32, f32)) -> Self {
+        Self::round(v.into())
     }
 }
 
