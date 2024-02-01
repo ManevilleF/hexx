@@ -66,7 +66,7 @@ jobs:
       matrix:
         version:
           - stable
-          - 1.65.0 # MSRV
+          - 1.72.0 # MSRV
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
