@@ -176,10 +176,10 @@ impl MeshInfo {
     ///
     /// This mesh has only 12 vertices, as no vertex is duplicated. As a
     /// consequence the normals will behave strangely and the UV mapping
-    /// will be very simplistic.
+    /// will be *extremely* simplistic and stretched on the sides.
     ///
-    /// Use this mesh if you don't care about lighting and texturing, for
-    /// example for *convex hull* collision shapes.
+    /// Use this mesh if you don't care about lighting and texturing, like
+    /// for *convex hull* collision shapes.
     ///
     /// Prefer using [`ColumnMeshBuilder`] in most cases
     #[must_use]

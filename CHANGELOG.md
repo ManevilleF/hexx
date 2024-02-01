@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+* Made internal `HexOrientationData` matrices `const` (#145)
+* (**BREAKING**) Fixed `uv` generation for planes and columns (#145):
+  * UV coords, by default, will be correctly wrapped between (0, 0) and (1, 1)
+* `MeshInfo::cheap_hexagonal_column` now returns a mesh with 12 vertices (#145)
+
+### Deprecations
+
+* Deprecated `UVOptions::quad_default` in favor of `UVOptions::new` (#145)
+* Deprecated `UVOptions::cap_default` in favor of `UVOptions::new` (#145)
+
 ## 0.13.0
 
 ### algorithms
@@ -45,7 +55,7 @@ nodes instead of one, allowing for more use cases (#130, #128)
   * Changed the order of operations in `alter_uvs` (#143)
 * (**BREAKING**) Fixed quad generation which had upside down uvs (#143)
 
-### Deprecation
+### Deprecations
 
 * Deprecated `MeshInfo::hexagonal_plane` in favor of `PlaneMeshBuilder` (#139)
 

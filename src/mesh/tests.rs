@@ -8,7 +8,6 @@ fn mesh_integrity(mesh: MeshInfo, expected_len: usize) {
         assert!(normal.is_normalized());
     }
     for uv in mesh.uvs {
-        println!("{uv:?}");
         assert!(uv.x >= 0.0);
         assert!(uv.y >= 0.0);
         assert!(uv.x <= 1.0);
@@ -25,18 +24,15 @@ fn plane_integrity() {
 #[test]
 fn column_integrity() {
     let layout = HexLayout::default();
-    println!("A");
     let mesh = ColumnMeshBuilder::new(&layout, 10.0)
         .without_top_face()
         .without_bottom_face()
         .build();
     mesh_integrity(mesh, 6 * 4);
-    println!("B");
     let mesh = ColumnMeshBuilder::new(&layout, 10.0)
         .without_bottom_face()
         .build();
     mesh_integrity(mesh, 6 * 4 + 6);
-    println!("C");
     let mesh = ColumnMeshBuilder::new(&layout, 10.0).build();
     mesh_integrity(mesh, 6 * 4 + 12);
 }
