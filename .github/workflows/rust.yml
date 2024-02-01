@@ -62,12 +62,18 @@ jobs:
 
   clippy:
     needs: [ build, fmt ]
+    strategy:
+      matrix:
+        version:
+          - stable
+          - 1.65.0 # MSRV
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-      - name: Cargo clippy installation
-        run: rustup component add clippy
+        with:
+          toolchain: ${{ matrix.version }}
+          components: clippy
       - name: Run clippy default check
         run: cargo clippy --all --tests -- -D warnings
       - name: Run clippy all features check

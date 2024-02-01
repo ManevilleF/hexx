@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Defined MSRV to be 1.65.0 (#145)
 * Made internal `HexOrientationData` matrices `const` (#145)
 * (**BREAKING**) Fixed `uv` generation for planes and columns (#145):
   * UV coords, by default, will be correctly wrapped between (0, 0) and (1, 1)
