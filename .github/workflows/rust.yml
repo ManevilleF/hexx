@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: build
         run: cargo build --verbose
@@ -27,7 +27,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: build examples
         run: cargo build --examples --verbose
@@ -36,7 +36,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Run tests
         run: cargo test --tests --all-features
@@ -45,7 +45,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Run doctests
         run: cargo test --doc --all-features
@@ -53,7 +53,7 @@ jobs:
   fmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: "rustfmt"
@@ -69,7 +69,7 @@ jobs:
           - 1.72.1 # MSRV
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ matrix.version }}
@@ -85,7 +85,7 @@ jobs:
     needs: [ build, fmt ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Run rustdoc
         run: cargo rustdoc --all-features -- -D warnings
