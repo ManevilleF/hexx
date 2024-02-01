@@ -166,7 +166,7 @@ mod tests {
                 Vec2::new(-5.0, 9.0),
                 Vec2::new(-10.0, -0.0),
                 Vec2::new(-5.0, -9.0),
-                Vec2::new(5.0, -9.0)
+                Vec2::new(5.0, -9.0),
             ]
         );
     }
@@ -184,12 +184,12 @@ mod tests {
         assert_eq!(
             corners,
             [
+                Vec2::new(9.0, -5.0),
                 Vec2::new(9.0, 5.0),
                 Vec2::new(-0.0, 10.0),
                 Vec2::new(-9.0, 5.0),
                 Vec2::new(-9.0, -5.0),
                 Vec2::new(0.0, -10.0),
-                Vec2::new(9.0, -5.0)
             ]
         );
     }

@@ -216,8 +216,8 @@ impl Default for BuilderParams {
             top_face: true,
             bottom_face: true,
             sides_uvs_mode: SideUVMode::Global,
-            sides_uvs: [UVOptions::quad_default().with_scale_factor(vec2(0.3, 1.0)); 6],
-            caps_uvs: UVOptions::cap_default().with_scale_factor(vec2(0.3, 0.3)),
+            sides_uvs: [UVOptions::new().with_scale_factor(vec2(0.3, 1.0)); 6],
+            caps_uvs: UVOptions::new(),
             scale: Vec3::ONE,
         }
     }

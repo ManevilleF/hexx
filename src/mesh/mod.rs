@@ -138,19 +138,11 @@ impl MeshInfo {
     #[deprecated(since = "0.13.0", note = "Use `PlaneMeshBuilder` instead")]
     pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
         let corners = layout.hex_corners(hex);
-        let corners_arr = corners.map(|p| Vec3::new(p.x, 0., p.y));
+        let uvs = corners.map(UVOptions::wrap_uv).to_vec();
+        let vertices = corners.map(|p| Vec3::new(p.x, 0., p.y)).to_vec();
         Self {
-            vertices: vec![
-                corners_arr[0],
-                corners_arr[1],
-                corners_arr[2],
-                corners_arr[3],
-                corners_arr[4],
-                corners_arr[5],
-            ],
-            uvs: vec![
-                corners[0], corners[1], corners[2], corners[3], corners[4], corners[5],
-            ],
+            vertices,
+            uvs,
             normals: [Vec3::Y; 6].to_vec(),
             indices: vec![
                 0, 2, 1, // Top tri
@@ -164,19 +156,11 @@ impl MeshInfo {
     #[must_use]
     pub(crate) fn center_aligned_hexagonal_plane(layout: &HexLayout) -> Self {
         let corners = layout.center_aligned_hex_corners();
-        let corners_arr = corners.map(|p| Vec3::new(p.x, 0., p.y));
+        let uvs = corners.map(UVOptions::wrap_uv).to_vec();
+        let vertices = corners.map(|p| Vec3::new(p.x, 0., p.y)).to_vec();
         Self {
-            vertices: vec![
-                corners_arr[0],
-                corners_arr[1],
-                corners_arr[2],
-                corners_arr[3],
-                corners_arr[4],
-                corners_arr[5],
-            ],
-            uvs: vec![
-                corners[0], corners[1], corners[2], corners[3], corners[4], corners[5],
-            ],
+            vertices,
+            uvs,
             normals: [Vec3::Y; 6].to_vec(),
             indices: vec![
                 0, 2, 1, // Top tri
@@ -190,17 +174,20 @@ impl MeshInfo {
     /// Computes cheap mesh data for an hexagonal column facing `Vec3::Y`
     /// without the bottom face.
     ///
-    /// This mesh has only 13 vertices, as no vertex is duplicated. As a
+    /// This mesh has only 12 vertices, as no vertex is duplicated. As a
     /// consequence the normals will behave strangely and the UV mapping
-    /// will be incorrect.
+    /// will be very simplistic.
     ///
     /// Use this mesh if you don't care about lighting and texturing, for
-    /// example for collision shapes.
+    /// example for *convex hull* collision shapes.
+    ///
+    /// Prefer using [`ColumnMeshBuilder`] in most cases
     #[must_use]
     pub fn cheap_hexagonal_column(layout: &HexLayout, hex: Hex, column_height: f32) -> Self {
         let center = layout.hex_to_world_pos(hex);
         let center_top = Vec3::new(center.x, column_height, center.y);
         let corners = layout.hex_corners(hex);
+        let uvs = corners.map(UVOptions::wrap_uv);
         let (top_corners, bot_corners) = (
             corners.map(|p| Vec3::new(p.x, column_height, p.y)),
             corners.map(|p| Vec3::new(p.x, 0., p.y)),
@@ -217,41 +204,37 @@ impl MeshInfo {
 
         let vertices = vec![
             // Top Vertices
-            center_top,     // 0
-            top_corners[0], // 1
-            top_corners[1], // 2
-            top_corners[2], // 3
-            top_corners[3], // 4
-            top_corners[4], // 5
-            top_corners[5], // 6
+            top_corners[0], // 0
+            top_corners[1], // 1
+            top_corners[2], // 2
+            top_corners[3], // 3
+            top_corners[4], // 4
+            top_corners[5], // 5
             // Bottom Vertices
-            bot_corners[0], // 7
-            bot_corners[1], // 8
-            bot_corners[2], // 9
-            bot_corners[3], // 10
-            bot_corners[4], // 11
-            bot_corners[5], // 12
+            bot_corners[0], // 6
+            bot_corners[1], // 7
+            bot_corners[2], // 8
+            bot_corners[3], // 9
+            bot_corners[4], // 10
+            bot_corners[5], // 11
         ];
         let indices = vec![
             // Top Face triangles
-            1, 0, 2, // 1
-            2, 0, 3, // 2
-            3, 0, 4, // 3
-            4, 0, 5, // 4
-            5, 0, 6, // 5
-            6, 0, 1, // 6
+            0, 2, 1, // 0
+            3, 5, 4, // 1
+            0, 5, 3, // 2
+            3, 2, 0, // 3
             // Side triangles
+            0, 1, 7, 7, 6, 0, // Quad 0
             1, 2, 8, 8, 7, 1, // Quad 1
             2, 3, 9, 9, 8, 2, // Quad 2
             3, 4, 10, 10, 9, 3, // Quad 3
             4, 5, 11, 11, 10, 4, // Quad 4
-            5, 6, 12, 12, 11, 5, // Quad 5
-            6, 1, 7, 7, 12, 6, // Quad 6
+            5, 0, 6, 6, 11, 5, // Quad 5
         ];
         Self {
             vertices,
             normals: vec![
-                BASE_FACING,
                 quad_normals[0],
                 quad_normals[1],
                 quad_normals[2],
@@ -265,7 +248,11 @@ impl MeshInfo {
                 quad_normals[4],
                 quad_normals[5],
             ],
-            uvs: [Vec2::Y; 13].to_vec(), // TODO: Find decent UV mapping
+            uvs: [
+                uvs[0], uvs[1], uvs[2], uvs[3], uvs[4], uvs[5], uvs[0], uvs[1], uvs[2], uvs[3],
+                uvs[4], uvs[5],
+            ]
+            .to_vec(),
             indices,
         }
     }
