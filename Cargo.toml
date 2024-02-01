@@ -59,6 +59,8 @@ features = [
   "ktx2",
   "zstd",
   "tonemapping_luts",
+  # Faster compilation
+  "dynamic_linking",
 ]
 default-features = false
 

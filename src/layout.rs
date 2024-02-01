@@ -106,7 +106,7 @@ impl HexLayout {
     #[must_use]
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
         Direction::ALL_DIRECTIONS.map(|dir| {
-            let angle = dir.angle_pointy() + self.orientation.angle_offset;
+            let angle = dir.angle(self.orientation);
             Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
         })
     }
