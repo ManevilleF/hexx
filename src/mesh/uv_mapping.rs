@@ -42,14 +42,18 @@ pub struct UVOptions {
     pub rect: Rect,
 }
 
-/// 2d rect, with remapping utilities
+/// 2D rect, with remapping utilities
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Rect {
     /// minimum coordinate
+    /// * the `x` value applies to `u`
+    /// * the `y` value applies to `v`
     pub min: Vec2,
     /// maximum coordinate
+    /// * the `x` value applies to `u`
+    /// * the `y` value applies to `v`
     pub max: Vec2,
 }
 
