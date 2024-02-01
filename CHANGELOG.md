@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.14.0
+
 * Defined MSRV to be 1.72.1 (#145)
 * Made internal `HexOrientationData` matrices `const` (#145)
 * (**BREAKING**) Fixed `uv` generation for planes and columns (#145):
