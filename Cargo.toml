@@ -56,10 +56,8 @@ features = [
   "default_font",
   "png",
   "x11",
-  # The following features are required because of https://github.com/bevyengine/bevy/discussions/9100
-  "ktx2",
-  "zstd",
   "tonemapping_luts",
+  "bevy_gizmos",
   # Faster compilation
   "dynamic_linking",
 ]

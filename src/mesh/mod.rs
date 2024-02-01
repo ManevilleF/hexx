@@ -153,6 +153,8 @@ impl MeshInfo {
         }
     }
 
+    /// Computes mesh data for an hexagonal plane facing `Vec3::Y` with 6
+    /// vertices and 4 triangles, ignoring the `layout` origin
     #[must_use]
     pub(crate) fn center_aligned_hexagonal_plane(layout: &HexLayout) -> Self {
         let corners = layout.center_aligned_hex_corners();

@@ -7,6 +7,7 @@
 * (**BREAKING**) Fixed `uv` generation for planes and columns (#145):
   * UV coords, by default, will be correctly wrapped between (0, 0) and (1, 1)
 * `MeshInfo::cheap_hexagonal_column` now returns a mesh with 12 vertices (#145)
+* Added gizmos to `mesh_builder` example (#145)
 
 ### Deprecations
 

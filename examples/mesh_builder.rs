@@ -55,7 +55,7 @@ pub fn main() {
         .add_plugins(EguiPlugin)
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Update, (show_ui, animate, update_mesh))
+        .add_systems(Update, (show_ui, animate, update_mesh, gizmos))
         .run();
 }
 
@@ -124,7 +124,7 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let texture = asset_server.load("uv_checker.png");
-    let transform = Transform::from_xyz(0.0, 0.0, 20.0).looking_at(Vec3::ZERO, Vec3::Y);
+    let transform = Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
     commands.spawn(Camera3dBundle {
         transform,
         ..default()
@@ -165,13 +165,44 @@ fn animate(
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
 ) {
-    if buttons.pressed(MouseButton::Left) {
-        for event in motion_evr.read() {
+    for event in motion_evr.read() {
+        if buttons.pressed(MouseButton::Left) {
             let mut transform = transforms.get_mut(info.mesh_entity).unwrap();
-            transform.rotate_y(event.delta.x * time.delta_seconds());
-            transform.rotate_x(event.delta.y * time.delta_seconds());
+            let axis = Vec3::new(event.delta.y, event.delta.x, 0.0).normalize();
+            let angle = event.delta.length() * time.delta_seconds();
+            let quaternion = Quat::from_axis_angle(axis, angle);
+            transform.rotate(quaternion);
         }
     }
+}
+
+fn gizmos(
+    mut draw: Gizmos,
+    info: Res<HexInfo>,
+    transforms: Query<&Transform>,
+    params: Res<BuilderParams>,
+) {
+    let transform = transforms.get(info.mesh_entity).unwrap();
+    // Global axis
+    draw.line(Vec3::NEG_X * 100.0, Vec3::X * 100.0, Color::RED.with_a(0.4));
+    draw.line(
+        Vec3::NEG_Y * 100.0,
+        Vec3::Y * 100.0,
+        Color::GREEN.with_a(0.4),
+    );
+    draw.line(
+        Vec3::NEG_Z * 100.0,
+        Vec3::Z * 100.0,
+        Color::BLUE.with_a(0.4),
+    );
+    // Local axis
+    let radius = info.layout.hex_size.length() * params.scale.length();
+    draw.circle(Vec3::ZERO, transform.local_x(), radius, Color::RED)
+        .segments(64);
+    draw.circle(Vec3::ZERO, transform.local_y(), radius, Color::GREEN)
+        .segments(64);
+    draw.circle(Vec3::ZERO, transform.forward(), radius, Color::BLUE)
+        .segments(64);
 }
 
 fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {
@@ -180,7 +211,7 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     }
     let mut new_mesh = ColumnMeshBuilder::new(&info.layout, params.height)
         .with_subdivisions(params.subdivisions)
-        .with_offset(Vec3::NEG_Y * params.height / 2.0)
+        .with_offset(Vec3::NEG_Y * params.height / 2.0 * params.scale.y)
         .with_scale(params.scale)
         .with_caps_uv_options(params.caps_uvs)
         .with_multi_sides_uv_options(match params.sides_uvs_mode {
