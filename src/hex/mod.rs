@@ -46,7 +46,7 @@ use std::cmp::{max, min};
 ///
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
-#[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone, Default, Eq, PartialEq)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Debug, Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "packed", repr(C))]
