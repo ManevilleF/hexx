@@ -66,7 +66,13 @@ jobs:
       matrix:
         version:
           - stable
+<<<<<<< HEAD
           # - 1.74.1 # MSRV
+||||||| parent of aa394cd (CHANGELOG)
+          - 1.72.1 # MSRV
+=======
+          - 1.74.1 # MSRV
+>>>>>>> aa394cd (CHANGELOG)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

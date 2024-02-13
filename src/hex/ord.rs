@@ -4,10 +4,6 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-/// [`Ordering`] wrapper around [`Hex`], comparing [`Hex::length`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct OrdByLength(pub Hex);
-
 /// [`Ordering`] wrapper around [`Hex`], comparing [`Hex::x`] then [`Hex::y`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OrdByXY(pub Hex);
@@ -15,13 +11,6 @@ pub struct OrdByXY(pub Hex);
 /// [`Ordering`] wrapper around [`Hex`], comparing [`Hex::y`] then [`Hex::x`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OrdByYX(pub Hex);
-
-impl Ord for OrdByLength {
-    #[inline]
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.0.length().cmp(&other.0.length())
-    }
-}
 
 impl Ord for OrdByXY {
     #[inline]
@@ -69,6 +58,5 @@ macro_rules! impl_ord_boilerplate {
     };
 }
 
-impl_ord_boilerplate!(OrdByLength);
 impl_ord_boilerplate!(OrdByXY);
 impl_ord_boilerplate!(OrdByYX);
