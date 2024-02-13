@@ -8,7 +8,7 @@ pub mod grid;
 mod impls;
 /// Iterator tools module
 mod iter;
-/// [`Hex`] ordering types
+/// Hex ordering wrappers
 pub mod ord;
 /// Hex ring utils
 mod rings;
