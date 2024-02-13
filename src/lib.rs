@@ -242,7 +242,7 @@ pub use direction::*;
 #[doc(hidden)]
 pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
 #[doc(inline)]
-pub use hex::{hex, Hex, HexIterExt};
+pub use hex::{hex, ord, Hex, HexIterExt};
 #[doc(inline)]
 pub use layout::HexLayout;
 #[cfg(feature = "mesh")]

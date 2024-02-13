@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+* Added *ordering* wrappers for `Hex` (#147):
+  * `OrdByLength`
+  * `OrdByXY`
+  * `OrdByYX`
+* Bumped MSRV to 1.74.1 (#147)
+
 ## 0.14.0
 
 * Defined MSRV to be 1.72.1 (#145)

@@ -10,7 +10,7 @@ categories = ["game-development", "mathematics"]
 repository = "https://github.com/ManevilleF/hexx"
 exclude = [".github"]
 resolver = "2"
-rust-version = "1.72.1"
+rust-version = "1.74.1"
 
 [features]
 default = ["algorithms", "mesh"]

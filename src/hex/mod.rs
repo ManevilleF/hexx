@@ -5,6 +5,8 @@ mod convert;
 mod impls;
 /// Iterator tools module
 mod iter;
+/// Hex ordering wrappers
+pub mod ord;
 /// Hex ring utils
 mod rings;
 /// swizzle utils
