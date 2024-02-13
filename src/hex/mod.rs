@@ -8,6 +8,8 @@ pub mod grid;
 mod impls;
 /// Iterator tools module
 mod iter;
+/// [`Hex`] ordering types
+pub mod ord;
 /// Hex ring utils
 mod rings;
 /// swizzle utils
