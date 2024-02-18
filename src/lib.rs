@@ -194,7 +194,9 @@
 //!```rust
 //! use bevy::{
 //!     prelude::Mesh,
-//!     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+//!     render::{
+//!         mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology,
+//!     },
 //! };
 //! use hexx::MeshInfo;
 //!
@@ -202,7 +204,7 @@
 //!     Mesh::new(
 //!         PrimitiveTopology::TriangleList,
 //!         // Means you won't edit the mesh afterwards, check bevy docs for more information
-//!         RenderAssetUsages::RENDER_WORLD
+//!         RenderAssetUsages::RENDER_WORLD,
 //!     )
 //!     .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
 //!     .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)

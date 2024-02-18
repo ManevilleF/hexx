@@ -140,7 +140,7 @@ fn setup(
         .with_offset(Vec3::NEG_Y * params.height / 2.0)
         .build();
     let mesh_handle = meshes.add(compute_mesh(mesh));
-    let material = materials.add(texture.into());
+    let material = materials.add(texture);
     let mesh_entity = commands
         .spawn((
             PbrBundle {
