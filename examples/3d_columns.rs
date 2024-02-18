@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     time::common_conditions::on_timer,
 };
 use hexx::{shapes, *};
@@ -64,8 +64,8 @@ fn setup_grid(
         ..default()
     };
     // materials
-    let default_material = materials.add(Color::WHITE.into());
-    let highlighted_material = materials.add(Color::YELLOW.into());
+    let default_material = materials.add(Color::WHITE);
+    let highlighted_material = materials.add(Color::YELLOW);
     // mesh
     let mesh = hexagonal_column(&layout);
     let mesh_handle = meshes.add(mesh);
@@ -126,9 +126,12 @@ fn hexagonal_column(hex_layout: &HexLayout) -> Mesh {
         .with_scale(Vec3::splat(0.9))
         .center_aligned()
         .build();
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }

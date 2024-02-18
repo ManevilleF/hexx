@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
 use hexx::{shapes, *};
 
@@ -38,7 +38,7 @@ fn setup_grid(
         ..default()
     };
     // materials
-    let materials = COLORS.map(|c| materials.add(c.into()));
+    let materials = COLORS.map(|c| materials.add(c));
     // mesh
     let mesh = hexagonal_plane(&layout);
     let mesh_handle = meshes.add(mesh);
@@ -63,9 +63,12 @@ fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
         .facing(Vec3::Z)
         .center_aligned()
         .build();
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }

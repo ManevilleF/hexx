@@ -1,7 +1,7 @@
 use bevy::{
     log,
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::{HashMap, HashSet},
     window::PrimaryWindow,
 };
@@ -51,9 +51,9 @@ fn setup_grid(
         ..default()
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
-    let default_mat = materials.add(Color::WHITE.into());
-    let blocked_mat = materials.add(Color::BLACK.into());
-    let path_mat = materials.add(Color::CYAN.into());
+    let default_mat = materials.add(Color::WHITE);
+    let blocked_mat = materials.add(Color::BLACK);
+    let path_mat = materials.add(Color::CYAN);
     let mut blocked_coords = HashSet::new();
     let entities = Hex::ZERO
         .spiral_range(0..=MAP_RADIUS)
@@ -92,7 +92,7 @@ fn setup_grid(
 /// Input interaction
 fn handle_input(
     mut commands: Commands,
-    buttons: Res<Input<MouseButton>>,
+    buttons: Res<ButtonInput<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     mut current: Local<Hex>,
@@ -156,9 +156,12 @@ fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
         .with_scale(Vec3::splat(0.9))
         .center_aligned()
         .build();
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }
