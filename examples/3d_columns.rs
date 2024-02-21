@@ -18,7 +18,7 @@ const TIME_STEP: Duration = Duration::from_millis(100);
 pub fn main() {
     App::new()
         .insert_resource(AmbientLight {
-            brightness: 0.1,
+            brightness: 200.0,
             ..default()
         })
         .add_plugins(DefaultPlugins)
@@ -47,6 +47,7 @@ fn setup_camera(mut commands: Commands) {
         transform,
         ..default()
     });
+    let transform = Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y);
     commands.spawn(DirectionalLightBundle {
         transform,
         ..default()
@@ -123,7 +124,6 @@ fn animate_rings(
 fn hexagonal_column(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = ColumnMeshBuilder::new(hex_layout, COLUMN_HEIGHT)
         .without_bottom_face()
-        .with_scale(Vec3::splat(0.9))
         .center_aligned()
         .build();
     Mesh::new(

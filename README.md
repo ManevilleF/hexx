@@ -30,8 +30,6 @@
 
  ## Installation
 
- > Minimum supported rust version (MSRV) is `1.72.1`
-
  Run `cargo add hexx` in your project or add the following line to your
  `Cargo.toml`:
 

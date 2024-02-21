@@ -4,10 +4,7 @@ use bevy::{
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
-use bevy_inspector_egui::{
-    quick::{ResourceInspectorPlugin, WorldInspectorPlugin},
-    InspectorOptions,
-};
+use bevy_inspector_egui::{quick::ResourceInspectorPlugin, InspectorOptions};
 use hexx::*;
 use rand::{thread_rng, Rng};
 
@@ -20,12 +17,11 @@ pub fn main() {
         .register_type::<Range<f32>>()
         .init_resource::<MapSettings>()
         .insert_resource(AmbientLight {
-            brightness: 1.,
+            brightness: 500.,
             ..default()
         })
         .add_plugins(DefaultPlugins)
         .add_plugins(ResourceInspectorPlugin::<MapSettings>::default())
-        .add_plugins(WorldInspectorPlugin::default())
         .add_systems(Startup, setup_camera)
         .add_systems(Update, setup_grid)
         .run();
@@ -45,7 +41,7 @@ struct MapSettings {
 #[derive(Debug, Resource)]
 struct Map(pub Entity);
 
-/// 3D Orthogrpahic camera setup
+/// 3D camera setup
 fn setup_camera(mut commands: Commands) {
     let transform = Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y);
     commands.spawn(Camera3dBundle {
