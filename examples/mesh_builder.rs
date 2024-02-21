@@ -2,7 +2,7 @@ use bevy::{
     input::mouse::MouseMotion,
     pbr::wireframe::{Wireframe, WireframePlugin},
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 use bevy_inspector_egui::bevy_inspector;
@@ -47,7 +47,7 @@ pub fn main() {
     App::new()
         .init_resource::<BuilderParams>()
         .insert_resource(AmbientLight {
-            brightness: 0.3,
+            brightness: 500.0,
             ..default()
         })
         .add_plugins(DefaultPlugins)
@@ -140,7 +140,7 @@ fn setup(
         .with_offset(Vec3::NEG_Y * params.height / 2.0)
         .build();
     let mesh_handle = meshes.add(compute_mesh(mesh));
-    let material = materials.add(texture.into());
+    let material = materials.add(texture);
     let mesh_entity = commands
         .spawn((
             PbrBundle {
@@ -162,7 +162,7 @@ fn animate(
     info: Res<HexInfo>,
     mut transforms: Query<&mut Transform>,
     mut motion_evr: EventReader<MouseMotion>,
-    buttons: Res<Input<MouseButton>>,
+    buttons: Res<ButtonInput<MouseButton>>,
     time: Res<Time>,
 ) {
     for event in motion_evr.read() {
@@ -232,11 +232,14 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
 
 /// Compute a bevy mesh from the layout
 fn compute_mesh(mesh_info: MeshInfo) -> Mesh {
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::MAIN_WORLD | RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }
 
 impl Default for BuilderParams {

@@ -2,12 +2,9 @@ use std::ops::Range;
 
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
-use bevy_inspector_egui::{
-    quick::{ResourceInspectorPlugin, WorldInspectorPlugin},
-    InspectorOptions,
-};
+use bevy_inspector_egui::{quick::ResourceInspectorPlugin, InspectorOptions};
 use hexx::*;
 use rand::{thread_rng, Rng};
 
@@ -20,12 +17,11 @@ pub fn main() {
         .register_type::<Range<f32>>()
         .init_resource::<MapSettings>()
         .insert_resource(AmbientLight {
-            brightness: 1.,
+            brightness: 500.,
             ..default()
         })
         .add_plugins(DefaultPlugins)
         .add_plugins(ResourceInspectorPlugin::<MapSettings>::default())
-        .add_plugins(WorldInspectorPlugin::default())
         .add_systems(Startup, setup_camera)
         .add_systems(Update, setup_grid)
         .run();
@@ -45,7 +41,7 @@ struct MapSettings {
 #[derive(Debug, Resource)]
 struct Map(pub Entity);
 
-/// 3D Orthogrpahic camera setup
+/// 3D camera setup
 fn setup_camera(mut commands: Commands) {
     let transform = Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y);
     commands.spawn(Camera3dBundle {
@@ -75,7 +71,7 @@ fn setup_grid(
     };
     // Materials shouldn't be added to assets every time, this is just to keep the
     // example simple
-    let materials = COLORS.map(|c| materials.add(c.into()));
+    let materials = COLORS.map(|c| materials.add(c));
 
     let map_entity = commands
         .spawn((SpatialBundle::default(), Name::new("Chunks")))
@@ -125,11 +121,14 @@ fn setup_grid(
 
 /// Compute a bevy mesh from a hexx mesh
 fn hex_mesh(mesh_info: MeshInfo) -> Mesh {
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }
 
 impl Default for MapSettings {

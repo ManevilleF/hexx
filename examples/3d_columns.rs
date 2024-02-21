@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     time::common_conditions::on_timer,
 };
 use hexx::{shapes, *};
@@ -18,7 +18,7 @@ const TIME_STEP: Duration = Duration::from_millis(100);
 pub fn main() {
     App::new()
         .insert_resource(AmbientLight {
-            brightness: 0.1,
+            brightness: 200.0,
             ..default()
         })
         .add_plugins(DefaultPlugins)
@@ -47,6 +47,7 @@ fn setup_camera(mut commands: Commands) {
         transform,
         ..default()
     });
+    let transform = Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y);
     commands.spawn(DirectionalLightBundle {
         transform,
         ..default()
@@ -64,8 +65,8 @@ fn setup_grid(
         ..default()
     };
     // materials
-    let default_material = materials.add(Color::WHITE.into());
-    let highlighted_material = materials.add(Color::YELLOW.into());
+    let default_material = materials.add(Color::WHITE);
+    let highlighted_material = materials.add(Color::YELLOW);
     // mesh
     let mesh = hexagonal_column(&layout);
     let mesh_handle = meshes.add(mesh);
@@ -123,12 +124,14 @@ fn animate_rings(
 fn hexagonal_column(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = ColumnMeshBuilder::new(hex_layout, COLUMN_HEIGHT)
         .without_bottom_face()
-        .with_scale(Vec3::splat(0.9))
         .center_aligned()
         .build();
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }

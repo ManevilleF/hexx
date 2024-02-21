@@ -811,7 +811,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[doc(alias = "reflect_q")]
-    /// Computes the reflection of `self` accross[`Hex::X`]
+    /// Computes the reflection of `self` accross [`Hex::X`]
     pub const fn reflect_x(self) -> Self {
         Self::new(self.x, self.z())
     }

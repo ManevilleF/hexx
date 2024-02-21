@@ -17,8 +17,6 @@
 //!
 //! ## Installation
 //!
-//! > Minimum supported rust version (MSRV) is `1.72.1`
-//!
 //! Run `cargo add hexx` in your project or add the following line to your
 //! `Cargo.toml`:
 //!
@@ -194,16 +192,22 @@
 //!```rust
 //! use bevy::{
 //!     prelude::Mesh,
-//!     render::{mesh::Indices, render_resource::PrimitiveTopology},
+//!     render::{
+//!         mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology,
+//!     },
 //! };
 //! use hexx::MeshInfo;
 //!
 //! pub fn hexagonal_plane(mesh_info: MeshInfo) -> Mesh {
-//!     Mesh::new(PrimitiveTopology::TriangleList)
-//!         .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-//!         .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-//!         .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-//!         .with_indices(Some(Indices::U16(mesh_info.indices)))
+//!     Mesh::new(
+//!         PrimitiveTopology::TriangleList,
+//!         // Means you won't edit the mesh afterwards, check bevy docs for more information
+//!         RenderAssetUsages::RENDER_WORLD,
+//!     )
+//!     .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+//!     .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+//!     .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+//!     .with_inserted_indices(Indices::U16(mesh_info.indices))
 //! }
 //! ```
 //!

@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::HashMap,
     window::PrimaryWindow,
 };
@@ -50,8 +50,8 @@ fn setup_grid(
         ..default()
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
-    let default_mat = materials.add(Color::WHITE.into());
-    let selected_mat = materials.add(Color::RED.into());
+    let default_mat = materials.add(Color::WHITE);
+    let selected_mat = materials.add(Color::RED);
     let bounds = HexBounds::new(Hex::ZERO, MAP_RADIUS);
     let entities = bounds
         .all_coords()
@@ -112,9 +112,12 @@ fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
         .facing(Vec3::Z)
         .center_aligned()
         .build();
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }

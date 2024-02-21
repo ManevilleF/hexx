@@ -10,7 +10,6 @@ categories = ["game-development", "mathematics"]
 repository = "https://github.com/ManevilleF/hexx"
 exclude = [".github"]
 resolver = "2"
-rust-version = "1.72.1"
 
 [features]
 default = ["algorithms", "mesh"]
@@ -28,7 +27,7 @@ ser_de = ["serde"]
 bevy_reflect = ["dep:bevy_reflect"]
 
 [dependencies]
-glam = "0.24"
+glam = "0.25"
 
 [dependencies.serde]
 version = "1"
@@ -37,14 +36,14 @@ features = ["derive"]
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.12"
+version = "0.13"
 default-features = false
 features = ["glam"]
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.12"
+version = "0.13"
 features = [
   "bevy_asset",
   "bevy_winit",
@@ -69,8 +68,8 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.8"
-bevy-inspector-egui = "0.22"
-bevy_egui = "0.24"
+bevy-inspector-egui = "0.23"
+bevy_egui = "0.25"
 
 [[example]]
 name = "hex_grid"

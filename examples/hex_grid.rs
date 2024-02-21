@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
 };
 use hexx::{shapes, *};
@@ -65,13 +65,13 @@ fn setup_grid(
         ..default()
     };
     // materials
-    let selected_material = materials.add(Color::RED.into());
-    let ring_material = materials.add(Color::YELLOW.into());
-    let wedge_material = materials.add(Color::CYAN.into());
-    let dir_wedge_material = materials.add(Color::VIOLET.into());
-    let line_material = materials.add(Color::ORANGE.into());
-    let half_ring_material = materials.add(Color::LIME_GREEN.into());
-    let default_material = materials.add(Color::WHITE.into());
+    let selected_material = materials.add(Color::RED);
+    let ring_material = materials.add(Color::YELLOW);
+    let wedge_material = materials.add(Color::CYAN);
+    let dir_wedge_material = materials.add(Color::VIOLET);
+    let line_material = materials.add(Color::ORANGE);
+    let half_ring_material = materials.add(Color::LIME_GREEN);
+    let default_material = materials.add(Color::WHITE);
     // mesh
     let mesh = hexagonal_plane(&layout);
     let mesh_handle = meshes.add(mesh);
@@ -204,9 +204,12 @@ fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
         .with_scale(Vec3::splat(0.95))
         .center_aligned()
         .build();
-    Mesh::new(PrimitiveTopology::TriangleList)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
-        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
-        .with_indices(Some(Indices::U16(mesh_info.indices)))
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
 }
