@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.15.0
+
 * Bumped `bevy`, `bevy_egui` and `bevy_inspector_egui` dev dependencies
 * Bumped `glam` to 0.25
 * Dropped MSRV

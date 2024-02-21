@@ -5,9 +5,9 @@
 //!
 //! This lib allows you to:
 //!
-//! - Manipulate hexagon coordinates
-//! - Generate hexagonal maps with custom layouts and orientation
-//! - Generate hexagon meshes (planes or columns)
+//! * Manipulate hexagon coordinates
+//! * Generate hexagonal maps with custom layouts and orientation
+//! * Generate hexagon meshes (planes or columns)
 //!
 //! I made the choice to use *Axial Coordinates* for performance and utility
 //! reasons, but the [`Hex`] type has conversion utilities with *cubic*,
@@ -20,7 +20,7 @@
 //! Run `cargo add hexx` in your project or add the following line to your
 //! `Cargo.toml`:
 //!
-//! - `hexx = "0.14"`
+//! * `hexx = "0.15"`
 //!
 //! ### Cargo features
 //!
@@ -28,42 +28,42 @@
 //! through the `serde` feature gate. To enable it add the following line to
 //! your `Cargo.toml`:
 //!
-//! - `hexx = { version = "0.14", features = ["serde"] }`
+//! * `hexx = { version = "0.15", features = ["serde"] }`
 //!
 //! By default `Hex` uses rust classic memory layout, if you want to use `hexx`
 //! through the FFI or have `Hex` be stored without any memory padding, the
 //! `packed` feature will make `Hex` `repr(C)`. To enable this behaviour add the
 //! following line to your `Cargo.toml`:
 //!
-//! - `hexx = { version = "0.14", features = ["packed"] }`
+//! * `hexx = { version = "0.15", features = ["packed"] }`
 //!
 //! `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect) through the
 //! `bevy_reflect` feature. To enable it add the following line to your
 //! `Cargo.toml`:
 //!
-//! - `hexx = { version = "0.14", features = ["bevy_reflect"] }`
+//! * `hexx = { version = "0.15", features = ["bevy_reflect"] }`
 //!
 //! ## Features
 //!
 //! `hexx` provides the [`Hex`] coordinates with:
 //!
-//! - Distances
-//! - Neighbors and directions
-//! - Lines
-//! - Ranges
-//! - Rings
-//! - Edges
-//! - Wedges
-//! - Spirals
-//! - Rotation
-//! - Symmetry
-//! - Vector operations
-//! - Conversions to other coordinate systems:
-//!     - Cubic coordinates
-//!     - Offset coordinates
-//!     - Doubled coordinates
-//!     - Hexmod coordinates
-//! - Multiple hex resolution
+//! * Distances
+//! * Neighbors and directions
+//! * Lines
+//! * Ranges
+//! * Rings
+//! * Edges
+//! * Wedges
+//! * Spirals
+//! * Rotation
+//! * Symmetry
+//! * Vector operations
+//! * Conversions to other coordinate systems:
+//!     * Cubic coordinates
+//!     * Offset coordinates
+//!     * Doubled coordinates
+//!     * Hexmod coordinates
+//! * Multiple hex resolution
 //!
 //! ## Basic usage
 //!
@@ -138,8 +138,9 @@
 //! [`Hex`] support multi-resolution coordinates.
 //! In practice this means that you may convert a coordinate to a different
 //! resolution:
-//! - To a lower resolution, meaning retrieving a *parent* coordinate
-//! - to a higher resolution, meaning retrieving the center *child* coordinate
+//!
+//! * To a lower resolution, meaning retrieving a *parent* coordinate
+//! * to a higher resolution, meaning retrieving the center *child* coordinate
 //!
 //! Resolutions are abstract, the only useful information is the resolution
 //! **radius**.
