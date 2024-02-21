@@ -234,7 +234,7 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
 fn compute_mesh(mesh_info: MeshInfo) -> Mesh {
     Mesh::new(
         PrimitiveTopology::TriangleList,
-        RenderAssetUsages::MAIN_WORLD,
+        RenderAssetUsages::MAIN_WORLD | RenderAssetUsages::RENDER_WORLD,
     )
     .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
     .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)

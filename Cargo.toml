@@ -69,7 +69,7 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.8"
-bevy-inspector-egui = "0.22"
+bevy-inspector-egui = "0.23"
 bevy_egui = "0.25"
 
 [[example]]
