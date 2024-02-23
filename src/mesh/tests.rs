@@ -1,4 +1,4 @@
-use crate::{ColumnMeshBuilder, HexLayout, MeshInfo, PlaneMeshBuilder};
+use crate::{ColumnMeshBuilder, HexLayout, MeshInfo, PlaneMeshBuilder, OutlineMeshBuilder};
 
 fn mesh_integrity(mesh: MeshInfo, expected_len: usize) {
     assert_eq!(mesh.vertices.len(), expected_len);
@@ -36,3 +36,10 @@ fn column_integrity() {
     let mesh = ColumnMeshBuilder::new(&layout, 10.0).build();
     mesh_integrity(mesh, 6 * 4 + 12);
 }
+
+#[test]
+fn outline_integrity() {
+    let mesh = OutlineMeshBuilder::new(&HexLayout::default()).build();
+    mesh_integrity(mesh, 12);
+}
+

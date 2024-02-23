@@ -1,11 +1,13 @@
 mod column_builder;
 mod plane_builder;
+mod outline_builder;
 #[cfg(test)]
 mod tests;
 mod uv_mapping;
 
 pub use column_builder::ColumnMeshBuilder;
 pub use plane_builder::PlaneMeshBuilder;
+pub use outline_builder::OutlineMeshBuilder;
 pub use uv_mapping::{Rect, UVOptions};
 
 use glam::{Quat, Vec2, Vec3};
@@ -169,6 +171,38 @@ impl MeshInfo {
                 3, 5, 4, // Bot tri
                 0, 5, 3, // Mid Quad
                 3, 2, 0, // Mid Quad
+            ],
+        }
+    }
+
+    /// Computes mesh data for an hexagonal outline facing `Vec3::Y` with 12
+    /// vertices and 12 triangles, ignoring the `layout` origin
+    #[must_use]
+    pub(crate) fn center_aligned_hexagonal_outline(layout: &HexLayout, larger_layout: &HexLayout) -> Self {
+        let small_corners = layout.center_aligned_hex_corners();
+        let large_corners = larger_layout.center_aligned_hex_corners();
+        let corners = [small_corners[0], large_corners[0], small_corners[1], large_corners[1], small_corners[2], large_corners[2], small_corners[3], large_corners[3], small_corners[4], large_corners[4], small_corners[5], large_corners[5]];
+        let uvs = corners.map(UVOptions::wrap_uv).to_vec();
+        let vertices = corners.map(|p| Vec3::new(p.x, 0., p.y)).to_vec();
+        Self {
+            vertices,
+            uvs,
+            normals: [Vec3::Y; 12].to_vec(),
+            indices: vec![
+                0, 1, 3,
+                3, 2, 0,
+                2, 3, 5,
+                5, 4, 2,
+
+                4, 5, 7,
+                7, 6, 4,
+                6, 7, 9,
+                9, 8, 6,
+
+                8, 9, 11,
+                11, 10, 8,
+                10, 11, 1,
+                1, 0, 10,
             ],
         }
     }
