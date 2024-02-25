@@ -221,7 +221,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
         // We compute the mesh at the origin to allow scaling
-        let cap_mesh = PlaneMeshBuilder::new(self.layout)
+        let mut cap_mesh = PlaneMeshBuilder::new(self.layout)
             .with_uv_options(self.caps_uv_options)
             .center_aligned()
             .build();
@@ -237,7 +237,7 @@ impl<'l> ColumnMeshBuilder<'l> {
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
-        let [a, b, c, d, e, f] = self.layout.hex_corners(Hex::ZERO);
+        let [a, b, c, d, e, f] = self.layout.center_aligned_hex_corners();
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         (0..6).for_each(|side| {
             let [left, right] = corners[side];
@@ -262,7 +262,7 @@ impl<'l> ColumnMeshBuilder<'l> {
         }
         // **S** - We apply optional scale
         if let Some(scale) = self.scale {
-            mesh.vertices.iter_mut().for_each(|p| *p *= scale);
+            mesh = mesh.with_scale(scale);
         }
         // **R** - We rotate the mesh to face the given direction
         if let Some(rotation) = self.rotation {

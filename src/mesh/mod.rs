@@ -64,30 +64,56 @@ impl MeshInfo {
     /// Returns a new [`MeshInfo`] but with vertex positions and normals rotated
     #[inline]
     #[must_use]
-    pub fn rotated(self, rotation: Quat) -> Self {
-        Self {
-            vertices: self
-                .vertices
-                .into_iter()
-                .map(|v| rotation.mul_vec3(v))
-                .collect(),
-            normals: self
-                .normals
-                .into_iter()
-                .map(|n| rotation.mul_vec3(n))
-                .collect(),
-            ..self
-        }
+    pub fn rotated(mut self, rotation: Quat) -> Self {
+        self.vertices
+            .iter_mut()
+            .for_each(|v| *v = rotation.mul_vec3(*v));
+        self.normals
+            .iter_mut()
+            .for_each(|n| *n = rotation.mul_vec3(*n));
+        self
     }
 
     /// Returns a new [`MeshInfo`] but with `offset` applied to vertex positions
     #[inline]
     #[must_use]
-    pub fn with_offset(self, offset: Vec3) -> Self {
-        Self {
-            vertices: self.vertices.into_iter().map(|p| p + offset).collect(),
-            ..self
-        }
+    pub fn with_offset(mut self, offset: Vec3) -> Self {
+        self.vertices.iter_mut().for_each(|v| *v += offset);
+        self
+    }
+
+    /// Returns a new [`MeshInfo`] but with `scale` applied to vertex positions
+    #[inline]
+    #[must_use]
+    pub fn with_scale(mut self, scale: Vec3) -> Self {
+        self.vertices.iter_mut().for_each(|p| *p *= scale);
+        self
+    }
+
+    /// Returns a new [`MeshInfo`] but with `scale` applied to vertex uvs
+    #[inline]
+    #[must_use]
+    pub fn with_uv_scale(mut self, scale: Vec2) -> Self {
+        self.uvs.iter_mut().for_each(|c| *c *= scale);
+        self
+    }
+
+    /// Computes the centroid of the mesh
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    pub fn centroid(&self) -> Vec3 {
+        let len = self.vertices.len() as f32;
+        self.vertices.iter().sum::<Vec3>() / len
+    }
+
+    /// Computes the centroid of the mesh
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    pub fn uv_centroid(&self) -> Vec2 {
+        let len = self.uvs.len() as f32;
+        self.uvs.iter().sum::<Vec2>() / len
     }
 
     /// Merges `rhs` into `self`.
@@ -114,43 +140,70 @@ impl MeshInfo {
     fn quad([left, right]: [Vec3; 2], normal: Vec3, height: f32) -> Self {
         let offset = BASE_FACING * height;
         Self {
-            vertices: vec![left, left + offset, right + offset, right],
+            vertices: vec![right, right + offset, left + offset, left],
             normals: [normal; 4].to_vec(),
-            uvs: vec![Vec2::Y, Vec2::ZERO, Vec2::X, Vec2::ONE],
+            uvs: vec![Vec2::X, Vec2::ONE, Vec2::Y, Vec2::ZERO],
+            // 2 - 1
+            // | \ |
+            // 3 - 0
             indices: vec![
-                1, 2, 3, // Tri 1
-                3, 0, 1, // Tri 2
+                2, 1, 0, // Tri 1
+                0, 3, 2, // Tri 2
             ],
         }
     }
 
-    /// Computes mesh data for an hexagonal plane facing `Vec3::Y` with 6
-    /// vertices and 4 triangles
+    /// Performs an _inset_ operition on the mesh, assuming the mesh is a _looping face_,
+    /// either a quad, triangle or hexagonal face.
     ///
-    /// # Note
+    /// # Arguments
     ///
-    /// Prefer using [`PlaneMeshBuilder`] for additional customization like:
-    /// * UV options
-    /// * Offsets
-    /// * rotation
-    /// * etc
-    #[must_use]
-    #[deprecated(since = "0.13.0", note = "Use `PlaneMeshBuilder` instead")]
-    pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
-        let corners = layout.hex_corners(hex);
-        let uvs = corners.map(UVOptions::wrap_uv).to_vec();
-        let vertices = corners.map(|p| Vec3::new(p.x, 0., p.y)).to_vec();
-        Self {
-            vertices,
-            uvs,
-            normals: [Vec3::Y; 6].to_vec(),
-            indices: vec![
-                0, 2, 1, // Top tri
-                3, 5, 4, // Bot tri
-                0, 5, 3, // Mid Quad
-                3, 2, 0, // Mid Quad
-            ],
+    /// * `scale` the scale of the new insetted vertices, must be between 0 and 1
+    /// * `keep_inner_face` - If set to true the insetted face will be kept, otherwise
+    /// it will be removed
+    #[allow(clippy::cast_possible_truncation)]
+    pub(crate) fn inset(&mut self, scale: f32, keep_inner_face: bool) {
+        let vertex_count = self.vertices.len();
+        // We compute the inset mesh, identical to the original face
+        let mut inset_mesh = self.clone();
+        // We downscale the inset face vertices and uvs along its plane
+        {
+            // vertices
+            let centroid = inset_mesh.centroid();
+            inset_mesh.vertices.iter_mut().for_each(|v| {
+                let dir = (*v - centroid) * scale;
+                *v = centroid + dir;
+            });
+            // uvs
+            let uv_centroid = inset_mesh.uv_centroid();
+            inset_mesh.uvs.iter_mut().for_each(|uv| {
+                let dir = (*uv - uv_centroid) * scale;
+                *uv = uv_centroid + dir;
+            });
         }
+        if !keep_inner_face {
+            inset_mesh.indices.clear();
+        }
+        self.indices.clear();
+        let vertex_count = vertex_count as u16;
+        let connection_indices = (0..vertex_count).flat_map(|v_idx| {
+            let next_v_idx = (v_idx + 1) % vertex_count;
+            let inset_v_idx = v_idx + vertex_count;
+            let next_inset_v_idx = next_v_idx + vertex_count;
+
+            [
+                // Tri 1
+                next_inset_v_idx,
+                next_v_idx,
+                v_idx,
+                // Tri 2
+                v_idx,
+                inset_v_idx,
+                next_inset_v_idx,
+            ]
+        });
+        self.indices.extend(connection_indices);
+        self.merge_with(inset_mesh);
     }
 
     /// Computes mesh data for an hexagonal plane facing `Vec3::Y` with 6

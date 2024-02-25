@@ -128,7 +128,7 @@ impl<'l> PlaneMeshBuilder<'l> {
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // **S** - We apply optional scale
         if let Some(scale) = self.scale {
-            mesh.vertices.iter_mut().for_each(|p| *p *= scale);
+            mesh = mesh.with_scale(scale);
         }
         // **R** - We rotate the mesh to face the given direction
         if let Some(rotation) = self.rotation {

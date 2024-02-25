@@ -141,20 +141,6 @@ impl UVOptions {
         }
     }
 
-    /// Default values for hexagonal planes or column caps
-    #[must_use]
-    #[deprecated(since = "0.14.0", note = "Use `UVOptions::new` instead")]
-    pub const fn cap_default() -> Self {
-        Self::new()
-    }
-
-    /// Default values for quads
-    #[must_use]
-    #[deprecated(since = "0.14.0", note = "Use `UVOptions::new` instead")]
-    pub const fn quad_default() -> Self {
-        Self::new()
-    }
-
     /// This function maps `p` to be normalized and between 0 and 1
     #[inline]
     pub(crate) fn wrap_uv(p: Vec2) -> Vec2 {

@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+* Removed methods deprecated in previous versions
+* Added new `MeshInfo` methods:
+  * `with_scale`
+  * `centroid`
+  * `uv_centroid`
+* (**BREAKING**) Changed the way `ColumnMeshBuilder` generates quad to be consistent
+with hexagonal faces
+* Fixed the way `ColumnMeshBuilder` generate the hexagonal caps, which could behave
+strangely with non center aligned layout
+
 ## 0.15.0
 
 * Bumped `bevy`, `bevy_egui` and `bevy_inspector_egui` dev dependencies
