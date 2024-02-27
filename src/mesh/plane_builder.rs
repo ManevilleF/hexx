@@ -1,5 +1,5 @@
-use super::{MeshInfo, BASE_FACING};
-use crate::{Hex, HexLayout, UVOptions};
+use super::{utils::Hexagon, MeshInfo, BASE_FACING};
+use crate::{Hex, HexLayout, InsetOptions, UVOptions};
 use glam::{Quat, Vec3};
 
 /// Builder struct to customize hex plane mesh generation.
@@ -36,6 +36,8 @@ pub struct PlaneMeshBuilder<'l> {
     pub uv_options: UVOptions,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
+    /// Optional inset options for the plane face
+    pub inset_options: Option<InsetOptions>,
 }
 
 impl<'l> PlaneMeshBuilder<'l> {
@@ -50,6 +52,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             scale: None,
             uv_options: UVOptions::new(),
             center_aligned: false,
+            inset_options: None,
         }
     }
 
@@ -114,11 +117,28 @@ impl<'l> PlaneMeshBuilder<'l> {
         self
     }
 
+    /// Specify insetting option for the hexagonal face
+    ///
+    /// # Arguments
+    ///
+    /// * `scale` the scale of the new insetted vertices,
+    /// * `keep_inner_face` - If set to true the insetted face will be kept, otherwise
+    /// it will be removed
+    #[must_use]
+    #[inline]
+    pub const fn with_inset_face(mut self, scale: f32, keep_inner_face: bool) -> Self {
+        self.inset_options = Some(InsetOptions {
+            keep_inner_face,
+            scale,
+        });
+        self
+    }
+
     /// Comsumes the builder to return the computed mesh data
     #[must_use]
     pub fn build(self) -> MeshInfo {
         // We compute the mesh at the origin and no offset to allow scaling
-        let mut mesh = MeshInfo::center_aligned_hexagonal_plane(self.layout);
+        let face = Hexagon::center_aligned(self.layout);
         // We store the offset to match the `self.pos`
         let pos = if self.center_aligned {
             self.layout.hex_to_center_aligned_world_pos(self.pos)
@@ -126,6 +146,12 @@ impl<'l> PlaneMeshBuilder<'l> {
             self.layout.hex_to_world_pos(self.pos)
         };
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
+        // We apply optional insetting
+        let mut mesh = if let Some(inset) = self.inset_options {
+            face.inset(inset.scale, inset.keep_inner_face)
+        } else {
+            face.into()
+        };
         // **S** - We apply optional scale
         if let Some(scale) = self.scale {
             mesh = mesh.with_scale(scale);

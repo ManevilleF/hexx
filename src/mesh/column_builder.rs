@@ -1,6 +1,6 @@
 use glam::{Quat, Vec3};
 
-use super::{MeshInfo, BASE_FACING};
+use super::{utils::Quad, MeshInfo, BASE_FACING};
 use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 
 /// Builder struct to customize hex column mesh generation.
@@ -221,7 +221,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
         // We compute the mesh at the origin to allow scaling
-        let mut cap_mesh = PlaneMeshBuilder::new(self.layout)
+        let cap_mesh = PlaneMeshBuilder::new(self.layout)
             .with_uv_options(self.caps_uv_options)
             .center_aligned()
             .build();
@@ -247,9 +247,9 @@ impl<'l> ColumnMeshBuilder<'l> {
                 let left = Vec3::new(left.x, height, left.y);
                 let right = Vec3::new(right.x, height, right.y);
                 let mut quad =
-                    MeshInfo::quad([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
+                    Quad::from_bottom([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
                 self.sides_uv_options[side].alter_uvs(&mut quad.uvs);
-                mesh.merge_with(quad);
+                mesh.merge_with(quad.into());
             }
         });
         if self.top_face {

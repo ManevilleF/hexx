@@ -135,7 +135,7 @@ impl UVOptions {
     }
 
     /// Apply the options to all UV coords in `uvs`
-    pub fn alter_uvs(&self, uvs: &mut Vec<Vec2>) {
+    pub fn alter_uvs(&self, uvs: &mut [Vec2]) {
         for uv in uvs {
             *uv = self.alter_uv(*uv);
         }

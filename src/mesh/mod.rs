@@ -2,6 +2,8 @@ mod column_builder;
 mod plane_builder;
 #[cfg(test)]
 mod tests;
+/// Utility module for mesh construction
+pub mod utils;
 mod uv_mapping;
 
 pub use column_builder::ColumnMeshBuilder;
@@ -13,6 +15,18 @@ use glam::{Quat, Vec2, Vec3};
 use crate::{Hex, HexLayout};
 
 pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
+
+/// Insetting options for [`PlaneMeshBuilder`] and [`ColumnMeshBuilder`]
+/// used to create an insetted face on either hexagonal planes or quads
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct InsetOptions {
+    /// If set to `true``the original downscaled face will be kept
+    pub keep_inner_face: bool,
+    /// Inset face scale relative to the original scale
+    pub scale: f32,
+}
 
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -98,7 +112,7 @@ impl MeshInfo {
         self
     }
 
-    /// Computes the centroid of the mesh
+    /// Computes the centroid of the mesh vertices
     #[inline]
     #[must_use]
     #[allow(clippy::cast_precision_loss)]
@@ -107,7 +121,7 @@ impl MeshInfo {
         self.vertices.iter().sum::<Vec3>() / len
     }
 
-    /// Computes the centroid of the mesh
+    /// Computes the centroid of the mesh uvs
     #[inline]
     #[must_use]
     #[allow(clippy::cast_precision_loss)]
@@ -135,95 +149,6 @@ impl MeshInfo {
         self.uvs.extend(rhs.uvs);
         self.indices
             .extend(rhs.indices.into_iter().map(|i| i + indices_offset));
-    }
-
-    fn quad([left, right]: [Vec3; 2], normal: Vec3, height: f32) -> Self {
-        let offset = BASE_FACING * height;
-        Self {
-            vertices: vec![right, right + offset, left + offset, left],
-            normals: [normal; 4].to_vec(),
-            uvs: vec![Vec2::X, Vec2::ONE, Vec2::Y, Vec2::ZERO],
-            // 2 - 1
-            // | \ |
-            // 3 - 0
-            indices: vec![
-                2, 1, 0, // Tri 1
-                0, 3, 2, // Tri 2
-            ],
-        }
-    }
-
-    /// Performs an _inset_ operition on the mesh, assuming the mesh is a _looping face_,
-    /// either a quad, triangle or hexagonal face.
-    ///
-    /// # Arguments
-    ///
-    /// * `scale` the scale of the new insetted vertices, must be between 0 and 1
-    /// * `keep_inner_face` - If set to true the insetted face will be kept, otherwise
-    /// it will be removed
-    #[allow(clippy::cast_possible_truncation)]
-    pub(crate) fn inset(&mut self, scale: f32, keep_inner_face: bool) {
-        let vertex_count = self.vertices.len();
-        // We compute the inset mesh, identical to the original face
-        let mut inset_mesh = self.clone();
-        // We downscale the inset face vertices and uvs along its plane
-        {
-            // vertices
-            let centroid = inset_mesh.centroid();
-            inset_mesh.vertices.iter_mut().for_each(|v| {
-                let dir = (*v - centroid) * scale;
-                *v = centroid + dir;
-            });
-            // uvs
-            let uv_centroid = inset_mesh.uv_centroid();
-            inset_mesh.uvs.iter_mut().for_each(|uv| {
-                let dir = (*uv - uv_centroid) * scale;
-                *uv = uv_centroid + dir;
-            });
-        }
-        if !keep_inner_face {
-            inset_mesh.indices.clear();
-        }
-        self.indices.clear();
-        let vertex_count = vertex_count as u16;
-        let connection_indices = (0..vertex_count).flat_map(|v_idx| {
-            let next_v_idx = (v_idx + 1) % vertex_count;
-            let inset_v_idx = v_idx + vertex_count;
-            let next_inset_v_idx = next_v_idx + vertex_count;
-
-            [
-                // Tri 1
-                next_inset_v_idx,
-                next_v_idx,
-                v_idx,
-                // Tri 2
-                v_idx,
-                inset_v_idx,
-                next_inset_v_idx,
-            ]
-        });
-        self.indices.extend(connection_indices);
-        self.merge_with(inset_mesh);
-    }
-
-    /// Computes mesh data for an hexagonal plane facing `Vec3::Y` with 6
-    /// vertices and 4 triangles, ignoring the `layout` origin
-    #[must_use]
-    pub(crate) fn center_aligned_hexagonal_plane(layout: &HexLayout) -> Self {
-        let corners = layout.center_aligned_hex_corners();
-        let uvs = corners.map(UVOptions::wrap_uv).to_vec();
-        let vertices = corners.map(|p| Vec3::new(p.x, 0., p.y)).to_vec();
-        Self {
-            vertices,
-            uvs,
-            normals: [Vec3::Y; 6].to_vec(),
-            indices: vec![
-                0, 2, 1, // Top tri
-                3, 5, 4, // Bot tri
-                0, 5, 3, // Mid Quad
-                3, 2, 0, // Mid Quad
-            ],
-        }
     }
 
     /// Computes cheap mesh data for an hexagonal column facing `Vec3::Y`
