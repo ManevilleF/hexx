@@ -55,9 +55,9 @@ pub struct ColumnMeshBuilder<'l> {
     pub rotation: Option<Quat>,
     /// Amount of quads to be generated on the sides of the column
     pub subdivisions: Option<usize>,
-    /// Should the top hexagonal face be present
+    /// Top hexagonal face builder
     pub top_face: Option<PlaneMeshBuilder<'l>>,
-    /// Should the bottom hexagonal face be present
+    /// Bottom hexagonal face builder
     pub bottom_face: Option<PlaneMeshBuilder<'l>>,
     /// UV mapping options for the column sides
     pub sides_uv_options: [UVOptions; 6],

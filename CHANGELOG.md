@@ -8,6 +8,7 @@
 
 * Added new `MeshInfo` methods:
   * `with_scale`
+  * `with_uv_scale`
   * `centroid`
   * `uv_centroid`
 * (**BREAKING**) Changed the way `ColumnMeshBuilder` generates quad to be consistent
