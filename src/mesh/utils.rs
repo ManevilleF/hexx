@@ -7,7 +7,7 @@ type VertexIdx = u16;
 #[derive(Debug, Clone, Copy)]
 pub struct Tri(pub [VertexIdx; 3]);
 
-/// Represnetation of a primitive face, with a fixed amount of vertices and triangles
+/// Representation of a primitive face, with a fixed amount of vertices and triangles
 #[derive(Debug, Clone)]
 pub struct Face<const VERTS: usize, const TRIS: usize> {
     /// Vertex positions

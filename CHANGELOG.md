@@ -3,14 +3,25 @@
 ## [Unreleased]
 
 * Removed methods deprecated in previous versions
+
+### Mesh generation overhaul
+
 * Added new `MeshInfo` methods:
   * `with_scale`
   * `centroid`
   * `uv_centroid`
 * (**BREAKING**) Changed the way `ColumnMeshBuilder` generates quad to be consistent
 with hexagonal faces
+* (**BREAKING**) Changed inner `ColumnMeshBuilder` fields, but the builder API was
+kept consistent
 * Fixed the way `ColumnMeshBuilder` generate the hexagonal caps, which could behave
 strangely with non center aligned layout
+* Added a `mesh::utils` modules for primitive shape management
+* Added `ColumnMeshBuilder::with_sides_uv_options_fn` for block based options setting
+* Added mesh insetting options:
+  * `ColumnMeshBuilder::with_caps_inset_options` to inset the column hexagonal faces
+  * `ColumnMeshBuilder::with_sides_inset_options` to inset the column side quads
+  * `PlaneMeshBuilder::with_inset_options` to inset the hexagonal face
 
 ## 0.15.0
 
