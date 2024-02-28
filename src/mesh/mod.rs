@@ -24,8 +24,28 @@ pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 pub struct InsetOptions {
     /// If set to `true``the original downscaled face will be kept
     pub keep_inner_face: bool,
-    /// Inset face scale relative to the original scale
-    pub scale: f32,
+    /// Inset mode
+    pub mode: InsetMode,
+}
+
+/// [`InsetOptions`] mode, defining the inset behaviour
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub enum InsetMode {
+    /// Each inset vertex position will be at a scale of the original one
+    Scale(f32),
+    /// Each inset vertex position will be at a fixed distance of the original one
+    Distance(f32),
+}
+
+impl InsetMode {
+    pub(crate) fn should_flip(self) -> bool {
+        match self {
+            Self::Scale(s) => s < 0.0,
+            Self::Distance(d) => d < 0.0,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default)]

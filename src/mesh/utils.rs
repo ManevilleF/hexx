@@ -1,4 +1,4 @@
-use crate::{HexLayout, MeshInfo, UVOptions, BASE_FACING};
+use crate::{HexLayout, InsetMode, MeshInfo, UVOptions, BASE_FACING};
 use glam::{Vec2, Vec3};
 
 type VertexIdx = u16;
@@ -103,28 +103,52 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
     ///
     /// # Arguments
     ///
-    /// * `scale` the scale of the new insetted vertices
+    /// * `mode` - the insetting behaviour mode
     /// * `keep_inner_face` - If set to true the insetted face will be kept, otherwise
     /// it will be removed
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    pub fn inset(self, scale: f32, keep_inner_face: bool) -> MeshInfo {
+    pub fn inset(self, mode: InsetMode, keep_inner_face: bool) -> MeshInfo {
         // We compute the inset mesh, identical to the original face
         let mut inset_face = self.clone();
         // We downscale the inset face vertices and uvs along its plane
-        {
-            // vertices
-            let centroid = inset_face.centroid();
-            inset_face.positions.iter_mut().for_each(|v| {
-                let dir = (*v - centroid) * scale;
-                *v = centroid + dir;
-            });
-            // uvs
-            let uv_centroid = inset_face.uv_centroid();
-            inset_face.uvs.iter_mut().for_each(|uv| {
-                let dir = (*uv - uv_centroid) * scale;
-                *uv = uv_centroid + dir;
-            });
+        match mode {
+            InsetMode::Scale(scale) => {
+                // vertices
+                let centroid = inset_face.centroid();
+                inset_face.positions.iter_mut().for_each(|v| {
+                    *v = *v + ((centroid - *v) * scale);
+                });
+                // uvs
+                let uv_centroid = inset_face.uv_centroid();
+                inset_face.uvs.iter_mut().for_each(|uv| {
+                    *uv = *uv + ((uv_centroid - *uv) * scale);
+                });
+            }
+            InsetMode::Distance(dist) => {
+                // vertices
+                let mut idx = 0;
+                let new_positions = inset_face.positions.map(|pos| {
+                    let prev = inset_face.positions[(idx + VERTS - 1) % VERTS];
+                    let next = inset_face.positions[(idx + 1) % VERTS];
+                    let dir_next = (next - pos).normalize();
+                    let dir_prev = (prev - pos).normalize();
+                    idx += 1;
+                    pos + (dir_next + dir_prev).normalize() * dist
+                });
+                inset_face.positions = new_positions;
+                // uvs
+                let mut idx = 0;
+                let new_uvs = inset_face.uvs.map(|pos| {
+                    let prev = inset_face.uvs[(idx + VERTS - 1) % VERTS];
+                    let next = inset_face.uvs[(idx + 1) % VERTS];
+                    let dir_next = (next - pos).normalize();
+                    let dir_prev = (prev - pos).normalize();
+                    idx += 1;
+                    pos + (dir_next + dir_prev).normalize() * dist
+                });
+                inset_face.uvs = new_uvs;
+            }
         }
         let mut inset_face = MeshInfo::from(inset_face);
         if !keep_inner_face {
@@ -133,6 +157,7 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
         let mut mesh = MeshInfo::from(self);
         mesh.indices.clear();
         let vertex_count = VERTS as u16;
+        let should_flip = mode.should_flip();
         let connection_indices = (0..vertex_count).flat_map(|v_idx| {
             let next_v_idx = (v_idx + 1) % vertex_count;
             let inset_v_idx = v_idx + vertex_count;
@@ -142,7 +167,7 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
                 Tri([next_inset_v_idx, next_v_idx, v_idx]),
                 Tri([v_idx, inset_v_idx, next_inset_v_idx]),
             ];
-            if scale > 1.0 {
+            if should_flip {
                 a.flip();
                 b.flip();
             }
