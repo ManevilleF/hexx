@@ -39,8 +39,8 @@ pub enum InsetScaleMode {
     /// Each inset vertex position will be at a scale of the original one
     /// relative to the centroid of the face
     Centroid,
-    /// Each inset vertex position will be at a proportional scale of the original one
-    /// relative to its smallest edge
+    /// Each inset vertex position will be at a proportional scale of the
+    /// original one relative to its smallest edge
     SmallestEdge,
 }
 

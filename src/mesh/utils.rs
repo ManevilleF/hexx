@@ -7,7 +7,8 @@ type VertexIdx = u16;
 #[derive(Debug, Clone, Copy)]
 pub struct Tri(pub [VertexIdx; 3]);
 
-/// Representation of a primitive face, with a fixed amount of vertices and triangles
+/// Representation of a primitive face, with a fixed amount of vertices and
+/// triangles
 #[derive(Debug, Clone)]
 pub struct Face<const VERTS: usize, const TRIS: usize> {
     /// Vertex positions
@@ -41,7 +42,8 @@ impl Quad {
     /// # Arguments
     /// * `[left, right]` - the two bottom vertex positions
     /// * `normal` - the normal to be applied to all 4 vertices
-    /// * `height` - the top vertices distance to the bottom ones alogn the Y axis
+    /// * `height` - the top vertices distance to the bottom ones alogn the Y
+    ///   axis
     #[must_use]
     pub fn from_bottom([left, right]: [Vec3; 2], normal: Vec3, height: f32) -> Self {
         let offset = BASE_FACING * height;
@@ -61,7 +63,8 @@ impl Quad {
 }
 
 impl Hexagon {
-    /// Constructs a _center aligned_ (no offset) hexagon face from the given `layout`
+    /// Constructs a _center aligned_ (no offset) hexagon face from the given
+    /// `layout`
     #[must_use]
     pub fn center_aligned(layout: &HexLayout) -> Self {
         let corners = layout.center_aligned_hex_corners();
@@ -98,13 +101,14 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
         self.uvs.iter().sum::<Vec2>() / VERTS as f32
     }
 
-    /// Performs an _inset_ operition on the mesh, assuming the mesh is a _looping face_,
-    /// either a quad, triangle or hexagonal face.
+    /// Performs an _inset_ operition on the mesh, assuming the mesh is a
+    /// _looping face_, either a quad, triangle or hexagonal face.
     ///
     /// # Arguments
     ///
     /// * `mode` - the insetting behaviour mode
-    /// * `keep_inner_face` - If set to true the insetted face will be kept, otherwise
+    /// * `keep_inner_face` - If set to true the insetted face will be kept,
+    ///   otherwise
     /// it will be removed
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
