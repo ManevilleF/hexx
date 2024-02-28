@@ -1,6 +1,4 @@
-use crate::{
-    utils::Hexagon, Hex, HexLayout, InsetMode, InsetOptions, MeshInfo, UVOptions, BASE_FACING,
-};
+use crate::{utils::Hexagon, Hex, HexLayout, InsetOptions, MeshInfo, UVOptions, BASE_FACING};
 use glam::{Quat, Vec3};
 
 /// Builder struct to customize hex plane mesh generation.
@@ -118,40 +116,6 @@ impl<'l> PlaneMeshBuilder<'l> {
         self
     }
 
-    /// Specify scale insetting option for the hexagonal face
-    ///
-    /// # Arguments
-    ///
-    /// * `scale` - the scale of the new insetted vertices,
-    /// * `keep_inner_face` - If set to true the insetted face will be kept, otherwise
-    /// it will be removed
-    #[must_use]
-    #[inline]
-    pub const fn with_scaled_inset(mut self, scale: f32, keep_inner_face: bool) -> Self {
-        self.inset_options = Some(InsetOptions {
-            keep_inner_face,
-            mode: InsetMode::Scale(scale),
-        });
-        self
-    }
-
-    /// Specify distance insetting option for the hexagonal face
-    ///
-    /// # Arguments
-    ///
-    /// * `dist` - the distance of the new insetted vertices relative to their original ones
-    /// * `keep_inner_face` - If set to true the insetted face will be kept, otherwise
-    /// it will be removed
-    #[must_use]
-    #[inline]
-    pub const fn with_distance_inset(mut self, dist: f32, keep_inner_face: bool) -> Self {
-        self.inset_options = Some(InsetOptions {
-            keep_inner_face,
-            mode: InsetMode::Distance(dist),
-        });
-        self
-    }
-
     /// Specify insetting option for the hexagonal face
     #[must_use]
     #[inline]
@@ -174,7 +138,7 @@ impl<'l> PlaneMeshBuilder<'l> {
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // We apply optional insetting
         let mut mesh = if let Some(inset) = self.inset_options {
-            face.inset(inset.mode, inset.keep_inner_face)
+            face.inset(inset.mode, inset.scale, inset.keep_inner_face)
         } else {
             face.into()
         };

@@ -1,4 +1,4 @@
-use crate::{HexLayout, InsetMode, MeshInfo, UVOptions, BASE_FACING};
+use crate::{HexLayout, InsetScaleMode, MeshInfo, UVOptions, BASE_FACING};
 use glam::{Vec2, Vec3};
 
 type VertexIdx = u16;
@@ -108,12 +108,12 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
     /// it will be removed
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
-    pub fn inset(self, mode: InsetMode, keep_inner_face: bool) -> MeshInfo {
+    pub fn inset(self, mode: InsetScaleMode, scale: f32, keep_inner_face: bool) -> MeshInfo {
         // We compute the inset mesh, identical to the original face
         let mut inset_face = self.clone();
         // We downscale the inset face vertices and uvs along its plane
         match mode {
-            InsetMode::Scale(scale) => {
+            InsetScaleMode::Centroid => {
                 // vertices
                 let centroid = inset_face.centroid();
                 inset_face.positions.iter_mut().for_each(|v| {
@@ -125,28 +125,26 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
                     *uv = *uv + ((uv_centroid - *uv) * scale);
                 });
             }
-            InsetMode::Distance(dist) => {
-                // vertices
-                let mut idx = 0;
-                let new_positions = inset_face.positions.map(|pos| {
-                    let prev = inset_face.positions[(idx + VERTS - 1) % VERTS];
-                    let next = inset_face.positions[(idx + 1) % VERTS];
-                    let dir_next = (next - pos).normalize();
-                    let dir_prev = (prev - pos).normalize();
-                    idx += 1;
-                    pos + (dir_next + dir_prev).normalize() * dist
-                });
+            InsetScaleMode::SmallestEdge => {
+                let mut new_positions = inset_face.positions;
+                let mut new_uvs = inset_face.uvs;
+                for idx in 0..VERTS {
+                    let [prev_idx, next_idx] = [(idx + VERTS - 1) % VERTS, (idx + 1) % VERTS];
+                    // vertices
+                    let [pos, prev, next] =
+                        [idx, prev_idx, next_idx].map(|i| inset_face.positions[i]);
+                    let [dir_prev, dir_next] = [(prev - pos), (next - pos)];
+                    let [prev_len, next_len] = [dir_prev.length(), dir_next.length()];
+                    let dist = prev_len.min(next_len) * scale;
+                    new_positions[idx] =
+                        pos + dir_next.normalize() * dist + dir_prev.normalize() * dist;
+                    // uvs
+                    let [disp_prev, disp_next] = [dist / prev_len, dist / next_len];
+                    let [pos, prev, next] = [idx, prev_idx, next_idx].map(|i| inset_face.uvs[i]);
+                    let [dir_prev, dir_next] = [(prev - pos), (next - pos)];
+                    new_uvs[idx] = pos + dir_next * disp_next + dir_prev * disp_prev;
+                }
                 inset_face.positions = new_positions;
-                // uvs
-                let mut idx = 0;
-                let new_uvs = inset_face.uvs.map(|pos| {
-                    let prev = inset_face.uvs[(idx + VERTS - 1) % VERTS];
-                    let next = inset_face.uvs[(idx + 1) % VERTS];
-                    let dir_next = (next - pos).normalize();
-                    let dir_prev = (prev - pos).normalize();
-                    idx += 1;
-                    pos + (dir_next + dir_prev).normalize() * dist
-                });
                 inset_face.uvs = new_uvs;
             }
         }
@@ -157,7 +155,6 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
         let mut mesh = MeshInfo::from(self);
         mesh.indices.clear();
         let vertex_count = VERTS as u16;
-        let should_flip = mode.should_flip();
         let connection_indices = (0..vertex_count).flat_map(|v_idx| {
             let next_v_idx = (v_idx + 1) % vertex_count;
             let inset_v_idx = v_idx + vertex_count;
@@ -167,7 +164,7 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
                 Tri([next_inset_v_idx, next_v_idx, v_idx]),
                 Tri([v_idx, inset_v_idx, next_inset_v_idx]),
             ];
-            if should_flip {
+            if scale < 0.0 {
                 a.flip();
                 b.flip();
             }

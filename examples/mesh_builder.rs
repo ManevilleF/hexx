@@ -104,7 +104,8 @@ fn show_ui(world: &mut World) {
                             if ui.button("Enable").clicked() {
                                 params.caps_inset = Some(InsetOptions {
                                     keep_inner_face: true,
-                                    mode: InsetMode::Scale(0.2),
+                                    scale: 0.2,
+                                    mode: InsetScaleMode::default(),
                                 })
                             }
                         }
@@ -145,7 +146,8 @@ fn show_ui(world: &mut World) {
                         if ui.button("Enable").clicked() {
                             params.sides_inset = Some(InsetOptions {
                                 keep_inner_face: true,
-                                mode: InsetMode::Scale(0.2),
+                                scale: 0.2,
+                                mode: InsetScaleMode::default(),
                             })
                         }
                     }

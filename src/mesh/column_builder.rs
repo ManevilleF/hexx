@@ -1,7 +1,7 @@
 use glam::{Quat, Vec3};
 
 use super::{utils::Quad, MeshInfo, BASE_FACING};
-use crate::{Hex, HexLayout, InsetMode, InsetOptions, PlaneMeshBuilder, UVOptions};
+use crate::{Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions};
 
 /// Builder struct to customize hex column mesh generation.
 ///
@@ -190,38 +190,6 @@ impl<'l> ColumnMeshBuilder<'l> {
         self
     }
 
-    #[must_use]
-    #[inline]
-    /// Specify scaled inset options for the top/bottom caps faces
-    ///
-    /// Note:
-    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
-    pub const fn with_scaled_inset_caps(mut self, scale: f32, keep_inner_face: bool) -> Self {
-        if let Some(builder) = self.top_face {
-            self.top_face = Some(builder.with_scaled_inset(scale, keep_inner_face));
-        }
-        if let Some(builder) = self.bottom_face {
-            self.bottom_face = Some(builder.with_scaled_inset(scale, keep_inner_face));
-        }
-        self
-    }
-
-    #[must_use]
-    #[inline]
-    /// Specify distance inset options for the top/bottom caps faces
-    ///
-    /// Note:
-    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
-    pub const fn with_distance_inset_caps(mut self, dist: f32, keep_inner_face: bool) -> Self {
-        if let Some(builder) = self.top_face {
-            self.top_face = Some(builder.with_distance_inset(dist, keep_inner_face));
-        }
-        if let Some(builder) = self.bottom_face {
-            self.bottom_face = Some(builder.with_distance_inset(dist, keep_inner_face));
-        }
-        self
-    }
-
     /// Specify inset option for the top/bottom caps faces
     ///
     /// Note:
@@ -278,28 +246,6 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     #[must_use]
     #[inline]
-    /// Specify custom global scaled inset options for the side quads
-    pub const fn with_sides_scaled_inset(mut self, scale: f32, keep_inner_face: bool) -> Self {
-        self.sides_inset_options = Some(InsetOptions {
-            keep_inner_face,
-            mode: InsetMode::Scale(scale),
-        });
-        self
-    }
-
-    #[must_use]
-    #[inline]
-    /// Specify custom global scaled inset options for the side quads
-    pub const fn with_sides_distance_inset(mut self, dist: f32, keep_inner_face: bool) -> Self {
-        self.sides_inset_options = Some(InsetOptions {
-            keep_inner_face,
-            mode: InsetMode::Distance(dist),
-        });
-        self
-    }
-
-    #[must_use]
-    #[inline]
     /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
     /// around `(0.0, 0.0)`.
     pub const fn center_aligned(mut self) -> Self {
@@ -337,7 +283,7 @@ impl<'l> ColumnMeshBuilder<'l> {
                     Quad::from_bottom([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
                 self.sides_uv_options[side].alter_uvs(&mut quad.uvs);
                 let quad = if let Some(opts) = self.sides_inset_options {
-                    quad.inset(opts.mode, opts.keep_inner_face)
+                    quad.inset(opts.mode, opts.scale, opts.keep_inner_face)
                 } else {
                     quad.into()
                 };
