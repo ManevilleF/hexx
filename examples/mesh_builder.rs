@@ -14,6 +14,7 @@ struct HexInfo {
     pub layout: HexLayout,
     pub mesh_entity: Entity,
     pub mesh_handle: Handle<Mesh>,
+    pub material_handle: Handle<StandardMaterial>,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -39,8 +40,10 @@ struct BuilderParams {
     pub bottom_face: bool,
     pub scale: Vec3,
     pub sides_uvs_mode: SideUVMode,
+    pub sides_inset: Option<InsetOptions>,
     pub sides_uvs: [UVOptions; 6],
     pub caps_uvs: UVOptions,
+    pub caps_inset: Option<InsetOptions>,
 }
 
 pub fn main() {
@@ -85,32 +88,98 @@ fn show_ui(world: &mut World) {
                 ui.end_row();
             });
             ui.separator();
-            ui.heading("Caps UV options");
-            bevy_inspector::ui_for_value(&mut params.caps_uvs, ui, world);
-            ui.separator();
-            ui.heading("Sides UV options");
-            ui.horizontal(|ui| {
-                egui::ComboBox::from_id_source("Side Uv mode")
-                    .selected_text(params.sides_uvs_mode.label())
-                    .show_ui(ui, |ui| {
-                        let option = SideUVMode::Global;
-                        ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
-                        let option = SideUVMode::Multi;
-                        ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
-                    })
-            });
-            egui::ScrollArea::vertical().show(ui, |ui| match params.sides_uvs_mode {
-                SideUVMode::Global => {
-                    if bevy_inspector::ui_for_value(&mut params.sides_uvs[0], ui, world) {
-                        params.sides_uvs = [params.sides_uvs[0]; 6];
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                ui.push_id("Caps", |ui| {
+                    ui.heading("Caps UV options");
+                    bevy_inspector::ui_for_value(&mut params.caps_uvs, ui, world);
+                    ui.heading("Caps Inset options");
+                    ui.scope(|ui| match &mut params.caps_inset {
+                        Some(opts) => {
+                            bevy_inspector::ui_for_value(opts, ui, world);
+                            if ui.button("Disable").clicked() {
+                                params.caps_inset = None;
+                            }
+                        }
+                        None => {
+                            if ui.button("Enable").clicked() {
+                                params.caps_inset = Some(InsetOptions {
+                                    keep_inner_face: true,
+                                    scale: 0.2,
+                                    mode: InsetScaleMode::default(),
+                                })
+                            }
+                        }
+                    });
+                });
+                ui.separator();
+                ui.heading("Sides UV options");
+                ui.horizontal(|ui| {
+                    egui::ComboBox::from_id_source("Side Uv mode")
+                        .selected_text(params.sides_uvs_mode.label())
+                        .show_ui(ui, |ui| {
+                            let option = SideUVMode::Global;
+                            ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
+                            let option = SideUVMode::Multi;
+                            ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
+                        })
+                });
+                match params.sides_uvs_mode {
+                    SideUVMode::Global => {
+                        if bevy_inspector::ui_for_value(&mut params.sides_uvs[0], ui, world) {
+                            params.sides_uvs = [params.sides_uvs[0]; 6];
+                        }
                     }
-                    true
+                    SideUVMode::Multi => {
+                        bevy_inspector::ui_for_value(&mut params.sides_uvs, ui, world);
+                    }
                 }
-                SideUVMode::Multi => bevy_inspector::ui_for_value(&mut params.sides_uvs, ui, world),
+
+                ui.heading("Sides Inset options");
+                ui.push_id("Sides inset", |ui| match &mut params.sides_inset {
+                    Some(opts) => {
+                        bevy_inspector::ui_for_value(opts, ui, world);
+                        if ui.button("Disable").clicked() {
+                            params.sides_inset = None;
+                        }
+                    }
+                    None => {
+                        if ui.button("Enable").clicked() {
+                            params.sides_inset = Some(InsetOptions {
+                                keep_inner_face: true,
+                                scale: 0.2,
+                                mode: InsetScaleMode::default(),
+                            })
+                        }
+                    }
+                });
             });
         });
-        egui::Window::new("AmbientLight").show(egui_context.get_mut(), |ui| {
+    });
+    world.resource_scope(|world, mut materials: Mut<Assets<StandardMaterial>>| {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+            return;
+        };
+        let mut egui_context = egui_context.clone();
+        egui::Window::new("Visuals").show(egui_context.get_mut(), |ui| {
             bevy_inspector::ui_for_resource::<AmbientLight>(world, ui);
+            let info = world.resource::<HexInfo>();
+            let mat = materials.get_mut(&info.material_handle).unwrap();
+            ui.collapsing("Material", |ui| {
+                bevy_inspector::ui_for_value(&mut mat.base_color, ui, world);
+                bevy_inspector::ui_for_value(&mut mat.double_sided, ui, world);
+                match &mut mat.cull_mode {
+                    Some(_) => {
+                        if ui.button("No Culling").clicked() {
+                            mat.cull_mode = None
+                        }
+                    }
+                    None => {
+                        if ui.button("Cull back faces").clicked() {
+                            mat.cull_mode = Some(bevy::render::render_resource::Face::Back);
+                        }
+                    }
+                }
+            });
         });
     });
 }
@@ -140,12 +209,17 @@ fn setup(
         .with_offset(Vec3::NEG_Y * params.height / 2.0)
         .build();
     let mesh_handle = meshes.add(compute_mesh(mesh));
-    let material = materials.add(texture);
+    let material_handle = materials.add(StandardMaterial {
+        base_color_texture: Some(texture),
+        cull_mode: None,
+        double_sided: true,
+        ..default()
+    });
     let mesh_entity = commands
         .spawn((
             PbrBundle {
                 mesh: mesh_handle.clone(),
-                material,
+                material: material_handle.clone(),
                 ..default()
             },
             Wireframe,
@@ -155,6 +229,7 @@ fn setup(
         layout,
         mesh_entity,
         mesh_handle,
+        material_handle,
     });
 }
 
@@ -224,6 +299,12 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     if !params.bottom_face {
         new_mesh = new_mesh.without_bottom_face();
     }
+    if let Some(opts) = params.caps_inset {
+        new_mesh = new_mesh.with_caps_inset_options(opts);
+    }
+    if let Some(opts) = params.sides_inset {
+        new_mesh = new_mesh.with_sides_inset_options(opts);
+    }
     let new_mesh = compute_mesh(new_mesh.build());
     // println!("Mesh has {} vertices", new_mesh.count_vertices());
     let mesh = meshes.get_mut(&info.mesh_handle).unwrap();
@@ -251,8 +332,10 @@ impl Default for BuilderParams {
             bottom_face: true,
             sides_uvs_mode: SideUVMode::Global,
             sides_uvs: [UVOptions::new().with_scale_factor(vec2(0.3, 1.0)); 6],
+            sides_inset: None,
             caps_uvs: UVOptions::new(),
             scale: Vec3::ONE,
+            caps_inset: None,
         }
     }
 }

@@ -1,7 +1,7 @@
 use glam::{Quat, Vec3};
 
-use super::{MeshInfo, BASE_FACING};
-use crate::{Hex, HexLayout, PlaneMeshBuilder, UVOptions};
+use super::{utils::Quad, MeshInfo, BASE_FACING};
+use crate::{Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions};
 
 /// Builder struct to customize hex column mesh generation.
 ///
@@ -55,14 +55,14 @@ pub struct ColumnMeshBuilder<'l> {
     pub rotation: Option<Quat>,
     /// Amount of quads to be generated on the sides of the column
     pub subdivisions: Option<usize>,
-    /// Should the top hexagonal face be present
-    pub top_face: bool,
-    /// Should the bottom hexagonal face be present
-    pub bottom_face: bool,
+    /// Top hexagonal face builder
+    pub top_face: Option<PlaneMeshBuilder<'l>>,
+    /// Bottom hexagonal face builder
+    pub bottom_face: Option<PlaneMeshBuilder<'l>>,
     /// UV mapping options for the column sides
     pub sides_uv_options: [UVOptions; 6],
-    /// UV mapping options for top and bottom faces
-    pub caps_uv_options: UVOptions,
+    /// Quad inset options for the column sides
+    pub sides_inset_options: Option<InsetOptions>,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
 }
@@ -79,11 +79,11 @@ impl<'l> ColumnMeshBuilder<'l> {
             subdivisions: None,
             offset: None,
             scale: None,
-            top_face: true,
-            bottom_face: true,
+            top_face: Some(PlaneMeshBuilder::new(layout)),
+            bottom_face: Some(PlaneMeshBuilder::new(layout)),
             sides_uv_options: [UVOptions::new(); 6],
-            caps_uv_options: UVOptions::new(),
             center_aligned: false,
+            sides_inset_options: None,
         }
     }
 
@@ -162,7 +162,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[must_use]
     #[inline]
     pub const fn without_bottom_face(mut self) -> Self {
-        self.bottom_face = false;
+        self.bottom_face = None;
         self
     }
 
@@ -170,7 +170,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[must_use]
     #[inline]
     pub const fn without_top_face(mut self) -> Self {
-        self.top_face = false;
+        self.top_face = None;
         self
     }
 
@@ -181,7 +181,28 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Note:
     /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
     pub const fn with_caps_uv_options(mut self, uv_options: UVOptions) -> Self {
-        self.caps_uv_options = uv_options;
+        if let Some(builder) = self.top_face {
+            self.top_face = Some(builder.with_uv_options(uv_options));
+        }
+        if let Some(builder) = self.bottom_face {
+            self.bottom_face = Some(builder.with_uv_options(uv_options));
+        }
+        self
+    }
+
+    /// Specify inset option for the top/bottom caps faces
+    ///
+    /// Note:
+    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
+    #[must_use]
+    #[inline]
+    pub const fn with_caps_inset_options(mut self, opts: InsetOptions) -> Self {
+        if let Some(builder) = self.top_face {
+            self.top_face = Some(builder.with_inset_options(opts));
+        }
+        if let Some(builder) = self.bottom_face {
+            self.bottom_face = Some(builder.with_inset_options(opts));
+        }
         self
     }
 
@@ -201,8 +222,25 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Specify custom uv options for each of the side quad triangles.
     ///
     /// For a global setting prefer [`Self::with_sides_uv_options`]
+    pub fn with_sides_uv_options_fn(mut self, uv_options: impl Fn(usize) -> UVOptions) -> Self {
+        self.sides_uv_options = std::array::from_fn(uv_options);
+        self
+    }
+    #[must_use]
+    #[inline]
+    /// Specify custom uv options for each of the side quad triangles.
+    ///
+    /// For a global setting prefer [`Self::with_sides_uv_options`]
     pub const fn with_multi_sides_uv_options(mut self, uv_options: [UVOptions; 6]) -> Self {
         self.sides_uv_options = uv_options;
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify custom global inset options for the side quads
+    pub const fn with_sides_inset_options(mut self, options: InsetOptions) -> Self {
+        self.sides_inset_options = Some(options);
         self
     }
 
@@ -220,11 +258,6 @@ impl<'l> ColumnMeshBuilder<'l> {
     #[allow(clippy::many_single_char_names)]
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
-        // We compute the mesh at the origin to allow scaling
-        let cap_mesh = PlaneMeshBuilder::new(self.layout)
-            .with_uv_options(self.caps_uv_options)
-            .center_aligned()
-            .build();
         // We store the offset to match the `self.pos`
         let pos = if self.center_aligned {
             self.layout.hex_to_center_aligned_world_pos(self.pos)
@@ -237,7 +270,7 @@ impl<'l> ColumnMeshBuilder<'l> {
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
-        let [a, b, c, d, e, f] = self.layout.hex_corners(Hex::ZERO);
+        let [a, b, c, d, e, f] = self.layout.center_aligned_hex_corners();
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         (0..6).for_each(|side| {
             let [left, right] = corners[side];
@@ -247,22 +280,34 @@ impl<'l> ColumnMeshBuilder<'l> {
                 let left = Vec3::new(left.x, height, left.y);
                 let right = Vec3::new(right.x, height, right.y);
                 let mut quad =
-                    MeshInfo::quad([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
+                    Quad::from_bottom([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
                 self.sides_uv_options[side].alter_uvs(&mut quad.uvs);
+                let quad = if let Some(opts) = self.sides_inset_options {
+                    quad.inset(opts.mode, opts.scale, opts.keep_inner_face)
+                } else {
+                    quad.into()
+                };
                 mesh.merge_with(quad);
             }
         });
-        if self.top_face {
-            mesh.merge_with(cap_mesh.clone().with_offset(Vec3::Y * self.height));
+        // Hexagon top face
+        if let Some(builder) = self.top_face {
+            mesh.merge_with(
+                builder
+                    .center_aligned()
+                    .with_offset(Vec3::Y * self.height)
+                    .build(),
+            );
         }
-        if self.bottom_face {
+        // Hexagon bottom face
+        if let Some(builder) = self.bottom_face {
             let rotation = Quat::from_rotation_arc(BASE_FACING, -BASE_FACING);
-            let bottom_face = cap_mesh.rotated(rotation);
+            let bottom_face = builder.center_aligned().build().rotated(rotation);
             mesh.merge_with(bottom_face);
         }
         // **S** - We apply optional scale
         if let Some(scale) = self.scale {
-            mesh.vertices.iter_mut().for_each(|p| *p *= scale);
+            mesh = mesh.with_scale(scale);
         }
         // **R** - We rotate the mesh to face the given direction
         if let Some(rotation) = self.rotation {

@@ -2,6 +2,8 @@ mod column_builder;
 mod plane_builder;
 #[cfg(test)]
 mod tests;
+/// Utility module for mesh construction
+pub mod utils;
 mod uv_mapping;
 
 pub use column_builder::ColumnMeshBuilder;
@@ -13,6 +15,34 @@ use glam::{Quat, Vec2, Vec3};
 use crate::{Hex, HexLayout};
 
 pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
+
+/// Insetting options for [`PlaneMeshBuilder`] and [`ColumnMeshBuilder`]
+/// used to create an insetted face on either hexagonal planes or quads
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct InsetOptions {
+    /// If set to `true``the original downscaled face will be kept
+    pub keep_inner_face: bool,
+    /// Scale factor
+    pub scale: f32,
+    /// Inset mode
+    pub mode: InsetScaleMode,
+}
+
+/// [`InsetOptions`] mode, defining the inset scaling behaviour
+#[derive(Debug, Copy, Clone, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub enum InsetScaleMode {
+    #[default]
+    /// Each inset vertex position will be at a scale of the original one
+    /// relative to the centroid of the face
+    Centroid,
+    /// Each inset vertex position will be at a proportional scale of the
+    /// original one relative to its smallest edge
+    SmallestEdge,
+}
 
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -64,30 +94,56 @@ impl MeshInfo {
     /// Returns a new [`MeshInfo`] but with vertex positions and normals rotated
     #[inline]
     #[must_use]
-    pub fn rotated(self, rotation: Quat) -> Self {
-        Self {
-            vertices: self
-                .vertices
-                .into_iter()
-                .map(|v| rotation.mul_vec3(v))
-                .collect(),
-            normals: self
-                .normals
-                .into_iter()
-                .map(|n| rotation.mul_vec3(n))
-                .collect(),
-            ..self
-        }
+    pub fn rotated(mut self, rotation: Quat) -> Self {
+        self.vertices
+            .iter_mut()
+            .for_each(|v| *v = rotation.mul_vec3(*v));
+        self.normals
+            .iter_mut()
+            .for_each(|n| *n = rotation.mul_vec3(*n));
+        self
     }
 
     /// Returns a new [`MeshInfo`] but with `offset` applied to vertex positions
     #[inline]
     #[must_use]
-    pub fn with_offset(self, offset: Vec3) -> Self {
-        Self {
-            vertices: self.vertices.into_iter().map(|p| p + offset).collect(),
-            ..self
-        }
+    pub fn with_offset(mut self, offset: Vec3) -> Self {
+        self.vertices.iter_mut().for_each(|v| *v += offset);
+        self
+    }
+
+    /// Returns a new [`MeshInfo`] but with `scale` applied to vertex positions
+    #[inline]
+    #[must_use]
+    pub fn with_scale(mut self, scale: Vec3) -> Self {
+        self.vertices.iter_mut().for_each(|p| *p *= scale);
+        self
+    }
+
+    /// Returns a new [`MeshInfo`] but with `scale` applied to vertex uvs
+    #[inline]
+    #[must_use]
+    pub fn with_uv_scale(mut self, scale: Vec2) -> Self {
+        self.uvs.iter_mut().for_each(|c| *c *= scale);
+        self
+    }
+
+    /// Computes the centroid of the mesh vertices
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    pub fn centroid(&self) -> Vec3 {
+        let len = self.vertices.len() as f32;
+        self.vertices.iter().sum::<Vec3>() / len
+    }
+
+    /// Computes the centroid of the mesh uvs
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    pub fn uv_centroid(&self) -> Vec2 {
+        let len = self.uvs.len() as f32;
+        self.uvs.iter().sum::<Vec2>() / len
     }
 
     /// Merges `rhs` into `self`.
@@ -109,68 +165,6 @@ impl MeshInfo {
         self.uvs.extend(rhs.uvs);
         self.indices
             .extend(rhs.indices.into_iter().map(|i| i + indices_offset));
-    }
-
-    fn quad([left, right]: [Vec3; 2], normal: Vec3, height: f32) -> Self {
-        let offset = BASE_FACING * height;
-        Self {
-            vertices: vec![left, left + offset, right + offset, right],
-            normals: [normal; 4].to_vec(),
-            uvs: vec![Vec2::Y, Vec2::ZERO, Vec2::X, Vec2::ONE],
-            indices: vec![
-                1, 2, 3, // Tri 1
-                3, 0, 1, // Tri 2
-            ],
-        }
-    }
-
-    /// Computes mesh data for an hexagonal plane facing `Vec3::Y` with 6
-    /// vertices and 4 triangles
-    ///
-    /// # Note
-    ///
-    /// Prefer using [`PlaneMeshBuilder`] for additional customization like:
-    /// * UV options
-    /// * Offsets
-    /// * rotation
-    /// * etc
-    #[must_use]
-    #[deprecated(since = "0.13.0", note = "Use `PlaneMeshBuilder` instead")]
-    pub fn hexagonal_plane(layout: &HexLayout, hex: Hex) -> Self {
-        let corners = layout.hex_corners(hex);
-        let uvs = corners.map(UVOptions::wrap_uv).to_vec();
-        let vertices = corners.map(|p| Vec3::new(p.x, 0., p.y)).to_vec();
-        Self {
-            vertices,
-            uvs,
-            normals: [Vec3::Y; 6].to_vec(),
-            indices: vec![
-                0, 2, 1, // Top tri
-                3, 5, 4, // Bot tri
-                0, 5, 3, // Mid Quad
-                3, 2, 0, // Mid Quad
-            ],
-        }
-    }
-
-    /// Computes mesh data for an hexagonal plane facing `Vec3::Y` with 6
-    /// vertices and 4 triangles, ignoring the `layout` origin
-    #[must_use]
-    pub(crate) fn center_aligned_hexagonal_plane(layout: &HexLayout) -> Self {
-        let corners = layout.center_aligned_hex_corners();
-        let uvs = corners.map(UVOptions::wrap_uv).to_vec();
-        let vertices = corners.map(|p| Vec3::new(p.x, 0., p.y)).to_vec();
-        Self {
-            vertices,
-            uvs,
-            normals: [Vec3::Y; 6].to_vec(),
-            indices: vec![
-                0, 2, 1, // Top tri
-                3, 5, 4, // Bot tri
-                0, 5, 3, // Mid Quad
-                3, 2, 0, // Mid Quad
-            ],
-        }
     }
 
     /// Computes cheap mesh data for an hexagonal column facing `Vec3::Y`

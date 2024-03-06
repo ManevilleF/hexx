@@ -135,24 +135,10 @@ impl UVOptions {
     }
 
     /// Apply the options to all UV coords in `uvs`
-    pub fn alter_uvs(&self, uvs: &mut Vec<Vec2>) {
+    pub fn alter_uvs(&self, uvs: &mut [Vec2]) {
         for uv in uvs {
             *uv = self.alter_uv(*uv);
         }
-    }
-
-    /// Default values for hexagonal planes or column caps
-    #[must_use]
-    #[deprecated(since = "0.14.0", note = "Use `UVOptions::new` instead")]
-    pub const fn cap_default() -> Self {
-        Self::new()
-    }
-
-    /// Default values for quads
-    #[must_use]
-    #[deprecated(since = "0.14.0", note = "Use `UVOptions::new` instead")]
-    pub const fn quad_default() -> Self {
-        Self::new()
     }
 
     /// This function maps `p` to be normalized and between 0 and 1
