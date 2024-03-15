@@ -134,7 +134,8 @@ impl HexLayout {
 
 #[cfg(feature = "grid")]
 impl HexLayout {
-    /// Returns the  world coordinate of the two edge vertices in clockwise order
+    /// Returns the  world coordinate of the two edge vertices in clockwise
+    /// order
     #[must_use]
     pub fn edge_coordinates(&self, edge: crate::GridEdge) -> [Vec2; 2] {
         edge.vertices().map(|v| self.vertex_coordinates(v))
