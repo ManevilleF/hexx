@@ -1,6 +1,9 @@
 #![allow(clippy::inline_always)]
 /// Type conversions
 mod convert;
+/// Hexagonal grid utilities, like edge and vertices
+#[cfg(feature = "grid")]
+pub mod grid;
 /// Traits implementations
 mod impls;
 /// Iterator tools module
@@ -17,6 +20,8 @@ pub use iter::HexIterExt;
 
 use crate::{DirectionWay, EdgeDirection, VertexDirection};
 use glam::{IVec2, IVec3, Vec2};
+#[cfg(feature = "grid")]
+pub use grid::{GridEdge, GridVertex};
 use std::{
     cmp::{max, min},
     fmt::Debug,
@@ -606,6 +611,14 @@ impl Hex {
         direction.into_inner()
     }
 
+    pub(crate) const fn add_dir(self, direction: EdgeDirection) -> Self {
+        self.const_add(Self::neighbor_coord(direction))
+    }
+
+    pub(crate) const fn add_diag_dir(self, direction: VertexDirection) -> Self {
+        self.const_add(Self::diagonal_neighbor_coord(direction))
+    }
+
     #[inline]
     #[must_use]
     /// Retrieves the neighbor coordinates matching the given `direction`
@@ -716,14 +729,14 @@ impl Hex {
     #[must_use]
     /// Retrieves all 6 neighbor coordinates around `self`
     pub fn all_neighbors(self) -> [Self; 6] {
-        Self::NEIGHBORS_COORDS.map(|n| self + n)
+        Self::NEIGHBORS_COORDS.map(|n| self.const_add(n))
     }
 
     #[inline]
     #[must_use]
     /// Retrieves all 6 neighbor diagonal coordinates around `self`
     pub fn all_diagonals(self) -> [Self; 6] {
-        Self::DIAGONAL_COORDS.map(|n| self + n)
+        Self::DIAGONAL_COORDS.map(|n| self.const_add(n))
     }
 
     #[inline]
@@ -927,16 +940,10 @@ impl Hex {
     /// assert_eq!(coord.xrange(1).len(), 6);
     /// ```
     pub fn xrange(self, range: u32) -> impl ExactSizeIterator<Item = Self> {
-        let radius = range as i32;
+        let iter = self.range(range);
         ExactSizeHexIterator {
-            iter: (-radius..=radius).flat_map(move |x| {
-                let y_min = max(-radius, -x - radius);
-                let y_max = min(radius, radius - x);
-                (y_min..=y_max)
-                    .map(move |y| self.const_add(Self::new(x, y)))
-                    .filter(move |h| *h != self)
-            }),
-            count: Self::range_count(range).saturating_sub(1) as usize,
+            count: iter.len().saturating_sub(1),
+            iter: iter.filter(move |h| *h != self),
         }
     }
 

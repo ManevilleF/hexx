@@ -132,6 +132,23 @@ impl HexLayout {
     }
 }
 
+#[cfg(feature = "grid")]
+impl HexLayout {
+    /// Returns the  world coordinate of the two edge vertices in clockwise order
+    #[must_use]
+    pub fn edge_coordinates(&self, edge: crate::GridEdge) -> [Vec2; 2] {
+        edge.vertices().map(|v| self.vertex_coordinates(v))
+    }
+
+    /// Returns the world coordinate of the vertex
+    #[must_use]
+    pub fn vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
+        let origin = self.hex_to_world_pos(vertex.origin);
+        let angle = vertex.direction.angle(self.orientation);
+        origin + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
+    }
+}
+
 impl Default for HexLayout {
     fn default() -> Self {
         Self {

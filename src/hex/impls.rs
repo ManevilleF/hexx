@@ -33,7 +33,7 @@ impl Add<EdgeDirection> for Hex {
 
     #[inline]
     fn add(self, rhs: EdgeDirection) -> Self::Output {
-        self.add(Self::from(rhs))
+        self.add_dir(rhs)
     }
 }
 
@@ -42,7 +42,7 @@ impl Add<VertexDirection> for Hex {
 
     #[inline]
     fn add(self, rhs: VertexDirection) -> Self::Output {
-        self.add(Self::from(rhs))
+        self.add_diag_dir(rhs)
     }
 }
 

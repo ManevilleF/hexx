@@ -249,6 +249,9 @@ pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
 #[doc(inline)]
 pub use hex::{hex, Hex, HexIterExt};
 #[doc(inline)]
+#[cfg(feature = "grid")]
+pub use hex::{GridEdge, GridVertex};
+#[doc(inline)]
 pub use layout::HexLayout;
 #[cfg(feature = "mesh")]
 pub use mesh::*;
