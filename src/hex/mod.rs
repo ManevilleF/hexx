@@ -106,7 +106,7 @@ impl Hex {
     /// The cubic unit axes.
     pub const CUBIC_AXES: [Self; 3] = [Self::X, Self::Y, Self::Z];
 
-    /// Hexagon neighbor coordinates array, following [`Direction`] order
+    /// Hexagon edge neighbor coordinates array, following [`EdgeDirection`] order
     ///
     /// ```txt
     ///            x Axis
@@ -130,6 +130,7 @@ impl Hex {
         Self::X,
     ];
 
+    /// Hexagon diagonal neighbor coordinates array, following [`VertexDirection`] order
     /// ```txt
     ///            x Axis
     ///           \___/
@@ -679,7 +680,7 @@ impl Hex {
         }
     }
 
-    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    /// Find in which [`EdgeDirection`] wedge `rhs` is relative to `self`
     ///
     /// > This method can be innaccurate in case of a *tie* between directions,
     /// > prefer
@@ -690,7 +691,7 @@ impl Hex {
     }
 
     #[must_use]
-    /// Find in which [`Direction`] wedge `rhs` is relative to `self`
+    /// Find in which [`EdgeDirection`] wedge `rhs` is relative to `self`
     pub fn way_to(self, rhs: Self) -> DirectionWay<EdgeDirection> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [x, y, z] = [y - x, z - y, x - z];
