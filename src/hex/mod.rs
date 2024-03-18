@@ -106,7 +106,8 @@ impl Hex {
     /// The cubic unit axes.
     pub const CUBIC_AXES: [Self; 3] = [Self::X, Self::Y, Self::Z];
 
-    /// Hexagon edge neighbor coordinates array, following [`EdgeDirection`] order
+    /// Hexagon edge neighbor coordinates array, following [`EdgeDirection`]
+    /// order
     ///
     /// ```txt
     ///            x Axis
@@ -130,7 +131,9 @@ impl Hex {
         Self::X,
     ];
 
-    /// Hexagon diagonal neighbor coordinates array, following [`VertexDirection`] order
+    /// Hexagon diagonal neighbor coordinates array, following
+    /// [`VertexDirection`] order
+    ///
     /// ```txt
     ///            x Axis
     ///           \___/
