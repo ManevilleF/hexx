@@ -1,4 +1,4 @@
-use crate::{Direction, Hex};
+use crate::{EdgeDirection, Hex};
 use std::collections::HashSet;
 
 /// Computes a field of view around `coord` in a given `range`.
@@ -56,10 +56,10 @@ pub fn range_fov(coord: Hex, range: u32, blocking: impl Fn(Hex) -> bool) -> Hash
 pub fn directional_fov(
     coord: Hex,
     range: u32,
-    direction: Direction,
+    direction: EdgeDirection,
     blocking: impl Fn(Hex) -> bool,
 ) -> HashSet<Hex> {
-    let [a, b] = [direction.diagonal_ccw(), direction.diagonal_cw()];
+    let [a, b] = direction.vertex_directions();
     coord
         .ring(range)
         .filter(|h| {
