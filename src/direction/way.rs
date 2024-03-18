@@ -1,6 +1,6 @@
 use std::ops::Neg;
 
-use crate::{DiagonalDirection, Direction};
+use crate::{EdgeDirection, VertexDirection};
 
 /// Describes a direction way, which can be a `Single` direction or a `Tie`
 /// betwen two directions.
@@ -98,7 +98,7 @@ impl<T> From<[T; 2]> for DirectionWay<T> {
     }
 }
 
-impl Way for Direction {
+impl Way for EdgeDirection {
     fn ccw(self) -> Self {
         self.counter_clockwise()
     }
@@ -108,7 +108,7 @@ impl Way for Direction {
     }
 }
 
-impl Way for DiagonalDirection {
+impl Way for VertexDirection {
     fn ccw(self) -> Self {
         self.counter_clockwise()
     }

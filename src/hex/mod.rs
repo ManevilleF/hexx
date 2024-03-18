@@ -15,7 +15,7 @@ mod tests;
 pub(crate) use iter::ExactSizeHexIterator;
 pub use iter::HexIterExt;
 
-use crate::{DiagonalDirection, Direction, DirectionWay};
+use crate::{DirectionWay, EdgeDirection, VertexDirection};
 use glam::{IVec2, IVec3, Vec2};
 use std::cmp::{max, min};
 
@@ -587,16 +587,16 @@ impl Hex {
     #[must_use]
     /// Retrieves the hexagonal neighbor coordinates matching the given
     /// `direction`
-    pub const fn neighbor_coord(direction: Direction) -> Self {
-        Self::NEIGHBORS_COORDS[direction as usize]
+    pub const fn neighbor_coord(direction: EdgeDirection) -> Self {
+        direction.into_inner()
     }
 
     #[inline]
     #[must_use]
     /// Retrieves the diagonal neighbor coordinates matching the given
     /// `direction`
-    pub const fn diagonal_neighbor_coord(direction: DiagonalDirection) -> Self {
-        Self::DIAGONAL_COORDS[direction as usize]
+    pub const fn diagonal_neighbor_coord(direction: VertexDirection) -> Self {
+        direction.into_inner()
     }
 
     #[inline]
@@ -611,7 +611,7 @@ impl Hex {
     /// let bottom = coord.neighbor(Direction::Bottom);
     /// assert_eq!(bottom, Hex::new(10, 6));
     /// ```
-    pub const fn neighbor(self, direction: Direction) -> Self {
+    pub const fn neighbor(self, direction: EdgeDirection) -> Self {
         self.const_add(Self::neighbor_coord(direction))
     }
 
@@ -628,7 +628,7 @@ impl Hex {
     /// let bottom = coord.diagonal_neighbor(DiagonalDirection::Right);
     /// assert_eq!(bottom, Hex::new(12, 4));
     /// ```
-    pub const fn diagonal_neighbor(self, direction: DiagonalDirection) -> Self {
+    pub const fn diagonal_neighbor(self, direction: VertexDirection) -> Self {
         self.const_add(Self::diagonal_neighbor_coord(direction))
     }
 
@@ -646,8 +646,8 @@ impl Hex {
     /// let dir = coord.neighbor_direction(bottom).unwrap();
     /// assert_eq!(dir, Direction::Bottom);
     /// ```
-    pub fn neighbor_direction(self, other: Self) -> Option<Direction> {
-        Direction::iter().find(|&dir| self.neighbor(dir) == other)
+    pub fn neighbor_direction(self, other: Self) -> Option<EdgeDirection> {
+        EdgeDirection::iter().find(|&dir| self.neighbor(dir) == other)
     }
 
     #[must_use]
@@ -656,23 +656,23 @@ impl Hex {
     /// > This method can be innaccurate in case of a *tie* between directions,
     /// > prefer
     /// using [`Self::diagonal_way_to`] instead
-    pub fn main_diagonal_to(self, rhs: Self) -> DiagonalDirection {
+    pub fn main_diagonal_to(self, rhs: Self) -> VertexDirection {
         self.diagonal_way_to(rhs).unwrap()
     }
 
     #[must_use]
     /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
-    pub fn diagonal_way_to(self, rhs: Self) -> DirectionWay<DiagonalDirection> {
+    pub fn diagonal_way_to(self, rhs: Self) -> DirectionWay<VertexDirection> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
         match xa.max(ya).max(za) {
             v if v == xa => {
-                DirectionWay::way_from(x < 0, xa == ya, xa == za, DiagonalDirection::Right)
+                DirectionWay::way_from(x < 0, xa == ya, xa == za, VertexDirection::FLAT_RIGHT)
             }
             v if v == ya => {
-                DirectionWay::way_from(y < 0, ya == za, ya == xa, DiagonalDirection::BottomLeft)
+                DirectionWay::way_from(y < 0, ya == za, ya == xa, VertexDirection::FLAT_BOTTOM_LEFT)
             }
-            _ => DirectionWay::way_from(z < 0, za == xa, za == ya, DiagonalDirection::TopLeft),
+            _ => DirectionWay::way_from(z < 0, za == xa, za == ya, VertexDirection::FLAT_TOP_LEFT),
         }
     }
 
@@ -682,22 +682,26 @@ impl Hex {
     /// > prefer
     /// using [`Self::way_to`] for accuracy
     #[must_use]
-    pub fn main_direction_to(self, rhs: Self) -> Direction {
+    pub fn main_direction_to(self, rhs: Self) -> EdgeDirection {
         self.way_to(rhs).unwrap()
     }
 
     #[must_use]
     /// Find in which [`Direction`] wedge `rhs` is relative to `self`
-    pub fn way_to(self, rhs: Self) -> DirectionWay<Direction> {
+    pub fn way_to(self, rhs: Self) -> DirectionWay<EdgeDirection> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [x, y, z] = [y - x, z - y, x - z];
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];
         match xa.max(ya).max(za) {
             v if v == xa => {
-                DirectionWay::way_from(x < 0, xa == ya, xa == za, Direction::BottomLeft)
+                DirectionWay::way_from(x < 0, xa == ya, xa == za, EdgeDirection::FLAT_BOTTOM_LEFT)
             }
-            v if v == ya => DirectionWay::way_from(y < 0, ya == za, ya == xa, Direction::Top),
-            _ => DirectionWay::way_from(z < 0, za == xa, za == ya, Direction::BottomRight),
+            v if v == ya => {
+                DirectionWay::way_from(y < 0, ya == za, ya == xa, EdgeDirection::FLAT_TOP)
+            }
+            _ => {
+                DirectionWay::way_from(z < 0, za == xa, za == ya, EdgeDirection::FLAT_BOTTOM_RIGHT)
+            }
         }
     }
 
