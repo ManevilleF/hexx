@@ -7,8 +7,8 @@ use crate::{EdgeDirection, VertexDirection};
 ///
 /// # Comparison
 ///
-/// To compare it with its inner [`EdgeDirection`] or [`VertexDirection`] you can
-/// use `Self::contains` or the [`PartialEq`] implementation:
+/// To compare it with its inner [`EdgeDirection`] or [`VertexDirection`] you
+/// can use `Self::contains` or the [`PartialEq`] implementation:
 ///
 /// ```rust
 /// # use hexx::*;

@@ -46,8 +46,8 @@ impl Hex {
 
     #[must_use]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop
-    /// around `self` counter clockwise.
+    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`]
+    /// and loop around `self` counter clockwise.
     ///
     /// > See [`Self::custom_ring`] for more options.
     ///
@@ -59,8 +59,8 @@ impl Hex {
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
-    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop
-    /// around `self` counter clockwise.
+    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`]
+    /// and loop around `self` counter clockwise.
     ///
     /// See [`Self::custom_rings`] for more options.
     /// If you only need the coordinates see [`Self::spiral_range`].
@@ -413,8 +413,8 @@ impl Hex {
     #[must_use]
     /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
     /// as an array of rings.
-    /// The returned rings start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop around
-    /// `self` counter clockwise.
+    /// The returned rings start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop
+    /// around `self` counter clockwise.
     ///
     /// See also [`Self::cached_custom_rings`]
     /// If you only need the coordinates see [`Self::range`] or
@@ -503,8 +503,8 @@ impl Hex {
     }
 
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as
-    /// successive rings, starting from [`EdgeDirection::FLAT_TOP_RIGHT`] and looping
-    /// counter clockwise, forming a spiral.
+    /// successive rings, starting from [`EdgeDirection::FLAT_TOP_RIGHT`] and
+    /// looping counter clockwise, forming a spiral.
     ///
     /// See [`Self::custom_spiral_range`] for more options
     ///

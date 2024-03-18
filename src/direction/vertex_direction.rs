@@ -197,7 +197,10 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(VertexDirection::FLAT_RIGHT.const_neg(), VertexDirection::FLAT_LEFT);
+    /// assert_eq!(
+    ///     VertexDirection::FLAT_RIGHT.const_neg(),
+    ///     VertexDirection::FLAT_LEFT
+    /// );
     /// ```
     #[must_use]
     #[inline]
@@ -211,7 +214,10 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(VertexDirection::FLAT_RIGHT.clockwise(), VertexDirection::FLAT_BOTTOM_RIGHT);
+    /// assert_eq!(
+    ///     VertexDirection::FLAT_RIGHT.clockwise(),
+    ///     VertexDirection::FLAT_BOTTOM_RIGHT
+    /// );
     /// ```
     #[must_use]
     #[inline]
@@ -226,7 +232,10 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(VertexDirection::FLAT_RIGHT.counter_clockwise(), VertexDirection::FLAT_TOP_RIGHT);
+    /// assert_eq!(
+    ///     VertexDirection::FLAT_RIGHT.counter_clockwise(),
+    ///     VertexDirection::FLAT_TOP_RIGHT
+    /// );
     /// ```
     #[must_use]
     #[inline]
@@ -243,7 +252,10 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(VertexDirection::FLAT_RIGHT, VertexDirection::FLAT_RIGHT.rotate_ccw(6));
+    /// assert_eq!(
+    ///     VertexDirection::FLAT_RIGHT,
+    ///     VertexDirection::FLAT_RIGHT.rotate_ccw(6)
+    /// );
     /// ```
     pub const fn rotate_ccw(self, offset: u8) -> Self {
         Self((self.0 + (offset % 6)) % 6)
@@ -257,7 +269,10 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(VertexDirection::FLAT_RIGHT, VertexDirection::FLAT_RIGHT.rotate_cw(6));
+    /// assert_eq!(
+    ///     VertexDirection::FLAT_RIGHT,
+    ///     VertexDirection::FLAT_RIGHT.rotate_cw(6)
+    /// );
     /// ```
     pub const fn rotate_cw(self, offset: u8) -> Self {
         Self((self.0 + 6 - (offset % 6)) % 6)
