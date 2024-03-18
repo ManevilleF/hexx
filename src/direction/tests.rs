@@ -8,7 +8,7 @@ use super::*;
 use crate::HexOrientation;
 use std::f32::{consts::PI, EPSILON};
 
-mod hex_directions {
+mod edge_directions {
     use super::*;
 
     #[test]
@@ -191,7 +191,7 @@ mod hex_directions {
     }
 }
 
-mod diagonal_direction {
+mod vertex_direction {
     use super::*;
 
     #[test]
@@ -260,12 +260,12 @@ mod diagonal_direction {
             let angle = if angle < 0.0 { angle + 360.0 } else { angle };
             print!("pos angle = {angle}");
             match angle {
-                v if v < 60.0 => TopRight,
-                v if v < 120.0 => TopLeft,
-                v if v < 180.0 => Left,
-                v if v < 240.0 => BottomLeft,
-                v if v < 300.0 => BottomRight,
-                _ => Right,
+                v if v < 60.0 => VertexDirection::FLAT_TOP_RIGHT,
+                v if v < 120.0 => VertexDirection::FLAT_TOP_LEFT,
+                v if v < 180.0 => VertexDirection::FLAT_LEFT,
+                v if v < 240.0 => VertexDirection::FLAT_BOTTOM_LEFT,
+                v if v < 300.0 => VertexDirection::FLAT_BOTTOM_RIGHT,
+                _ => VertexDirection::FLAT_RIGHT,
             }
         };
         for angle in -1000..1000 {
@@ -284,13 +284,13 @@ mod diagonal_direction {
             let angle = angle % 360.0;
             let angle = if angle < 0.0 { angle + 360.0 } else { angle };
             match angle {
-                v if v < 30.0 => Right,
-                v if v < 90.0 => TopRight,
-                v if v < 150.0 => TopLeft,
-                v if v < 210.0 => Left,
-                v if v < 270.0 => BottomLeft,
-                v if v < 330.0 => BottomRight,
-                _ => Right,
+                v if v < 30.0 => VertexDirection::FLAT_RIGHT,
+                v if v < 90.0 => VertexDirection::FLAT_TOP_RIGHT,
+                v if v < 150.0 => VertexDirection::FLAT_TOP_LEFT,
+                v if v < 210.0 => VertexDirection::FLAT_LEFT,
+                v if v < 270.0 => VertexDirection::FLAT_BOTTOM_LEFT,
+                v if v < 330.0 => VertexDirection::FLAT_BOTTOM_RIGHT,
+                _ => VertexDirection::FLAT_RIGHT,
             }
         };
         for angle in -1000..1000 {

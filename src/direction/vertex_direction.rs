@@ -1,8 +1,11 @@
 use crate::{
-    angles::{DIRECTION_ANGLE_DEGREES, DIRECTION_ANGLE_RAD},
-    EdgeDirection, Hex,
+    angles::{
+        DIRECTION_ANGLE_DEGREES, DIRECTION_ANGLE_OFFSET_DEGREES, DIRECTION_ANGLE_OFFSET_RAD,
+        DIRECTION_ANGLE_RAD,
+    },
+    EdgeDirection, Hex, HexOrientation,
 };
-use std::fmt::Debug;
+use std::{f32::consts::TAU, fmt::Debug};
 
 /// All 6 possible diagonal/vertex directions in hexagonal space.
 ///
@@ -199,7 +202,7 @@ impl VertexDirection {
     #[must_use]
     #[inline]
     pub const fn const_neg(self) -> Self {
-        Self((6 - self.0) % 6)
+        Self((self.0 + 3) % 6)
     }
 
     /// Returns the next direction in clockwise order
@@ -286,6 +289,184 @@ impl VertexDirection {
 
     #[inline]
     #[must_use]
+    /// Returns the angle in radians of the given direction for *flat* hexagons
+    ///
+    /// See [`Self::angle_pointy`] for *pointy* hexagons
+    pub fn angle_flat(self) -> f32 {
+        self.angle_between(Self::default())
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the angle in radians of the given direction for *pointy*
+    /// hexagons
+    ///
+    /// See [`Self::angle_flat`] for *flat* hexagons
+    pub fn angle_pointy(self) -> f32 {
+        self.angle_flat() - DIRECTION_ANGLE_OFFSET_RAD
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the angle in degrees of the given direction for *pointy*
+    /// hexagons
+    ///
+    /// See [`Self::angle_flat`] for *flat* hexagons
+    pub fn angle_flat_degrees(self) -> f32 {
+        self.angle_degrees_between(Self::default())
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the angle in degrees of the given direction for *pointy*
+    /// hexagons
+    ///
+    /// See [`Self::angle_flat`] for *flat* hexagons
+    pub fn angle_pointy_degrees(self) -> f32 {
+        self.angle_flat_degrees() - DIRECTION_ANGLE_OFFSET_DEGREES
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the angle in radians of the given direction in the given
+    /// `orientation`
+    pub fn angle(self, orientation: HexOrientation) -> f32 {
+        self.angle_pointy() - orientation.angle_offset
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the angle in degrees of the given direction according to its
+    /// `orientation`
+    ///
+    /// See [`Self::angle`] for radians angles
+    pub fn angle_degrees(self, orientation: HexOrientation) -> f32 {
+        match orientation {
+            HexOrientation::Pointy => self.angle_pointy_degrees(),
+            HexOrientation::Flat => self.angle_flat_degrees(),
+        }
+    }
+
+    #[must_use]
+    /// Returns the direction from the given `angle` in degrees
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let direction = VertexDirection::from_flat_angle_degrees(15.0);
+    /// assert_eq!(direction, VertexDirection::FLAT_RIGHT);
+    /// ```
+    pub fn from_flat_angle_degrees(angle: f32) -> Self {
+        Self::from_pointy_angle_degrees(angle - DIRECTION_ANGLE_OFFSET_DEGREES)
+    }
+
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    /// Returns the direction from the given `angle` in degrees
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let direction = VertexDirection::from_pointy_angle_degrees(15.0);
+    /// assert_eq!(direction, VertexDirection::FLAT_TOP_RIGHT);
+    /// ```
+    pub fn from_pointy_angle_degrees(angle: f32) -> Self {
+        let angle = angle.rem_euclid(360.0);
+        let sector = (angle / DIRECTION_ANGLE_DEGREES).trunc() as u8;
+        Self((sector + 1) % 6)
+    }
+
+    #[must_use]
+    /// Returns the direction from the given `angle` in radians
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let direction = VertexDirection::from_flat_angle(0.26);
+    /// assert_eq!(direction, VertexDirection::FLAT_RIGHT);
+    /// ```
+    pub fn from_flat_angle(angle: f32) -> Self {
+        Self::from_pointy_angle(angle - DIRECTION_ANGLE_OFFSET_RAD)
+    }
+
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    /// Returns the direction from the given `angle` in radians
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let direction = VertexDirection::from_pointy_angle(0.26);
+    /// assert_eq!(direction, VertexDirection::FLAT_TOP_RIGHT);
+    /// ```
+    pub fn from_pointy_angle(angle: f32) -> Self {
+        let angle = angle.rem_euclid(TAU);
+        let sector = (angle / DIRECTION_ANGLE_RAD) as u8;
+        Self((sector + 1) % 6)
+    }
+
+    #[must_use]
+    /// Returns the direction from the given `angle` in degrees according the
+    /// `orientation`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let angle = 15.0;
+    /// assert_eq!(
+    ///     VertexDirection::from_angle_degrees(angle, HexOrientation::Flat),
+    ///     VertexDirection::FLAT_RIGHT
+    /// );
+    /// assert_eq!(
+    ///     VertexDirection::from_angle_degrees(angle, HexOrientation::Pointy),
+    ///     VertexDirection::FLAT_TOP_RIGHT
+    /// );
+    /// ```
+    pub fn from_angle_degrees(angle: f32, orientation: HexOrientation) -> Self {
+        match orientation {
+            HexOrientation::Pointy => Self::from_pointy_angle_degrees(angle),
+            HexOrientation::Flat => Self::from_flat_angle_degrees(angle),
+        }
+    }
+
+    #[must_use]
+    /// Returns the direction from the given `angle` in radians according the
+    /// `orientation`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    ///
+    /// let angle = 0.26;
+    /// assert_eq!(
+    ///     VertexDirection::from_angle(angle, HexOrientation::Flat),
+    ///     VertexDirection::FLAT_RIGHT
+    /// );
+    /// assert_eq!(
+    ///     VertexDirection::from_angle(angle, HexOrientation::Pointy),
+    ///     VertexDirection::FLAT_TOP_RIGHT
+    /// );
+    /// ```
+    pub fn from_angle(angle: f32, orientation: HexOrientation) -> Self {
+        match orientation {
+            HexOrientation::Pointy => Self::from_pointy_angle(angle),
+            HexOrientation::Flat => Self::from_flat_angle(angle),
+        }
+    }
+
+    #[inline]
+    #[must_use]
     /// Computes the counter clockwise [`EdgeDirection`] neighbor of self.
     ///
     /// # Example
@@ -358,6 +539,7 @@ impl From<VertexDirection> for Hex {
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Debug for VertexDirection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let c = self.into_inner();
@@ -365,6 +547,7 @@ impl Debug for VertexDirection {
             .field("index", &self.0)
             .field("x", &c.x)
             .field("y", &c.y)
+            .field("z", &c.z())
             .finish()
     }
 }

@@ -205,7 +205,7 @@ impl EdgeDirection {
     #[must_use]
     #[inline]
     pub const fn const_neg(self) -> Self {
-        Self((6 - self.0) % 6)
+        Self((self.0 + 3) % 6)
     }
 
     /// Returns the next direction in clockwise order
@@ -541,6 +541,7 @@ impl From<EdgeDirection> for Hex {
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Debug for EdgeDirection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let c = self.into_inner();
@@ -548,6 +549,7 @@ impl Debug for EdgeDirection {
             .field("index", &self.0)
             .field("x", &c.x)
             .field("y", &c.y)
+            .field("z", &c.z())
             .finish()
     }
 }

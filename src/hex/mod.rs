@@ -17,7 +17,10 @@ pub use iter::HexIterExt;
 
 use crate::{DirectionWay, EdgeDirection, VertexDirection};
 use glam::{IVec2, IVec3, Vec2};
-use std::cmp::{max, min};
+use std::{
+    cmp::{max, min},
+    fmt::Debug,
+};
 
 /// Hexagonal [axial] coordinates
 ///
@@ -47,7 +50,7 @@ use std::cmp::{max, min};
 /// [comparison]: https://www.redblobgames.com/grids/hexagons/#coordinates-comparison
 /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
 #[derive(Copy, Clone, Default, Eq, PartialEq)]
-#[cfg_attr(not(target_arch = "spirv"), derive(Debug, Hash))]
+#[cfg_attr(not(target_arch = "spirv"), derive(Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "packed", repr(C))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
@@ -1088,5 +1091,15 @@ impl Hex {
     /// [article]: https://www.redblobgames.com/grids/hexagons/#wraparound
     pub fn wrap_in_range(self, range: u32) -> Self {
         self.to_local(range)
+    }
+}
+
+impl Debug for Hex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Hex")
+            .field("x", &self.x)
+            .field("y", &self.y)
+            .field("z", &self.z())
+            .finish()
     }
 }
