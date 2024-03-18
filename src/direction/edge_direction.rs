@@ -200,7 +200,7 @@ impl EdgeDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(EdgeDirection::FLAT_TOP.const_neg(), Direction::FLAT_BOTTOM);
+    /// assert_eq!(EdgeDirection::FLAT_TOP.const_neg(), EdgeDirection::FLAT_BOTTOM);
     /// ```
     #[must_use]
     #[inline]
@@ -214,7 +214,7 @@ impl EdgeDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(EdgeDirection::FLAT_TOP.clockwise(), Direction::FLAT_TOP_RIGHT);
+    /// assert_eq!(EdgeDirection::FLAT_TOP.clockwise(), EdgeDirection::FLAT_TOP_RIGHT);
     /// ```
     #[must_use]
     #[inline]
@@ -229,7 +229,7 @@ impl EdgeDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(EdgeDirection::FLAT_TOP.counter_clockwise(), Direction::FLAT_TOP_LEFT);
+    /// assert_eq!(EdgeDirection::FLAT_TOP.counter_clockwise(), EdgeDirection::FLAT_TOP_LEFT);
     /// ```
     #[must_use]
     #[inline]
@@ -246,7 +246,7 @@ impl EdgeDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(EdgeDirection::FLAT_TOP, Direction::FLAT_TOP.rotate_ccw(6));
+    /// assert_eq!(EdgeDirection::FLAT_TOP, EdgeDirection::FLAT_TOP.rotate_ccw(6));
     /// ```
     pub const fn rotate_ccw(self, offset: u8) -> Self {
         Self((self.0 + (offset % 6)) % 6)
@@ -260,7 +260,7 @@ impl EdgeDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(EdgeDirection::FLAT_TOP, Direction::FLAT_TOP.rotate_cw(6));
+    /// assert_eq!(EdgeDirection::FLAT_TOP, EdgeDirection::FLAT_TOP.rotate_cw(6));
     /// ```
     pub const fn rotate_cw(self, offset: u8) -> Self {
         Self((self.0 + 6 - (offset % 6)) % 6)

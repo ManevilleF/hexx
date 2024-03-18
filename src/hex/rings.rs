@@ -46,7 +46,7 @@ impl Hex {
 
     #[must_use]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and loop
+    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop
     /// around `self` counter clockwise.
     ///
     /// > See [`Self::custom_ring`] for more options.
@@ -59,7 +59,7 @@ impl Hex {
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and loop
+    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop
     /// around `self` counter clockwise.
     ///
     /// See [`Self::custom_rings`] for more options.
@@ -88,7 +88,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let rings: Vec<Vec<Hex>> = Hex::ZERO
-    ///     .custom_rings(3..10, Direction::Top, true)
+    ///     .custom_rings(3..10, EdgeDirection::FLAT_TOP, true)
     ///     .collect();
     /// assert_eq!(rings.len(), 7);
     /// ```
@@ -158,7 +158,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let edges: Vec<_> = Hex::ZERO
-    ///     .ring_edges(3..10, VertexDirection::Right)
+    ///     .ring_edges(3..10, VertexDirection::FLAT_RIGHT)
     ///     .collect();
     /// assert_eq!(edges.len(), 7);
     /// ```
@@ -183,7 +183,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let edges: Vec<_> = Hex::ZERO
-    ///     .custom_ring_edges(3..10, VertexDirection::Right, true)
+    ///     .custom_ring_edges(3..10, VertexDirection::FLAT_RIGHT, true)
     ///     .collect();
     /// assert_eq!(edges.len(), 7);
     /// ```
@@ -258,7 +258,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let point = Hex::new(3, -6);
-    /// let wedge: Vec<Hex> = point.wedge(0..=13, VertexDirection::Right).collect();
+    /// let wedge: Vec<Hex> = point.wedge(0..=13, VertexDirection::FLAT_RIGHT).collect();
     /// assert_eq!(wedge.len(), Hex::wedge_count(13) as usize);
     /// ```
     #[inline]
@@ -350,7 +350,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_custom_ring_edges::<10>(VertexDirection::Right, true);
+    /// let cache = Hex::ORIGIN.cached_custom_ring_edges::<10>(VertexDirection::FLAT_RIGHT, true);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -393,7 +393,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_ring_edges::<10>(VertexDirection::Right);
+    /// let cache = Hex::ORIGIN.cached_ring_edges::<10>(VertexDirection::FLAT_RIGHT);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -413,7 +413,7 @@ impl Hex {
     #[must_use]
     /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
     /// as an array of rings.
-    /// The returned rings start from [`Direction::TopRight`] and loop around
+    /// The returned rings start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop around
     /// `self` counter clockwise.
     ///
     /// See also [`Self::cached_custom_rings`]
@@ -468,7 +468,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_custom_rings::<10>(Direction::Top, true);
+    /// let cache = Hex::ORIGIN.cached_custom_rings::<10>(EdgeDirection::FLAT_TOP, true);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -503,7 +503,7 @@ impl Hex {
     }
 
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as
-    /// successive rings, starting from [`Direction::TopRight`] and looping
+    /// successive rings, starting from [`EdgeDirection::FLAT_TOP_RIGHT`] and looping
     /// counter clockwise, forming a spiral.
     ///
     /// See [`Self::custom_spiral_range`] for more options

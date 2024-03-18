@@ -611,7 +611,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let coord = Hex::new(10, 5);
-    /// let bottom = coord.neighbor(Direction::Bottom);
+    /// let bottom = coord.neighbor(EdgeDirection::FLAT_BOTTOM);
     /// assert_eq!(bottom, Hex::new(10, 6));
     /// ```
     pub const fn neighbor(self, direction: EdgeDirection) -> Self {
@@ -628,7 +628,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let coord = Hex::new(10, 5);
-    /// let bottom = coord.diagonal_neighbor(DiagonalDirection::Right);
+    /// let bottom = coord.diagonal_neighbor(VertexDirection::FLAT_RIGHT);
     /// assert_eq!(bottom, Hex::new(12, 4));
     /// ```
     pub const fn diagonal_neighbor(self, direction: VertexDirection) -> Self {
@@ -645,16 +645,16 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let coord = Hex::new(10, 5);
-    /// let bottom = coord.neighbor(Direction::Bottom);
+    /// let bottom = coord.neighbor(EdgeDirection::FLAT_BOTTOM);
     /// let dir = coord.neighbor_direction(bottom).unwrap();
-    /// assert_eq!(dir, Direction::Bottom);
+    /// assert_eq!(dir, EdgeDirection::FLAT_BOTTOM);
     /// ```
     pub fn neighbor_direction(self, other: Self) -> Option<EdgeDirection> {
         EdgeDirection::iter().find(|&dir| self.neighbor(dir) == other)
     }
 
     #[must_use]
-    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`.
+    /// Find in which [`VertexDirection`] wedge `rhs` is relative to `self`.
     ///
     /// > This method can be innaccurate in case of a *tie* between directions,
     /// > prefer
@@ -664,7 +664,7 @@ impl Hex {
     }
 
     #[must_use]
-    /// Find in which [`DiagonalDirection`] wedge `rhs` is relative to `self`
+    /// Find in which [`VertexDirection`] wedge `rhs` is relative to `self`
     pub fn diagonal_way_to(self, rhs: Self) -> DirectionWay<VertexDirection> {
         let [x, y, z] = (rhs - self).to_cubic_array();
         let [xa, ya, za] = [x.abs(), y.abs(), z.abs()];

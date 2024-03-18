@@ -46,7 +46,7 @@ pub fn range_fov(coord: Hex, range: u32, blocking: impl Fn(Hex) -> bool) -> Hash
 ///
 /// let pos = hex(0, 0);
 /// let range = 10;
-/// let dir = Direction::Top;
+/// let dir = EdgeDirection::FLAT_TOP;
 /// let blocking_coords: HashSet<Hex> = HashSet::new();
 /// // Add blocking coordinates
 /// // blocking_coords.insert(hex(2, 0));

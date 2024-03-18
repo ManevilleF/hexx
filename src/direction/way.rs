@@ -7,7 +7,7 @@ use crate::{EdgeDirection, VertexDirection};
 ///
 /// # Comparison
 ///
-/// To compare it with its inner [`Direction`] or [`DiagonalDirection`] you can
+/// To compare it with its inner [`EdgeDirection`] or [`VertexDirection`] you can
 /// use `Self::contains` or the [`PartialEq`] implementation:
 ///
 /// ```rust
@@ -16,10 +16,10 @@ use crate::{EdgeDirection, VertexDirection};
 /// let b = hex(6, -2);
 /// let way = a.way_to(b);
 /// let diag_way = a.diagonal_way_to(b);
-/// if way == Direction::Top {
+/// if way == EdgeDirection::FLAT_TOP {
 ///     // do something
 /// }
-/// if diag_way == DiagonalDirection::Left {
+/// if diag_way == VertexDirection::FLAT_LEFT {
 ///     // do something
 /// }
 /// ```
