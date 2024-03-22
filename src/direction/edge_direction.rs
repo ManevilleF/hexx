@@ -46,7 +46,8 @@ use std::{f32::consts::TAU, fmt::Debug};
 /// assert_eq!(direction >> 1, EdgeDirection::FLAT_TOP_RIGHT);
 /// assert_eq!(direction << 1, EdgeDirection::FLAT_TOP_LEFT);
 /// ```
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 #[repr(transparent)]

@@ -1098,6 +1098,7 @@ impl Hex {
     }
 }
 
+#[cfg(not(target_arch = "spirv"))]
 impl Debug for Hex {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Hex")
