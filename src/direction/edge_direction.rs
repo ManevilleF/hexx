@@ -291,8 +291,9 @@ impl EdgeDirection {
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
+    #[doc(alias = "angle_between")]
     /// Computes the angle between `self` and `rhs` in radians.
-    pub fn angle_between(self, rhs: Self) -> f32 {
+    pub fn angle_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
         steps * DIRECTION_ANGLE_RAD
     }
@@ -300,8 +301,9 @@ impl EdgeDirection {
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
+    #[doc(alias = "angle_degrees_between")]
     /// Computes the angle between `self` and `rhs` in degrees.
-    pub fn angle_degrees_between(self, rhs: Self) -> f32 {
+    pub fn angle_degrees_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
         steps * DIRECTION_ANGLE_DEGREES
     }
@@ -312,7 +314,7 @@ impl EdgeDirection {
     ///
     /// See [`Self::angle_pointy`] for *pointy* hexagons
     pub fn angle_flat(self) -> f32 {
-        self.angle_pointy() + DIRECTION_ANGLE_OFFSET_RAD
+        self.angle(HexOrientation::Flat)
     }
 
     #[inline]
@@ -322,7 +324,7 @@ impl EdgeDirection {
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_pointy(self) -> f32 {
-        self.angle_between(Self(0))
+        self.angle(HexOrientation::Pointy)
     }
 
     #[inline]
@@ -330,7 +332,11 @@ impl EdgeDirection {
     /// Returns the angle in radians of the given direction in the given
     /// `orientation`
     pub fn angle(self, orientation: HexOrientation) -> f32 {
-        self.angle_pointy() - orientation.angle_offset
+        let base = self.angle_to(Self(0));
+        match orientation {
+            HexOrientation::Pointy => base,
+            HexOrientation::Flat => base + DIRECTION_ANGLE_OFFSET_RAD,
+        }
     }
 
     #[inline]
@@ -338,9 +344,9 @@ impl EdgeDirection {
     /// Returns the angle in degrees of the given direction for *pointy*
     /// hexagons
     ///
-    /// See [`Self::angle_flat`] for *flat* hexagons
+    /// See [`Self::angle_pointy_degrees`] for *flat* hexagons
     pub fn angle_flat_degrees(self) -> f32 {
-        self.angle_pointy_degrees() + DIRECTION_ANGLE_OFFSET_DEGREES
+        self.angle_degrees(HexOrientation::Flat)
     }
 
     #[inline]
@@ -348,9 +354,9 @@ impl EdgeDirection {
     /// Returns the angle in degrees of the given direction for *pointy*
     /// hexagons
     ///
-    /// See [`Self::angle_flat`] for *flat* hexagons
+    /// See [`Self::angle_flat_degrees`] for *flat* hexagons
     pub fn angle_pointy_degrees(self) -> f32 {
-        self.angle_degrees_between(Self::default())
+        self.angle_degrees(HexOrientation::Pointy)
     }
 
     #[inline]
@@ -360,9 +366,10 @@ impl EdgeDirection {
     ///
     /// See [`Self::angle`] for radians angles
     pub fn angle_degrees(self, orientation: HexOrientation) -> f32 {
+        let base = self.angle_degrees_to(Self(0));
         match orientation {
-            HexOrientation::Pointy => self.angle_pointy_degrees(),
-            HexOrientation::Flat => self.angle_flat_degrees(),
+            HexOrientation::Pointy => base,
+            HexOrientation::Flat => base + DIRECTION_ANGLE_OFFSET_DEGREES,
         }
     }
     #[must_use]
