@@ -329,7 +329,7 @@ impl VertexDirection {
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_flat_degrees(self) -> f32 {
-        self.angle_degrees_between(Self::default())
+        self.angle_degrees_between(Self(0))
     }
 
     #[inline]
@@ -347,7 +347,7 @@ impl VertexDirection {
     /// Returns the angle in radians of the given direction in the given
     /// `orientation`
     pub fn angle(self, orientation: HexOrientation) -> f32 {
-        self.angle_pointy() - orientation.angle_offset
+        self.angle_flat() - orientation.angle_offset
     }
 
     #[inline]

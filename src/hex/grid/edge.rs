@@ -125,3 +125,12 @@ impl Neg for GridEdge {
         self.const_neg()
     }
 }
+
+impl From<EdgeDirection> for GridEdge {
+    fn from(direction: EdgeDirection) -> Self {
+        Self {
+            origin: Hex::ZERO,
+            direction,
+        }
+    }
+}

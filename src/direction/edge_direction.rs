@@ -322,7 +322,7 @@ impl EdgeDirection {
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_pointy(self) -> f32 {
-        self.angle_between(Self::default())
+        self.angle_between(Self(0))
     }
 
     #[inline]

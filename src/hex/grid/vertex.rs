@@ -140,3 +140,12 @@ impl Neg for GridVertex {
         self.const_neg()
     }
 }
+
+impl From<VertexDirection> for GridVertex {
+    fn from(direction: VertexDirection) -> Self {
+        Self {
+            origin: Hex::ZERO,
+            direction,
+        }
+    }
+}

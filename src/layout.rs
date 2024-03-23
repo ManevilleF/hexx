@@ -1,4 +1,4 @@
-use crate::{orientation::SQRT_3, EdgeDirection, Hex, HexOrientation};
+use crate::{orientation::SQRT_3, Hex, HexOrientation, VertexDirection};
 use glam::Vec2;
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
@@ -105,7 +105,7 @@ impl HexLayout {
 
     #[must_use]
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
-        EdgeDirection::ALL_DIRECTIONS.map(|dir| {
+        VertexDirection::ALL_DIRECTIONS.map(|dir| {
             let angle = dir.angle(self.orientation);
             Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
         })
