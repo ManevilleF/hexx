@@ -43,6 +43,24 @@ use std::{f32::consts::TAU, fmt::Debug};
 /// assert_eq!(direction >> 1, VertexDirection::FLAT_BOTTOM_RIGHT);
 /// assert_eq!(direction << 1, VertexDirection::FLAT_TOP_RIGHT);
 /// ```
+///
+/// ## Storage
+///
+/// Both [`EdgeDirection`] and [`VertexDirection`] store a u8 byte between 0 and
+/// 5 as following:
+///
+/// ```txt
+///           e1
+///       v2_____ v1
+///     e2 /     \ e0
+///       /       \
+///   v3 (         ) v0
+///       \       /
+///     e3 \_____/ e5
+///      v4   e5  v5
+/// ```
+///
+/// On pointy orientation the hexagon is shifted by 30 degrees clockwise
 #[derive(Clone, Copy, PartialEq, Eq, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -188,7 +206,7 @@ impl VertexDirection {
     /// Converts the direction to a hex coordinate
     #[must_use]
     #[inline]
-    pub const fn into_inner(self) -> Hex {
+    pub const fn into_hex(self) -> Hex {
         Hex::DIAGONAL_COORDS[self.0 as usize]
     }
 
@@ -559,14 +577,14 @@ impl VertexDirection {
 
 impl From<VertexDirection> for Hex {
     fn from(value: VertexDirection) -> Self {
-        value.into_inner()
+        value.into_hex()
     }
 }
 
 #[cfg(not(target_arch = "spirv"))]
 impl Debug for VertexDirection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let c = self.into_inner();
+        let c = self.into_hex();
         f.debug_struct("VertexDirection")
             .field("index", &self.0)
             .field("x", &c.x)

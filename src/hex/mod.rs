@@ -600,7 +600,7 @@ impl Hex {
     /// Retrieves the hexagonal neighbor coordinates matching the given
     /// `direction`
     pub const fn neighbor_coord(direction: EdgeDirection) -> Self {
-        direction.into_inner()
+        direction.into_hex()
     }
 
     #[inline]
@@ -608,7 +608,7 @@ impl Hex {
     /// Retrieves the diagonal neighbor coordinates matching the given
     /// `direction`
     pub const fn diagonal_neighbor_coord(direction: VertexDirection) -> Self {
-        direction.into_inner()
+        direction.into_hex()
     }
 
     pub(crate) const fn add_dir(self, direction: EdgeDirection) -> Self {
