@@ -16,7 +16,8 @@ pub struct GridEdge {
 }
 
 impl GridEdge {
-    /// Edges are equivalent if they have identical or flipped origin or direction
+    /// Edges are equivalent if they have identical or flipped origin or
+    /// direction
     #[must_use]
     pub fn equivalent(&self, other: &Self) -> bool {
         (self.origin == other.origin && self.direction == other.direction)
