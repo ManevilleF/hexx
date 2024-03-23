@@ -5,7 +5,10 @@ use crate::{Hex, VertexDirection};
 use super::GridEdge;
 
 /// Hexagonal grid orientated vertex representation.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Hash))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct GridVertex {
     /// The coordinate of the edge
     pub origin: Hex,
@@ -13,8 +16,11 @@ pub struct GridVertex {
     pub direction: VertexDirection,
 }
 
-impl PartialEq for GridVertex {
-    fn eq(&self, other: &Self) -> bool {
+impl GridVertex {
+    /// Checks if `self` and `rhs` are the same vertex, meaning either identical
+    /// or shared between adjacent coordinates
+    #[must_use]
+    pub fn equivalent(&self, other: &Self) -> bool {
         let [cw, ccw] = [
             Self {
                 origin: self.origin + self.direction.direction_cw(),
@@ -30,9 +36,7 @@ impl PartialEq for GridVertex {
             || (cw.origin == other.origin && cw.direction == other.direction)
             || (ccw.origin == other.origin && ccw.direction == other.direction)
     }
-}
 
-impl GridVertex {
     #[inline]
     #[must_use]
     /// Returns the three connected coordinates in clockwise order

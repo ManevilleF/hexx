@@ -4,7 +4,10 @@ use std::ops::Neg;
 use super::GridVertex;
 
 /// Hexagonal grid orientated edge representation
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(target_arch = "spirv"), derive(Hash))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct GridEdge {
     /// The coordinate of the edge
     pub origin: Hex,
@@ -12,15 +15,14 @@ pub struct GridEdge {
     pub direction: EdgeDirection,
 }
 
-impl PartialEq for GridEdge {
-    // Edges are equal if they have identical or flipped origin or direction
-    fn eq(&self, other: &Self) -> bool {
+impl GridEdge {
+    /// Edges are equivalent if they have identical or flipped origin or direction
+    #[must_use]
+    pub fn equivalent(&self, other: &Self) -> bool {
         (self.origin == other.origin && self.direction == other.direction)
             || (self.origin == other.destination() && self.direction == other.direction.const_neg())
     }
-}
 
-impl GridEdge {
     #[inline]
     #[must_use]
     /// Returns the coordinate the edge id pointing to
