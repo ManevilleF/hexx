@@ -6,6 +6,12 @@
 * Added `z` field in the `Debug` impl of `Hex` (#156)
 * Added `xyz` fields in the `Debug` impl of directions (#156)
 
+### New grid utilities (#154)
+
+* Added new `grid` feature gate
+* Added `GridVertex` and `GridEgde` types, representing oriented grid vertices
+and edges
+
 ### New directions (#156)
 
 * (**BREAKING**) Renamed `Direction` to `EdgeDirection`, and is no longer an enum.
@@ -24,6 +30,8 @@ longer an enum. Instead of the oriented variants use associated const values:
   * `DiagonalDirection::Left` -> `VertexDirection::FLAT_LEFT` or `VertexDirection::POINTY_TOP_LEFT`
   * `DiagonalDirection::BottomLeft` -> `VertexDirection::FLAT_BOTTOM_LEFT` or `VertexDirection::POINTY_BOTTOM_LEFT`
   * `DiagonalDirection::BottomRight` -> `VertexDirection::FLAT_BOTTOM_RIGHT` or `VertexDirection::POINTY_BOTTOM`
+* Fixed angle inconsistencies in both direction types
+* (**BREAKING**) Removed `HexOrientation::direction_angle` method
 
 ### Mesh generation overhaul (#152)
 
