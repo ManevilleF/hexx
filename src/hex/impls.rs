@@ -1,4 +1,4 @@
-use crate::{DiagonalDirection, Direction, Hex};
+use crate::{EdgeDirection, Hex, VertexDirection};
 use std::{
     iter::{Product, Sum},
     ops::{
@@ -28,20 +28,20 @@ impl Add<i32> for Hex {
     }
 }
 
-impl Add<Direction> for Hex {
+impl Add<EdgeDirection> for Hex {
     type Output = Self;
 
     #[inline]
-    fn add(self, rhs: Direction) -> Self::Output {
+    fn add(self, rhs: EdgeDirection) -> Self::Output {
         self.add(Self::from(rhs))
     }
 }
 
-impl Add<DiagonalDirection> for Hex {
+impl Add<VertexDirection> for Hex {
     type Output = Self;
 
     #[inline]
-    fn add(self, rhs: DiagonalDirection) -> Self::Output {
+    fn add(self, rhs: VertexDirection) -> Self::Output {
         self.add(Self::from(rhs))
     }
 }
@@ -60,16 +60,16 @@ impl AddAssign<i32> for Hex {
     }
 }
 
-impl AddAssign<Direction> for Hex {
+impl AddAssign<EdgeDirection> for Hex {
     #[inline]
-    fn add_assign(&mut self, rhs: Direction) {
+    fn add_assign(&mut self, rhs: EdgeDirection) {
         *self = self.add(rhs);
     }
 }
 
-impl AddAssign<DiagonalDirection> for Hex {
+impl AddAssign<VertexDirection> for Hex {
     #[inline]
-    fn add_assign(&mut self, rhs: DiagonalDirection) {
+    fn add_assign(&mut self, rhs: VertexDirection) {
         *self = self.add(rhs);
     }
 }
@@ -107,20 +107,20 @@ impl Sub<i32> for Hex {
     }
 }
 
-impl Sub<Direction> for Hex {
+impl Sub<EdgeDirection> for Hex {
     type Output = Self;
 
     #[inline]
-    fn sub(self, rhs: Direction) -> Self::Output {
+    fn sub(self, rhs: EdgeDirection) -> Self::Output {
         self.sub(Self::from(rhs))
     }
 }
 
-impl Sub<DiagonalDirection> for Hex {
+impl Sub<VertexDirection> for Hex {
     type Output = Self;
 
     #[inline]
-    fn sub(self, rhs: DiagonalDirection) -> Self::Output {
+    fn sub(self, rhs: VertexDirection) -> Self::Output {
         self.sub(Self::from(rhs))
     }
 }
@@ -139,16 +139,16 @@ impl SubAssign<i32> for Hex {
     }
 }
 
-impl SubAssign<Direction> for Hex {
+impl SubAssign<EdgeDirection> for Hex {
     #[inline]
-    fn sub_assign(&mut self, rhs: Direction) {
+    fn sub_assign(&mut self, rhs: EdgeDirection) {
         *self = self.sub(rhs);
     }
 }
 
-impl SubAssign<DiagonalDirection> for Hex {
+impl SubAssign<VertexDirection> for Hex {
     #[inline]
-    fn sub_assign(&mut self, rhs: DiagonalDirection) {
+    fn sub_assign(&mut self, rhs: VertexDirection) {
         *self = self.sub(rhs);
     }
 }

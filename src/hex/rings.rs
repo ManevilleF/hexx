@@ -1,5 +1,4 @@
-use super::{iter::ExactSizeHexIterator, Direction, Hex};
-use crate::DiagonalDirection;
+use super::{iter::ExactSizeHexIterator, EdgeDirection, Hex, VertexDirection};
 
 impl Hex {
     #[must_use]
@@ -16,12 +15,12 @@ impl Hex {
     pub fn custom_ring(
         self,
         range: u32,
-        start_dir: Direction,
+        start_dir: EdgeDirection,
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
         let mut directions = Self::NEIGHBORS_COORDS;
         // TODO: improve code clarity
-        directions.rotate_left(start_dir as usize);
+        directions.rotate_left(start_dir.index() as usize);
         if clockwise {
             directions.reverse();
             directions.rotate_left(1);
@@ -47,8 +46,8 @@ impl Hex {
 
     #[must_use]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and loop
-    /// around `self` counter clockwise.
+    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`]
+    /// and loop around `self` counter clockwise.
     ///
     /// > See [`Self::custom_ring`] for more options.
     ///
@@ -56,12 +55,12 @@ impl Hex {
     /// The returned iterator will have `6 * range` ([`Self::ring_count`])
     /// items, unless `range` is 0 which will return `self`
     pub fn ring(self, range: u32) -> impl ExactSizeIterator<Item = Self> {
-        self.custom_ring(range, Direction::TopRight, false)
+        self.custom_ring(range, EdgeDirection::default(), false)
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
-    /// The returned coordinates start from [`Direction::TopRight`] and loop
-    /// around `self` counter clockwise.
+    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`]
+    /// and loop around `self` counter clockwise.
     ///
     /// See [`Self::custom_rings`] for more options.
     /// If you only need the coordinates see [`Self::spiral_range`].
@@ -89,14 +88,14 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let rings: Vec<Vec<Hex>> = Hex::ZERO
-    ///     .custom_rings(3..10, Direction::Top, true)
+    ///     .custom_rings(3..10, EdgeDirection::FLAT_TOP, true)
     ///     .collect();
     /// assert_eq!(rings.len(), 7);
     /// ```
     pub fn custom_rings(
         self,
         range: impl Iterator<Item = u32>,
-        start_dir: Direction,
+        start_dir: EdgeDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Vec<Self>> {
         range.map(move |r| self.custom_ring(r, start_dir, clockwise).collect())
@@ -115,7 +114,7 @@ impl Hex {
     pub fn custom_ring_edge(
         self,
         radius: u32,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
         let [start_dir, end_dir] = if clockwise {
@@ -144,7 +143,7 @@ impl Hex {
     pub fn ring_edge(
         self,
         radius: u32,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
     ) -> impl ExactSizeIterator<Item = Self> {
         self.custom_ring_edge(radius, direction, false)
     }
@@ -159,7 +158,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let edges: Vec<_> = Hex::ZERO
-    ///     .ring_edges(3..10, DiagonalDirection::Right)
+    ///     .ring_edges(3..10, VertexDirection::FLAT_RIGHT)
     ///     .collect();
     /// assert_eq!(edges.len(), 7);
     /// ```
@@ -169,7 +168,7 @@ impl Hex {
     pub fn ring_edges(
         self,
         ranges: impl Iterator<Item = u32>,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
         ranges.map(move |r| self.ring_edge(r, direction))
     }
@@ -184,7 +183,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let edges: Vec<_> = Hex::ZERO
-    ///     .custom_ring_edges(3..10, DiagonalDirection::Right, true)
+    ///     .custom_ring_edges(3..10, VertexDirection::FLAT_RIGHT, true)
     ///     .collect();
     /// assert_eq!(edges.len(), 7);
     /// ```
@@ -194,7 +193,7 @@ impl Hex {
     pub fn custom_ring_edges(
         self,
         ranges: impl Iterator<Item = u32>,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
         ranges.map(move |r| self.custom_ring_edge(r, direction, clockwise))
@@ -211,7 +210,7 @@ impl Hex {
     pub fn custom_wedge(
         self,
         ranges: impl Iterator<Item = u32>,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Self> {
         self.custom_ring_edges(ranges, direction, clockwise)
@@ -243,7 +242,7 @@ impl Hex {
     pub fn custom_full_wedge(
         self,
         range: u32,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
         ExactSizeHexIterator {
@@ -259,7 +258,7 @@ impl Hex {
     /// ```rust
     /// # use hexx::*;
     /// let point = Hex::new(3, -6);
-    /// let wedge: Vec<Hex> = point.wedge(0..=13, DiagonalDirection::Right).collect();
+    /// let wedge: Vec<Hex> = point.wedge(0..=13, VertexDirection::FLAT_RIGHT).collect();
     /// assert_eq!(wedge.len(), Hex::wedge_count(13) as usize);
     /// ```
     #[inline]
@@ -277,7 +276,7 @@ impl Hex {
     pub fn wedge(
         self,
         range: impl Iterator<Item = u32>,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
     ) -> impl Iterator<Item = Self> {
         self.ring_edges(range, direction).flatten()
     }
@@ -300,7 +299,7 @@ impl Hex {
     pub fn full_wedge(
         self,
         range: u32,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
     ) -> impl ExactSizeIterator<Item = Self> {
         self.custom_full_wedge(range, direction, false)
     }
@@ -312,7 +311,7 @@ impl Hex {
     pub fn corner_wedge(
         self,
         range: impl Iterator<Item = u32> + Clone,
-        direction: Direction,
+        direction: EdgeDirection,
     ) -> impl Iterator<Item = Self> {
         let left = self.wedge(range.clone(), direction.diagonal_ccw());
         let right = self.wedge(range, direction.diagonal_cw());
@@ -351,7 +350,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_custom_ring_edges::<10>(DiagonalDirection::Right, true);
+    /// let cache = Hex::ORIGIN.cached_custom_ring_edges::<10>(VertexDirection::FLAT_RIGHT, true);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -362,7 +361,7 @@ impl Hex {
     /// information
     pub fn cached_custom_ring_edges<const RANGE: usize>(
         self,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
         clockwise: bool,
     ) -> [Vec<Self>; RANGE] {
         std::array::from_fn(|r| {
@@ -394,7 +393,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_ring_edges::<10>(DiagonalDirection::Right);
+    /// let cache = Hex::ORIGIN.cached_ring_edges::<10>(VertexDirection::FLAT_RIGHT);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -405,7 +404,7 @@ impl Hex {
     /// information
     pub fn cached_ring_edges<const RANGE: usize>(
         self,
-        direction: DiagonalDirection,
+        direction: VertexDirection,
     ) -> [Vec<Self>; RANGE] {
         std::array::from_fn(|r| self.ring_edge(r as u32, direction).collect())
     }
@@ -414,8 +413,8 @@ impl Hex {
     #[must_use]
     /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
     /// as an array of rings.
-    /// The returned rings start from [`Direction::TopRight`] and loop around
-    /// `self` counter clockwise.
+    /// The returned rings start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop
+    /// around `self` counter clockwise.
     ///
     /// See also [`Self::cached_custom_rings`]
     /// If you only need the coordinates see [`Self::range`] or
@@ -469,7 +468,7 @@ impl Hex {
     /// # use hexx::*;
     ///
     /// // We cache 10 rings around the origin
-    /// let cache = Hex::ORIGIN.cached_custom_rings::<10>(Direction::Top, true);
+    /// let cache = Hex::ORIGIN.cached_custom_rings::<10>(EdgeDirection::FLAT_TOP, true);
     /// // We have our target center
     /// let target = Hex::new(11, 24);
     /// // We retrieve the ring of range 5 and offset it to match the target
@@ -480,7 +479,7 @@ impl Hex {
     /// information
     pub fn cached_custom_rings<const RANGE: usize>(
         self,
-        start_dir: Direction,
+        start_dir: EdgeDirection,
         clockwise: bool,
     ) -> [Vec<Self>; RANGE] {
         std::array::from_fn(|r| self.custom_ring(r as u32, start_dir, clockwise).collect())
@@ -497,22 +496,22 @@ impl Hex {
     pub fn custom_spiral_range(
         self,
         range: impl Iterator<Item = u32>,
-        start_dir: Direction,
+        start_dir: EdgeDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = Self> {
         self.custom_rings(range, start_dir, clockwise).flatten()
     }
 
     /// Retrieves all [`Hex`] around `self` in a given `range` but ordered as
-    /// successive rings, starting from [`Direction::TopRight`] and looping
-    /// counter clockwise, forming a spiral.
+    /// successive rings, starting from [`EdgeDirection::FLAT_TOP_RIGHT`] and
+    /// looping counter clockwise, forming a spiral.
     ///
     /// See [`Self::custom_spiral_range`] for more options
     ///
     /// See this [article](https://www.redblobgames.com/grids/hexagons/#rings-spiral) for more
     /// information
     pub fn spiral_range(self, range: impl Iterator<Item = u32>) -> impl Iterator<Item = Self> {
-        self.custom_spiral_range(range, Direction::TopRight, false)
+        self.custom_spiral_range(range, EdgeDirection::default(), false)
     }
 
     #[inline]

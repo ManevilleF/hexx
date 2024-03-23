@@ -3,8 +3,29 @@
 ## [Unreleased]
 
 * Removed methods deprecated in previous versions
+* Added `z` field in the `Debug` impl of `Hex` (#156)
+* Added `xyz` fields in the `Debug` impl of directions (#156)
 
-### Mesh generation overhaul
+### New directions (#156)
+
+* (**BREAKING**) Renamed `Direction` to `EdgeDirection`, and is no longer an enum.
+Instead of the oriented variants use associated const values:
+  * `Direction::TopRight` -> `EdgeDirection::FLAT_TOP_RIGHT` or `EdgeDirection::POINTY_RIGHT`
+  * `Direction::Top` -> `EdgeDirection::FLAT_TOP` or `EdgeDirection::POINTY_TOP_RIGHT`
+  * `Direction::TopLeft` -> `EdgeDirection::FLAT_TOP_LEFT` or `EdgeDirection::POINTY_TOP_LEFT`
+  * `Direction::BottomLeft` -> `EdgeDirection::FLAT_BOTTOM_LEFT` or `EdgeDirection::POINTY_LEFT`
+  * `Direction::Bottom` -> `EdgeDirection::FLAT_BOTTOM` or `EdgeDirection::POINTY_BOTTOM_LEFT`
+  * `Direction::BottomRight` -> `EdgeDirection::FLAT_BOTTOM_RIGHT` or `EdgeDirection::POINTY_BOTTOM_RIGHT`
+* (**BREAKING**) Renamed `DiagonalDirection` to `VertexDirection`, and is no
+longer an enum. Instead of the oriented variants use associated const values:
+  * `DiagonalDirection::Right` -> `VertexDirection::FLAT_RIGHT` or `VertexDirection::POINTY_BOTTOM_RIGHT`
+  * `DiagonalDirection::TopRight` -> `VertexDirection::FLAT_TOP_RIGHT` or `VertexDirection::POINTY_TOP_RIGHT`
+  * `DiagonalDirection::TopLeft` -> `VertexDirection::FLAT_TOP_LEFT` or `VertexDirection::POINTY_TOP`
+  * `DiagonalDirection::Left` -> `VertexDirection::FLAT_LEFT` or `VertexDirection::POINTY_TOP_LEFT`
+  * `DiagonalDirection::BottomLeft` -> `VertexDirection::FLAT_BOTTOM_LEFT` or `VertexDirection::POINTY_BOTTOM_LEFT`
+  * `DiagonalDirection::BottomRight` -> `VertexDirection::FLAT_BOTTOM_RIGHT` or `VertexDirection::POINTY_BOTTOM`
+
+### Mesh generation overhaul (#152)
 
 * Added new `MeshInfo` methods:
   * `with_scale`

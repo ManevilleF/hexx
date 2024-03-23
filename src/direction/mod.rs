@@ -1,21 +1,17 @@
-/// [`Hex`] diagonal directions
-///
-/// [`Hex`]: crate::Hex
-mod diagonal_direction;
-/// [`Hex`] neighbor directions
-///
-/// [`Hex`]: crate::Hex
-mod hex_direction;
+/// Hexagonal neighbor/edge directions
+mod edge_direction;
 /// Trait implementations
 mod impls;
 /// Test module
 #[cfg(test)]
 mod tests;
+/// Hexagonal vertex/diagonal directions
+mod vertex_direction;
 /// Direction way module
 pub(crate) mod way;
 
-pub use diagonal_direction::DiagonalDirection;
-pub use hex_direction::Direction;
+pub use edge_direction::EdgeDirection;
+pub use vertex_direction::VertexDirection;
 pub use way::DirectionWay;
 
 /// Angle constants used for directions

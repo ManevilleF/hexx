@@ -434,7 +434,7 @@ fn custom_ring() {
     let point = Hex::ZERO;
     assert_eq!(
         point
-            .custom_ring(0, Direction::TopLeft, true)
+            .custom_ring(0, EdgeDirection::FLAT_TOP_LEFT, true)
             .collect::<Vec<_>>(),
         vec![point]
     );
@@ -445,13 +445,13 @@ fn custom_ring() {
     expected.rotate_right(1);
     assert_eq!(
         point
-            .custom_ring(5, Direction::TopRight, true)
+            .custom_ring(5, EdgeDirection::FLAT_TOP_RIGHT, true)
             .collect::<Vec<_>>(),
         expected
     );
     // offsetted
     let expected: Vec<_> = point.ring(5).collect();
-    let ring = point.custom_ring(5, Direction::BottomLeft, false);
+    let ring = point.custom_ring(5, EdgeDirection::FLAT_BOTTOM_LEFT, false);
     assert_eq!(expected.len(), ring.len());
     for h in ring {
         assert!(expected.contains(&h));
@@ -461,16 +461,16 @@ fn custom_ring() {
 #[test]
 fn ring_edge() {
     let point = Hex::new(-189, 35);
-    let edge = point.ring_edge(48, DiagonalDirection::TopRight);
+    let edge = point.ring_edge(48, VertexDirection::FLAT_TOP_RIGHT);
     assert_eq!(edge.len(), edge.count());
     // empty
-    let edge = point.ring_edge(0, DiagonalDirection::TopRight);
+    let edge = point.ring_edge(0, VertexDirection::FLAT_TOP_RIGHT);
     let len = edge.len();
     let edge: Vec<_> = edge.collect();
     assert_eq!(edge.len(), len);
     assert_eq!(edge, vec![point]);
     // len 1
-    let edge = point.ring_edge(1, DiagonalDirection::TopRight);
+    let edge = point.ring_edge(1, VertexDirection::FLAT_TOP_RIGHT);
     let len = edge.len();
     let edge: Vec<_> = edge.collect();
     assert_eq!(edge.len(), len);
@@ -481,7 +481,7 @@ fn ring_edge() {
 #[allow(clippy::cast_possible_truncation)]
 fn wedge() {
     let point = Hex::new(98, -123);
-    for dir in DiagonalDirection::ALL_DIRECTIONS {
+    for dir in VertexDirection::ALL_DIRECTIONS {
         for range in 0..=30 {
             let wedge: Vec<_> = point.wedge(0..=range, dir).collect();
             assert_eq!(wedge.len() as u32, range * (range + 3) / 2 + 1);

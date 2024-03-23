@@ -11,15 +11,19 @@ pub fn wedge_benchmark(c: &mut Criterion) {
             Hex::wedge(
                 black_box(Hex::ZERO),
                 0..=*dist as u32,
-                DiagonalDirection::Left,
+                VertexDirection::FLAT_LEFT,
             )
             .collect::<Vec<_>>()
         })
     });
     group.bench_with_input(BenchmarkId::new("Full Wedge", dist), &dist, |b, dist| {
         b.iter(|| {
-            Hex::full_wedge(black_box(Hex::ZERO), *dist as u32, DiagonalDirection::Left)
-                .collect::<Vec<_>>()
+            Hex::full_wedge(
+                black_box(Hex::ZERO),
+                *dist as u32,
+                VertexDirection::FLAT_LEFT,
+            )
+            .collect::<Vec<_>>()
         })
     });
     group.bench_with_input(BenchmarkId::new("Triangle", dist), &dist, |b, dist| {
@@ -27,8 +31,12 @@ pub fn wedge_benchmark(c: &mut Criterion) {
     });
     group.bench_with_input(BenchmarkId::new("Corner Wedge", dist), &dist, |b, dist| {
         b.iter(|| {
-            Hex::corner_wedge(black_box(Hex::ZERO), 0..=*dist as u32, Direction::Top)
-                .collect::<Vec<_>>()
+            Hex::corner_wedge(
+                black_box(Hex::ZERO),
+                0..=*dist as u32,
+                EdgeDirection::FLAT_TOP,
+            )
+            .collect::<Vec<_>>()
         })
     });
     group.finish();

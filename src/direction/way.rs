@@ -1,14 +1,14 @@
 use std::ops::Neg;
 
-use crate::{DiagonalDirection, Direction};
+use crate::{EdgeDirection, VertexDirection};
 
 /// Describes a direction way, which can be a `Single` direction or a `Tie`
 /// betwen two directions.
 ///
 /// # Comparison
 ///
-/// To compare it with its inner [`Direction`] or [`DiagonalDirection`] you can
-/// use `Self::contains` or the [`PartialEq`] implementation:
+/// To compare it with its inner [`EdgeDirection`] or [`VertexDirection`] you
+/// can use `Self::contains` or the [`PartialEq`] implementation:
 ///
 /// ```rust
 /// # use hexx::*;
@@ -16,10 +16,10 @@ use crate::{DiagonalDirection, Direction};
 /// let b = hex(6, -2);
 /// let way = a.way_to(b);
 /// let diag_way = a.diagonal_way_to(b);
-/// if way == Direction::Top {
+/// if way == EdgeDirection::FLAT_TOP {
 ///     // do something
 /// }
-/// if diag_way == DiagonalDirection::Left {
+/// if diag_way == VertexDirection::FLAT_LEFT {
 ///     // do something
 /// }
 /// ```
@@ -98,7 +98,7 @@ impl<T> From<[T; 2]> for DirectionWay<T> {
     }
 }
 
-impl Way for Direction {
+impl Way for EdgeDirection {
     fn ccw(self) -> Self {
         self.counter_clockwise()
     }
@@ -108,7 +108,7 @@ impl Way for Direction {
     }
 }
 
-impl Way for DiagonalDirection {
+impl Way for VertexDirection {
     fn ccw(self) -> Self {
         self.counter_clockwise()
     }

@@ -1,4 +1,4 @@
-use crate::{DiagonalDirection, Direction, Hex};
+use crate::Hex;
 use glam::{IVec2, IVec3, Vec2};
 
 impl From<(i32, i32)> for Hex {
@@ -54,17 +54,5 @@ impl From<IVec2> for Hex {
     #[inline]
     fn from(v: IVec2) -> Self {
         Self::new(v.x, v.y)
-    }
-}
-
-impl From<Direction> for Hex {
-    fn from(value: Direction) -> Self {
-        Self::neighbor_coord(value)
-    }
-}
-
-impl From<DiagonalDirection> for Hex {
-    fn from(value: DiagonalDirection) -> Self {
-        Self::diagonal_neighbor_coord(value)
     }
 }

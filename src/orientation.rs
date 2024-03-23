@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use crate::{direction::angles::DIRECTION_ANGLE_OFFSET_RAD, Direction};
+use crate::{direction::angles::DIRECTION_ANGLE_OFFSET_RAD, EdgeDirection};
 
 pub(crate) const SQRT_3: f32 = 1.732_050_8;
 
@@ -63,7 +63,7 @@ impl HexOrientation {
     #[inline]
     /// Computes the angle in radians of the given `direction` in the current
     /// orientation
-    pub fn direction_angle(self, direction: Direction) -> f32 {
+    pub fn direction_angle(self, direction: EdgeDirection) -> f32 {
         direction.angle(self)
     }
 

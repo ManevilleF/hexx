@@ -1,8 +1,8 @@
 use std::ops::{Mul, Neg, Shl, Shr};
 
-use crate::{DiagonalDirection, Direction, Hex};
+use crate::{EdgeDirection, Hex, VertexDirection};
 
-impl Neg for DiagonalDirection {
+impl Neg for VertexDirection {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -10,7 +10,7 @@ impl Neg for DiagonalDirection {
     }
 }
 
-impl Neg for Direction {
+impl Neg for EdgeDirection {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -18,39 +18,39 @@ impl Neg for Direction {
     }
 }
 
-impl Shr<usize> for Direction {
+impl Shr<u8> for EdgeDirection {
     type Output = Self;
 
-    fn shr(self, rhs: usize) -> Self::Output {
+    fn shr(self, rhs: u8) -> Self::Output {
         self.rotate_cw(rhs)
     }
 }
 
-impl Shr<usize> for DiagonalDirection {
+impl Shr<u8> for VertexDirection {
     type Output = Self;
 
-    fn shr(self, rhs: usize) -> Self::Output {
+    fn shr(self, rhs: u8) -> Self::Output {
         self.rotate_cw(rhs)
     }
 }
 
-impl Shl<usize> for Direction {
+impl Shl<u8> for EdgeDirection {
     type Output = Self;
 
-    fn shl(self, rhs: usize) -> Self::Output {
+    fn shl(self, rhs: u8) -> Self::Output {
         self.rotate_ccw(rhs)
     }
 }
 
-impl Shl<usize> for DiagonalDirection {
+impl Shl<u8> for VertexDirection {
     type Output = Self;
 
-    fn shl(self, rhs: usize) -> Self::Output {
+    fn shl(self, rhs: u8) -> Self::Output {
         self.rotate_ccw(rhs)
     }
 }
 
-impl Mul<i32> for Direction {
+impl Mul<i32> for EdgeDirection {
     type Output = Hex;
 
     fn mul(self, rhs: i32) -> Self::Output {
@@ -58,7 +58,7 @@ impl Mul<i32> for Direction {
     }
 }
 
-impl Mul<i32> for DiagonalDirection {
+impl Mul<i32> for VertexDirection {
     type Output = Hex;
 
     fn mul(self, rhs: i32) -> Self::Output {
