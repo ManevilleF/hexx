@@ -12,6 +12,7 @@ const HEX_SIZE: Vec2 = Vec2::splat(13.0);
 
 pub fn main() {
     App::new()
+        .init_resource::<HighlightedHexes>()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 resolution: (1_000.0, 1_000.0).into(),
@@ -20,7 +21,7 @@ pub fn main() {
             ..default()
         }))
         .add_systems(Startup, (setup_camera, setup_grid))
-        .add_systems(Update, handle_input)
+        .add_systems(Update, (handle_input, gizmos).chain())
         .run();
 }
 
@@ -123,7 +124,7 @@ fn handle_input(
     windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     map: Res<Map>,
-    mut highlighted_hexes: Local<HighlightedHexes>,
+    mut highlighted_hexes: ResMut<HighlightedHexes>,
 ) {
     let window = windows.single();
     let (camera, cam_transform) = cameras.single();
@@ -197,11 +198,18 @@ fn handle_input(
     }
 }
 
+fn gizmos(mut gizmos: Gizmos, higlights: Res<HighlightedHexes>, map: Res<Map>) {
+    let selected = higlights.selected;
+    for [a, b] in selected.all_edges().map(|e| map.layout.edge_coordinates(e)) {
+        gizmos.line_2d(a, b, Color::CYAN);
+    }
+}
+
 /// Compute a bevy mesh from the layout
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = PlaneMeshBuilder::new(hex_layout)
         .facing(Vec3::Z)
-        .with_scale(Vec3::splat(0.95))
+        .with_scale(Vec3::splat(0.98))
         .center_aligned()
         .build();
     Mesh::new(
