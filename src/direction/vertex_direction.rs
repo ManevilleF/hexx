@@ -70,6 +70,8 @@ use std::{f32::consts::TAU, fmt::Debug};
 pub struct VertexDirection(pub(crate) u8);
 
 impl VertexDirection {
+    /// Direction towards `X, -Y, -Z`
+    pub const X_NEG_Y_NEG_Z: Self = Self(0);
     /// Direction to (2, -1) or (2, -1, -1)
     ///
     /// Represents "Right" in flat orientation
@@ -87,6 +89,8 @@ impl VertexDirection {
     /// Represents "South West" in pointy orientation
     pub const POINTY_SOUTH_WEST: Self = Self(0);
 
+    /// Direction towards `X, -Y, Z`
+    pub const X_NEG_Y_Z: Self = Self(1);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
     /// Represents "Top Right" in flat orientation
@@ -104,6 +108,8 @@ impl VertexDirection {
     /// Represents "North West" in pointy orientation
     pub const POINTY_NORTH_WEST: Self = Self(1);
 
+    /// Direction towards `-X, -Y, Z`
+    pub const NEG_X_NEG_Y: Self = Self(2);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
     /// Represents "Top Left" in flat orientation
@@ -121,6 +127,8 @@ impl VertexDirection {
     /// Represents "North" in pointy orientation
     pub const POINTY_NORTH: Self = Self(2);
 
+    /// Direction towards `-X, Y, Z`
+    pub const NEG_X_Y_Z: Self = Self(3);
     /// Direction to (-2, 1) or (-2, 1, 1)
     ///
     /// Represents "Left" in flat orientation
@@ -138,6 +146,8 @@ impl VertexDirection {
     /// Represents "North East" in pointy orientation
     pub const POINTY_NORTH_EAST: Self = Self(3);
 
+    /// Direction towards `-X, Y, -Z`
+    pub const NEG_X_Y_NEG_Z: Self = Self(4);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
     /// Represents "Bottom Left" in flat orientation
@@ -155,6 +165,8 @@ impl VertexDirection {
     /// Represents "South Easth" in pointy orientation
     pub const POINTY_SOUTH_EAST: Self = Self(4);
 
+    /// Direction towards `X, Y, -Z`
+    pub const X_Y: Self = Self(5);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
     /// Represents "Bottom Right" in flat orientation

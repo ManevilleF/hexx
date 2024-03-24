@@ -73,6 +73,8 @@ use std::{f32::consts::TAU, fmt::Debug};
 pub struct EdgeDirection(pub(crate) u8);
 
 impl EdgeDirection {
+    /// Direction towards `X, -Y`
+    pub const X_NEG_Y: Self = Self(0);
     /// Direction to (1, -1)
     ///
     /// Represents "Top right" edge in flat orientation
@@ -90,6 +92,8 @@ impl EdgeDirection {
     /// Represents "North west" edge in pointy orientation
     pub const POINTY_WEST: Self = Self(0);
 
+    /// Direction towards `-Y`
+    pub const NEG_Y: Self = Self(1);
     /// Direction to (0, -1)
     ///
     /// Represents "Top" edge in flat orientation
@@ -107,6 +111,8 @@ impl EdgeDirection {
     /// Represents "North West" edge in pointy orientation
     pub const POINTY_NORTH_WEST: Self = Self(1);
 
+    /// Direction towards `-X`
+    pub const NEG_X: Self = Self(2);
     /// Direction to (-1, 0)
     ///
     /// Represents "Top Left" in flat orientation
@@ -124,6 +130,8 @@ impl EdgeDirection {
     /// Represents "North East" in pointy orientation
     pub const POINTY_NORTH_EAST: Self = Self(2);
 
+    /// Direction towards `-X, Y`
+    pub const NEG_X_Y: Self = Self(3);
     /// Direction to (-1, 1)
     ///
     /// Represents "Bottom Left" in flat orientation
@@ -141,6 +149,8 @@ impl EdgeDirection {
     /// Represents "East" in pointy orientation
     pub const POINTY_EAST: Self = Self(3);
 
+    /// Direction towards `Y`
+    pub const Y: Self = Self(4);
     /// Direction to (0, 1)
     ///
     /// Represents "Bottom" in flat orientation
@@ -158,6 +168,8 @@ impl EdgeDirection {
     /// Represents "South east" in pointy orientation
     pub const POINTY_SOUTH_EAST: Self = Self(4);
 
+    /// Direction towards `X`
+    pub const X: Self = Self(5);
     /// Direction to (1, 0)
     ///
     /// Represents "Bottom Right" in flat orientation
