@@ -84,12 +84,33 @@ mod edge_directions {
         for angle in -1000..1000 {
             let angle = angle as f32 + 0.1;
             let angle_rad = angle.to_radians();
-            let expect = expected(angle);
-            assert_eq!(
-                EdgeDirection::from_flat_angle_degrees(angle).index(),
-                expect
-            );
-            assert_eq!(EdgeDirection::from_flat_angle(angle_rad).index(), expect);
+            let expect = EdgeDirection(expected(angle));
+            assert_eq!(EdgeDirection::from_flat_angle_degrees(angle), expect);
+            assert_eq!(EdgeDirection::from_flat_angle(angle_rad), expect);
+        }
+    }
+
+    #[test]
+    fn from_pointy_angles() {
+        let expected = |angle: f32| {
+            let angle = angle % 360.0;
+            let angle = if angle < 0.0 { angle + 360.0 } else { angle };
+            match angle {
+                v if v < 30.0 => 0,
+                v if v < 90.0 => 1,
+                v if v < 150.0 => 2,
+                v if v < 210.0 => 3,
+                v if v < 270.0 => 4,
+                v if v < 330.0 => 5,
+                _ => 0,
+            }
+        };
+        for angle in -1000..1000 {
+            let angle = angle as f32 + 0.1;
+            let angle_rad = angle.to_radians();
+            let expect = EdgeDirection(expected(angle));
+            assert_eq!(EdgeDirection::from_pointy_angle_degrees(angle), expect);
+            assert_eq!(EdgeDirection::from_pointy_angle(angle_rad), expect);
         }
     }
 
@@ -119,10 +140,9 @@ mod edge_directions {
             (EdgeDirection::FLAT_BOTTOM, 3.0 * PI / 2.0),
             (EdgeDirection::FLAT_BOTTOM_RIGHT, 11.0 * PI / 6.0),
         ];
-        let orientation = HexOrientation::Flat;
         for (dir, angle) in expected {
             assert!(dir.angle_flat() - angle <= EPSILON);
-            assert!(dir.angle(orientation) - angle <= EPSILON);
+            assert!(dir.angle(HexOrientation::Flat) - angle <= EPSILON);
         }
     }
 
@@ -138,30 +158,7 @@ mod edge_directions {
         ];
         for (dir, angle) in expected {
             assert!(dir.angle_pointy_degrees() - angle <= EPSILON);
-        }
-    }
-
-    #[test]
-    fn from_pointy_angles() {
-        let expected = |angle: f32| {
-            let angle = angle % 360.0;
-            let angle = if angle < 0.0 { angle + 360.0 } else { angle };
-            match angle {
-                v if v < 30.0 => EdgeDirection::FLAT_TOP_RIGHT,
-                v if v < 90.0 => EdgeDirection::FLAT_TOP,
-                v if v < 150.0 => EdgeDirection::FLAT_TOP_LEFT,
-                v if v < 210.0 => EdgeDirection::FLAT_BOTTOM_LEFT,
-                v if v < 270.0 => EdgeDirection::FLAT_BOTTOM,
-                v if v < 330.0 => EdgeDirection::FLAT_BOTTOM_RIGHT,
-                _ => EdgeDirection::FLAT_TOP_RIGHT,
-            }
-        };
-        for angle in -1000..1000 {
-            let angle = angle as f32 + 0.1;
-            let angle_rad = angle.to_radians();
-            let expect = expected(angle);
-            assert_eq!(EdgeDirection::from_pointy_angle_degrees(angle), expect);
-            assert_eq!(EdgeDirection::from_pointy_angle(angle_rad), expect);
+            assert!(dir.angle_degrees(HexOrientation::Pointy) - angle <= EPSILON);
         }
     }
 
@@ -175,10 +172,9 @@ mod edge_directions {
             (EdgeDirection::FLAT_BOTTOM, 4.0 * PI / 3.0),
             (EdgeDirection::FLAT_BOTTOM_RIGHT, 5.0 * PI / 3.0),
         ];
-        let orientation = HexOrientation::Pointy;
         for (dir, angle) in expected {
             assert!(dir.angle_pointy() - angle <= EPSILON);
-            assert!(dir.angle(orientation) - angle <= EPSILON);
+            assert!(dir.angle(HexOrientation::Pointy) - angle <= EPSILON);
         }
     }
 
@@ -205,32 +201,67 @@ mod vertex_direction {
     #[test]
     fn flat_angles_rad() {
         for dir in VertexDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_ccw().angle_flat() - PI / 6.0;
-            assert!(dir.angle_flat() - expected <= EPSILON);
+            assert!(dir.angle_flat() - (f32::from(dir.index()) * PI / 3.0) <= EPSILON);
+        }
+        let expected = [
+            (VertexDirection(0), 0.0),
+            (VertexDirection(1), PI / 3.0),
+            (VertexDirection(2), 2.0 * PI / 3.0),
+            (VertexDirection(3), PI),
+            (VertexDirection(4), 4.0 * PI / 3.0),
+            (VertexDirection(5), 5.0 * PI / 3.0),
+        ];
+        for (dir, angle) in expected {
+            assert!(dir.angle_flat() - angle <= EPSILON);
+            assert!(dir.angle(HexOrientation::Flat) - angle <= EPSILON);
         }
     }
 
     #[test]
     fn pointy_angles_rad() {
-        for dir in VertexDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_ccw().angle_pointy() - PI / 6.0;
-            assert!(dir.angle_pointy() - expected <= EPSILON);
+        let expected = [
+            (VertexDirection(1), PI / 6.0),
+            (VertexDirection(2), PI / 2.0),
+            (VertexDirection(3), 5.0 * PI / 6.0),
+            (VertexDirection(4), 7.0 * PI / 6.0),
+            (VertexDirection(5), 3.0 * PI / 2.0),
+            (VertexDirection(0), 11.0 * PI / 6.0),
+        ];
+        for (dir, angle) in expected {
+            assert!(dir.angle_pointy() - angle <= EPSILON);
+            assert!(dir.angle(HexOrientation::Pointy) - angle <= EPSILON);
         }
     }
 
     #[test]
     fn flat_angles_degrees() {
-        for dir in VertexDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_ccw().angle_flat_degrees() - 30.0;
-            assert!(dir.angle_flat_degrees() - expected <= EPSILON);
+        let expected = [
+            (VertexDirection(0), 0.0),
+            (VertexDirection(1), 60.0),
+            (VertexDirection(2), 120.0),
+            (VertexDirection(3), 180.0),
+            (VertexDirection(4), 240.0),
+            (VertexDirection(5), 300.0),
+        ];
+        for (dir, angle) in expected {
+            assert!(dir.angle_flat_degrees() - angle <= EPSILON);
+            assert!(dir.angle(HexOrientation::Flat) - angle <= EPSILON);
         }
     }
 
     #[test]
     fn pointy_angles_degrees() {
-        for dir in VertexDirection::ALL_DIRECTIONS {
-            let expected = dir.direction_ccw().angle_pointy_degrees() - 30.0;
-            assert!(dir.angle_pointy_degrees() - expected <= EPSILON);
+        let expected = [
+            (VertexDirection(0), 330.0),
+            (VertexDirection(1), 30.0),
+            (VertexDirection(2), 90.0),
+            (VertexDirection(3), 150.0),
+            (VertexDirection(4), 210.0),
+            (VertexDirection(5), 270.0),
+        ];
+        for (dir, angle) in expected {
+            assert!(dir.angle_pointy_degrees() - angle <= EPSILON);
+            assert!(dir.angle(HexOrientation::Pointy) - angle <= EPSILON);
         }
     }
 
@@ -258,21 +289,19 @@ mod vertex_direction {
         let expected = |angle: f32| {
             let angle = angle % 360.0;
             let angle = if angle < 0.0 { angle + 360.0 } else { angle };
-            print!("pos angle = {angle}");
             match angle {
-                v if v < 60.0 => VertexDirection::FLAT_TOP_RIGHT,
-                v if v < 120.0 => VertexDirection::FLAT_TOP_LEFT,
-                v if v < 180.0 => VertexDirection::FLAT_LEFT,
-                v if v < 240.0 => VertexDirection::FLAT_BOTTOM_LEFT,
-                v if v < 300.0 => VertexDirection::FLAT_BOTTOM_RIGHT,
-                _ => VertexDirection::FLAT_RIGHT,
+                v if v < 60.0 => 1,
+                v if v < 120.0 => 2,
+                v if v < 180.0 => 3,
+                v if v < 240.0 => 4,
+                v if v < 300.0 => 5,
+                _ => 0,
             }
         };
         for angle in -1000..1000 {
             let angle = angle as f32 + 0.1;
             let angle_rad = angle.to_radians();
-            let expect = expected(angle);
-            println!("expect = {expect:?}, angle = {angle} ");
+            let expect = VertexDirection(expected(angle));
             assert_eq!(VertexDirection::from_pointy_angle_degrees(angle), expect);
             assert_eq!(VertexDirection::from_pointy_angle(angle_rad), expect);
         }
@@ -284,21 +313,42 @@ mod vertex_direction {
             let angle = angle % 360.0;
             let angle = if angle < 0.0 { angle + 360.0 } else { angle };
             match angle {
-                v if v < 30.0 => VertexDirection::FLAT_RIGHT,
-                v if v < 90.0 => VertexDirection::FLAT_TOP_RIGHT,
-                v if v < 150.0 => VertexDirection::FLAT_TOP_LEFT,
-                v if v < 210.0 => VertexDirection::FLAT_LEFT,
-                v if v < 270.0 => VertexDirection::FLAT_BOTTOM_LEFT,
-                v if v < 330.0 => VertexDirection::FLAT_BOTTOM_RIGHT,
-                _ => VertexDirection::FLAT_RIGHT,
+                v if v < 30.0 => 0,
+                v if v < 90.0 => 1,
+                v if v < 150.0 => 2,
+                v if v < 210.0 => 3,
+                v if v < 270.0 => 4,
+                v if v < 330.0 => 5,
+                _ => 0,
             }
         };
         for angle in -1000..1000 {
             let angle = angle as f32 + 0.1;
             let angle_rad = angle.to_radians();
-            let expect = expected(angle);
+            let expect = VertexDirection(expected(angle));
             assert_eq!(VertexDirection::from_flat_angle_degrees(angle), expect);
             assert_eq!(VertexDirection::from_flat_angle(angle_rad), expect);
         }
+    }
+}
+
+#[test]
+fn edge_vs_vertex() {
+    for i in 0..6 {
+        let edge = EdgeDirection(i);
+        let vertex = VertexDirection(i);
+        assert_eq!(
+            (edge.angle_flat() - vertex.counter_clockwise().angle_pointy()) as i32,
+            0
+        );
+        assert_eq!((edge.angle_pointy() - vertex.angle_flat()) as i32, 0);
+        assert_eq!(
+            (edge.angle_flat_degrees() - vertex.counter_clockwise().angle_pointy_degrees()) as i32,
+            0
+        );
+        assert_eq!(
+            (edge.angle_pointy_degrees() - vertex.angle_flat_degrees()) as i32,
+            0
+        );
     }
 }

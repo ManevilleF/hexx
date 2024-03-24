@@ -1,4 +1,4 @@
-use crate::{orientation::SQRT_3, EdgeDirection, Hex, HexOrientation};
+use crate::{orientation::SQRT_3, Hex, HexOrientation, VertexDirection};
 use glam::Vec2;
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
@@ -105,7 +105,7 @@ impl HexLayout {
 
     #[must_use]
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
-        EdgeDirection::ALL_DIRECTIONS.map(|dir| {
+        VertexDirection::ALL_DIRECTIONS.map(|dir| {
             let angle = dir.angle(self.orientation);
             Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
         })
@@ -129,6 +129,24 @@ impl HexLayout {
                 HexOrientation::Pointy => Vec2::new(SQRT_3, 2.0),
                 HexOrientation::Flat => Vec2::new(2.0, SQRT_3),
             }
+    }
+}
+
+#[cfg(feature = "grid")]
+impl HexLayout {
+    /// Returns the  world coordinate of the two edge vertices in clockwise
+    /// order
+    #[must_use]
+    pub fn edge_coordinates(&self, edge: crate::GridEdge) -> [Vec2; 2] {
+        edge.vertices().map(|v| self.vertex_coordinates(v))
+    }
+
+    /// Returns the world coordinate of the vertex
+    #[must_use]
+    pub fn vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
+        let origin = self.hex_to_world_pos(vertex.origin);
+        let angle = vertex.direction.angle(self.orientation);
+        origin + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
     }
 }
 

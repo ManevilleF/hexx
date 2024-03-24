@@ -22,7 +22,7 @@ pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct InsetOptions {
-    /// If set to `true``the original downscaled face will be kept
+    /// If set to `true` the original downscaled face will be kept
     pub keep_inner_face: bool,
     /// Scale factor
     pub scale: f32,

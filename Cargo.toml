@@ -12,11 +12,13 @@ exclude = [".github"]
 resolver = "2"
 
 [features]
-default = ["algorithms", "mesh"]
+default = ["algorithms", "mesh", "grid"]
 # HL algoritms
 algorithms = []
 # 3d Mesh features
 mesh = ["serde?/std"]
+# Grid management utilities
+grid = []
 # repr C
 packed = []
 # serde compatibility

@@ -43,6 +43,12 @@
 //!
 //! * `hexx = { version = "0.15", features = ["bevy_reflect"] }`
 //!
+//! `hexx` supports Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
+//! using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge. To
+//! enable it add the following line to your `Cargo.toml`:
+//!
+//! * `hexx = { version = "0.15", features = ["grid"] }`
+//!
 //! ## Features
 //!
 //! `hexx` provides the [`Hex`] coordinates with:
@@ -248,6 +254,9 @@ pub use direction::*;
 pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
 #[doc(inline)]
 pub use hex::{hex, Hex, HexIterExt};
+#[doc(inline)]
+#[cfg(feature = "grid")]
+pub use hex::{GridEdge, GridVertex};
 #[doc(inline)]
 pub use layout::HexLayout;
 #[cfg(feature = "mesh")]

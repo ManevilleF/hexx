@@ -46,6 +46,24 @@ use std::{f32::consts::TAU, fmt::Debug};
 /// assert_eq!(direction >> 1, EdgeDirection::FLAT_TOP_RIGHT);
 /// assert_eq!(direction << 1, EdgeDirection::FLAT_TOP_LEFT);
 /// ```
+///
+/// ## Storage
+///
+/// Both [`EdgeDirection`] and [`VertexDirection`] store a u8 byte between 0 and
+/// 5 as following:
+///
+/// ```txt
+///           e1
+///       v2_____ v1
+///     e2 /     \ e0
+///       /       \
+///   v3 (         ) v0
+///       \       /
+///     e3 \_____/ e5
+///      v4   e5  v5
+/// ```
+///
+/// On pointy orientation the hexagon is shifted by 30 degrees clockwise
 #[derive(Clone, Copy, PartialEq, Eq, Default)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -55,6 +73,8 @@ use std::{f32::consts::TAU, fmt::Debug};
 pub struct EdgeDirection(pub(crate) u8);
 
 impl EdgeDirection {
+    /// Direction towards `X, -Y`
+    pub const X_NEG_Y: Self = Self(0);
     /// Direction to (1, -1)
     ///
     /// Represents "Top right" edge in flat orientation
@@ -72,6 +92,8 @@ impl EdgeDirection {
     /// Represents "North west" edge in pointy orientation
     pub const POINTY_WEST: Self = Self(0);
 
+    /// Direction towards `-Y`
+    pub const NEG_Y: Self = Self(1);
     /// Direction to (0, -1)
     ///
     /// Represents "Top" edge in flat orientation
@@ -89,6 +111,8 @@ impl EdgeDirection {
     /// Represents "North West" edge in pointy orientation
     pub const POINTY_NORTH_WEST: Self = Self(1);
 
+    /// Direction towards `-X`
+    pub const NEG_X: Self = Self(2);
     /// Direction to (-1, 0)
     ///
     /// Represents "Top Left" in flat orientation
@@ -106,6 +130,8 @@ impl EdgeDirection {
     /// Represents "North East" in pointy orientation
     pub const POINTY_NORTH_EAST: Self = Self(2);
 
+    /// Direction towards `-X, Y`
+    pub const NEG_X_Y: Self = Self(3);
     /// Direction to (-1, 1)
     ///
     /// Represents "Bottom Left" in flat orientation
@@ -123,6 +149,8 @@ impl EdgeDirection {
     /// Represents "East" in pointy orientation
     pub const POINTY_EAST: Self = Self(3);
 
+    /// Direction towards `Y`
+    pub const Y: Self = Self(4);
     /// Direction to (0, 1)
     ///
     /// Represents "Bottom" in flat orientation
@@ -140,6 +168,8 @@ impl EdgeDirection {
     /// Represents "South east" in pointy orientation
     pub const POINTY_SOUTH_EAST: Self = Self(4);
 
+    /// Direction towards `X`
+    pub const X: Self = Self(5);
     /// Direction to (1, 0)
     ///
     /// Represents "Bottom Right" in flat orientation
@@ -191,7 +221,7 @@ impl EdgeDirection {
     /// Converts the direction to a normalized hex coordinate
     #[must_use]
     #[inline]
-    pub const fn into_inner(self) -> Hex {
+    pub const fn into_hex(self) -> Hex {
         Hex::NEIGHBORS_COORDS[self.0 as usize]
     }
 
@@ -291,8 +321,9 @@ impl EdgeDirection {
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
+    #[doc(alias = "angle_between")]
     /// Computes the angle between `self` and `rhs` in radians.
-    pub fn angle_between(self, rhs: Self) -> f32 {
+    pub fn angle_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
         steps * DIRECTION_ANGLE_RAD
     }
@@ -300,8 +331,9 @@ impl EdgeDirection {
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
+    #[doc(alias = "angle_degrees_between")]
     /// Computes the angle between `self` and `rhs` in degrees.
-    pub fn angle_degrees_between(self, rhs: Self) -> f32 {
+    pub fn angle_degrees_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
         steps * DIRECTION_ANGLE_DEGREES
     }
@@ -312,7 +344,7 @@ impl EdgeDirection {
     ///
     /// See [`Self::angle_pointy`] for *pointy* hexagons
     pub fn angle_flat(self) -> f32 {
-        self.angle_pointy() + DIRECTION_ANGLE_OFFSET_RAD
+        self.angle(HexOrientation::Flat)
     }
 
     #[inline]
@@ -322,7 +354,7 @@ impl EdgeDirection {
     ///
     /// See [`Self::angle_flat`] for *flat* hexagons
     pub fn angle_pointy(self) -> f32 {
-        self.angle_between(Self::default())
+        self.angle(HexOrientation::Pointy)
     }
 
     #[inline]
@@ -330,7 +362,11 @@ impl EdgeDirection {
     /// Returns the angle in radians of the given direction in the given
     /// `orientation`
     pub fn angle(self, orientation: HexOrientation) -> f32 {
-        self.angle_pointy() - orientation.angle_offset
+        let base = self.angle_to(Self(0));
+        match orientation {
+            HexOrientation::Pointy => base,
+            HexOrientation::Flat => base + DIRECTION_ANGLE_OFFSET_RAD,
+        }
     }
 
     #[inline]
@@ -338,9 +374,9 @@ impl EdgeDirection {
     /// Returns the angle in degrees of the given direction for *pointy*
     /// hexagons
     ///
-    /// See [`Self::angle_flat`] for *flat* hexagons
+    /// See [`Self::angle_pointy_degrees`] for *flat* hexagons
     pub fn angle_flat_degrees(self) -> f32 {
-        self.angle_pointy_degrees() + DIRECTION_ANGLE_OFFSET_DEGREES
+        self.angle_degrees(HexOrientation::Flat)
     }
 
     #[inline]
@@ -348,9 +384,9 @@ impl EdgeDirection {
     /// Returns the angle in degrees of the given direction for *pointy*
     /// hexagons
     ///
-    /// See [`Self::angle_flat`] for *flat* hexagons
+    /// See [`Self::angle_flat_degrees`] for *flat* hexagons
     pub fn angle_pointy_degrees(self) -> f32 {
-        self.angle_degrees_between(Self::default())
+        self.angle_degrees(HexOrientation::Pointy)
     }
 
     #[inline]
@@ -360,9 +396,10 @@ impl EdgeDirection {
     ///
     /// See [`Self::angle`] for radians angles
     pub fn angle_degrees(self, orientation: HexOrientation) -> f32 {
+        let base = self.angle_degrees_to(Self(0));
         match orientation {
-            HexOrientation::Pointy => self.angle_pointy_degrees(),
-            HexOrientation::Flat => self.angle_flat_degrees(),
+            HexOrientation::Pointy => base,
+            HexOrientation::Flat => base + DIRECTION_ANGLE_OFFSET_DEGREES,
         }
     }
     #[must_use]
@@ -553,14 +590,14 @@ impl EdgeDirection {
 
 impl From<EdgeDirection> for Hex {
     fn from(value: EdgeDirection) -> Self {
-        value.into_inner()
+        value.into_hex()
     }
 }
 
 #[cfg(not(target_arch = "spirv"))]
 impl Debug for EdgeDirection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let c = self.into_inner();
+        let c = self.into_hex();
         f.debug_struct("EdgeDirection")
             .field("index", &self.0)
             .field("x", &c.x)

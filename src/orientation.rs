@@ -1,21 +1,17 @@
 use std::ops::Deref;
 
-use crate::{direction::angles::DIRECTION_ANGLE_OFFSET_RAD, EdgeDirection};
-
 pub(crate) const SQRT_3: f32 = 1.732_050_8;
 
 /// Pointy orientation matrices and offset
 const POINTY_ORIENTATION: HexOrientationData = HexOrientationData {
     forward_matrix: [SQRT_3, SQRT_3 / 2.0, 0.0, 3.0 / 2.0],
     inverse_matrix: [SQRT_3 / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0],
-    angle_offset: DIRECTION_ANGLE_OFFSET_RAD, // 30 degrees
 };
 
 /// Flat orientation matrices and offset
 const FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
     forward_matrix: [3.0 / 2.0, 0.0, SQRT_3 / 2.0, SQRT_3],
     inverse_matrix: [2.0 / 3.0, 0.0, -1.0 / 3.0, SQRT_3 / 3.0],
-    angle_offset: 0.0, // 0 degrees
 };
 
 /// [`HexOrientation`] inner data, retrieved by
@@ -42,8 +38,6 @@ pub struct HexOrientationData {
     pub(crate) forward_matrix: [f32; 4],
     /// Matrix used to compute world/pixel coordinates to hexagonal coordinates
     pub(crate) inverse_matrix: [f32; 4],
-    /// orientation offset in radians
-    pub(crate) angle_offset: f32,
 }
 
 /// Hexagonal orientation, either *Pointy-Topped* or *Flat-Topped*
@@ -59,14 +53,6 @@ pub enum HexOrientation {
 }
 
 impl HexOrientation {
-    #[must_use]
-    #[inline]
-    /// Computes the angle in radians of the given `direction` in the current
-    /// orientation
-    pub fn direction_angle(self, direction: EdgeDirection) -> f32 {
-        direction.angle(self)
-    }
-
     #[must_use]
     #[inline]
     /// Returns the orientation inner data, rotation angle and matrices
