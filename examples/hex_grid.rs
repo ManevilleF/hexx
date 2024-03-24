@@ -201,7 +201,7 @@ fn handle_input(
 fn gizmos(mut gizmos: Gizmos, higlights: Res<HighlightedHexes>, map: Res<Map>) {
     let selected = higlights.selected;
     for [a, b] in selected.all_edges().map(|e| map.layout.edge_coordinates(e)) {
-        gizmos.line_2d(a, b, Color::CYAN);
+        gizmos.line_2d(a, b, Color::LIME_GREEN);
     }
 }
 
