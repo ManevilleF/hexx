@@ -245,10 +245,7 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::X.const_neg(),
-    ///     VertexDirection::NEG_X
-    /// );
+    /// assert_eq!(VertexDirection::X.const_neg(), VertexDirection::NEG_X);
     /// ```
     #[must_use]
     #[inline]
@@ -262,10 +259,7 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::X.clockwise(),
-    ///     VertexDirection::NEG_Z
-    /// );
+    /// assert_eq!(VertexDirection::X.clockwise(), VertexDirection::NEG_Z);
     /// ```
     #[must_use]
     #[inline]
@@ -300,10 +294,7 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::X,
-    ///     VertexDirection::X.rotate_ccw(6)
-    /// );
+    /// assert_eq!(VertexDirection::X, VertexDirection::X.rotate_ccw(6));
     /// ```
     pub const fn rotate_ccw(self, offset: u8) -> Self {
         Self((self.0 + (offset % 6)) % 6)
@@ -317,10 +308,7 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::X,
-    ///     VertexDirection::X.rotate_cw(6)
-    /// );
+    /// assert_eq!(VertexDirection::X, VertexDirection::X.rotate_cw(6));
     /// ```
     pub const fn rotate_cw(self, offset: u8) -> Self {
         Self((self.0 + 6 - (offset % 6)) % 6)
