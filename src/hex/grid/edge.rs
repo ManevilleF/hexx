@@ -38,11 +38,11 @@ impl GridEdge {
         [
             GridVertex {
                 origin: self.origin,
-                direction: self.direction.diagonal_ccw(),
+                direction: self.direction.vertex_ccw(),
             },
             GridVertex {
                 origin: self.origin,
-                direction: self.direction.diagonal_cw(),
+                direction: self.direction.vertex_cw(),
             },
         ]
     }

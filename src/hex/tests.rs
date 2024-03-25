@@ -165,23 +165,23 @@ fn neighbors() {
     assert_eq!(
         Hex::ZERO.all_neighbors(),
         [
-            Hex::new(1, -1),
-            Hex::new(0, -1),
-            Hex::new(-1, 0),
-            Hex::new(-1, 1),
-            Hex::new(0, 1),
             Hex::new(1, 0),
+            Hex::new(0, 1),
+            Hex::new(-1, 1),
+            Hex::new(-1, 0),
+            Hex::new(0, -1),
+            Hex::new(1, -1),
         ]
     );
     assert_eq!(
         Hex::new(-2, 5).all_neighbors(),
         [
-            Hex::new(-1, 4),
-            Hex::new(-2, 4),
-            Hex::new(-3, 5),
-            Hex::new(-3, 6),
-            Hex::new(-2, 6),
             Hex::new(-1, 5),
+            Hex::new(-2, 6),
+            Hex::new(-3, 6),
+            Hex::new(-3, 5),
+            Hex::new(-2, 4),
+            Hex::new(-1, 4),
         ]
     );
 }
@@ -192,22 +192,22 @@ fn diagonals() {
         Hex::ZERO.all_diagonals(),
         [
             Hex::new(2, -1),
-            Hex::new(1, -2),
-            Hex::new(-1, -1),
-            Hex::new(-2, 1),
-            Hex::new(-1, 2),
             Hex::new(1, 1),
+            Hex::new(-1, 2),
+            Hex::new(-2, 1),
+            Hex::new(-1, -1),
+            Hex::new(1, -2),
         ]
     );
     assert_eq!(
         Hex::new(-2, 5).all_diagonals(),
         [
             Hex::new(0, 4),
-            Hex::new(-1, 3),
-            Hex::new(-3, 4),
-            Hex::new(-4, 6),
-            Hex::new(-3, 7),
             Hex::new(-1, 6),
+            Hex::new(-3, 7),
+            Hex::new(-4, 6),
+            Hex::new(-3, 4),
+            Hex::new(-1, 3),
         ]
     );
 }
@@ -225,7 +225,7 @@ fn distance_to() {
 fn rotation() {
     let neighbors = Hex::ZERO.all_neighbors();
     for elems in neighbors.windows(2) {
-        let [next, prev] = [elems[0], elems[1]];
+        let [next, prev] = [elems[1], elems[0]];
         let prev_dir = Hex::ZERO.way_to(prev).unwrap();
         let next_dir = Hex::ZERO.way_to(next).unwrap();
         assert_eq!(prev.clockwise(), next);
@@ -445,7 +445,7 @@ fn custom_ring() {
     expected.rotate_right(1);
     assert_eq!(
         point
-            .custom_ring(5, EdgeDirection::FLAT_TOP_RIGHT, true)
+            .custom_ring(5, EdgeDirection(0), true)
             .collect::<Vec<_>>(),
         expected
     );

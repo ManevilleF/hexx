@@ -57,12 +57,12 @@ mod edge_directions {
     #[test]
     fn flat_angles_degrees() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, 30.0),
-            (EdgeDirection::FLAT_TOP, 90.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 150.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, 210.0),
-            (EdgeDirection::FLAT_BOTTOM, 270.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 330.0),
+            (EdgeDirection(0), 30.0),
+            (EdgeDirection(1), 90.0),
+            (EdgeDirection(2), 150.0),
+            (EdgeDirection(3), 210.0),
+            (EdgeDirection(4), 270.0),
+            (EdgeDirection(5), 330.0),
         ];
         for (dir, angle) in expected {
             assert_relative_eq!(dir.angle_flat_degrees(), angle);
@@ -135,12 +135,12 @@ mod edge_directions {
     #[test]
     fn flat_angles_rad() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, PI / 6.0),
-            (EdgeDirection::FLAT_TOP, PI / 2.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 5.0 * PI / 6.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, 7.0 * PI / 6.0),
-            (EdgeDirection::FLAT_BOTTOM, 3.0 * PI / 2.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 11.0 * PI / 6.0),
+            (EdgeDirection(0), PI / 6.0),
+            (EdgeDirection(1), PI / 2.0),
+            (EdgeDirection(2), 5.0 * PI / 6.0),
+            (EdgeDirection(3), 7.0 * PI / 6.0),
+            (EdgeDirection(4), 3.0 * PI / 2.0),
+            (EdgeDirection(5), 11.0 * PI / 6.0),
         ];
         for (dir, angle) in expected {
             assert_relative_eq!(dir.angle_flat(), angle);
@@ -151,12 +151,12 @@ mod edge_directions {
     #[test]
     fn pointy_angles_degrees() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, 0.0),
-            (EdgeDirection::FLAT_TOP, 60.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 120.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, 180.0),
-            (EdgeDirection::FLAT_BOTTOM, 240.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 300.0),
+            (EdgeDirection(0), 0.0),
+            (EdgeDirection(1), 60.0),
+            (EdgeDirection(2), 120.0),
+            (EdgeDirection(3), 180.0),
+            (EdgeDirection(4), 240.0),
+            (EdgeDirection(5), 300.0),
         ];
         for (dir, angle) in expected {
             assert_relative_eq!(dir.angle_pointy_degrees(), angle);
@@ -167,12 +167,12 @@ mod edge_directions {
     #[test]
     fn pointy_angles_rad() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, 0.0),
-            (EdgeDirection::FLAT_TOP, PI / 3.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 2.0 * PI / 3.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, PI),
-            (EdgeDirection::FLAT_BOTTOM, 4.0 * PI / 3.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 5.0 * PI / 3.0),
+            (EdgeDirection(0), 0.0),
+            (EdgeDirection(1), PI / 3.0),
+            (EdgeDirection(2), 2.0 * PI / 3.0),
+            (EdgeDirection(3), PI),
+            (EdgeDirection(4), 4.0 * PI / 3.0),
+            (EdgeDirection(5), 5.0 * PI / 3.0),
         ];
         for (dir, angle) in expected {
             assert_relative_eq!(dir.angle_pointy(), angle);
@@ -339,11 +339,11 @@ fn edge_vs_vertex() {
     for i in 0..6 {
         let edge = EdgeDirection(i);
         let vertex = VertexDirection(i);
-        assert_relative_eq!(edge.angle_flat(), vertex.counter_clockwise().angle_pointy());
+        assert_relative_eq!(edge.angle_flat(), vertex.clockwise().angle_pointy());
         assert_relative_eq!(edge.angle_pointy(), vertex.angle_flat());
         assert_relative_eq!(
             edge.angle_flat_degrees(),
-            vertex.counter_clockwise().angle_pointy_degrees()
+            vertex.clockwise().angle_pointy_degrees()
         );
         assert_relative_eq!(edge.angle_pointy_degrees(), vertex.angle_flat_degrees());
     }
@@ -351,10 +351,10 @@ fn edge_vs_vertex() {
 
 #[test]
 fn rad_deg() {
-    for i in 0..6 {
-        let edge = EdgeDirection(i);
-        let vertex = VertexDirection(i);
-        for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+    for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+        for i in 0..6 {
+            let edge = EdgeDirection(i);
+            let vertex = VertexDirection(i);
             let rad = edge.angle(orientation);
             let degs = edge.angle_degrees(orientation);
             assert_relative_eq!(rad, degs.to_radians());

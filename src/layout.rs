@@ -105,14 +105,15 @@ impl HexLayout {
 
     #[must_use]
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
-        VertexDirection::ALL_DIRECTIONS.map(|dir| dir.unit_vector(self.orientation) * self.hex_size)
+        let offset = self.hex_size * self.axis_scale();
+        VertexDirection::ALL_DIRECTIONS.map(|dir| dir.unit_vector(self.orientation) * offset)
     }
 
     #[inline]
     /// Returns a signum axis coefficient, allowing for inverted axis
     const fn axis_scale(&self) -> Vec2 {
         let x = if self.invert_x { -1.0 } else { 1.0 };
-        let y = if self.invert_y { 1.0 } else { -1.0 };
+        let y = if self.invert_y { -1.0 } else { 1.0 };
         Vec2::new(x, y)
     }
 
@@ -142,7 +143,8 @@ impl HexLayout {
     #[must_use]
     pub fn vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
         let origin = self.hex_to_world_pos(vertex.origin);
-        origin + (vertex.direction.unit_vector(self.orientation) * self.hex_size)
+        origin
+            + (vertex.direction.unit_vector(self.orientation) * self.hex_size * self.axis_scale())
     }
 }
 
