@@ -105,10 +105,7 @@ impl HexLayout {
 
     #[must_use]
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
-        VertexDirection::ALL_DIRECTIONS.map(|dir| {
-            let angle = dir.angle(self.orientation);
-            Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
-        })
+        VertexDirection::ALL_DIRECTIONS.map(|dir| dir.unit_vector(self.orientation) * self.hex_size)
     }
 
     #[inline]
@@ -145,8 +142,7 @@ impl HexLayout {
     #[must_use]
     pub fn vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
         let origin = self.hex_to_world_pos(vertex.origin);
-        let angle = vertex.direction.angle(self.orientation);
-        origin + Vec2::new(self.hex_size.x * angle.cos(), self.hex_size.y * angle.sin())
+        origin + (vertex.direction.unit_vector(self.orientation) * self.hex_size)
     }
 }
 

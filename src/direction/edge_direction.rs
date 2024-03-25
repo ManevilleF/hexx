@@ -5,22 +5,23 @@ use crate::{
     },
     Hex, HexOrientation, VertexDirection,
 };
+use glam::Vec2;
 use std::{f32::consts::TAU, fmt::Debug};
 
 /// All 6 possible neighbor/edge directions in hexagonal space.
 ///
 /// ```txt
-///            x Axis
-///            ___
+///       Z    ___   -Y
 ///           /   \
 ///       +--+  1  +--+
-///      /  2 \___/ 0  \
+///      / 2  \___/  0 \
 ///      \    /   \    /
-///       +--+     +--+
-///      /  3 \___/ 5  \
-///      \    /   \    /
-///       +--+  4  +--+   y Axis
+///  -X   +--+     +--+    X
+///      /    \___/    \
+///      \ 3  /   \  5 /
+///       +--+  4  +--+
 ///           \___/
+///       Y           -Z
 /// ```
 ///
 /// See [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
@@ -191,17 +192,17 @@ impl EdgeDirection {
     /// [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
     ///
     /// ```txt
-    ///            x Axis
-    ///            ___
+    ///       Z    ___   -Y
     ///           /   \
     ///       +--+  1  +--+
     ///      / 2  \___/  0 \
     ///      \    /   \    /
-    ///       +--+     +--+
+    ///  -X   +--+     +--+    X
     ///      /    \___/    \
     ///      \ 3  /   \  5 /
-    ///       +--+  4  +--+   y Axis
+    ///       +--+  4  +--+
     ///           \___/
+    ///       Y           -Z
     /// ```
     pub const ALL_DIRECTIONS: [Self; 6] = [Self(0), Self(1), Self(2), Self(3), Self(4), Self(5)];
 
@@ -318,10 +319,23 @@ impl EdgeDirection {
         (self.0 + 6 - rhs.0) % 6
     }
 
+    /// Computes the angle between `a` and `b` in radians.
+    #[must_use]
+    #[inline]
+    pub fn angle_between(a: Self, b: Self) -> f32 {
+        a.angle_to(b)
+    }
+
+    /// Computes the angle between `a` and `b` in degrees.
+    #[must_use]
+    #[inline]
+    pub fn angle_degrees_between(a: Self, b: Self) -> f32 {
+        a.angle_degrees_to(b)
+    }
+
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
-    #[doc(alias = "angle_between")]
     /// Computes the angle between `self` and `rhs` in radians.
     pub fn angle_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
@@ -331,7 +345,6 @@ impl EdgeDirection {
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
-    #[doc(alias = "angle_degrees_between")]
     /// Computes the angle between `self` and `rhs` in degrees.
     pub fn angle_degrees_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
@@ -367,6 +380,14 @@ impl EdgeDirection {
             HexOrientation::Pointy => base,
             HexOrientation::Flat => base + DIRECTION_ANGLE_OFFSET_RAD,
         }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the unit vector of the direction in the given `orientation`
+    pub fn unit_vector(self, orientation: HexOrientation) -> Vec2 {
+        let angle = self.angle(orientation);
+        Vec2::new(angle.cos(), angle.sin())
     }
 
     #[inline]
