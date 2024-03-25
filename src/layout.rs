@@ -113,7 +113,7 @@ impl HexLayout {
     /// Returns a signum axis coefficient, allowing for inverted axis
     const fn axis_scale(&self) -> Vec2 {
         let x = if self.invert_x { -1.0 } else { 1.0 };
-        let y = if self.invert_y { -1.0 } else { 1.0 };
+        let y = if self.invert_y { 1.0 } else { -1.0 };
         Vec2::new(x, y)
     }
 
@@ -178,11 +178,11 @@ mod tests {
             corners,
             [
                 Vec2::new(10.0, 0.0),
-                Vec2::new(5.0, 9.0),
-                Vec2::new(-5.0, 9.0),
-                Vec2::new(-10.0, -0.0),
-                Vec2::new(-5.0, -9.0),
                 Vec2::new(5.0, -9.0),
+                Vec2::new(-5.0, -9.0),
+                Vec2::new(-10.0, 0.0),
+                Vec2::new(-5.0, 9.0),
+                Vec2::new(5.0, 9.0),
             ]
         );
     }
@@ -200,12 +200,12 @@ mod tests {
         assert_eq!(
             corners,
             [
-                Vec2::new(9.0, -5.0),
                 Vec2::new(9.0, 5.0),
-                Vec2::new(-0.0, 10.0),
-                Vec2::new(-9.0, 5.0),
+                Vec2::new(9.0, -5.0),
+                Vec2::new(-0.0, -10.0),
                 Vec2::new(-9.0, -5.0),
-                Vec2::new(0.0, -10.0),
+                Vec2::new(-9.0, 5.0),
+                Vec2::new(0.0, 10.0),
             ]
         );
     }
