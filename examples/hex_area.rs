@@ -36,7 +36,9 @@ struct Map {
     pointy_layout: HexLayout,
     flat_entities: HashMap<Hex, Entity>,
     pointy_entities: HashMap<Hex, Entity>,
-    selected_material: Handle<ColorMaterial>,
+    flat_cursor_entity: Entity,
+    pointy_cursor_entity: Entity,
+    area_material: Handle<ColorMaterial>,
     default_material: Handle<ColorMaterial>,
 }
 
@@ -64,14 +66,24 @@ fn setup_grid(
         ..default()
     };
     // materials
-    let selected_material = materials.add(Color::RED);
+    let area_material = materials.add(Color::GOLD);
     let default_material = materials.add(Color::WHITE);
+    let cursor_material = materials.add(Color::RED);
+
     // mesh
     let mut spawn_map = |layout: &HexLayout| {
-        let mesh = hexagonal_plane(layout);
-        let mesh_handle = meshes.add(mesh);
+        let mesh_handle = meshes.add(hexagonal_plane(layout));
+        let cursor_mesh = meshes.add(border_plane(layout));
 
-        Hex::ZERO
+        let cursor_entity = commands
+            .spawn(ColorMesh2dBundle {
+                mesh: cursor_mesh.into(),
+                material: cursor_material.clone(),
+                transform: Transform::from_xyz(0.0, 0.0, 10.0),
+                ..default()
+            })
+            .id();
+        let entities = Hex::ZERO
             .range(15)
             .map(|hex| {
                 let pos = layout.hex_to_world_pos(hex);
@@ -85,17 +97,20 @@ fn setup_grid(
                     .id();
                 (hex, id)
             })
-            .collect()
+            .collect();
+        (cursor_entity, entities)
     };
 
-    let flat_entities = spawn_map(&flat_layout);
-    let pointy_entities = spawn_map(&pointy_layout);
+    let (flat_cursor_entity, flat_entities) = spawn_map(&flat_layout);
+    let (pointy_cursor_entity, pointy_entities) = spawn_map(&pointy_layout);
     commands.insert_resource(Map {
         flat_layout,
         pointy_layout,
         flat_entities,
         pointy_entities,
-        selected_material,
+        flat_cursor_entity,
+        pointy_cursor_entity,
+        area_material,
         default_material,
     });
 }
@@ -108,7 +123,7 @@ fn handle_input(
     map: Res<Map>,
     mut area: ResMut<HexArea>,
     mouse: Res<ButtonInput<MouseButton>>,
-    mut selected: Local<[Hex; 2]>,
+    mut cursors: Query<&mut Transform>,
 ) {
     let window = windows.single();
     let (camera, cam_transform) = cameras.single();
@@ -118,29 +133,51 @@ fn handle_input(
     else {
         return;
     };
-    for (layout, entities, selected_idx) in [
-        (&map.flat_layout, &map.flat_entities, 0),
-        (&map.pointy_layout, &map.pointy_entities, 1),
+    let mut to_add = Vec::new();
+    let mut to_remove = Vec::new();
+    for (layout, entities, cursor) in [
+        (
+            &map.flat_layout,
+            &map.flat_entities,
+            &map.flat_cursor_entity,
+        ),
+        (
+            &map.pointy_layout,
+            &map.pointy_entities,
+            &map.pointy_cursor_entity,
+        ),
     ] {
         let coord = layout.world_pos_to_hex(pos);
-        let Some(entity) = entities.get(&coord).copied() else {
+        if entities.get(&coord).is_none() {
             continue;
         };
-        if coord != selected[selected_idx] {
-            let selected_entity = entities.get(&selected[selected_idx]).unwrap();
-            commands
-                .entity(*selected_entity)
-                .insert(map.default_material.clone());
-            commands
-                .entity(entity)
-                .insert(map.selected_material.clone());
-            selected[selected_idx] = coord;
-        }
+        let mut cursor = cursors.get_mut(*cursor).unwrap();
+        let pos = layout.hex_to_world_pos(coord);
+        cursor.translation.x = pos.x;
+        cursor.translation.y = pos.y;
         if mouse.pressed(MouseButton::Left) {
-            area.area.insert(coord);
+            to_add.push(coord);
         } else if mouse.pressed(MouseButton::Right) {
-            area.area.remove(&coord);
+            to_remove.push(coord);
         }
+    }
+    for coord in to_add {
+        area.area.insert(coord);
+        let entity = map.flat_entities.get(&coord).unwrap();
+        commands.entity(*entity).insert(map.area_material.clone());
+        let entity = map.pointy_entities.get(&coord).unwrap();
+        commands.entity(*entity).insert(map.area_material.clone());
+    }
+    for coord in to_remove {
+        area.area.remove(&coord);
+        let entity = map.flat_entities.get(&coord).unwrap();
+        commands
+            .entity(*entity)
+            .insert(map.default_material.clone());
+        let entity = map.pointy_entities.get(&coord).unwrap();
+        commands
+            .entity(*entity)
+            .insert(map.default_material.clone());
     }
 }
 
@@ -170,6 +207,26 @@ fn gizmos(mut gizmos: Gizmos, area: Res<HexArea>, map: Res<Map>) {
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = PlaneMeshBuilder::new(hex_layout)
         .facing(Vec3::Z)
+        .center_aligned()
+        .build();
+    Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::RENDER_WORLD,
+    )
+    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, mesh_info.normals)
+    .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, mesh_info.uvs)
+    .with_inserted_indices(Indices::U16(mesh_info.indices))
+}
+
+fn border_plane(hex_layout: &HexLayout) -> Mesh {
+    let mesh_info = PlaneMeshBuilder::new(hex_layout)
+        .facing(Vec3::Z)
+        .with_inset_options(InsetOptions {
+            keep_inner_face: false,
+            scale: 0.2,
+            ..default()
+        })
         .center_aligned()
         .build();
     Mesh::new(

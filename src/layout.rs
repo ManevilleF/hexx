@@ -100,13 +100,14 @@ impl HexLayout {
     /// `hex`
     pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
         let center = self.hex_to_world_pos(hex);
-        self.center_aligned_hex_corners().map(|c| c + center)
+        self.center_aligned_hex_corners()
+            .map(|c| (c * self.axis_scale()) + center)
     }
 
     #[must_use]
+    /// Unscaled, non offsetted hex corners
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
-        let offset = self.hex_size * self.axis_scale();
-        VertexDirection::ALL_DIRECTIONS.map(|dir| dir.unit_vector(self.orientation) * offset)
+        VertexDirection::ALL_DIRECTIONS.map(|dir| dir.unit_vector(self.orientation) * self.hex_size)
     }
 
     #[inline]
