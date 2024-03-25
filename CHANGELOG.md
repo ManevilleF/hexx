@@ -5,6 +5,9 @@
 * Removed methods deprecated in previous versions
 * Added `z` field in the `Debug` impl of `Hex` (#156)
 * Added `xyz` fields in the `Debug` impl of directions (#156)
+* (**BREAKING**) Hex neighbors are now following a clockwise order (#157)
+* (**BREAKING**) Hex diagonal neighbors are now following a clockwise order (#157)
+* Added new `hex_area` example
 
 ### New grid utilities (#154)
 
@@ -12,8 +15,9 @@
 * Added `GridVertex` and `GridEgde` types, representing oriented grid vertices
 and edges
 
-### New directions (#156)
+### New directions (#156, #157)
 
+* (**BREAKING**) Direction types are now following a clockwise order
 * (**BREAKING**) Renamed `Direction` to `EdgeDirection`, and is no longer an enum.
 Instead of the oriented variants use associated const values:
   * `Direction::TopRight` -> `EdgeDirection::FLAT_TOP_RIGHT` or `EdgeDirection::POINTY_RIGHT`

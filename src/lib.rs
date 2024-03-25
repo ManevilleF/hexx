@@ -37,8 +37,8 @@
 //!
 //! * `hexx = { version = "0.15", features = ["packed"] }`
 //!
-//! `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect) through the
-//! `bevy_reflect` feature. To enable it add the following line to your
+//! `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
+//! through the `bevy_reflect` feature. To enable it add the following line to your
 //! `Cargo.toml`:
 //!
 //! * `hexx = { version = "0.15", features = ["bevy_reflect"] }`
@@ -125,7 +125,8 @@
 //! It can be used for boundary and interesection checks but also for wrapping
 //! coordinates.
 //! Coordinate wrapping transform a point outside of the bounds to a point
-//! inside. This allows for seamless or repeating [wraparound](https://www.redblobgames.com/grids/hexagons/#wraparound) maps.
+//! inside. This allows for seamless or repeating [wraparound](https://www.redblobgames.com/grids/hexagons/#wraparound)
+//! maps.
 //!
 //! ```rust
 //! use hexx::*;
