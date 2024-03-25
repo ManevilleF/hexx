@@ -5,22 +5,23 @@ use crate::{
     },
     Hex, HexOrientation, VertexDirection,
 };
+use glam::Vec2;
 use std::{f32::consts::TAU, fmt::Debug};
 
 /// All 6 possible neighbor/edge directions in hexagonal space.
 ///
 /// ```txt
-///            x Axis
-///            ___
+///       Z    ___   -Y
 ///           /   \
+///       +--+  4  +--+
+///      / 3  \___/  5 \
+///      \    /   \    /
+///  -X   +--+     +--+    X
+///      /    \___/    \
+///      \ 2  /   \  0 /
 ///       +--+  1  +--+
-///      /  2 \___/ 0  \
-///      \    /   \    /
-///       +--+     +--+
-///      /  3 \___/ 5  \
-///      \    /   \    /
-///       +--+  4  +--+   y Axis
 ///           \___/
+///       Y           -Z
 /// ```
 ///
 /// See [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
@@ -53,14 +54,14 @@ use std::{f32::consts::TAU, fmt::Debug};
 /// 5 as following:
 ///
 /// ```txt
-///           e1
-///       v2_____ v1
-///     e2 /     \ e0
+///           e4
+///       v4_____ v5
+///     e3 /     \ e5
 ///       /       \
 ///   v3 (         ) v0
 ///       \       /
-///     e3 \_____/ e5
-///      v4   e5  v5
+///     e2 \_____/ e0
+///      v2   e1  v1
 /// ```
 ///
 /// On pointy orientation the hexagon is shifted by 30 degrees clockwise
@@ -74,134 +75,134 @@ pub struct EdgeDirection(pub(crate) u8);
 
 impl EdgeDirection {
     /// Direction towards `X, -Y`
-    pub const X_NEG_Y: Self = Self(0);
+    pub const X_NEG_Y: Self = Self(5);
     /// Direction to (1, -1)
     ///
     /// Represents "Top right" edge in flat orientation
-    pub const FLAT_TOP_RIGHT: Self = Self(0);
+    pub const FLAT_TOP_RIGHT: Self = Self(5);
     /// Direction to (1, -1)
     ///
     /// Represents "North west" edge in flat orientation
-    pub const FLAT_NORTH_WEST: Self = Self(0);
+    pub const FLAT_NORTH_WEST: Self = Self(5);
     /// Direction to (1, -1)
     ///
     /// Represents "Right" edge in pointy orientation
-    pub const POINTY_RIGHT: Self = Self(0);
+    pub const POINTY_RIGHT: Self = Self(5);
     /// Direction to (1, -1)
     ///
     /// Represents "North west" edge in pointy orientation
-    pub const POINTY_WEST: Self = Self(0);
+    pub const POINTY_WEST: Self = Self(5);
 
     /// Direction towards `-Y`
-    pub const NEG_Y: Self = Self(1);
+    pub const NEG_Y: Self = Self(4);
     /// Direction to (0, -1)
     ///
     /// Represents "Top" edge in flat orientation
-    pub const FLAT_TOP: Self = Self(1);
+    pub const FLAT_TOP: Self = Self(4);
     /// Direction to (0, -1)
     ///
     /// Represents "North" edge in flat orientation
-    pub const FLAT_NORTH: Self = Self(1);
+    pub const FLAT_NORTH: Self = Self(4);
     /// Direction to (0, -1)
     ///
     /// Represents "Top Right" edge in pointy orientation
-    pub const POINTY_TOP_RIGHT: Self = Self(1);
+    pub const POINTY_TOP_RIGHT: Self = Self(4);
     /// Direction to (0, -1)
     ///
     /// Represents "North West" edge in pointy orientation
-    pub const POINTY_NORTH_WEST: Self = Self(1);
+    pub const POINTY_NORTH_WEST: Self = Self(4);
 
     /// Direction towards `-X`
-    pub const NEG_X: Self = Self(2);
+    pub const NEG_X: Self = Self(3);
     /// Direction to (-1, 0)
     ///
     /// Represents "Top Left" in flat orientation
-    pub const FLAT_TOP_LEFT: Self = Self(2);
+    pub const FLAT_TOP_LEFT: Self = Self(3);
     /// Direction to (-1, 0)
     ///
     /// Represents "North East" in flat orientation
-    pub const FLAT_NORTH_EAST: Self = Self(2);
+    pub const FLAT_NORTH_EAST: Self = Self(3);
     /// Direction to (-1, 0)
     ///
     /// Represents "Top Left" in pointy orientation
-    pub const POINTY_TOP_LEFT: Self = Self(2);
+    pub const POINTY_TOP_LEFT: Self = Self(3);
     /// Direction to (-1, 0)
     ///
     /// Represents "North East" in pointy orientation
-    pub const POINTY_NORTH_EAST: Self = Self(2);
+    pub const POINTY_NORTH_EAST: Self = Self(3);
 
     /// Direction towards `-X, Y`
-    pub const NEG_X_Y: Self = Self(3);
+    pub const NEG_X_Y: Self = Self(2);
     /// Direction to (-1, 1)
     ///
     /// Represents "Bottom Left" in flat orientation
-    pub const FLAT_BOTTOM_LEFT: Self = Self(3);
+    pub const FLAT_BOTTOM_LEFT: Self = Self(2);
     /// Direction to (-1, 1)
     ///
     /// Represents "South East" in flat orientation
-    pub const FLAT_SOUTH_EAST: Self = Self(3);
+    pub const FLAT_SOUTH_EAST: Self = Self(2);
     /// Direction to (-1, 1)
     ///
     /// Represents "Left" in pointy orientation
-    pub const POINTY_LEFT: Self = Self(3);
+    pub const POINTY_LEFT: Self = Self(2);
     /// Direction to (-1, 1)
     ///
     /// Represents "East" in pointy orientation
-    pub const POINTY_EAST: Self = Self(3);
+    pub const POINTY_EAST: Self = Self(2);
 
     /// Direction towards `Y`
-    pub const Y: Self = Self(4);
+    pub const Y: Self = Self(1);
     /// Direction to (0, 1)
     ///
     /// Represents "Bottom" in flat orientation
-    pub const FLAT_BOTTOM: Self = Self(4);
+    pub const FLAT_BOTTOM: Self = Self(1);
     /// Direction to (0, 1)
     ///
     /// Represents "South" in flat orientation
-    pub const FLAT_SOUTH: Self = Self(4);
+    pub const FLAT_SOUTH: Self = Self(1);
     /// Direction to (0, 1)
     ///
     /// Represents "Bottom left" in pointy orientation
-    pub const POINTY_BOTTOM_LEFT: Self = Self(4);
+    pub const POINTY_BOTTOM_LEFT: Self = Self(1);
     /// Direction to (0, 1)
     ///
     /// Represents "South east" in pointy orientation
-    pub const POINTY_SOUTH_EAST: Self = Self(4);
+    pub const POINTY_SOUTH_EAST: Self = Self(1);
 
     /// Direction towards `X`
-    pub const X: Self = Self(5);
+    pub const X: Self = Self(0);
     /// Direction to (1, 0)
     ///
     /// Represents "Bottom Right" in flat orientation
-    pub const FLAT_BOTTOM_RIGHT: Self = Self(5);
+    pub const FLAT_BOTTOM_RIGHT: Self = Self(0);
     /// Direction to (1, 0)
     ///
     /// Represents "South West" in flat orientation
-    pub const FLAT_SOUTH_WEST: Self = Self(5);
+    pub const FLAT_SOUTH_WEST: Self = Self(0);
     /// Direction to (1, 0)
     ///
     /// Represents "Bottom Right" in pointy orientation
-    pub const POINTY_BOTTOM_RIGHT: Self = Self(5);
+    pub const POINTY_BOTTOM_RIGHT: Self = Self(0);
     /// Direction to (1, 0)
     ///
     /// Represents "South West" in pointy orientation
-    pub const POINTY_SOUTH_WEST: Self = Self(5);
+    pub const POINTY_SOUTH_WEST: Self = Self(0);
 
     /// All 6 hexagonal directions matching
     /// [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
     ///
     /// ```txt
-    ///            x Axis
-    ///            ___
+    ///       Z    ___   -Y
     ///           /   \
-    ///       +--+  1  +--+
-    ///      / 2  \___/  0 \
+    ///       +--+  4  +--+
+    ///      / 3  \___/  5 \
     ///      \    /   \    /
-    ///       +--+     +--+
+    ///  -X   +--+     +--+    X
     ///      /    \___/    \
-    ///      \ 3  /   \  5 /
-    ///       +--+  4  +--+   y Axis
+    ///      \ 2  /   \  0 /
+    ///       +--+  1  +--+
     ///           \___/
+    ///       Y           -Z
     /// ```
     pub const ALL_DIRECTIONS: [Self; 6] = [Self(0), Self(1), Self(2), Self(3), Self(4), Self(5)];
 
@@ -257,7 +258,7 @@ impl EdgeDirection {
     #[inline]
     #[doc(alias = "cw")]
     pub const fn clockwise(self) -> Self {
-        Self((self.0 + 5) % 6)
+        Self((self.0 + 1) % 6)
     }
 
     /// Returns the next direction in counter clockwise order
@@ -275,7 +276,7 @@ impl EdgeDirection {
     #[inline]
     #[doc(alias = "ccw")]
     pub const fn counter_clockwise(self) -> Self {
-        Self((self.0 + 1) % 6)
+        Self((self.0 + 5) % 6)
     }
 
     #[must_use]
@@ -292,7 +293,7 @@ impl EdgeDirection {
     /// );
     /// ```
     pub const fn rotate_ccw(self, offset: u8) -> Self {
-        Self((self.0 + (offset % 6)) % 6)
+        Self((self.0 + 6 - (offset % 6)) % 6)
     }
 
     #[must_use]
@@ -309,7 +310,7 @@ impl EdgeDirection {
     /// );
     /// ```
     pub const fn rotate_cw(self, offset: u8) -> Self {
-        Self((self.0 + 6 - (offset % 6)) % 6)
+        Self((self.0 + (offset % 6)) % 6)
     }
 
     #[must_use]
@@ -318,10 +319,23 @@ impl EdgeDirection {
         (self.0 + 6 - rhs.0) % 6
     }
 
+    /// Computes the angle between `a` and `b` in radians.
+    #[must_use]
+    #[inline]
+    pub fn angle_between(a: Self, b: Self) -> f32 {
+        a.angle_to(b)
+    }
+
+    /// Computes the angle between `a` and `b` in degrees.
+    #[must_use]
+    #[inline]
+    pub fn angle_degrees_between(a: Self, b: Self) -> f32 {
+        a.angle_degrees_to(b)
+    }
+
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
-    #[doc(alias = "angle_between")]
     /// Computes the angle between `self` and `rhs` in radians.
     pub fn angle_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
@@ -331,7 +345,6 @@ impl EdgeDirection {
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
-    #[doc(alias = "angle_degrees_between")]
     /// Computes the angle between `self` and `rhs` in degrees.
     pub fn angle_degrees_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
@@ -367,6 +380,14 @@ impl EdgeDirection {
             HexOrientation::Pointy => base,
             HexOrientation::Flat => base + DIRECTION_ANGLE_OFFSET_RAD,
         }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the unit vector of the direction in the given `orientation`
+    pub fn unit_vector(self, orientation: HexOrientation) -> Vec2 {
+        let angle = self.angle(orientation);
+        Vec2::new(angle.cos(), angle.sin())
     }
 
     #[inline]
@@ -411,7 +432,7 @@ impl EdgeDirection {
     /// # use hexx::*;
     ///
     /// let direction = EdgeDirection::from_pointy_angle_degrees(35.0);
-    /// assert_eq!(direction, EdgeDirection::FLAT_TOP);
+    /// assert_eq!(direction, EdgeDirection::FLAT_BOTTOM);
     /// ```
     pub fn from_pointy_angle_degrees(angle: f32) -> Self {
         Self::from_flat_angle_degrees(angle + DIRECTION_ANGLE_OFFSET_DEGREES)
@@ -427,7 +448,7 @@ impl EdgeDirection {
     /// # use hexx::*;
     ///
     /// let direction = EdgeDirection::from_flat_angle_degrees(35.0);
-    /// assert_eq!(direction, EdgeDirection::FLAT_TOP_RIGHT);
+    /// assert_eq!(direction, EdgeDirection::FLAT_BOTTOM_RIGHT);
     /// ```
     pub fn from_flat_angle_degrees(angle: f32) -> Self {
         let angle = angle.rem_euclid(360.0);
@@ -444,7 +465,7 @@ impl EdgeDirection {
     /// # use hexx::*;
     ///
     /// let direction = EdgeDirection::from_pointy_angle(0.6);
-    /// assert_eq!(direction, EdgeDirection::FLAT_TOP);
+    /// assert_eq!(direction, EdgeDirection::FLAT_BOTTOM);
     /// ```
     pub fn from_pointy_angle(angle: f32) -> Self {
         Self::from_flat_angle(angle + DIRECTION_ANGLE_OFFSET_RAD)
@@ -460,7 +481,7 @@ impl EdgeDirection {
     /// # use hexx::*;
     ///
     /// let direction = EdgeDirection::from_flat_angle(0.6);
-    /// assert_eq!(direction, EdgeDirection::FLAT_TOP_RIGHT);
+    /// assert_eq!(direction, EdgeDirection::FLAT_BOTTOM_RIGHT);
     /// ```
     pub fn from_flat_angle(angle: f32) -> Self {
         let angle = angle.rem_euclid(TAU);
@@ -480,11 +501,11 @@ impl EdgeDirection {
     /// let angle = 35.0;
     /// assert_eq!(
     ///     EdgeDirection::from_angle_degrees(angle, HexOrientation::Flat),
-    ///     EdgeDirection::FLAT_TOP_RIGHT
+    ///     EdgeDirection::FLAT_BOTTOM_RIGHT
     /// );
     /// assert_eq!(
     ///     EdgeDirection::from_angle_degrees(angle, HexOrientation::Pointy),
-    ///     EdgeDirection::FLAT_TOP
+    ///     EdgeDirection::FLAT_BOTTOM
     /// );
     /// ```
     pub fn from_angle_degrees(angle: f32, orientation: HexOrientation) -> Self {
@@ -506,11 +527,11 @@ impl EdgeDirection {
     /// let angle = 0.6;
     /// assert_eq!(
     ///     EdgeDirection::from_angle(angle, HexOrientation::Flat),
-    ///     EdgeDirection::FLAT_TOP_RIGHT
+    ///     EdgeDirection::FLAT_BOTTOM_RIGHT
     /// );
     /// assert_eq!(
     ///     EdgeDirection::from_angle(angle, HexOrientation::Pointy),
-    ///     EdgeDirection::FLAT_TOP
+    ///     EdgeDirection::FLAT_BOTTOM
     /// );
     /// ```
     pub fn from_angle(angle: f32, orientation: HexOrientation) -> Self {
@@ -547,7 +568,7 @@ impl EdgeDirection {
     /// assert_eq!(diagonal, VertexDirection::FLAT_TOP_LEFT);
     /// ```
     pub const fn vertex_ccw(self) -> VertexDirection {
-        VertexDirection(self.counter_clockwise().0)
+        VertexDirection(self.0)
     }
 
     #[inline]
@@ -577,7 +598,7 @@ impl EdgeDirection {
     /// assert_eq!(diagonal, VertexDirection::FLAT_TOP_RIGHT);
     /// ```
     pub const fn vertex_cw(self) -> VertexDirection {
-        VertexDirection(self.0)
+        VertexDirection(self.clockwise().0)
     }
 
     #[inline]

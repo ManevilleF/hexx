@@ -5,22 +5,25 @@ use crate::{
     },
     EdgeDirection, Hex, HexOrientation,
 };
+use glam::Vec2;
 use std::{f32::consts::TAU, fmt::Debug};
 
 /// All 6 possible diagonal/vertex directions in hexagonal space.
 ///
 /// ```txt
-///            x Axis
+///       Z           -Y
 ///           \___/
-///      \ 2  /   \ 1  /
+///      \ 4  /   \ 5  /
 ///       +--+     +--+
 ///    __/    \___/    \__
 ///      \    /   \    /
-///    3  +--+     +--+  0
+/// -X 3  +--+     +--+  0   X
 ///    __/    \___/    \__
 ///      \    /   \    /
-///       +--+     +--+   y Axis
-///      / 4  \___/  5 \
+///       +--+     +--+
+///      / 2  \___/  1 \
+///
+///       Y           -Z
 /// ```
 ///
 /// ## Operations
@@ -50,14 +53,14 @@ use std::{f32::consts::TAU, fmt::Debug};
 /// 5 as following:
 ///
 /// ```txt
-///           e1
-///       v2_____ v1
-///     e2 /     \ e0
+///           e4
+///       v4_____ v5
+///     e3 /     \ e5
 ///       /       \
 ///   v3 (         ) v0
 ///       \       /
-///     e3 \_____/ e5
-///      v4   e5  v5
+///     e2 \_____/ e0
+///      v2   e1  v1
 /// ```
 ///
 /// On pointy orientation the hexagon is shifted by 30 degrees clockwise
@@ -72,6 +75,8 @@ pub struct VertexDirection(pub(crate) u8);
 impl VertexDirection {
     /// Direction towards `X, -Y, -Z`
     pub const X_NEG_Y_NEG_Z: Self = Self(0);
+    /// Direction to (2, -1) or (2, -1, -1)
+    pub const X: Self = Self(0);
     /// Direction to (2, -1) or (2, -1, -1)
     ///
     /// Represents "Right" in flat orientation
@@ -90,45 +95,51 @@ impl VertexDirection {
     pub const POINTY_SOUTH_WEST: Self = Self(0);
 
     /// Direction towards `X, -Y, Z`
-    pub const X_NEG_Y_Z: Self = Self(1);
+    pub const X_NEG_Y_Z: Self = Self(5);
+    /// Direction to (1, -2) or (1, -2, 1)
+    pub const NEG_Y: Self = Self(5);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
     /// Represents "Top Right" in flat orientation
-    pub const FLAT_TOP_RIGHT: Self = Self(1);
+    pub const FLAT_TOP_RIGHT: Self = Self(5);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
     /// Represents "North West" in flat orientation
-    pub const FLAT_NORTH_WEST: Self = Self(1);
+    pub const FLAT_NORTH_WEST: Self = Self(5);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
     /// Represents "Top Right" in pointy orientation
-    pub const POINTY_TOP_RIGHT: Self = Self(1);
+    pub const POINTY_TOP_RIGHT: Self = Self(5);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
     /// Represents "North West" in pointy orientation
-    pub const POINTY_NORTH_WEST: Self = Self(1);
+    pub const POINTY_NORTH_WEST: Self = Self(5);
 
     /// Direction towards `-X, -Y, Z`
-    pub const NEG_X_NEG_Y: Self = Self(2);
+    pub const NEG_X_NEG_Y: Self = Self(4);
+    /// Direction to (-1, -1) or (-1, -1, 2)
+    pub const Z: Self = Self(4);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
     /// Represents "Top Left" in flat orientation
-    pub const FLAT_TOP_LEFT: Self = Self(2);
+    pub const FLAT_TOP_LEFT: Self = Self(4);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
     /// Represents "North east" in flat orientation
-    pub const FLAT_NORTH_EAST: Self = Self(2);
+    pub const FLAT_NORTH_EAST: Self = Self(4);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
     /// Represents "Top" in pointy orientation
-    pub const POINTY_TOP: Self = Self(2);
+    pub const POINTY_TOP: Self = Self(4);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
     /// Represents "North" in pointy orientation
-    pub const POINTY_NORTH: Self = Self(2);
+    pub const POINTY_NORTH: Self = Self(4);
 
     /// Direction towards `-X, Y, Z`
     pub const NEG_X_Y_Z: Self = Self(3);
+    /// Direction to (-2, 1) or (-2, 1, 1)
+    pub const NEG_X: Self = Self(3);
     /// Direction to (-2, 1) or (-2, 1, 1)
     ///
     /// Represents "Left" in flat orientation
@@ -147,58 +158,64 @@ impl VertexDirection {
     pub const POINTY_NORTH_EAST: Self = Self(3);
 
     /// Direction towards `-X, Y, -Z`
-    pub const NEG_X_Y_NEG_Z: Self = Self(4);
+    pub const NEG_X_Y_NEG_Z: Self = Self(2);
+    /// Direction to (-1, 2) or (-1, 2, -1)
+    pub const Y: Self = Self(2);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
     /// Represents "Bottom Left" in flat orientation
-    pub const FLAT_BOTTOM_LEFT: Self = Self(4);
+    pub const FLAT_BOTTOM_LEFT: Self = Self(2);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
     /// Represents "South East" in flat orientation
-    pub const FLAT_SOUTH_EAST: Self = Self(4);
+    pub const FLAT_SOUTH_EAST: Self = Self(2);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
     /// Represents "Bottom Left" in pointy orientation
-    pub const POINTY_BOTTOM_LEFT: Self = Self(4);
+    pub const POINTY_BOTTOM_LEFT: Self = Self(2);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
     /// Represents "South Easth" in pointy orientation
-    pub const POINTY_SOUTH_EAST: Self = Self(4);
+    pub const POINTY_SOUTH_EAST: Self = Self(2);
 
     /// Direction towards `X, Y, -Z`
-    pub const X_Y: Self = Self(5);
+    pub const X_Y: Self = Self(1);
+    /// Direction to (1, 1) or (1, 1, -2)
+    pub const NEG_Z: Self = Self(1);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
     /// Represents "Bottom Right" in flat orientation
-    pub const FLAT_BOTTOM_RIGHT: Self = Self(5);
+    pub const FLAT_BOTTOM_RIGHT: Self = Self(1);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
     /// Represents "South West" in flat orientation
-    pub const FLAT_SOUTH_WEST: Self = Self(5);
+    pub const FLAT_SOUTH_WEST: Self = Self(1);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
     /// Represents "Bottom" in pointy orientation
-    pub const POINTY_BOTTOM: Self = Self(5);
+    pub const POINTY_BOTTOM: Self = Self(1);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
     /// Represents "South" in pointy orientation
-    pub const POINTY_SOUTH: Self = Self(5);
+    pub const POINTY_SOUTH: Self = Self(1);
 
     /// All 6 diagonal directions matching
     /// [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS)
     ///
     /// ```txt
-    ///            x Axis
+    ///       Z           -Y
     ///           \___/
-    ///      \ 2  /   \ 1  /
+    ///      \ 4  /   \ 5  /
     ///       +--+     +--+
     ///    __/    \___/    \__
     ///      \    /   \    /
-    ///    3  +--+     +--+  0
+    /// -X 3  +--+     +--+  0   X
     ///    __/    \___/    \__
     ///      \    /   \    /
-    ///       +--+     +--+   y Axis
-    ///      / 4  \___/  5 \
+    ///       +--+     +--+
+    ///      / 2  \___/  1 \
+    ///
+    ///       Y           -Z
     /// ```
     pub const ALL_DIRECTIONS: [Self; 6] = [Self(0), Self(1), Self(2), Self(3), Self(4), Self(5)];
 
@@ -228,10 +245,7 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::FLAT_RIGHT.const_neg(),
-    ///     VertexDirection::FLAT_LEFT
-    /// );
+    /// assert_eq!(VertexDirection::X.const_neg(), VertexDirection::NEG_X);
     /// ```
     #[must_use]
     #[inline]
@@ -245,16 +259,13 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::FLAT_RIGHT.clockwise(),
-    ///     VertexDirection::FLAT_BOTTOM_RIGHT
-    /// );
+    /// assert_eq!(VertexDirection::X.clockwise(), VertexDirection::NEG_Z);
     /// ```
     #[must_use]
     #[inline]
     #[doc(alias = "cw")]
     pub const fn clockwise(self) -> Self {
-        Self((self.0 + 5) % 6)
+        Self((self.0 + 1) % 6)
     }
 
     /// Returns the next direction in counter clockwise order
@@ -264,15 +275,15 @@ impl VertexDirection {
     /// ```rust
     /// # use hexx::*;
     /// assert_eq!(
-    ///     VertexDirection::FLAT_RIGHT.counter_clockwise(),
-    ///     VertexDirection::FLAT_TOP_RIGHT
+    ///     VertexDirection::X.counter_clockwise(),
+    ///     VertexDirection::NEG_Y
     /// );
     /// ```
     #[must_use]
     #[inline]
     #[doc(alias = "ccw")]
     pub const fn counter_clockwise(self) -> Self {
-        Self((self.0 + 1) % 6)
+        Self((self.0 + 5) % 6)
     }
 
     #[must_use]
@@ -283,13 +294,10 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::FLAT_RIGHT,
-    ///     VertexDirection::FLAT_RIGHT.rotate_ccw(6)
-    /// );
+    /// assert_eq!(VertexDirection::X, VertexDirection::X.rotate_ccw(6));
     /// ```
     pub const fn rotate_ccw(self, offset: u8) -> Self {
-        Self((self.0 + (offset % 6)) % 6)
+        Self((self.0 + 6 - (offset % 6)) % 6)
     }
 
     #[must_use]
@@ -300,13 +308,10 @@ impl VertexDirection {
     ///
     /// ```rust
     /// # use hexx::*;
-    /// assert_eq!(
-    ///     VertexDirection::FLAT_RIGHT,
-    ///     VertexDirection::FLAT_RIGHT.rotate_cw(6)
-    /// );
+    /// assert_eq!(VertexDirection::X, VertexDirection::X.rotate_cw(6));
     /// ```
     pub const fn rotate_cw(self, offset: u8) -> Self {
-        Self((self.0 + 6 - (offset % 6)) % 6)
+        Self((self.0 + (offset % 6)) % 6)
     }
 
     #[must_use]
@@ -315,10 +320,23 @@ impl VertexDirection {
         (self.0 + 6 - rhs.0) % 6
     }
 
+    /// Computes the angle between `a` and `b` in radians.
+    #[must_use]
+    #[inline]
+    pub fn angle_between(a: Self, b: Self) -> f32 {
+        a.angle_to(b)
+    }
+
+    /// Computes the angle between `a` and `b` in degrees.
+    #[must_use]
+    #[inline]
+    pub fn angle_degrees_between(a: Self, b: Self) -> f32 {
+        a.angle_degrees_to(b)
+    }
+
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
-    #[doc(alias = "angle_between")]
     /// Computes the angle between `self` and `rhs` in radians.
     pub fn angle_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
@@ -328,7 +346,6 @@ impl VertexDirection {
     #[allow(clippy::cast_lossless)]
     #[must_use]
     #[inline]
-    #[doc(alias = "angle_degrees_between")]
     /// Computes the angle between `self` and `rhs` in degrees.
     pub fn angle_degrees_to(self, rhs: Self) -> f32 {
         let steps = self.steps_between(rhs) as f32;
@@ -364,6 +381,14 @@ impl VertexDirection {
             HexOrientation::Pointy => (base - DIRECTION_ANGLE_OFFSET_RAD).rem_euclid(TAU),
             HexOrientation::Flat => base,
         }
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the unit vector of the direction in the given `orientation`
+    pub fn unit_vector(self, orientation: HexOrientation) -> Vec2 {
+        let angle = self.angle(orientation);
+        Vec2::new(angle.cos(), angle.sin())
     }
 
     #[inline]
@@ -410,7 +435,7 @@ impl VertexDirection {
     /// # use hexx::*;
     ///
     /// let direction = VertexDirection::from_flat_angle_degrees(15.0);
-    /// assert_eq!(direction, VertexDirection::FLAT_RIGHT);
+    /// assert_eq!(direction, VertexDirection::X);
     /// ```
     pub fn from_flat_angle_degrees(angle: f32) -> Self {
         Self::from_pointy_angle_degrees(angle - DIRECTION_ANGLE_OFFSET_DEGREES)
@@ -426,7 +451,7 @@ impl VertexDirection {
     /// # use hexx::*;
     ///
     /// let direction = VertexDirection::from_pointy_angle_degrees(15.0);
-    /// assert_eq!(direction, VertexDirection::FLAT_TOP_RIGHT);
+    /// assert_eq!(direction, VertexDirection::FLAT_BOTTOM_RIGHT);
     /// ```
     pub fn from_pointy_angle_degrees(angle: f32) -> Self {
         let angle = angle.rem_euclid(360.0);
@@ -459,7 +484,7 @@ impl VertexDirection {
     /// # use hexx::*;
     ///
     /// let direction = VertexDirection::from_pointy_angle(0.26);
-    /// assert_eq!(direction, VertexDirection::FLAT_TOP_RIGHT);
+    /// assert_eq!(direction, VertexDirection::FLAT_BOTTOM_RIGHT);
     /// ```
     pub fn from_pointy_angle(angle: f32) -> Self {
         let angle = angle.rem_euclid(TAU);
@@ -483,7 +508,7 @@ impl VertexDirection {
     /// );
     /// assert_eq!(
     ///     VertexDirection::from_angle_degrees(angle, HexOrientation::Pointy),
-    ///     VertexDirection::FLAT_TOP_RIGHT
+    ///     VertexDirection::FLAT_BOTTOM_RIGHT
     /// );
     /// ```
     pub fn from_angle_degrees(angle: f32, orientation: HexOrientation) -> Self {
@@ -509,7 +534,7 @@ impl VertexDirection {
     /// );
     /// assert_eq!(
     ///     VertexDirection::from_angle(angle, HexOrientation::Pointy),
-    ///     VertexDirection::FLAT_TOP_RIGHT
+    ///     VertexDirection::FLAT_BOTTOM_RIGHT
     /// );
     /// ```
     pub fn from_angle(angle: f32, orientation: HexOrientation) -> Self {
@@ -546,7 +571,7 @@ impl VertexDirection {
     /// assert_eq!(diagonal, EdgeDirection::FLAT_TOP_RIGHT);
     /// ```
     pub const fn edge_ccw(self) -> EdgeDirection {
-        EdgeDirection(self.0)
+        EdgeDirection(self.counter_clockwise().0)
     }
 
     #[inline]
@@ -576,7 +601,7 @@ impl VertexDirection {
     /// assert_eq!(diagonal, EdgeDirection::FLAT_BOTTOM_RIGHT);
     // ```
     pub const fn edge_cw(self) -> EdgeDirection {
-        EdgeDirection(self.clockwise().0)
+        EdgeDirection(self.0)
     }
 
     #[inline]

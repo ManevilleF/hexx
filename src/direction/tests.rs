@@ -4,9 +4,11 @@
     clippy::cast_precision_loss
 )]
 
+use approx::assert_relative_eq;
+
 use super::*;
 use crate::HexOrientation;
-use std::f32::{consts::PI, EPSILON};
+use std::f32::consts::PI;
 
 mod edge_directions {
     use super::*;
@@ -55,15 +57,15 @@ mod edge_directions {
     #[test]
     fn flat_angles_degrees() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, 30.0),
-            (EdgeDirection::FLAT_TOP, 90.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 150.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, 210.0),
-            (EdgeDirection::FLAT_BOTTOM, 270.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 330.0),
+            (EdgeDirection(0), 30.0),
+            (EdgeDirection(1), 90.0),
+            (EdgeDirection(2), 150.0),
+            (EdgeDirection(3), 210.0),
+            (EdgeDirection(4), 270.0),
+            (EdgeDirection(5), 330.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_flat_degrees() - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_flat_degrees(), angle);
         }
     }
 
@@ -133,48 +135,48 @@ mod edge_directions {
     #[test]
     fn flat_angles_rad() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, PI / 6.0),
-            (EdgeDirection::FLAT_TOP, PI / 2.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 5.0 * PI / 6.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, 7.0 * PI / 6.0),
-            (EdgeDirection::FLAT_BOTTOM, 3.0 * PI / 2.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 11.0 * PI / 6.0),
+            (EdgeDirection(0), PI / 6.0),
+            (EdgeDirection(1), PI / 2.0),
+            (EdgeDirection(2), 5.0 * PI / 6.0),
+            (EdgeDirection(3), 7.0 * PI / 6.0),
+            (EdgeDirection(4), 3.0 * PI / 2.0),
+            (EdgeDirection(5), 11.0 * PI / 6.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_flat() - angle <= EPSILON);
-            assert!(dir.angle(HexOrientation::Flat) - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_flat(), angle);
+            assert_relative_eq!(dir.angle(HexOrientation::Flat), angle);
         }
     }
 
     #[test]
     fn pointy_angles_degrees() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, 0.0),
-            (EdgeDirection::FLAT_TOP, 60.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 120.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, 180.0),
-            (EdgeDirection::FLAT_BOTTOM, 240.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 300.0),
+            (EdgeDirection(0), 0.0),
+            (EdgeDirection(1), 60.0),
+            (EdgeDirection(2), 120.0),
+            (EdgeDirection(3), 180.0),
+            (EdgeDirection(4), 240.0),
+            (EdgeDirection(5), 300.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_pointy_degrees() - angle <= EPSILON);
-            assert!(dir.angle_degrees(HexOrientation::Pointy) - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_pointy_degrees(), angle);
+            assert_relative_eq!(dir.angle_degrees(HexOrientation::Pointy), angle);
         }
     }
 
     #[test]
     fn pointy_angles_rad() {
         let expected = [
-            (EdgeDirection::FLAT_TOP_RIGHT, 0.0),
-            (EdgeDirection::FLAT_TOP, PI / 3.0),
-            (EdgeDirection::FLAT_TOP_LEFT, 2.0 * PI / 3.0),
-            (EdgeDirection::FLAT_BOTTOM_LEFT, PI),
-            (EdgeDirection::FLAT_BOTTOM, 4.0 * PI / 3.0),
-            (EdgeDirection::FLAT_BOTTOM_RIGHT, 5.0 * PI / 3.0),
+            (EdgeDirection(0), 0.0),
+            (EdgeDirection(1), PI / 3.0),
+            (EdgeDirection(2), 2.0 * PI / 3.0),
+            (EdgeDirection(3), PI),
+            (EdgeDirection(4), 4.0 * PI / 3.0),
+            (EdgeDirection(5), 5.0 * PI / 3.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_pointy() - angle <= EPSILON);
-            assert!(dir.angle(HexOrientation::Pointy) - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_pointy(), angle);
+            assert_relative_eq!(dir.angle(HexOrientation::Pointy), angle);
         }
     }
 
@@ -201,7 +203,7 @@ mod vertex_direction {
     #[test]
     fn flat_angles_rad() {
         for dir in VertexDirection::ALL_DIRECTIONS {
-            assert!(dir.angle_flat() - (f32::from(dir.index()) * PI / 3.0) <= EPSILON);
+            assert_relative_eq!(dir.angle_flat(), (f32::from(dir.index()) * PI / 3.0));
         }
         let expected = [
             (VertexDirection(0), 0.0),
@@ -212,8 +214,8 @@ mod vertex_direction {
             (VertexDirection(5), 5.0 * PI / 3.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_flat() - angle <= EPSILON);
-            assert!(dir.angle(HexOrientation::Flat) - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_flat(), angle);
+            assert_relative_eq!(dir.angle(HexOrientation::Flat), angle);
         }
     }
 
@@ -228,8 +230,8 @@ mod vertex_direction {
             (VertexDirection(0), 11.0 * PI / 6.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_pointy() - angle <= EPSILON);
-            assert!(dir.angle(HexOrientation::Pointy) - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_pointy(), angle);
+            assert_relative_eq!(dir.angle(HexOrientation::Pointy), angle);
         }
     }
 
@@ -244,8 +246,8 @@ mod vertex_direction {
             (VertexDirection(5), 300.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_flat_degrees() - angle <= EPSILON);
-            assert!(dir.angle(HexOrientation::Flat) - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_flat_degrees(), angle);
+            assert_relative_eq!(dir.angle_degrees(HexOrientation::Flat), angle);
         }
     }
 
@@ -260,8 +262,8 @@ mod vertex_direction {
             (VertexDirection(5), 270.0),
         ];
         for (dir, angle) in expected {
-            assert!(dir.angle_pointy_degrees() - angle <= EPSILON);
-            assert!(dir.angle(HexOrientation::Pointy) - angle <= EPSILON);
+            assert_relative_eq!(dir.angle_pointy_degrees(), angle);
+            assert_relative_eq!(dir.angle_degrees(HexOrientation::Pointy), angle);
         }
     }
 
@@ -337,18 +339,31 @@ fn edge_vs_vertex() {
     for i in 0..6 {
         let edge = EdgeDirection(i);
         let vertex = VertexDirection(i);
-        assert_eq!(
-            (edge.angle_flat() - vertex.counter_clockwise().angle_pointy()) as i32,
-            0
+        assert_relative_eq!(edge.angle_flat(), vertex.clockwise().angle_pointy());
+        assert_relative_eq!(edge.angle_pointy(), vertex.angle_flat());
+        assert_relative_eq!(
+            edge.angle_flat_degrees(),
+            vertex.clockwise().angle_pointy_degrees()
         );
-        assert_eq!((edge.angle_pointy() - vertex.angle_flat()) as i32, 0);
-        assert_eq!(
-            (edge.angle_flat_degrees() - vertex.counter_clockwise().angle_pointy_degrees()) as i32,
-            0
-        );
-        assert_eq!(
-            (edge.angle_pointy_degrees() - vertex.angle_flat_degrees()) as i32,
-            0
-        );
+        assert_relative_eq!(edge.angle_pointy_degrees(), vertex.angle_flat_degrees());
+    }
+}
+
+#[test]
+fn rad_deg() {
+    for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+        for i in 0..6 {
+            let edge = EdgeDirection(i);
+            let vertex = VertexDirection(i);
+            let rad = edge.angle(orientation);
+            let degs = edge.angle_degrees(orientation);
+            assert_relative_eq!(rad, degs.to_radians());
+            assert_relative_eq!(degs, rad.to_degrees());
+
+            let rad = vertex.angle(orientation);
+            let degs = vertex.angle_degrees(orientation);
+            assert_relative_eq!(rad, degs.to_radians());
+            assert_relative_eq!(degs, rad.to_degrees());
+        }
     }
 }

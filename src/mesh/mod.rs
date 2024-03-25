@@ -18,7 +18,7 @@ pub(crate) const BASE_FACING: Vec3 = Vec3::Y;
 
 /// Insetting options for [`PlaneMeshBuilder`] and [`ColumnMeshBuilder`]
 /// used to create an insetted face on either hexagonal planes or quads
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct InsetOptions {

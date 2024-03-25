@@ -46,7 +46,7 @@ impl Hex {
 
     #[must_use]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
-    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`]
+    /// The returned coordinates start from [`EdgeDirection::default`]
     /// and loop around `self` counter clockwise.
     ///
     /// > See [`Self::custom_ring`] for more options.
@@ -59,7 +59,7 @@ impl Hex {
     }
 
     /// Retrieves `range` [`Hex`] rings around `self` in a given `range`.
-    /// The returned coordinates start from [`EdgeDirection::FLAT_TOP_RIGHT`]
+    /// The returned coordinates start from [`EdgeDirection::default`]
     /// and loop around `self` counter clockwise.
     ///
     /// See [`Self::custom_rings`] for more options.
@@ -413,7 +413,7 @@ impl Hex {
     #[must_use]
     /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
     /// as an array of rings.
-    /// The returned rings start from [`EdgeDirection::FLAT_TOP_RIGHT`] and loop
+    /// The returned rings start from [`EdgeDirection::default`] and loop
     /// around `self` counter clockwise.
     ///
     /// See also [`Self::cached_custom_rings`]

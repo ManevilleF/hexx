@@ -115,50 +115,52 @@ impl Hex {
     /// order
     ///
     /// ```txt
-    ///            x Axis
-    ///            ___
+    ///       Z    ___   -Y
     ///           /   \
-    ///       +--+  1  +--+
-    ///      / 2  \___/  0 \
+    ///       +--+  4  +--+
+    ///      / 3  \___/  5 \
     ///      \    /   \    /
-    ///       +--+     +--+
+    ///  -X   +--+     +--+    X
     ///      /    \___/    \
-    ///      \ 3  /   \  5 /
-    ///       +--+  4  +--+   y Axis
+    ///      \ 2  /   \  0 /
+    ///       +--+  1  +--+
     ///           \___/
+    ///       Y           -Z
     /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
-        Self::new(1, -1),
-        Self::NEG_Y,
-        Self::NEG_X,
-        Self::new(-1, 1),
-        Self::Y,
         Self::X,
+        Self::Y,
+        Self::new(-1, 1),
+        Self::NEG_X,
+        Self::NEG_Y,
+        Self::new(1, -1),
     ];
 
     /// Hexagon diagonal neighbor coordinates array, following
     /// [`VertexDirection`] order
     ///
     /// ```txt
-    ///            x Axis
+    ///       Z           -Y
     ///           \___/
-    ///      \ 2  /   \ 1  /
+    ///      \ 4  /   \ 5  /
     ///       +--+     +--+
     ///    __/    \___/    \__
     ///      \    /   \    /
-    ///    3  +--+     +--+  0
+    /// -X 3  +--+     +--+  0   X
     ///    __/    \___/    \__
     ///      \    /   \    /
-    ///       +--+     +--+   y Axis
-    ///      / 4  \___/  5 \
+    ///       +--+     +--+
+    ///      / 2  \___/  1 \
+    ///
+    ///       Y           -Z
     /// ```
     pub const DIAGONAL_COORDS: [Self; 6] = [
         Self::new(2, -1),
-        Self::new(1, -2),
-        Self::NEG_ONE,
-        Self::new(-2, 1),
-        Self::new(-1, 2),
         Self::ONE,
+        Self::new(-1, 2),
+        Self::new(-2, 1),
+        Self::NEG_ONE,
+        Self::new(1, -2),
     ];
 
     #[inline(always)]

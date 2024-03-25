@@ -43,8 +43,8 @@ impl GridVertex {
     pub const fn coordinates(&self) -> [Hex; 3] {
         [
             self.origin,
-            self.origin.add_dir(self.direction.direction_ccw()),
-            self.origin.add_dir(self.direction.direction_cw()),
+            self.origin.add_dir(self.direction.edge_ccw()),
+            self.origin.add_dir(self.direction.edge_cw()),
         ]
     }
     #[inline]
@@ -52,8 +52,8 @@ impl GridVertex {
     /// Returns the two destination coordinates in clockwise order
     pub const fn destinations(&self) -> [Hex; 2] {
         [
-            self.origin.add_dir(self.direction.direction_ccw()),
-            self.origin.add_dir(self.direction.direction_cw()),
+            self.origin.add_dir(self.direction.edge_ccw()),
+            self.origin.add_dir(self.direction.edge_cw()),
         ]
     }
 
@@ -65,11 +65,11 @@ impl GridVertex {
         [
             GridEdge {
                 origin: self.origin,
-                direction: self.direction.direction_ccw(),
+                direction: self.direction.edge_ccw(),
             },
             GridEdge {
                 origin: self.origin,
-                direction: self.direction.direction_cw(),
+                direction: self.direction.edge_cw(),
             },
         ]
     }

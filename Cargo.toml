@@ -72,10 +72,15 @@ features = ["html_reports"]
 rand = "0.8"
 bevy-inspector-egui = "0.23"
 bevy_egui = "0.25"
+approx = "0.5"
 
 [[example]]
 name = "hex_grid"
 path = "examples/hex_grid.rs"
+
+[[example]]
+name = "hex_area"
+path = "examples/hex_area.rs"
 
 [[example]]
 name = "scroll_map"
