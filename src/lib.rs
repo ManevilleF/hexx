@@ -11,7 +11,7 @@
 //!
 //! I made the choice to use *Axial Coordinates* for performance and utility
 //! reasons, but the [`Hex`] type has conversion utilities with *cubic*,
-//! *doubled* and *offset* coordinates.
+//! *doubled*, *hexmod* and *offset* coordinates.
 //!
 //! > See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates)
 //!
@@ -20,7 +20,7 @@
 //! Run `cargo add hexx` in your project or add the following line to your
 //! `Cargo.toml`:
 //!
-//! * `hexx = "0.15"`
+//! * `hexx = "0.16"`
 //!
 //! ### Cargo features
 //!
@@ -28,26 +28,26 @@
 //! through the `serde` feature gate. To enable it add the following line to
 //! your `Cargo.toml`:
 //!
-//! * `hexx = { version = "0.15", features = ["serde"] }`
+//! * `hexx = { version = "0.16", features = ["serde"] }`
 //!
 //! By default `Hex` uses rust classic memory layout, if you want to use `hexx`
 //! through the FFI or have `Hex` be stored without any memory padding, the
 //! `packed` feature will make `Hex` `repr(C)`. To enable this behaviour add the
 //! following line to your `Cargo.toml`:
 //!
-//! * `hexx = { version = "0.15", features = ["packed"] }`
+//! * `hexx = { version = "0.16", features = ["packed"] }`
 //!
 //! `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
 //! through the `bevy_reflect` feature. To enable it add the following line to
 //! your `Cargo.toml`:
 //!
-//! * `hexx = { version = "0.15", features = ["bevy_reflect"] }`
+//! * `hexx = { version = "0.16", features = ["bevy_reflect"] }`
 //!
 //! `hexx` supports Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
 //! using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge. To
 //! enable it add the following line to your `Cargo.toml`:
 //!
-//! * `hexx = { version = "0.15", features = ["grid"] }`
+//! * `hexx = { version = "0.16", features = ["grid"] }`
 //!
 //! ## Features
 //!

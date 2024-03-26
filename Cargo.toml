@@ -1,6 +1,6 @@
 [package]
 name = "hexx"
-version = "0.15.0"
+version = "0.16.0"
 edition = "2021"
 authors = ["Felix de Maneville <felix.maneville@gmail.com>"]
 description = "Hexagonal utilities"
@@ -23,8 +23,6 @@ grid = []
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
-# Old serde compat feature
-ser_de = ["serde"]
 # Adds Bevy Reflection support
 bevy_reflect = ["dep:bevy_reflect"]
 
@@ -71,7 +69,7 @@ features = ["html_reports"]
 [dev-dependencies]
 rand = "0.8"
 bevy-inspector-egui = "0.23"
-bevy_egui = "0.25"
+bevy_egui = "0.26"
 approx = "0.5"
 
 [[example]]
