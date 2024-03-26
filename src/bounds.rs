@@ -29,7 +29,7 @@ use crate::Hex;
 /// ```
 ///
 /// [wraparound]: https://www.redblobgames.com/grids/hexagons/#wraparound
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct HexBounds {
