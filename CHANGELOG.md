@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Derived `PartialEq` and `Eq` for `HexBounds` (#160)
+* Derived `PartialEq` and `Eq` on `DoubledHexMode` and `OffsetHexMode` (#160)
+
 ## 0.16.0
 
 * Removed methods deprecated in previous versions
