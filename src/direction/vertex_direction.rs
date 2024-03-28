@@ -83,16 +83,16 @@ impl VertexDirection {
     pub const FLAT_RIGHT: Self = Self(0);
     /// Direction to (2, -1) or (2, -1, -1)
     ///
-    /// Represents "West" in flat orientation
-    pub const FLAT_WEST: Self = Self(0);
+    /// Represents "East" in flat orientation
+    pub const FLAT_EAST: Self = Self(0);
     /// Direction to (2, -1) or (2, -1, -1)
     ///
-    /// Represents "Bottom right" in pointy orientation
-    pub const POINTY_BOTTOM_RIGHT: Self = Self(0);
+    /// Represents "Top right" in pointy orientation
+    pub const POINTY_TOP_RIGHT: Self = Self(0);
     /// Direction to (2, -1) or (2, -1, -1)
     ///
-    /// Represents "South West" in pointy orientation
-    pub const POINTY_SOUTH_WEST: Self = Self(0);
+    /// Represents "North East" in pointy orientation
+    pub const POINTY_NORTH_EAST: Self = Self(0);
 
     /// Direction towards `X, -Y, Z`
     pub const X_NEG_Y_Z: Self = Self(5);
@@ -104,16 +104,16 @@ impl VertexDirection {
     pub const FLAT_TOP_RIGHT: Self = Self(5);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
-    /// Represents "North West" in flat orientation
-    pub const FLAT_NORTH_WEST: Self = Self(5);
+    /// Represents "North East" in flat orientation
+    pub const FLAT_NORTH_EAST: Self = Self(5);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
-    /// Represents "Top Right" in pointy orientation
-    pub const POINTY_TOP_RIGHT: Self = Self(5);
+    /// Represents "Top" in pointy orientation
+    pub const POINTY_TOP: Self = Self(5);
     /// Direction to (1, -2) or (1, -2, 1)
     ///
-    /// Represents "North West" in pointy orientation
-    pub const POINTY_NORTH_WEST: Self = Self(5);
+    /// Represents "North" in pointy orientation
+    pub const POINTY_NORTH: Self = Self(5);
 
     /// Direction towards `-X, -Y, Z`
     pub const NEG_X_NEG_Y: Self = Self(4);
@@ -125,16 +125,16 @@ impl VertexDirection {
     pub const FLAT_TOP_LEFT: Self = Self(4);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
-    /// Represents "North east" in flat orientation
-    pub const FLAT_NORTH_EAST: Self = Self(4);
+    /// Represents "North West" in flat orientation
+    pub const FLAT_NORTH_WEST: Self = Self(4);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
-    /// Represents "Top" in pointy orientation
-    pub const POINTY_TOP: Self = Self(4);
+    /// Represents "Top Left" in pointy orientation
+    pub const POINTY_TOP_LEFT: Self = Self(4);
     /// Direction to (-1, -1) or (-1, -1, 2)
     ///
-    /// Represents "North" in pointy orientation
-    pub const POINTY_NORTH: Self = Self(4);
+    /// Represents "North West" in pointy orientation
+    pub const POINTY_NORTH_WEST: Self = Self(4);
 
     /// Direction towards `-X, Y, Z`
     pub const NEG_X_Y_Z: Self = Self(3);
@@ -146,16 +146,16 @@ impl VertexDirection {
     pub const FLAT_LEFT: Self = Self(3);
     /// Direction to (-2, 1) or (-2, 1, 1)
     ///
-    /// Represents "East" in flat orientation
-    pub const FLAT_EAST: Self = Self(3);
+    /// Represents "West" in flat orientation
+    pub const FLAT_WEST: Self = Self(3);
     /// Direction to (-2, 1) or (-2, 1, 1)
     ///
-    /// Represents "Top Left" in pointy orientation
-    pub const POINTY_TOP_LEFT: Self = Self(3);
+    /// Represents "Bottom Left" in pointy orientation
+    pub const POINTY_BOTTOM_LEFT: Self = Self(3);
     /// Direction to (-2, 1) or (-2, 1, 1)
     ///
-    /// Represents "North East" in pointy orientation
-    pub const POINTY_NORTH_EAST: Self = Self(3);
+    /// Represents "South West" in pointy orientation
+    pub const POINTY_SOUTH_WEST: Self = Self(3);
 
     /// Direction towards `-X, Y, -Z`
     pub const NEG_X_Y_NEG_Z: Self = Self(2);
@@ -167,16 +167,16 @@ impl VertexDirection {
     pub const FLAT_BOTTOM_LEFT: Self = Self(2);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
-    /// Represents "South East" in flat orientation
-    pub const FLAT_SOUTH_EAST: Self = Self(2);
+    /// Represents "South West" in flat orientation
+    pub const FLAT_SOUTH_WEST: Self = Self(2);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
-    /// Represents "Bottom Left" in pointy orientation
-    pub const POINTY_BOTTOM_LEFT: Self = Self(2);
+    /// Represents "Bottom " in pointy orientation
+    pub const POINTY_BOTTOM: Self = Self(2);
     /// Direction to (-1, 2) or (-1, 2, -1)
     ///
-    /// Represents "South Easth" in pointy orientation
-    pub const POINTY_SOUTH_EAST: Self = Self(2);
+    /// Represents "South" in pointy orientation
+    pub const POINTY_SOUTH: Self = Self(2);
 
     /// Direction towards `X, Y, -Z`
     pub const X_Y: Self = Self(1);
@@ -188,16 +188,16 @@ impl VertexDirection {
     pub const FLAT_BOTTOM_RIGHT: Self = Self(1);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
-    /// Represents "South West" in flat orientation
-    pub const FLAT_SOUTH_WEST: Self = Self(1);
+    /// Represents "South East" in flat orientation
+    pub const FLAT_SOUTH_EAST: Self = Self(1);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
-    /// Represents "Bottom" in pointy orientation
-    pub const POINTY_BOTTOM: Self = Self(1);
+    /// Represents "Bottom Right" in pointy orientation
+    pub const POINTY_BOTTOM_RIGHT: Self = Self(1);
     /// Direction to (1, 1) or (1, 1, -2)
     ///
-    /// Represents "South" in pointy orientation
-    pub const POINTY_SOUTH: Self = Self(1);
+    /// Represents "South East" in pointy orientation
+    pub const POINTY_SOUTH_EAST: Self = Self(1);
 
     /// All 6 diagonal directions matching
     /// [`Hex::DIAGONAL_COORDS`](crate::Hex::DIAGONAL_COORDS)
