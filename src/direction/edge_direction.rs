@@ -82,16 +82,16 @@ impl EdgeDirection {
     pub const FLAT_TOP_RIGHT: Self = Self(5);
     /// Direction to (1, -1)
     ///
-    /// Represents "North west" edge in flat orientation
-    pub const FLAT_NORTH_WEST: Self = Self(5);
+    /// Represents "North East" edge in flat orientation
+    pub const FLAT_NORTH_EAST: Self = Self(5);
     /// Direction to (1, -1)
     ///
-    /// Represents "Right" edge in pointy orientation
-    pub const POINTY_RIGHT: Self = Self(5);
+    /// Represents "Top Right" edge in pointy orientation
+    pub const POINTY_TOP_RIGHT: Self = Self(5);
     /// Direction to (1, -1)
     ///
-    /// Represents "North west" edge in pointy orientation
-    pub const POINTY_WEST: Self = Self(5);
+    /// Represents "North East" edge in pointy orientation
+    pub const POINTY_NORTH_EAST: Self = Self(5);
 
     /// Direction towards `-Y`
     pub const NEG_Y: Self = Self(4);
@@ -105,8 +105,8 @@ impl EdgeDirection {
     pub const FLAT_NORTH: Self = Self(4);
     /// Direction to (0, -1)
     ///
-    /// Represents "Top Right" edge in pointy orientation
-    pub const POINTY_TOP_RIGHT: Self = Self(4);
+    /// Represents "Top Left" edge in pointy orientation
+    pub const POINTY_TOP_LEFT: Self = Self(4);
     /// Direction to (0, -1)
     ///
     /// Represents "North West" edge in pointy orientation
@@ -120,16 +120,16 @@ impl EdgeDirection {
     pub const FLAT_TOP_LEFT: Self = Self(3);
     /// Direction to (-1, 0)
     ///
-    /// Represents "North East" in flat orientation
-    pub const FLAT_NORTH_EAST: Self = Self(3);
+    /// Represents "North West" in flat orientation
+    pub const FLAT_NORTH_WEST: Self = Self(3);
     /// Direction to (-1, 0)
     ///
-    /// Represents "Top Left" in pointy orientation
-    pub const POINTY_TOP_LEFT: Self = Self(3);
+    /// Represents "Left" in pointy orientation
+    pub const POINTY_LEFT: Self = Self(3);
     /// Direction to (-1, 0)
     ///
-    /// Represents "North East" in pointy orientation
-    pub const POINTY_NORTH_EAST: Self = Self(3);
+    /// Represents "West" in pointy orientation
+    pub const POINTY_WEST: Self = Self(3);
 
     /// Direction towards `-X, Y`
     pub const NEG_X_Y: Self = Self(2);
@@ -139,16 +139,16 @@ impl EdgeDirection {
     pub const FLAT_BOTTOM_LEFT: Self = Self(2);
     /// Direction to (-1, 1)
     ///
-    /// Represents "South East" in flat orientation
-    pub const FLAT_SOUTH_EAST: Self = Self(2);
+    /// Represents "South West" in flat orientation
+    pub const FLAT_SOUTH_WEST: Self = Self(2);
     /// Direction to (-1, 1)
     ///
-    /// Represents "Left" in pointy orientation
-    pub const POINTY_LEFT: Self = Self(2);
+    /// Represents "Bottom Left" in pointy orientation
+    pub const POINTY_BOTTOM_LEFT: Self = Self(2);
     /// Direction to (-1, 1)
     ///
-    /// Represents "East" in pointy orientation
-    pub const POINTY_EAST: Self = Self(2);
+    /// Represents "South West" in pointy orientation
+    pub const POINTY_SOUTH_WEST: Self = Self(2);
 
     /// Direction towards `Y`
     pub const Y: Self = Self(1);
@@ -162,11 +162,11 @@ impl EdgeDirection {
     pub const FLAT_SOUTH: Self = Self(1);
     /// Direction to (0, 1)
     ///
-    /// Represents "Bottom left" in pointy orientation
-    pub const POINTY_BOTTOM_LEFT: Self = Self(1);
+    /// Represents "Bottom Right" in pointy orientation
+    pub const POINTY_BOTTOM_RIGHT: Self = Self(1);
     /// Direction to (0, 1)
     ///
-    /// Represents "South east" in pointy orientation
+    /// Represents "South East" in pointy orientation
     pub const POINTY_SOUTH_EAST: Self = Self(1);
 
     /// Direction towards `X`
@@ -177,16 +177,16 @@ impl EdgeDirection {
     pub const FLAT_BOTTOM_RIGHT: Self = Self(0);
     /// Direction to (1, 0)
     ///
-    /// Represents "South West" in flat orientation
-    pub const FLAT_SOUTH_WEST: Self = Self(0);
+    /// Represents "South East" in flat orientation
+    pub const FLAT_SOUTH_EAST: Self = Self(0);
     /// Direction to (1, 0)
     ///
-    /// Represents "Bottom Right" in pointy orientation
-    pub const POINTY_BOTTOM_RIGHT: Self = Self(0);
+    /// Represents "Right" in pointy orientation
+    pub const POINTY_RIGHT: Self = Self(0);
     /// Direction to (1, 0)
     ///
-    /// Represents "South West" in pointy orientation
-    pub const POINTY_SOUTH_WEST: Self = Self(0);
+    /// Represents "East" in pointy orientation
+    pub const POINTY_EAST: Self = Self(0);
 
     /// All 6 hexagonal directions matching
     /// [`Hex::NEIGHBORS_COORDS`](crate::Hex::NEIGHBORS_COORDS)
