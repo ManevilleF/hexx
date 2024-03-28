@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.16.1
+
 * Derived `PartialEq` and `Eq` for `HexBounds` (#160)
 * Derived `PartialEq` and `Eq` on `DoubledHexMode` and `OffsetHexMode` (#160)
 * Fixed Wrong associated const values for `EdgeDirection` (#162)
