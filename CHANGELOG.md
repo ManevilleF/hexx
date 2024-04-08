@@ -3,7 +3,6 @@
 ## [Unreleased]
 
 * Added *ordering* wrappers for `Hex` (#147):
-  * `OrdByLength`
   * `OrdByXY`
   * `OrdByYX`
 
