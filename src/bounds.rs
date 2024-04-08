@@ -66,6 +66,19 @@ impl HexBounds {
         Self { center, radius }
     }
 
+    /// Computes the bounds for `radius` with all coordinates
+    /// being positive.
+    ///
+    /// This can be used for efficient map storage in a 2D vector
+    /// disallowing negative coordinates
+    #[inline]
+    #[must_use]
+    #[allow(clippy::cast_possible_wrap)]
+    pub const fn positive_radius(radius: u32) -> Self {
+        let center = Hex::splat(radius as i32);
+        Self { center, radius }
+    }
+
     #[inline]
     #[must_use]
     /// Checks if `rhs` is in bounds
@@ -182,5 +195,16 @@ mod tests {
 
         assert_eq!(map.wrap(Hex::new(2, 3)), Hex::new(0, 0)); // mirror
         assert_eq!(map.wrap(Hex::new(4, 6)), Hex::new(0, 0));
+    }
+
+    #[test]
+    fn positive_radius() {
+        for radius in 0..100_u32 {
+            let bounds = HexBounds::positive_radius(radius);
+            let coords = bounds.all_coords();
+            let fails: Vec<_> = coords.filter(|c| c.x < 0 || c.y < 0).collect();
+            println!("{fails:#?}");
+            assert!(fails.is_empty());
+        }
     }
 }
