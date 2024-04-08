@@ -239,6 +239,48 @@
 
 > See the [examples](examples) for bevy usage
 
+## Q&A
+
+> Why not derive `PartialOrd, Ord` on `Hex` ?
+
+Adding these traits to `Hex` would mean to define an absolute rule on how to solve
+this:
+
+```rust
+let a = hex(-10, 20);
+let b = hex(1, 2);
+a > b
+```
+
+Depending on how you consider this there are at least 3 possible rules:
+
+* `a.y` is greater than `b.y` so it's `true`
+* `a.x` is lower than `b.x` so it's `false`
+* `a`'s length is greater than `b`'s so it's `true`
+
+> What if I want to use it in a `BtreeMap`, `BTreeSet` or `BinaryHeap` ?
+
+Use a wrapper with the `Ord` and `PartialOrd` trait. You can copy and paste this
+code snippet into your project:
+
+```rust
+/// [`Ordering`] wrapper around [`Hex`], comparing [`Hex::y`] then [`Hex::x`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct OrdByYX(pub Hex);
+
+impl Ord for OrdByYX {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.y.cmp(&other.0.y).then(self.0.x.cmp(&other.0.x))
+    }
+}
+
+impl PartialOrd for OrdByYX {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+```
+
 ## Examples
 
 `hexx` provides interactive examples showcasing various features:
