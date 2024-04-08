@@ -274,7 +274,7 @@ impl Ord for OrdByYX {
     }
 }
 
-impl PartialOrd for $ty {
+impl PartialOrd for OrdByYX {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
