@@ -1,5 +1,6 @@
 use crate::{Hex, HexBounds};
 use std::{
+    fmt,
     ops::{Index, IndexMut},
     slice::{Iter, IterMut},
 };
@@ -27,7 +28,7 @@ impl<T> HexagonalMap<T> {
     #[inline]
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
-    pub fn new(center: Hex, radius: u32, values: impl Fn(Hex) -> T) -> Self {
+    pub fn new(center: Hex, radius: u32, mut values: impl FnMut(Hex) -> T) -> Self {
         let bounds = HexBounds::new(center, radius);
         let range = radius as i32;
         let inner = (-range..=range)
@@ -150,6 +151,30 @@ impl<'a, T> IntoIterator for &'a mut HexagonalMap<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter_mut()
+    }
+}
+
+impl<T> fmt::Debug for HexagonalMap<T>
+where
+    T: fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("HexagonalMap")
+            .field("bounds", &self.bounds)
+            .field("inner", &self.inner)
+            .finish()
+    }
+}
+
+impl<T> Clone for HexagonalMap<T>
+where
+    T: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            inner: self.inner.clone(),
+            bounds: self.bounds,
+        }
     }
 }
 

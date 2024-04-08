@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Added `HexagonalMap` storage structure for dense, hexagon shaped maps (#163)
+* Update `field_of_movement` to use `HexagonalMap` (#163)
+
 ## 0.16.1
 
 * Derived `PartialEq` and `Eq` for `HexBounds` (#160)
