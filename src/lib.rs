@@ -268,4 +268,3 @@ pub use mesh::*;
 pub use orientation::HexOrientation;
 #[doc(inline)]
 pub use storage::HexagonalMap;
-

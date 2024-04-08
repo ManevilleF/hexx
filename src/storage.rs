@@ -9,8 +9,8 @@ use std::{
 ///
 /// > See [this article](https://www.redblobgames.com/grids/hexagons/#map-storage)
 ///
-/// [`HexagonalMap`] is made for _hexagonal_ large _dense_ maps, utilizing some tricks
-/// to map [`Hex`] coordinate to a positive 2D array.
+/// [`HexagonalMap`] is made for _hexagonal_ large _dense_ maps, utilizing some
+/// tricks to map [`Hex`] coordinate to a positive 2D array.
 ///
 /// It can be used only if:
 /// - The map is an hexagon shape
