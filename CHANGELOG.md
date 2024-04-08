@@ -2,10 +2,6 @@
 
 ## [Unreleased]
 
-* Added *ordering* wrappers for `Hex` (#147):
-  * `OrdByXY`
-  * `OrdByYX`
-
 ## 0.16.1
 
 * Derived `PartialEq` and `Eq` for `HexBounds` (#160)
