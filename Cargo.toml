@@ -138,5 +138,9 @@ harness = false
 name = "rings"
 harness = false
 
+[[bench]]
+name = "maps"
+harness = false
+
 [profile.dev]
 opt-level = 1
