@@ -18,6 +18,8 @@ use std::{
 /// - No coordinate will be added or removed from the map
 ///
 /// If your use case doesn't match all of the above, use a [`HashMap`] instead
+///
+/// [`HashMap`]: std::collections::HashMap
 pub struct HexagonalMap<T> {
     inner: Vec<Vec<T>>,
     bounds: HexBounds,
