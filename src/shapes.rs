@@ -33,6 +33,18 @@ pub fn hexagon(center: Hex, radius: u32) -> impl ExactSizeIterator<Item = Hex> {
     center.range(radius)
 }
 
+/// Generates a Rombus from `point` of `rows` in y and `columns` in `x`
+#[must_use]
+#[allow(clippy::cast_possible_wrap)]
+pub fn rombus(point: Hex, rows: u32, columns: u32) -> impl ExactSizeIterator<Item = Hex> {
+    ExactSizeHexIterator {
+        iter: (0..rows).flat_map(move |y| {
+            (0..columns).map(move |x| point.const_add(Hex::new(x as i32, y as i32)))
+        }),
+        count: (rows * columns) as usize,
+    }
+}
+
 /// Generates a rectangle with the given bounds for "pointy topped" hexagons.
 ///
 /// The function takes four offsets as `[left, right, top, bottom]`.
@@ -98,6 +110,18 @@ mod tests {
             for max in 0..=30 {
                 let iter = parallelogram(Hex::splat(min), Hex::splat(min + max));
                 assert_eq!(iter.len(), iter.count());
+            }
+        }
+    }
+
+    #[test]
+    fn rombus_test() {
+        for columns in 0..=30 {
+            for rows in 0..=30 {
+                for p in Hex::ZERO.range(10) {
+                    let iter = rombus(p, rows, columns);
+                    assert_eq!(iter.len(), iter.count());
+                }
             }
         }
     }

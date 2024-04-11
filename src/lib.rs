@@ -244,6 +244,8 @@ pub mod mesh;
 pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
+/// Map Storage utility
+pub mod storage;
 
 #[doc(inline)]
 pub use bounds::HexBounds;
@@ -264,3 +266,5 @@ pub use layout::HexLayout;
 pub use mesh::*;
 #[doc(inline)]
 pub use orientation::HexOrientation;
+#[doc(inline)]
+pub use storage::HexagonalMap;
