@@ -139,7 +139,7 @@ name = "rings"
 harness = false
 
 [[bench]]
-name = "maps"
+name = "storage"
 harness = false
 
 [profile.dev]
