@@ -4,7 +4,7 @@ use bevy::{
     utils::HashSet,
     window::PrimaryWindow,
 };
-use hexx::{algorithms::field_of_movement, *};
+use hexx::{algorithms::field_of_movement, storage::HexagonalMap, *};
 use rand::prelude::*;
 
 /// World size of the hexagons (outer radius)

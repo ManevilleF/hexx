@@ -1,7 +1,6 @@
 use crate::{Hex, HexBounds};
 use std::{
     fmt,
-    ops::{Index, IndexMut},
     slice::{Iter, IterMut},
 };
 
@@ -26,8 +25,22 @@ pub struct HexagonalMap<T> {
 }
 
 impl<T> HexagonalMap<T> {
+    /// Creates and fills a hexagon shaped map
     ///
-    #[inline]
+    /// # Arguments
+    ///
+    /// * `center` - The center coordinate of the hexagon
+    /// * `radius` - The radius of the map, around `center`
+    /// * `values` - Function called for each coordinate in the `radius` to fill the map
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::{*, storage::HexagonalMap};
+    ///
+    /// let map = HexagonalMap::new(Hex::ZERO, 10, |coord| coord.length());
+    /// assert_eq!(map[hex(1, 0)], 1);
+    /// ```
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
     pub fn new(center: Hex, radius: u32, mut values: impl FnMut(Hex) -> T) -> Self {
@@ -62,12 +75,8 @@ impl<T> HexagonalMap<T> {
 
     fn hex_to_idx(&self, idx: Hex) -> Option<[usize; 2]> {
         let key = idx + self.offset();
-        let Ok(x) = u32::try_from(key.x) else {
-            return None;
-        };
-        let Ok(y) = u32::try_from(key.y) else {
-            return None;
-        };
+        let x = u32::try_from(key.x).ok()?;
+        let y = u32::try_from(key.y).ok()?;
         Some([
             y as usize,
             x.saturating_sub(self.bounds.radius.saturating_sub(y)) as usize,
@@ -98,34 +107,6 @@ impl<T> HexagonalMap<T> {
     /// Returns an iterator over the storage, in `y` order
     pub fn iter_mut(&mut self) -> IterMut<Vec<T>> {
         self.inner.iter_mut()
-    }
-}
-
-impl<T> Index<Hex> for HexagonalMap<T> {
-    type Output = T;
-
-    fn index(&self, index: Hex) -> &Self::Output {
-        self.get(index).unwrap()
-    }
-}
-
-impl<T> Index<&Hex> for HexagonalMap<T> {
-    type Output = T;
-
-    fn index(&self, index: &Hex) -> &Self::Output {
-        self.get(*index).unwrap()
-    }
-}
-
-impl<T> IndexMut<Hex> for HexagonalMap<T> {
-    fn index_mut(&mut self, index: Hex) -> &mut Self::Output {
-        self.get_mut(index).unwrap()
-    }
-}
-
-impl<T> IndexMut<&Hex> for HexagonalMap<T> {
-    fn index_mut(&mut self, index: &Hex) -> &mut Self::Output {
-        self.get_mut(*index).unwrap()
     }
 }
 
