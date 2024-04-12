@@ -4,13 +4,13 @@ use hexx::{
     storage::{HexagonalMap, RombusMap},
     *,
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 pub fn hexagonal_map_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hexagonal Storage");
     group
         .significance_level(0.1)
-        .target_time(6.0)
+        .measurement_time(Duration::from_secs(6))
         .sample_size(100);
 
     let get_value = |h: Hex| h.length();

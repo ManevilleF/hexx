@@ -244,7 +244,6 @@ pub mod mesh;
 pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
-/// Map Storage utility
 pub mod storage;
 
 #[doc(inline)]

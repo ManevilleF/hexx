@@ -31,7 +31,8 @@ impl<T> HexagonalMap<T> {
     ///
     /// * `center` - The center coordinate of the hexagon
     /// * `radius` - The radius of the map, around `center`
-    /// * `values` - Function called for each coordinate in the `radius` to fill the map
+    /// * `values` - Function called for each coordinate in the `radius` to fill
+    ///   the map
     ///
     /// # Example
     ///

@@ -1,3 +1,11 @@
+//! Optimized storage module inspired by [this article]
+//!
+//! According to our benchmarks:
+//!
+//! * [`HexagonalMap`] is ~15x faster than a hash map
+//! * [`RombusMap`] is ~100x faster than a hash map
+//!
+//! [this article]: https://www.redblobgames.com/grids/hexagons/#map-storage
 mod hexagonal;
 mod rombus;
 
