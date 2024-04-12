@@ -117,7 +117,7 @@ impl Hex {
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
         let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, clockwise);
-        self.__ring_edge(radius, start_dir, end_dir)
+        self.__ring_edge(radius, radius, start_dir, end_dir)
     }
 
     #[inline]
@@ -131,17 +131,20 @@ impl Hex {
         }
     }
 
+    /// Computes an `origin` as `self + start_dir * dist`
+    /// and computes a line between `origin` and `origin + len * end_dir`
     #[allow(clippy::cast_possible_wrap)]
     fn __ring_edge(
         self,
-        radius: u32,
+        dist: u32,
+        len: u32,
         start_dir: EdgeDirection,
         end_dir: EdgeDirection,
     ) -> impl ExactSizeIterator<Item = Self> {
-        let p = self + start_dir * radius as i32;
+        let p = self + start_dir * dist as i32;
         ExactSizeHexIterator {
-            iter: (0..=radius).map(move |i| p + end_dir * i as i32),
-            count: radius as usize + 1,
+            iter: (0..=len).map(move |i| p + end_dir * i as i32),
+            count: dist as usize + 1,
         }
     }
 
@@ -185,7 +188,7 @@ impl Hex {
         direction: VertexDirection,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
         let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, false);
-        ranges.map(move |r| self.__ring_edge(r, start_dir, end_dir))
+        ranges.map(move |r| self.__ring_edge(r, r, start_dir, end_dir))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given
@@ -212,7 +215,7 @@ impl Hex {
         clockwise: bool,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
         let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, clockwise);
-        ranges.map(move |r| self.__ring_edge(r, start_dir, end_dir))
+        ranges.map(move |r| self.__ring_edge(r, r, start_dir, end_dir))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given
@@ -329,10 +332,11 @@ impl Hex {
         range: impl Iterator<Item = u32> + Clone,
         direction: EdgeDirection,
     ) -> impl Iterator<Item = Self> {
-        let left = self.wedge(range.clone(), direction.diagonal_ccw());
-        let right = self.wedge(range, direction.diagonal_cw());
-        left.chain(right)
-            .filter(move |h| self.way_to(*h) == direction)
+        let [left, right] = [direction << 2, direction >> 2];
+        range.flat_map(move |r| {
+            self.__ring_edge(r, r / 2, direction, left)
+                .chain(self.__ring_edge(r, r / 2, direction, right))
+        })
     }
 
     /// Retrieves all successive [`Hex`] half ring edges from `self` to `rhs`
