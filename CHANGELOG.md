@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 * Added `HexagonalMap` storage structure for dense, hexagon shaped maps (#163)
+* Added `RombusMap` storage structure for dense, rombus shaped maps (#164)
 * Update `field_of_movement` to use `HexagonalMap` (#163)
 * Added `shapes::rombus` (#163)
 
