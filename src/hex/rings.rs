@@ -102,7 +102,6 @@ impl Hex {
     }
 
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring edge around `self` in a given `radius` and
     /// `direction`. The returned coordinates are sorted counter clockwise
     /// unless `clockwise` is set to `true`.
@@ -117,13 +116,28 @@ impl Hex {
         direction: VertexDirection,
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
-        let [start_dir, end_dir] = if clockwise {
+        let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, clockwise);
+        self.__ring_edge(radius, start_dir, end_dir)
+    }
+
+    #[inline]
+    fn __vertex_dir_to_edge_dir(direction: VertexDirection, clockwise: bool) -> [EdgeDirection; 2] {
+        if clockwise {
             let dir = direction.direction_ccw();
             [dir, dir >> 2]
         } else {
             let dir = direction.direction_cw();
             [dir, dir << 2]
-        };
+        }
+    }
+
+    #[allow(clippy::cast_possible_wrap)]
+    fn __ring_edge(
+        self,
+        radius: u32,
+        start_dir: EdgeDirection,
+        end_dir: EdgeDirection,
+    ) -> impl ExactSizeIterator<Item = Self> {
         let p = self + start_dir * radius as i32;
         ExactSizeHexIterator {
             iter: (0..=radius).map(move |i| p + end_dir * i as i32),
@@ -170,7 +184,8 @@ impl Hex {
         ranges: impl Iterator<Item = u32>,
         direction: VertexDirection,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
-        ranges.map(move |r| self.ring_edge(r, direction))
+        let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, false);
+        ranges.map(move |r| self.__ring_edge(r, start_dir, end_dir))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given
@@ -196,7 +211,8 @@ impl Hex {
         direction: VertexDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
-        ranges.map(move |r| self.custom_ring_edge(r, direction, clockwise))
+        let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, clockwise);
+        ranges.map(move |r| self.__ring_edge(r, start_dir, end_dir))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given
