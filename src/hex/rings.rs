@@ -18,30 +18,30 @@ impl Hex {
         start_dir: EdgeDirection,
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
-        let mut directions = Self::NEIGHBORS_COORDS;
-        // TODO: improve code clarity
-        directions.rotate_left(start_dir.index() as usize);
-        if clockwise {
-            directions.reverse();
-            directions.rotate_left(1);
-        } else {
-            directions.rotate_left(2);
-        }
-
+        let mut directions = vec![Self::ZERO];
+        if range > 0 {
+            let mut neighbors = Self::NEIGHBORS_COORDS;
+            // TODO: improve code clarity
+            neighbors.rotate_left(start_dir.index() as usize);
+            if clockwise {
+                neighbors.reverse();
+                neighbors.rotate_left(1);
+            } else {
+                neighbors.rotate_left(2);
+            }
+            directions.extend(
+                neighbors
+                    .into_iter()
+                    .flat_map(|dir| (0..range).map(move |_| dir)),
+            );
+        };
+        let count = Self::ring_count(range);
         let point = self + start_dir * range as i32;
-        let iter = directions
-            .into_iter()
-            .flat_map(move |dir| std::iter::repeat(dir).take(range as usize))
-            .scan(point, move |pos, dir| {
-                let next = *pos + dir;
-                *pos = next;
-                Some(next)
-            })
-            .take((range as usize * 6).saturating_sub(1));
-        ExactSizeHexIterator {
-            iter: std::iter::once(point).chain(iter),
-            count: Self::ring_count(range),
-        }
+        let iter = (0..count).scan(point, move |point, i| {
+            *point += directions[i];
+            Some(*point)
+        });
+        ExactSizeHexIterator { iter, count }
     }
 
     #[must_use]
