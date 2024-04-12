@@ -9,7 +9,7 @@ use crate::Hex;
 ///
 /// > See [this article](https://www.redblobgames.com/grids/hexagons/#map-storage)
 ///
-/// [`Rombus`] is made for _rombus_ large _dense_ maps, utilizing some
+/// [`RombusMap`] is made for _rombus_ large _dense_ maps, utilizing some
 /// tricks to map [`Hex`] coordinate to a positive 1D array.
 ///
 /// It can be used only if:
