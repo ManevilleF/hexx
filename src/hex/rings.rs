@@ -144,7 +144,7 @@ impl Hex {
         let p = self + start_dir * dist as i32;
         ExactSizeHexIterator {
             iter: (0..=len).map(move |i| p + end_dir * i as i32),
-            count: dist as usize + 1,
+            count: len as usize + 1,
         }
     }
 
@@ -329,13 +329,13 @@ impl Hex {
     /// See also [`Self::corner_wedge_to`] and [`Self::wedge`]
     pub fn corner_wedge(
         self,
-        range: impl Iterator<Item = u32> + Clone,
+        range: impl Iterator<Item = u32>,
         direction: EdgeDirection,
     ) -> impl Iterator<Item = Self> {
         let [left, right] = [direction << 2, direction >> 2];
         range.flat_map(move |r| {
             self.__ring_edge(r, r / 2, direction, left)
-                .chain(self.__ring_edge(r, r / 2, direction, right))
+                .chain(self.__ring_edge(r, r / 2, direction, right).skip(1))
         })
     }
 
