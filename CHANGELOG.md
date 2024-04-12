@@ -6,6 +6,8 @@
 * Added `RombusMap` storage structure for dense, rombus shaped maps (#164)
 * Update `field_of_movement` to use `HexagonalMap` (#163)
 * Added `shapes::rombus` (#163)
+* Improved performance `Hex` ring compute methods (#165)
+* Improved performance `Hex` edge/wedge compute methods (#165)
 
 ## 0.16.1
 

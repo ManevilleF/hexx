@@ -2,8 +2,8 @@
 //!
 //! According to our benchmarks:
 //!
-//! * [`HexagonalMap`] is ~15x faster than a hash map
-//! * [`RombusMap`] is ~100x faster than a hash map
+//! * [`HexagonalMap`] is up to ~15x faster than a hash map
+//! * [`RombusMap`] is up to ~100x faster than a hash map
 //!
 //! [this article]: https://www.redblobgames.com/grids/hexagons/#map-storage
 mod hexagonal;

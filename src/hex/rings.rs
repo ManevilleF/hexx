@@ -18,30 +18,30 @@ impl Hex {
         start_dir: EdgeDirection,
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
-        let mut directions = Self::NEIGHBORS_COORDS;
-        // TODO: improve code clarity
-        directions.rotate_left(start_dir.index() as usize);
-        if clockwise {
-            directions.reverse();
-            directions.rotate_left(1);
-        } else {
-            directions.rotate_left(2);
-        }
-
+        let mut directions = vec![Self::ZERO];
+        if range > 0 {
+            let mut neighbors = Self::NEIGHBORS_COORDS;
+            // TODO: improve code clarity
+            neighbors.rotate_left(start_dir.index() as usize);
+            if clockwise {
+                neighbors.reverse();
+                neighbors.rotate_left(1);
+            } else {
+                neighbors.rotate_left(2);
+            }
+            directions.extend(
+                neighbors
+                    .into_iter()
+                    .flat_map(|dir| (0..range).map(move |_| dir)),
+            );
+        };
+        let count = Self::ring_count(range);
         let point = self + start_dir * range as i32;
-        let iter = directions
-            .into_iter()
-            .flat_map(move |dir| std::iter::repeat(dir).take(range as usize))
-            .scan(point, move |pos, dir| {
-                let next = *pos + dir;
-                *pos = next;
-                Some(next)
-            })
-            .take((range as usize * 6).saturating_sub(1));
-        ExactSizeHexIterator {
-            iter: std::iter::once(point).chain(iter),
-            count: Self::ring_count(range),
-        }
+        let iter = (0..count).scan(point, move |point, i| {
+            *point += directions[i];
+            Some(*point)
+        });
+        ExactSizeHexIterator { iter, count }
     }
 
     #[must_use]
@@ -102,7 +102,6 @@ impl Hex {
     }
 
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring edge around `self` in a given `radius` and
     /// `direction`. The returned coordinates are sorted counter clockwise
     /// unless `clockwise` is set to `true`.
@@ -117,17 +116,35 @@ impl Hex {
         direction: VertexDirection,
         clockwise: bool,
     ) -> impl ExactSizeIterator<Item = Self> {
-        let [start_dir, end_dir] = if clockwise {
+        let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, clockwise);
+        self.__ring_edge(radius, radius, start_dir, end_dir)
+    }
+
+    #[inline]
+    fn __vertex_dir_to_edge_dir(direction: VertexDirection, clockwise: bool) -> [EdgeDirection; 2] {
+        if clockwise {
             let dir = direction.direction_ccw();
             [dir, dir >> 2]
         } else {
             let dir = direction.direction_cw();
             [dir, dir << 2]
-        };
-        let p = self + start_dir * radius as i32;
+        }
+    }
+
+    /// Computes an `origin` as `self + start_dir * dist`
+    /// and computes a line between `origin` and `origin + len * end_dir`
+    #[allow(clippy::cast_possible_wrap)]
+    fn __ring_edge(
+        self,
+        dist: u32,
+        len: u32,
+        start_dir: EdgeDirection,
+        end_dir: EdgeDirection,
+    ) -> impl ExactSizeIterator<Item = Self> {
+        let p = self + start_dir * dist as i32;
         ExactSizeHexIterator {
-            iter: (0..=radius).map(move |i| p + end_dir * i as i32),
-            count: radius as usize + 1,
+            iter: (0..=len).map(move |i| p + end_dir * i as i32),
+            count: len as usize + 1,
         }
     }
 
@@ -170,7 +187,8 @@ impl Hex {
         ranges: impl Iterator<Item = u32>,
         direction: VertexDirection,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
-        ranges.map(move |r| self.ring_edge(r, direction))
+        let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, false);
+        ranges.map(move |r| self.__ring_edge(r, r, start_dir, end_dir))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given
@@ -196,7 +214,8 @@ impl Hex {
         direction: VertexDirection,
         clockwise: bool,
     ) -> impl Iterator<Item = impl ExactSizeIterator<Item = Self>> {
-        ranges.map(move |r| self.custom_ring_edge(r, direction, clockwise))
+        let [start_dir, end_dir] = Self::__vertex_dir_to_edge_dir(direction, clockwise);
+        ranges.map(move |r| self.__ring_edge(r, r, start_dir, end_dir))
     }
 
     /// Retrieves all successive [`Hex`] ring edges around `self` in given
@@ -310,13 +329,14 @@ impl Hex {
     /// See also [`Self::corner_wedge_to`] and [`Self::wedge`]
     pub fn corner_wedge(
         self,
-        range: impl Iterator<Item = u32> + Clone,
+        range: impl Iterator<Item = u32>,
         direction: EdgeDirection,
     ) -> impl Iterator<Item = Self> {
-        let left = self.wedge(range.clone(), direction.diagonal_ccw());
-        let right = self.wedge(range, direction.diagonal_cw());
-        left.chain(right)
-            .filter(move |h| self.way_to(*h) == direction)
+        let [left, right] = [direction << 2, direction >> 2];
+        range.flat_map(move |r| {
+            self.__ring_edge(r, r / 2, direction, left)
+                .chain(self.__ring_edge(r, r / 2, direction, right).skip(1))
+        })
     }
 
     /// Retrieves all successive [`Hex`] half ring edges from `self` to `rhs`
