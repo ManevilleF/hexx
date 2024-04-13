@@ -1,5 +1,36 @@
 use crate::{hex::ExactSizeHexIterator, Hex};
 
+/// Parallelogram shape parameters.
+///
+/// Calling `coords` will return coordinates in that shape.
+/// Equivalent to [`parallelogram`]
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct Parallelogram {
+    /// Start coordinate
+    pub min: Hex,
+    /// End coordinate
+    pub max: Hex,
+}
+
+impl Default for Parallelogram {
+    fn default() -> Self {
+        Self {
+            min: Hex::splat(-10),
+            max: Hex::splat(10),
+        }
+    }
+}
+
+impl Parallelogram {
+    /// Generates a [`parallelogram`] with the shape parameters
+    #[must_use]
+    pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
+        parallelogram(self.min, self.max)
+    }
+}
+
 /// Generates a parallelogram layout from `min` to `max`
 #[must_use]
 #[allow(clippy::cast_sign_loss)]
@@ -12,6 +43,31 @@ pub fn parallelogram(min: Hex, max: Hex) -> impl ExactSizeIterator<Item = Hex> {
     }
 }
 
+/// Triangle shape parameters.
+///
+/// Calling `coords` will return coordinates in that shape.
+/// Equivalent to [`triangle`]
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct Triangle {
+    /// Triangle size
+    pub size: u32,
+}
+
+impl Default for Triangle {
+    fn default() -> Self {
+        Self { size: 10 }
+    }
+}
+
+impl Triangle {
+    /// Generates a [`triangle`] with the shape parameters
+    #[must_use]
+    pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
+        triangle(self.size)
+    }
+}
 /// Generates a triangle with a custom `size`
 ///
 /// # Note
@@ -27,10 +83,75 @@ pub fn triangle(size: u32) -> impl ExactSizeIterator<Item = Hex> {
     }
 }
 
+/// Hexagon shape parameters.
+///
+/// Calling `coords` will return coordinates in that shape.
+/// Equivalent to [`hexagon`]
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct Hexagon {
+    /// Center coordinate
+    pub center: Hex,
+    /// Hexagon radius
+    pub radius: u32,
+}
+
+impl Default for Hexagon {
+    fn default() -> Self {
+        Self {
+            center: Hex::ZERO,
+            radius: 10,
+        }
+    }
+}
+
+impl Hexagon {
+    /// Generates a [`hexagon`] with the shape parameters
+    #[must_use]
+    pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
+        hexagon(self.center, self.radius)
+    }
+}
+
 /// Generates an hexagonal layout around `center` with a custom `radius`.
 #[must_use]
 pub fn hexagon(center: Hex, radius: u32) -> impl ExactSizeIterator<Item = Hex> {
     center.range(radius)
+}
+
+/// Rombus shape parameters.
+///
+/// Calling `coords` will return coordinates in that shape.
+/// Equivalent to [`rombus`]
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct Rombus {
+    /// rombus lowest coordinate
+    pub origin: Hex,
+    /// Row count (`y`)
+    pub rows: u32,
+    /// Column count (`x`)
+    pub columns: u32,
+}
+
+impl Default for Rombus {
+    fn default() -> Self {
+        Self {
+            origin: Hex::ZERO,
+            rows: 10,
+            columns: 10,
+        }
+    }
+}
+
+impl Rombus {
+    /// Generates a [`rombus`] with the shape parameters
+    #[must_use]
+    pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
+        rombus(self.origin, self.rows, self.columns)
+    }
 }
 
 /// Generates a Rombus from `point` of `rows` in y and `columns` in `x`
@@ -42,6 +163,45 @@ pub fn rombus(point: Hex, rows: u32, columns: u32) -> impl ExactSizeIterator<Ite
             (0..columns).map(move |x| point.const_add(Hex::new(x as i32, y as i32)))
         }),
         count: (rows * columns) as usize,
+    }
+}
+
+/// [Pointy] rectangle shape parameters.
+///
+/// Calling `coords` will return coordinates in that shape.
+/// Equivalent to [`pointy_rectangle`]
+///
+/// [Pointy]: crate::HexOrientation::Pointy
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct PointyRectangle {
+    /// Lowest `x` coordinate
+    pub left: i32,
+    /// Highest `x` coordinate
+    pub right: i32,
+    /// Lowest `y` coordinate
+    pub top: i32,
+    /// Highest `y` coordinate
+    pub bottom: i32,
+}
+
+impl Default for PointyRectangle {
+    fn default() -> Self {
+        Self {
+            left: -10,
+            right: 10,
+            top: -10,
+            bottom: 10,
+        }
+    }
+}
+
+impl PointyRectangle {
+    /// Generates a [`pointy_rectangle`] with the shape parameters
+    #[must_use]
+    pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
+        pointy_rectangle([self.left, self.right, self.top, self.bottom])
     }
 }
 
@@ -62,6 +222,45 @@ pub fn pointy_rectangle(
             ((left - y_offset)..=(right - y_offset)).map(move |x| Hex::new(x, y))
         }),
         count: count as usize,
+    }
+}
+
+/// [Flat] rectangle shape parameters.
+///
+/// Calling `coords` will return coordinates in that shape.
+/// Equivalent to [`pointy_rectangle`]
+///
+/// [Flat]: crate::HexOrientation::Flat
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct FlatRectangle {
+    /// Lowest `x` coordinate
+    pub left: i32,
+    /// Highest `x` coordinate
+    pub right: i32,
+    /// Lowest `y` coordinate
+    pub top: i32,
+    /// Highest `y` coordinate
+    pub bottom: i32,
+}
+
+impl Default for FlatRectangle {
+    fn default() -> Self {
+        Self {
+            left: -10,
+            right: 10,
+            top: -10,
+            bottom: 10,
+        }
+    }
+}
+
+impl FlatRectangle {
+    /// Generates a [`flat_rectangle`] with the shape parameters
+    #[must_use]
+    pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
+        flat_rectangle([self.left, self.right, self.top, self.bottom])
     }
 }
 

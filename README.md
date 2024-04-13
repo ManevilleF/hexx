@@ -387,3 +387,11 @@ and how to use two layouts on the same grid.
  > `cargo run --example sprite_sheet`
 
  This example showcases how to use hexx with 2D sprite sheet.
+
+### Shapes
+
+![shapes](docs/shapes.png "Shapes example")
+
+ > `cargo run --example shapes --features bevy_reflect`
+
+ This example showcases how to use hexx shapes module

@@ -8,6 +8,8 @@
 * Added `shapes::rombus` (#163)
 * Improved performance `Hex` ring compute methods (#165)
 * Improved performance `Hex` edge/wedge compute methods (#165)
+* Added `shapes` example (#166)
+* Added shape parameter structs in `shapes` module (#166)
 
 ## 0.16.1
 
