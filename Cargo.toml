@@ -122,6 +122,10 @@ required-features = ["bevy_reflect"]
 name = "sprite_sheet"
 path = "examples/sprite_sheet.rs"
 
+[[example]]
+name = "shapes"
+path = "examples/shapes.rs"
+
 [[bench]]
 name = "length"
 harness = false
