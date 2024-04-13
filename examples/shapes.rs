@@ -14,6 +14,7 @@ use hexx::{shapes, *};
 
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(13.0);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -105,18 +106,25 @@ fn show_ui(world: &mut World) {
     let mut egui_context = egui_context.clone();
     egui::Window::new("Options").show(egui_context.get_mut(), |ui| {
         world.resource_scope(|world, mut map: Mut<HexMap>| {
-            bevy_inspector::ui_for_value(&mut map.layout.orientation, ui, world);
+            ui.horizontal(|ui| {
+                ui.label("Orientation");
+                bevy_inspector::ui_for_value(&mut map.layout.orientation, ui, world);
+            });
         });
+
         world.resource_scope(|world, mut shape: Mut<Shape>| {
-            egui::ComboBox::from_id_source("Shape")
-                .selected_text(shape.label())
-                .show_ui(ui, |ui| {
-                    for option in Shape::all_values() {
-                        if ui.selectable_label(false, option.label()).clicked() {
-                            *shape = option;
-                        };
-                    }
-                });
+            ui.horizontal(|ui| {
+                ui.label("Shape");
+                egui::ComboBox::from_id_source("Shape")
+                    .selected_text(shape.label())
+                    .show_ui(ui, |ui| {
+                        for option in Shape::all_values() {
+                            if ui.selectable_label(false, option.label()).clicked() {
+                                *shape = option;
+                            };
+                        }
+                    });
+            });
             match shape.deref_mut() {
                 Shape::Hexagon(v) => bevy_inspector::ui_for_value(v, ui, world),
                 Shape::Rombus(v) => bevy_inspector::ui_for_value(v, ui, world),
@@ -126,7 +134,10 @@ fn show_ui(world: &mut World) {
                 Shape::Parallelogram(v) => bevy_inspector::ui_for_value(v, ui, world),
             };
 
-            regenerate = ui.button("Generate").clicked();
+            ui.add_space(10.0);
+            ui.vertical_centered_justified(|ui| {
+                regenerate = ui.button("Generate").clicked();
+            });
         });
     });
     if regenerate {
