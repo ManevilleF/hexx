@@ -12,6 +12,8 @@ use bevy_egui::{egui, EguiContext, EguiPlugin};
 use bevy_inspector_egui::bevy_inspector;
 use hexx::{shapes, *};
 
+/// World size of the hexagons (outer radius)
+const HEX_SIZE: Vec2 = Vec2::splat(13.0);
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
@@ -28,88 +30,6 @@ fn main() {
         .run();
 }
 
-#[derive(Reflect)]
-#[reflect(Default)]
-struct Hexagon {
-    center: Hex,
-    radius: u32,
-}
-
-impl Default for Hexagon {
-    fn default() -> Self {
-        Self {
-            center: Hex::ZERO,
-            radius: 20,
-        }
-    }
-}
-
-#[derive(Reflect)]
-#[reflect(Default)]
-struct Rombus {
-    origin: Hex,
-    rows: u32,
-    columns: u32,
-}
-
-impl Default for Rombus {
-    fn default() -> Self {
-        Self {
-            origin: Hex::ZERO,
-            rows: 10,
-            columns: 10,
-        }
-    }
-}
-
-#[derive(Reflect)]
-#[reflect(Default)]
-struct Rectangle {
-    left: i32,
-    right: i32,
-    top: i32,
-    bottom: i32,
-}
-
-impl Default for Rectangle {
-    fn default() -> Self {
-        Self {
-            left: -10,
-            right: 10,
-            top: -10,
-            bottom: 10,
-        }
-    }
-}
-
-#[derive(Reflect)]
-#[reflect(Default)]
-struct Triangle {
-    size: u32,
-}
-
-impl Default for Triangle {
-    fn default() -> Self {
-        Self { size: 20 }
-    }
-}
-
-#[derive(Reflect)]
-#[reflect(Default)]
-struct Parallelogram {
-    min: Hex,
-    max: Hex,
-}
-
-impl Default for Parallelogram {
-    fn default() -> Self {
-        Self {
-            min: Hex::splat(-10),
-            max: Hex::splat(10),
-        }
-    }
-}
-
 #[derive(Resource)]
 struct HexMap {
     layout: HexLayout,
@@ -119,12 +39,12 @@ struct HexMap {
 
 #[derive(Resource)]
 enum Shape {
-    Hexagon(Hexagon),
-    Rombus(Rombus),
-    Triangle(Triangle),
-    FlatRectangle(Rectangle),
-    PointyRectangle(Rectangle),
-    Parallelogram(Parallelogram),
+    Hexagon(shapes::Hexagon),
+    Rombus(shapes::Rombus),
+    Triangle(shapes::Triangle),
+    FlatRectangle(shapes::FlatRectangle),
+    PointyRectangle(shapes::PointyRectangle),
+    Parallelogram(shapes::Parallelogram),
 }
 
 impl Shape {
@@ -150,16 +70,12 @@ impl Shape {
     }
     fn coords(&self) -> Vec<Hex> {
         match self {
-            Self::Hexagon(h) => shapes::hexagon(h.center, h.radius).collect(),
-            Self::Rombus(r) => shapes::rombus(r.origin, r.rows, r.columns).collect(),
-            Self::Triangle(t) => shapes::triangle(t.size).collect(),
-            Self::FlatRectangle(r) => {
-                shapes::flat_rectangle([r.left, r.right, r.top, r.bottom]).collect()
-            }
-            Self::PointyRectangle(r) => {
-                shapes::pointy_rectangle([r.left, r.right, r.top, r.bottom]).collect()
-            }
-            Self::Parallelogram(p) => shapes::parallelogram(p.min, p.max).collect(),
+            Self::Hexagon(v) => v.coords().collect(),
+            Self::Rombus(v) => v.coords().collect(),
+            Self::Triangle(v) => v.coords().collect(),
+            Self::FlatRectangle(v) => v.coords().collect(),
+            Self::PointyRectangle(v) => v.coords().collect(),
+            Self::Parallelogram(v) => v.coords().collect(),
         }
     }
 }
@@ -167,7 +83,7 @@ impl Shape {
 pub fn setup(mut commands: Commands, mut mats: ResMut<Assets<ColorMaterial>>) {
     commands.spawn(Camera2dBundle::default());
     let layout = HexLayout {
-        hex_size: Vec2::splat(10.0),
+        hex_size: HEX_SIZE,
         ..default()
     };
     let mat = mats.add(Color::WHITE);
@@ -235,6 +151,20 @@ fn generate(
                 transform: Transform::from_xyz(pos.x, pos.y, 0.0),
                 ..default()
             })
+            .with_children(|b| {
+                b.spawn(Text2dBundle {
+                    text: Text::from_section(
+                        format!("{},{}", coord.x, coord.y),
+                        TextStyle {
+                            font_size: 7.0,
+                            color: Color::BLACK,
+                            ..default()
+                        },
+                    ),
+                    transform: Transform::from_xyz(0.0, 0.0, 10.0),
+                    ..default()
+                });
+            })
             .set_parent(map.entity);
     }
 }
@@ -243,7 +173,7 @@ fn generate(
 fn hexagonal_plane(hex_layout: &HexLayout) -> Mesh {
     let mesh_info = PlaneMeshBuilder::new(hex_layout)
         .facing(Vec3::Z)
-        .with_scale(Vec3::splat(0.9))
+        .with_scale(Vec3::splat(0.98))
         .center_aligned()
         .build();
     Mesh::new(
