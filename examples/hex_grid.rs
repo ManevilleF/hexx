@@ -33,6 +33,7 @@ struct HighlightedHexes {
     pub wedge: Vec<Hex>,
     pub dir_wedge: Vec<Hex>,
     pub line: Vec<Hex>,
+    pub rectiline: Vec<Hex>,
     pub half_ring: Vec<Hex>,
     pub rotated: Vec<Hex>,
 }
@@ -149,17 +150,19 @@ fn handle_input(
                 for entity in vec.iter().filter_map(|h| map.entities.get(h)) {
                     commands
                         .entity(*entity)
-                        .insert(map.default_material.clone());
+                        .insert(map.default_material.clone_weak());
                 }
             }
             commands
                 .entity(map.entities[&highlighted_hexes.selected])
-                .insert(map.default_material.clone());
+                .insert(map.default_material.clone_weak());
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(map.default_material.clone());
-            // Draw a  line
+                .insert(map.default_material.clone_weak());
+            // Draw a line
             highlighted_hexes.line = Hex::ZERO.line_to(coord).collect();
+            // Draw a rectiline path
+            highlighted_hexes.rectiline = Hex::ZERO.rectiline_to(coord, false).collect();
             // Draw a ring
             highlighted_hexes.ring = Hex::ZERO.ring(coord.ulength()).collect();
             // Draw an wedge
@@ -180,7 +183,7 @@ fn handle_input(
             ] {
                 for h in vec {
                     if let Some(e) = map.entities.get(h) {
-                        commands.entity(*e).insert(mat.clone());
+                        commands.entity(*e).insert(mat.clone_weak());
                     }
                 }
             }
@@ -188,20 +191,21 @@ fn handle_input(
             highlighted_hexes.halfway = coord / 2;
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(map.selected_material.clone());
+                .insert(map.selected_material.clone_weak());
             // Make the selected tile red
             commands
                 .entity(entity)
-                .insert(map.selected_material.clone());
+                .insert(map.selected_material.clone_weak());
             highlighted_hexes.selected = coord;
         }
     }
 }
 
 fn gizmos(mut gizmos: Gizmos, higlights: Res<HighlightedHexes>, map: Res<Map>) {
-    let selected = higlights.selected;
-    for [a, b] in selected.all_edges().map(|e| map.layout.edge_coordinates(e)) {
-        gizmos.line_2d(a, b, Color::LIME_GREEN);
+    for coord in &higlights.rectiline {
+        for [a, b] in map.layout.all_edge_coordinates(*coord) {
+            gizmos.line_2d(a, b, Color::WHITE);
+        }
     }
 }
 

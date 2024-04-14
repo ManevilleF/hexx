@@ -10,6 +10,14 @@
 * Improved performance `Hex` edge/wedge compute methods (#165)
 * Added `shapes` example (#166)
 * Added shape parameter structs in `shapes` module (#166)
+* Added `Hex::rectiline_to` (#167)
+* Added `HexLayout::all_edges_cordinates` (#167)
+* Added `DirectionWay::map` (#167)
+* (**BREAKING**) Removed the following ambiguous const values: (#167)
+  * `Hex::Z`
+  * `Hex::NEG_Z`
+  * `Hex::AXES`
+  * `Hex::AXES`
 
 ## 0.16.1
 

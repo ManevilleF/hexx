@@ -9,7 +9,15 @@ pub fn line_benchmark(c: &mut Criterion) {
     group.bench_with_input(BenchmarkId::new("Line", dist), &dist, |b, dist| {
         b.iter(|| {
             let p = black_box(Hex::ZERO);
-            p.line_to(black_box(Hex::splat(*dist))).collect::<Vec<_>>()
+            let _ = p.line_to(black_box(Hex::splat(*dist))).collect::<Vec<_>>();
+        })
+    });
+    group.bench_with_input(BenchmarkId::new("Rectiline", dist), &dist, |b, dist| {
+        b.iter(|| {
+            let p = black_box(Hex::ZERO);
+            let _ = p
+                .rectiline_to(black_box(Hex::splat(*dist)), true)
+                .collect::<Vec<_>>();
         })
     });
     group.finish();
