@@ -26,6 +26,7 @@ use crate::{EdgeDirection, VertexDirection};
 ///
 /// You can also `unwrap` the way to safely retrieve a single direction, with
 /// potential inaccuracy in case of a `Tie`
+#[derive(Debug)]
 pub enum DirectionWay<T> {
     /// Single direction
     Single(T),
@@ -68,17 +69,25 @@ impl<T> DirectionWay<T> {
             Self::Tie([a, b]) => a.eq(dir) || b.eq(dir),
         }
     }
+
+    #[inline]
+    #[must_use]
+    /// Returns `DirectionWay::<U>` with `func` applied to the items
+    pub fn map<U>(self, mut func: impl FnMut(T) -> U) -> DirectionWay<U> {
+        match self {
+            Self::Single(v) => DirectionWay::Single(func(v)),
+            Self::Tie(v) => DirectionWay::Tie(v.map(func)),
+        }
+    }
 }
 
 impl<T: Way> DirectionWay<T> {
     #[inline]
     pub(crate) fn way_from(is_neg: bool, eq_left: bool, eq_right: bool, dir: T) -> Self {
-        match [is_neg, eq_left, eq_right] {
-            [false, true, _] => Self::Tie([dir, dir.ccw()]),
-            [true, true, _] => Self::Tie([-dir, (-dir).ccw()]),
-            [false, _, true] => Self::Tie([dir, dir.cw()]),
-            [true, _, true] => Self::Tie([-dir, (-dir).cw()]),
-            [true, _, _] => Self::Single(-dir),
+        let dir = if is_neg { -dir } else { dir };
+        match [eq_left, eq_right] {
+            [true, _] => Self::Tie([dir, dir.ccw()]),
+            [_, true] => Self::Tie([dir, dir.cw()]),
             _ => Self::Single(dir),
         }
     }
@@ -99,20 +108,24 @@ impl<T> From<[T; 2]> for DirectionWay<T> {
 }
 
 impl Way for EdgeDirection {
+    #[inline]
     fn ccw(self) -> Self {
         self.counter_clockwise()
     }
 
+    #[inline]
     fn cw(self) -> Self {
         self.clockwise()
     }
 }
 
 impl Way for VertexDirection {
+    #[inline]
     fn ccw(self) -> Self {
         self.counter_clockwise()
     }
 
+    #[inline]
     fn cw(self) -> Self {
         self.clockwise()
     }

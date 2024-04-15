@@ -91,25 +91,16 @@ impl Hex {
     /// (1, 1)
     pub const ONE: Self = Self::new(1, 1);
     /// (-1, -1)
-    pub const NEG_ONE: Self = Self::ONE.const_neg();
+    pub const NEG_ONE: Self = Self::new(-1, -1);
 
-    /// X (Q) axis (1, 0)
+    /// +X (Q) (1, 0)
     pub const X: Self = Self::new(1, 0);
-    /// -X (-Q) axis (-1, 0)
-    pub const NEG_X: Self = Self::X.const_neg();
-    /// Y (R) axis (0, 1)
+    /// -X (-Q) (-1, 0)
+    pub const NEG_X: Self = Self::new(-1, 0);
+    /// +Y (R) (0, 1)
     pub const Y: Self = Self::new(0, 1);
-    /// -Y (-R) axis (0, -1)
+    /// -Y (-R) (0, -1)
     pub const NEG_Y: Self = Self::new(0, -1);
-    /// Arbitrary cubic Z (S) axis (0, -1, **1**)
-    pub const Z: Self = Self::NEG_Y;
-    /// Arbitrary cubic -Z (S) axis (0, 1, **-1**)
-    pub const NEG_Z: Self = Self::Y;
-
-    /// The unit axes.
-    pub const AXES: [Self; 2] = [Self::X, Self::Y];
-    /// The cubic unit axes.
-    pub const CUBIC_AXES: [Self; 3] = [Self::X, Self::Y, Self::Z];
 
     /// Hexagon edge neighbor coordinates array, following [`EdgeDirection`]
     /// order
@@ -128,11 +119,11 @@ impl Hex {
     ///       Y           -Z
     /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
-        Self::X,
-        Self::Y,
+        Self::new(1, 0),
+        Self::new(0, 1),
         Self::new(-1, 1),
-        Self::NEG_X,
-        Self::NEG_Y,
+        Self::new(-1, 0),
+        Self::new(0, -1),
         Self::new(1, -1),
     ];
 
@@ -156,10 +147,10 @@ impl Hex {
     /// ```
     pub const DIAGONAL_COORDS: [Self; 6] = [
         Self::new(2, -1),
-        Self::ONE,
+        Self::new(1, 1),
         Self::new(-1, 2),
         Self::new(-2, 1),
-        Self::NEG_ONE,
+        Self::new(-1, -1),
         Self::new(1, -2),
     ];
 
@@ -837,7 +828,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[doc(alias = "reflect_q")]
-    /// Computes the reflection of `self` accross [`Hex::X`]
+    /// Computes the reflection of `self` accross the `x` axis
     pub const fn reflect_x(self) -> Self {
         Self::new(self.x, self.z())
     }
@@ -845,7 +836,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[doc(alias = "reflect_r")]
-    /// Computes the reflection of `self` accross [`Hex::Y`]
+    /// Computes the reflection of `self` accross the `y` axis
     pub const fn reflect_y(self) -> Self {
         Self::new(self.z(), self.y)
     }
@@ -853,7 +844,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[doc(alias = "reflect_s")]
-    /// Computes the reflection of `self` accross [`Hex::Z`]
+    /// Computes the reflection of `self` accross the `z` axis
     pub const fn reflect_z(self) -> Self {
         Self::new(self.y, self.x)
     }
@@ -880,6 +871,55 @@ impl Hex {
         ExactSizeHexIterator {
             iter: (0..=distance).map(move |step| a.lerp(b, step as f32 / dist).into()),
             count: distance as usize + 1,
+        }
+    }
+
+    #[allow(clippy::cast_sign_loss)]
+    #[must_use]
+    /// Computes all coordinate in a two segment rectiline path from `self` to
+    /// `other`
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The destination coordinate
+    /// * `clockwise` - If set to `true` the line paths will be clockwise
+    ///
+    /// # Example
+    /// ```rust
+    /// # use hexx::*;
+    /// let start = Hex::ZERO;
+    /// let end = Hex::new(5, 0);
+    ///
+    /// let line = start.rectiline_to(end, true);
+    /// assert_eq!(line.len(), 6);
+    /// let line: Vec<Hex> = line.collect();
+    /// assert_eq!(line.len(), 6);
+    /// ````
+    pub fn rectiline_to(self, other: Self, clockwise: bool) -> impl ExactSizeIterator<Item = Self> {
+        let delta = other.const_sub(self);
+        let count = delta.length();
+        let mut dirs = self.main_diagonal_to(other).edge_directions();
+        if !clockwise {
+            dirs.rotate_left(1);
+        }
+        // The two directions to apply
+        let [da, db] = dirs;
+        // The amount of `da` is the distance between `delta` and the full projection of
+        // `db`
+        let proj_b = db * count;
+        let ca = proj_b.distance_to(delta);
+
+        let iter = std::iter::once(self).chain((0..count).scan(self, move |p, i| {
+            if i <= ca {
+                *p += da;
+            } else {
+                *p += db;
+            }
+            Some(*p)
+        }));
+        ExactSizeHexIterator {
+            iter,
+            count: (count + 1) as usize,
         }
     }
 

@@ -125,6 +125,7 @@ path = "examples/sprite_sheet.rs"
 [[example]]
 name = "shapes"
 path = "examples/shapes.rs"
+required-features = ["bevy_reflect"]
 
 [[bench]]
 name = "length"

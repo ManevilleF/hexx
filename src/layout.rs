@@ -137,15 +137,31 @@ impl HexLayout {
     /// order
     #[must_use]
     pub fn edge_coordinates(&self, edge: crate::GridEdge) -> [Vec2; 2] {
-        edge.vertices().map(|v| self.vertex_coordinates(v))
+        let origin = self.hex_to_world_pos(edge.origin);
+        edge.vertices()
+            .map(|v| self.__vertex_coordinates(v) + origin)
+    }
+
+    /// Returns the  world coordinate of all edge vertex pairs in clockwise
+    /// order
+    #[must_use]
+    pub fn all_edge_coordinates(&self, coord: Hex) -> [[Vec2; 2]; 6] {
+        let origin = self.hex_to_world_pos(coord);
+        coord.all_edges().map(|edge| {
+            edge.vertices()
+                .map(|v| self.__vertex_coordinates(v) + origin)
+        })
     }
 
     /// Returns the world coordinate of the vertex
     #[must_use]
     pub fn vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
         let origin = self.hex_to_world_pos(vertex.origin);
-        origin
-            + (vertex.direction.unit_vector(self.orientation) * self.hex_size * self.axis_scale())
+        self.__vertex_coordinates(vertex) + origin
+    }
+
+    fn __vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
+        vertex.direction.unit_vector(self.orientation) * self.hex_size * self.axis_scale()
     }
 }
 

@@ -368,6 +368,20 @@ fn empty_line_to() {
 }
 
 #[test]
+fn rectiline() {
+    for start in Hex::ZERO.range(20) {
+        for end in Hex::ZERO.range(20) {
+            let line = start.rectiline_to(end, true);
+            assert_eq!(line.len(), start.unsigned_distance_to(end) as usize + 1);
+            assert_eq!(line.len(), line.count());
+            let line = start.rectiline_to(end, false);
+            assert_eq!(line.len(), start.unsigned_distance_to(end) as usize + 1);
+            assert_eq!(line.len(), line.count());
+        }
+    }
+}
+
+#[test]
 fn range_count() {
     assert_eq!(Hex::range_count(0), 1);
     assert_eq!(Hex::range_count(1), 7);
