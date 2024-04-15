@@ -528,3 +528,19 @@ fn resolutions() {
         }
     }
 }
+
+#[test]
+fn axis_pairs() {
+    for [[a, b], [na, nb]] in [
+        [Hex::INCR_X, Hex::DECR_X],
+        [Hex::INCR_Y, Hex::DECR_Y],
+        [Hex::INCR_Z, Hex::DECR_Z],
+    ] {
+        assert_eq!(a.length(), 1);
+        assert_eq!(b.length(), 1);
+        assert_eq!(na.length(), 1);
+        assert_eq!(nb.length(), 1);
+        assert_eq!(a.const_neg(), na);
+        assert_eq!(b.const_neg(), nb);
+    }
+}

@@ -18,6 +18,13 @@
   * `Hex::NEG_Z`
   * `Hex::AXES`
   * `Hex::AXES`
+* Added axis pair consts as:
+  * `Hex::INCR_X`
+  * `Hex::INCR_Y
+  * `Hex::INCR_Z`
+  * `Hex::DECR_X`
+  * `Hex::DECR_Y
+  * `Hex::DECR_Z`
 
 ## 0.16.1
 

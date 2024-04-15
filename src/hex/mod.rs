@@ -102,6 +102,20 @@ impl Hex {
     /// -Y (-R) (0, -1)
     pub const NEG_Y: Self = Self::new(0, -1);
 
+    /// Unit vectors that increase the X axis in clockwise order
+    pub const INCR_X: [Self; 2] = [Self::new(1, 0), Self::new(1, -1)];
+    /// Unit vectors that increase the Y axis in clockwise order
+    pub const INCR_Y: [Self; 2] = [Self::new(0, 1), Self::new(-1, 1)];
+    /// Unit vectors that increase the Z axis in clockwise order
+    pub const INCR_Z: [Self; 2] = [Self::new(-1, 0), Self::new(0, -1)];
+
+    /// Unit vectors that decrease the X axis in clockwise order
+    pub const DECR_X: [Self; 2] = [Self::new(-1, 0), Self::new(-1, 1)];
+    /// Unit vectors that decrease the Y axis in clockwise order
+    pub const DECR_Y: [Self; 2] = [Self::new(0, -1), Self::new(1, -1)];
+    /// Unit vectors that decrease the Z axis in clockwise order
+    pub const DECR_Z: [Self; 2] = [Self::new(1, 0), Self::new(0, 1)];
+
     /// Hexagon edge neighbor coordinates array, following [`EdgeDirection`]
     /// order
     ///
@@ -117,6 +131,23 @@ impl Hex {
     ///       +--+  1  +--+
     ///           \___/
     ///       Y           -Z
+    /// ```
+    ///
+    /// Cubic coordinates:
+    ///
+    /// ```txt
+    ///              (0, -1, 1)
+    ///                  ___
+    ///                 /   \
+    ///  (-1, 0, 1) +--+  4  +--+ (1, -1, 0)
+    ///            / 3  \___/  5 \
+    ///            \    /   \    /
+    ///             +--+     +--+
+    ///            /    \___/    \
+    /// (-1, 1, 0) \ 2  /   \  0 / (1, 0, -1)
+    ///             +--+  1  +--+
+    ///                 \___/
+    ///               (0, 1, -1)
     /// ```
     pub const NEIGHBORS_COORDS: [Self; 6] = [
         Self::new(1, 0),
