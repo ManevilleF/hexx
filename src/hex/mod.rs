@@ -828,7 +828,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[doc(alias = "reflect_q")]
-    /// Computes the reflection of `self` accross [`Hex::X`]
+    /// Computes the reflection of `self` accross the `x` axis
     pub const fn reflect_x(self) -> Self {
         Self::new(self.x, self.z())
     }
@@ -836,7 +836,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[doc(alias = "reflect_r")]
-    /// Computes the reflection of `self` accross [`Hex::Y`]
+    /// Computes the reflection of `self` accross the `y` axis
     pub const fn reflect_y(self) -> Self {
         Self::new(self.z(), self.y)
     }
@@ -844,7 +844,7 @@ impl Hex {
     #[inline]
     #[must_use]
     #[doc(alias = "reflect_s")]
-    /// Computes the reflection of `self` accross [`Hex::Z`]
+    /// Computes the reflection of `self` accross the `z` axis
     pub const fn reflect_z(self) -> Self {
         Self::new(self.y, self.x)
     }
