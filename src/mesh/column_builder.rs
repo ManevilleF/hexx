@@ -1,7 +1,7 @@
 use glam::{Quat, Vec3};
 
 use super::{utils::Quad, MeshInfo, BASE_FACING};
-use crate::{Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions};
+use crate::{EdgeDirection, Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions};
 
 /// Builder struct to customize hex column mesh generation.
 ///
@@ -59,12 +59,32 @@ pub struct ColumnMeshBuilder<'l> {
     pub top_face: Option<PlaneMeshBuilder<'l>>,
     /// Bottom hexagonal face builder
     pub bottom_face: Option<PlaneMeshBuilder<'l>>,
-    /// UV mapping options for the column sides
-    pub sides_uv_options: [UVOptions; 6],
-    /// Quad inset options for the column sides
-    pub sides_inset_options: Option<InsetOptions>,
+    /// Options for the column side quads
+    pub sides_options: [Option<SideOptions>; 6],
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
+}
+
+/// Column Quad options
+#[derive(Debug, Copy, Clone, Default)]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct SideOptions {
+    /// UV mapping options
+    pub uv: UVOptions,
+    /// Insetting options
+    pub insetting: Option<InsetOptions>,
+}
+
+impl SideOptions {
+    /// Generates default quad options
+    #[inline]
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            uv: UVOptions::new(),
+            insetting: None,
+        }
+    }
 }
 
 impl<'l> ColumnMeshBuilder<'l> {
@@ -81,9 +101,8 @@ impl<'l> ColumnMeshBuilder<'l> {
             scale: None,
             top_face: Some(PlaneMeshBuilder::new(layout)),
             bottom_face: Some(PlaneMeshBuilder::new(layout)),
-            sides_uv_options: [UVOptions::new(); 6],
+            sides_options: [Some(SideOptions::new()); 6],
             center_aligned: false,
-            sides_inset_options: None,
         }
     }
 
@@ -208,39 +227,49 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     #[must_use]
     #[inline]
-    /// Specify custom global uv options for the side quad triangles.
+    /// Specify custom global options for the side quad triangles.
     ///
     /// To customize each side quad, prefer
-    /// [`Self::with_multi_sides_uv_options`]
-    pub const fn with_sides_uv_options(mut self, uv_options: UVOptions) -> Self {
-        self.sides_uv_options = [uv_options; 6];
+    /// [`Self::with_multi_sides_options`]
+    pub const fn with_sides_options(mut self, options: SideOptions) -> Self {
+        self.sides_options = [Some(options); 6];
         self
     }
 
     #[must_use]
     #[inline]
-    /// Specify custom uv options for each of the side quad triangles.
+    #[allow(clippy::cast_possible_truncation)]
+    /// Specify custom options for each of the side quad triangles.
     ///
-    /// For a global setting prefer [`Self::with_sides_uv_options`]
-    pub fn with_sides_uv_options_fn(mut self, uv_options: impl Fn(usize) -> UVOptions) -> Self {
-        self.sides_uv_options = std::array::from_fn(uv_options);
-        self
-    }
-    #[must_use]
-    #[inline]
-    /// Specify custom uv options for each of the side quad triangles.
-    ///
-    /// For a global setting prefer [`Self::with_sides_uv_options`]
-    pub const fn with_multi_sides_uv_options(mut self, uv_options: [UVOptions; 6]) -> Self {
-        self.sides_uv_options = uv_options;
+    /// For a global setting prefer [`Self::with_sides_options`]
+    pub fn with_sides_options_fn(
+        mut self,
+        options: impl Fn(EdgeDirection) -> Option<SideOptions>,
+    ) -> Self {
+        self.sides_options = std::array::from_fn(|i| options(EdgeDirection(i as u8)));
         self
     }
 
     #[must_use]
     #[inline]
-    /// Specify custom global inset options for the side quads
-    pub const fn with_sides_inset_options(mut self, options: InsetOptions) -> Self {
-        self.sides_inset_options = Some(options);
+    /// Specify options for each of the side quad triangles.
+    ///
+    /// For a global setting prefer [`Self::with_sides_options`]
+    pub fn with_multi_sides_options(mut self, options: [SideOptions; 6]) -> Self {
+        self.sides_options = options.map(Some);
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify custom options for each of the side quad triangles.
+    ///
+    /// For a global setting prefer [`Self::with_sides_options`]
+    pub const fn with_multi_custom_sides_options(
+        mut self,
+        options: [Option<SideOptions>; 6],
+    ) -> Self {
+        self.sides_options = options;
         self
     }
 
@@ -274,6 +303,9 @@ impl<'l> ColumnMeshBuilder<'l> {
         let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
         (0..6).for_each(|side| {
             let [left, right] = corners[side];
+            let Some(options) = self.sides_options[side] else {
+                return;
+            };
             let normal = (left + right).normalize();
             for div in 0..subidivisions {
                 let height = delta * div as f32;
@@ -281,8 +313,8 @@ impl<'l> ColumnMeshBuilder<'l> {
                 let right = Vec3::new(right.x, height, right.y);
                 let mut quad =
                     Quad::from_bottom([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
-                self.sides_uv_options[side].alter_uvs(&mut quad.uvs);
-                let quad = if let Some(opts) = self.sides_inset_options {
+                options.uv.alter_uvs(&mut quad.uvs);
+                let quad = if let Some(opts) = options.insetting {
                     quad.inset(opts.mode, opts.scale, opts.keep_inner_face)
                 } else {
                     quad.into()
