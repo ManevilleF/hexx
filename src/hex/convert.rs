@@ -61,6 +61,14 @@ impl Hex {
     /// Unpack from a [`u64`].
     /// [x][`Hex::x`] is read from the most signifigant 32 bits; [x][`Hex::y`] is read from the least signifigant 32 bits.
     /// Intended to be used with [`Hex::as_u64`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use hexx::*;
+    /// let x: u64 = 0x000000AA_FFFFFF45;
+    /// assert_eq!(Hex::from_u64(x), Hex::new(0xAA, -0xBB));
+    /// ```
     #[inline]
     #[doc(alias = "unpack")]
     pub fn from_u64(value: u64) -> Self {
@@ -73,6 +81,14 @@ impl Hex {
     /// [x][`Hex::x`] is placed in the most signifigant 32 bits; [y][`Hex::y`] is placed in the least signifigant 32 bits.
     /// Can be used as a sort key, or for saving in a binary format.
     /// Intended to be used with [`Hex::from_u64`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use hexx::*;
+    /// let x = Hex::new(0xAA, -0xBB).as_u64();
+    /// assert_eq!(x, 0x000000AA_FFFFFF45u64);
+    /// ```
     #[inline]
     #[doc(alias = "pack")]
     pub fn as_u64(self) -> u64 {
