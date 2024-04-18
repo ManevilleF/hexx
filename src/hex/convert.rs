@@ -56,3 +56,28 @@ impl From<IVec2> for Hex {
         Self::new(v.x, v.y)
     }
 }
+
+impl Hex {
+    /// Unpack from a [`u64`].
+    /// [x][`Hex::x`] is read from the most signifigant 32 bits; [x][`Hex::y`] is read from the least signifigant 32 bits.
+    /// Intended to be used with [`Hex::as_u64`].
+    #[inline]
+    #[doc(alias = "unpack")]
+    pub fn from_u64(value: u64) -> Self {
+        let x = (value >> 32) as i32;
+        let y = (value & 0xFFFF_FFFF) as i32;
+        Self::new(x, y)
+    }
+
+    /// Pack into a [`u64`].
+    /// [x][`Hex::x`] is placed in the most signifigant 32 bits; [y][`Hex::y`] is placed in the least signifigant 32 bits.
+    /// Can be used as a sort key, or for saving in a binary format.
+    /// Intended to be used with [`Hex::from_u64`].
+    #[inline]
+    #[doc(alias = "pack")]
+    pub fn as_u64(self) -> u64 {
+        let high = (self.x as u32 as u64) << 32;
+        let low = self.y as u32 as u64;
+        high | low
+    }
+}
