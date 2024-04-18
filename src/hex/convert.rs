@@ -59,8 +59,9 @@ impl From<IVec2> for Hex {
 
 impl Hex {
     /// Unpack from a [`u64`].
-    /// [x][`Hex::x`] is read from the most signifigant 32 bits; [x][`Hex::y`] is read from the least signifigant 32 bits.
-    /// Intended to be used with [`Hex::as_u64`].
+    /// [x][`Hex::x`] is read from the most signifigant 32 bits; [y][`Hex::y`]
+    /// is read from the least signifigant 32 bits. Intended to be used with
+    /// [`Hex::as_u64`].
     ///
     /// # Example
     ///
@@ -78,9 +79,10 @@ impl Hex {
     }
 
     /// Pack into a [`u64`].
-    /// [x][`Hex::x`] is placed in the most signifigant 32 bits; [y][`Hex::y`] is placed in the least signifigant 32 bits.
-    /// Can be used as a sort key, or for saving in a binary format.
-    /// Intended to be used with [`Hex::from_u64`].
+    /// [x][`Hex::x`] is placed in the most signifigant 32 bits; [y][`Hex::y`]
+    /// is placed in the least signifigant 32 bits. Can be used as a sort
+    /// key, or for saving in a binary format. Intended to be used with
+    /// [`Hex::from_u64`].
     ///
     /// # Example
     ///
