@@ -60,6 +60,41 @@ impl Quad {
             ],
         }
     }
+
+    /// Construct a regular quad from two [`left`, `right`] bottom positions
+    /// and a `bottom_height` and `top_height`
+    ///
+    /// # Arguments
+    /// * `[left, right]` - the two bottom 2d vertex positions
+    /// * `bottom_height` - the bottom vertices Y value
+    /// * `top_height` - the top vertices Y value
+    #[must_use]
+    pub(crate) fn from_bottom2(
+        [left, right]: [Vec2; 2],
+        bottom_height: f32,
+        top_height: f32,
+    ) -> Self {
+        let normal = (left + right).normalize();
+        let normal = Vec3::new(normal.x, 0.0, normal.y);
+        let positions = [
+            Vec3::new(right.x, bottom_height, right.y),
+            Vec3::new(right.x, top_height, right.y),
+            Vec3::new(left.x, bottom_height, left.y),
+            Vec3::new(left.x, top_height, left.y),
+        ];
+        Self {
+            positions,
+            normals: [normal; 4],
+            uvs: [Vec2::X, Vec2::ONE, Vec2::Y, Vec2::ZERO],
+            // 2 - 1
+            // | \ |
+            // 3 - 0
+            triangles: [
+                Tri([2, 1, 0]), // Tri 1
+                Tri([0, 3, 2]), // Tri 2
+            ],
+        }
+    }
 }
 
 impl Hexagon {

@@ -1,4 +1,5 @@
 mod column_builder;
+mod heightmap_builder;
 mod plane_builder;
 #[cfg(test)]
 mod tests;

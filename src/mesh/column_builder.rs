@@ -299,20 +299,16 @@ impl<'l> ColumnMeshBuilder<'l> {
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
-        let [a, b, c, d, e, f] = self.layout.center_aligned_hex_corners();
-        let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
+        let corners = self.layout.center_aligned_edge_corners();
         (0..6).for_each(|side| {
             let [left, right] = corners[side];
             let Some(options) = self.sides_options[side] else {
                 return;
             };
-            let normal = (left + right).normalize();
             for div in 0..subidivisions {
-                let height = delta * div as f32;
-                let left = Vec3::new(left.x, height, left.y);
-                let right = Vec3::new(right.x, height, right.y);
+                let bottom_height = delta * div as f32;
                 let mut quad =
-                    Quad::from_bottom([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
+                    Quad::from_bottom2([left, right], bottom_height, bottom_height + delta);
                 options.uv.alter_uvs(&mut quad.uvs);
                 let quad = if let Some(opts) = options.insetting {
                     quad.inset(opts.mode, opts.scale, opts.keep_inner_face)
