@@ -71,8 +71,9 @@ impl Hex {
     /// assert_eq!(Hex::from_u64(x), Hex::new(0xAA, -0xBB));
     /// ```
     #[inline]
+    #[must_use]
     #[doc(alias = "unpack")]
-    pub fn from_u64(value: u64) -> Self {
+    pub const fn from_u64(value: u64) -> Self {
         let x = (value >> 32) as i32;
         let y = (value & 0xFFFF_FFFF) as i32;
         Self::new(x, y)
@@ -92,8 +93,10 @@ impl Hex {
     /// assert_eq!(x, 0x000000AA_FFFFFF45u64);
     /// ```
     #[inline]
+    #[must_use]
+    #[allow(clippy::cast_sign_loss)]
     #[doc(alias = "pack")]
-    pub fn as_u64(self) -> u64 {
+    pub const fn as_u64(self) -> u64 {
         let high = (self.x as u32 as u64) << 32;
         let low = self.y as u32 as u64;
         high | low
