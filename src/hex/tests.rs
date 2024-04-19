@@ -544,3 +544,16 @@ fn axis_pairs() {
         assert_eq!(b.const_neg(), nb);
     }
 }
+
+#[test]
+fn u64_conversion() {
+    let coords = [i32::MIN, -100, -1, 0, 1, 100, i32::MAX];
+    for x in coords {
+        for y in coords {
+            let first = Hex::new(x, y);
+            let second = first.as_u64();
+            let third = Hex::from_u64(second);
+            assert_eq!(first, third);
+        }
+    }
+}
