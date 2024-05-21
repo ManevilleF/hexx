@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 * Added `Hex::as_u64` and `Hex::from_u64`
+  * Both are now little-endian
 
 ## 0.17.0
 
