@@ -1,8 +1,5 @@
 use crate::Hex;
-use std::{
-    collections::{HashMap, HashSet},
-    usize,
-};
+use std::collections::{HashMap, HashSet};
 
 /// Computes a field of movement around `coord` given a `budget`.
 /// This algorithm takes a `cost` function, which calculates and
