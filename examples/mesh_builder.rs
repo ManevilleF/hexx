@@ -42,8 +42,8 @@ struct BuilderParams {
     pub bottom_face: bool,
     pub scale: Vec3,
     pub sides_edit_mode: SideEditMode,
-    pub side_glob_options: SideOptions,
-    pub sides_options: [Option<SideOptions>; 6],
+    pub side_glob_options: FaceOptions,
+    pub sides_options: [Option<FaceOptions>; 6],
     pub caps_uvs: UVOptions,
     pub caps_inset: Option<InsetOptions>,
 }
@@ -134,7 +134,7 @@ fn show_ui(world: &mut World) {
                         })
                 });
 
-                let mut side_opts = |ui: &mut Ui, options: &mut SideOptions| {
+                let mut side_opts = |ui: &mut Ui, options: &mut FaceOptions| {
                     ui.scope(|ui| {
                         ui.label("UV");
                         bevy_inspector::ui_for_value(&mut options.uv, ui, world);
@@ -171,7 +171,7 @@ fn show_ui(world: &mut World) {
                             ui.strong(format!("{dir:?}"));
                             if option.is_none() {
                                 if ui.button("Enable").clicked() {
-                                    *option = Some(SideOptions::new());
+                                    *option = Some(FaceOptions::new());
                                 }
                             } else if ui.button("Disable").clicked() {
                                 *option = None;
@@ -352,8 +352,8 @@ impl Default for BuilderParams {
             top_face: true,
             bottom_face: true,
             sides_edit_mode: SideEditMode::Global,
-            side_glob_options: SideOptions::new(),
-            sides_options: [Some(SideOptions::new()); 6],
+            side_glob_options: FaceOptions::new(),
+            sides_options: [Some(FaceOptions::new()); 6],
             caps_uvs: UVOptions::new(),
             scale: Vec3::ONE,
             caps_inset: None,

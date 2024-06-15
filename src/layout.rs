@@ -160,17 +160,17 @@ impl HexLayout {
     pub fn hex_edge_corners(&self, hex: Hex) -> [[Vec2; 2]; 6] {
         let center = self.hex_to_world_pos(hex);
         self.center_aligned_edge_corners()
-            .map(|p| p.map(|c| c * self.axis_scale() + center))
+            .map(|p| p.map(|c| c + center))
     }
 
     #[must_use]
-    /// Unscaled, non offsetted hex corners
+    /// Non offsetted hex corners
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
         VertexDirection::ALL_DIRECTIONS.map(|dir| dir.world_unit_vector(self))
     }
 
     #[must_use]
-    /// Unscaled, non offsetted hex edges
+    /// Non offsetted hex edges
     pub(crate) fn center_aligned_edge_corners(&self) -> [[Vec2; 2]; 6] {
         EdgeDirection::ALL_DIRECTIONS
             .map(|dir| dir.vertex_directions().map(|v| v.world_unit_vector(self)))

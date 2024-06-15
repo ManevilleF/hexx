@@ -1,13 +1,14 @@
 mod column_builder;
+/// Utility module for mesh construction
+pub mod face;
 mod heightmap_builder;
 mod plane_builder;
 #[cfg(test)]
 mod tests;
-/// Utility module for mesh construction
-pub mod utils;
 mod uv_mapping;
 
-pub use column_builder::{ColumnMeshBuilder, SideOptions};
+pub use column_builder::ColumnMeshBuilder;
+pub use heightmap_builder::HeightMapMeshBuilder;
 pub use plane_builder::PlaneMeshBuilder;
 pub use uv_mapping::{Rect, UVOptions};
 
@@ -43,6 +44,28 @@ pub enum InsetScaleMode {
     /// Each inset vertex position will be at a proportional scale of the
     /// original one relative to its smallest edge
     SmallestEdge,
+}
+
+/// 3d face uv and insetting options
+#[derive(Debug, Copy, Clone, Default)]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+pub struct FaceOptions {
+    /// UV mapping options
+    pub uv: UVOptions,
+    /// Insetting options
+    pub insetting: Option<InsetOptions>,
+}
+
+impl FaceOptions {
+    /// Generates default quad options
+    #[inline]
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            uv: UVOptions::new(),
+            insetting: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default)]

@@ -1,5 +1,7 @@
-use crate::{utils::Hexagon, Hex, HexLayout, InsetOptions, MeshInfo, UVOptions, BASE_FACING};
+use crate::{face::Hexagon, Hex, HexLayout, InsetOptions, MeshInfo, UVOptions, BASE_FACING};
 use glam::{Quat, Vec3};
+
+use super::FaceOptions;
 
 /// Builder struct to customize hex plane mesh generation.
 ///
@@ -31,12 +33,10 @@ pub struct PlaneMeshBuilder<'l> {
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub rotation: Option<Quat>,
-    /// UV mapping options
-    pub uv_options: UVOptions,
+    /// UV mapping and insetting options
+    pub face_options: FaceOptions,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
-    /// Optional inset options for the plane face
-    pub inset_options: Option<InsetOptions>,
 }
 
 impl<'l> PlaneMeshBuilder<'l> {
@@ -49,9 +49,8 @@ impl<'l> PlaneMeshBuilder<'l> {
             rotation: None,
             offset: None,
             scale: None,
-            uv_options: UVOptions::new(),
+            face_options: FaceOptions::new(),
             center_aligned: false,
-            inset_options: None,
         }
     }
 
@@ -103,7 +102,7 @@ impl<'l> PlaneMeshBuilder<'l> {
     /// Specify custom UV mapping options
     #[must_use]
     pub const fn with_uv_options(mut self, uv_options: UVOptions) -> Self {
-        self.uv_options = uv_options;
+        self.face_options.uv = uv_options;
         self
     }
 
@@ -120,7 +119,7 @@ impl<'l> PlaneMeshBuilder<'l> {
     #[must_use]
     #[inline]
     pub const fn with_inset_options(mut self, opts: InsetOptions) -> Self {
-        self.inset_options = Some(opts);
+        self.face_options.insetting = Some(opts);
         self
     }
 
@@ -137,7 +136,7 @@ impl<'l> PlaneMeshBuilder<'l> {
         };
         let mut offset = Vec3::new(pos.x, 0.0, pos.y);
         // We apply optional insetting
-        let mut mesh = if let Some(inset) = self.inset_options {
+        let mut mesh = if let Some(inset) = self.face_options.insetting {
             face.inset(inset.mode, inset.scale, inset.keep_inner_face)
         } else {
             face.into()
@@ -155,7 +154,7 @@ impl<'l> PlaneMeshBuilder<'l> {
             offset += custom_offset;
         }
         mesh = mesh.with_offset(offset);
-        self.uv_options.alter_uvs(&mut mesh.uvs);
+        self.face_options.uv.alter_uvs(&mut mesh.uvs);
         mesh
     }
 }

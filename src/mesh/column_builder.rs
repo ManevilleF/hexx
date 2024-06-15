@@ -1,7 +1,9 @@
 use glam::{Quat, Vec3};
 
-use super::{utils::Quad, MeshInfo, BASE_FACING};
-use crate::{EdgeDirection, Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions};
+use super::{face::Quad, MeshInfo, BASE_FACING};
+use crate::{
+    EdgeDirection, FaceOptions, Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions,
+};
 
 /// Builder struct to customize hex column mesh generation.
 ///
@@ -59,32 +61,11 @@ pub struct ColumnMeshBuilder<'l> {
     pub top_face: Option<PlaneMeshBuilder<'l>>,
     /// Bottom hexagonal face builder
     pub bottom_face: Option<PlaneMeshBuilder<'l>>,
-    /// Options for the column side quads
-    pub sides_options: [Option<SideOptions>; 6],
+    /// Options for the column side quads. If `None` the side quad will not be
+    /// generated
+    pub sides_options: [Option<FaceOptions>; 6],
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
-}
-
-/// Column Quad options
-#[derive(Debug, Copy, Clone, Default)]
-#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
-pub struct SideOptions {
-    /// UV mapping options
-    pub uv: UVOptions,
-    /// Insetting options
-    pub insetting: Option<InsetOptions>,
-}
-
-impl SideOptions {
-    /// Generates default quad options
-    #[inline]
-    #[must_use]
-    pub const fn new() -> Self {
-        Self {
-            uv: UVOptions::new(),
-            insetting: None,
-        }
-    }
 }
 
 impl<'l> ColumnMeshBuilder<'l> {
@@ -101,7 +82,7 @@ impl<'l> ColumnMeshBuilder<'l> {
             scale: None,
             top_face: Some(PlaneMeshBuilder::new(layout)),
             bottom_face: Some(PlaneMeshBuilder::new(layout)),
-            sides_options: [Some(SideOptions::new()); 6],
+            sides_options: [Some(FaceOptions::new()); 6],
             center_aligned: false,
         }
     }
@@ -198,7 +179,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Specify custom uv options for the top/bottom caps triangles
     ///
     /// Note:
-    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
+    /// this won't have any effect if `top_face` and `bottom_face` are disabled
     pub const fn with_caps_uv_options(mut self, uv_options: UVOptions) -> Self {
         if let Some(builder) = self.top_face {
             self.top_face = Some(builder.with_uv_options(uv_options));
@@ -212,7 +193,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Specify inset option for the top/bottom caps faces
     ///
     /// Note:
-    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
+    /// this won't have any effect if `top_face` and `bottom_face` are disabled
     #[must_use]
     #[inline]
     pub const fn with_caps_inset_options(mut self, opts: InsetOptions) -> Self {
@@ -231,7 +212,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     ///
     /// To customize each side quad, prefer
     /// [`Self::with_multi_sides_options`]
-    pub const fn with_sides_options(mut self, options: SideOptions) -> Self {
+    pub const fn with_sides_options(mut self, options: FaceOptions) -> Self {
         self.sides_options = [Some(options); 6];
         self
     }
@@ -244,7 +225,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// For a global setting prefer [`Self::with_sides_options`]
     pub fn with_sides_options_fn(
         mut self,
-        options: impl Fn(EdgeDirection) -> Option<SideOptions>,
+        options: impl Fn(EdgeDirection) -> Option<FaceOptions>,
     ) -> Self {
         self.sides_options = std::array::from_fn(|i| options(EdgeDirection(i as u8)));
         self
@@ -255,7 +236,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Specify options for each of the side quad triangles.
     ///
     /// For a global setting prefer [`Self::with_sides_options`]
-    pub fn with_multi_sides_options(mut self, options: [SideOptions; 6]) -> Self {
+    pub fn with_multi_sides_options(mut self, options: [FaceOptions; 6]) -> Self {
         self.sides_options = options.map(Some);
         self
     }
@@ -267,7 +248,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// For a global setting prefer [`Self::with_sides_options`]
     pub const fn with_multi_custom_sides_options(
         mut self,
-        options: [Option<SideOptions>; 6],
+        options: [Option<FaceOptions>; 6],
     ) -> Self {
         self.sides_options = options;
         self
@@ -307,8 +288,7 @@ impl<'l> ColumnMeshBuilder<'l> {
             };
             for div in 0..subidivisions {
                 let bottom_height = delta * div as f32;
-                let mut quad =
-                    Quad::from_bottom2([left, right], bottom_height, bottom_height + delta);
+                let mut quad = Quad::new([left, right], bottom_height, bottom_height + delta);
                 options.uv.alter_uvs(&mut quad.uvs);
                 let quad = if let Some(opts) = options.insetting {
                     quad.inset(opts.mode, opts.scale, opts.keep_inner_face)
