@@ -307,8 +307,7 @@ impl<'l> ColumnMeshBuilder<'l> {
             };
             for div in 0..subidivisions {
                 let bottom_height = delta * div as f32;
-                let mut quad =
-                    Quad::from_bottom2([left, right], bottom_height, bottom_height + delta);
+                let mut quad = Quad::new([left, right], bottom_height, bottom_height + delta);
                 options.uv.alter_uvs(&mut quad.uvs);
                 let quad = if let Some(opts) = options.insetting {
                     quad.inset(opts.mode, opts.scale, opts.keep_inner_face)

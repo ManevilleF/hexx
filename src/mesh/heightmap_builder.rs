@@ -1,18 +1,17 @@
+use super::{utils::Quad, MeshInfo};
+use crate::{EdgeDirection, Hex, HexLayout, PlaneMeshBuilder, UVOptions};
+use glam::Vec3;
 use std::collections::HashMap;
 
-use glam::{Quat, Vec3};
-
-use super::{utils::Quad, MeshInfo, BASE_FACING};
-use crate::{EdgeDirection, Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions};
-
-#[derive(Debug, Clone)]
-#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct HeightMapMeshBuilder<'l, 'm> {
     /// The hexagonal layout, used to compute vertex positions
     pub layout: &'l HexLayout,
     /// The column height on missing neighbor
     pub base_height: Option<f32>,
     pub map: &'m HashMap<Hex, f32>,
+
+    pub caps_uv_options: Option<Box<dyn Fn(Hex, f32) -> UVOptions>>,
+    pub sides_uv_options: Option<Box<dyn Fn(Hex, EdgeDirection, f32) -> UVOptions>>,
 }
 
 impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
@@ -21,6 +20,8 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
             layout,
             map,
             base_height: None,
+            caps_uv_options: None,
+            sides_uv_options: None,
         }
     }
 
@@ -28,12 +29,18 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
         // We create the final mesh
         let mut mesh = MeshInfo::default();
 
+        let min = self.map.values().copied().reduce(f32::min).unwrap_or(0.0);
+        let max = self.map.values().copied().reduce(f32::max).unwrap_or(0.0);
+
         for (&hex, &height) in self.map {
-            let plane = PlaneMeshBuilder::new(self.layout)
+            let mut plane = PlaneMeshBuilder::new(self.layout)
                 .at(hex)
-                .with_offset(Vec3::Y * height)
-                .build();
-            mesh.merge_with(plane);
+                .with_offset(Vec3::Y * height);
+            if let Some(opt) = &self.caps_uv_options {
+                let options = opt(hex, height);
+                plane = plane.with_uv_options(options);
+            }
+            mesh.merge_with(plane.build());
             let corners = self.layout.hex_edge_corners(hex);
             let dir_heights = EdgeDirection::ALL_DIRECTIONS.map(|dir| {
                 (
@@ -45,11 +52,20 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
                 let Some(other_height) = opt_height else {
                     continue;
                 };
-                if other_height < height {
+                if other_height <= height {
                     continue;
                 }
                 let points = corners[dir.index() as usize];
-                let quad = Quad::from_bottom2(points, height, other_height);
+
+                let quad = self.sides_uv_options.as_ref().map_or_else(
+                    || Quad::new_bounded(points, height, other_height, [min, max]),
+                    |opt| {
+                        let mut quad = Quad::new(points, height, other_height);
+                        let options = opt(hex, dir, other_height - height);
+                        options.alter_uvs(&mut quad.uvs);
+                        quad
+                    },
+                );
                 mesh.merge_with(quad.into());
             }
         }
