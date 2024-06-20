@@ -6,7 +6,7 @@ mod tests;
 pub mod utils;
 mod uv_mapping;
 
-pub use column_builder::ColumnMeshBuilder;
+pub use column_builder::{ColumnMeshBuilder, SideOptions};
 pub use plane_builder::PlaneMeshBuilder;
 pub use uv_mapping::{Rect, UVOptions};
 
