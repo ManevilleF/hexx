@@ -51,7 +51,7 @@ fn setup_grid(
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
     let default_mat = materials.add(Color::WHITE);
-    let selected_mat = materials.add(Color::RED);
+    let selected_mat = materials.add(Color::srgb(1.0, 0.0, 0.0));
     let bounds = HexBounds::new(Hex::ZERO, MAP_RADIUS);
     let entities = bounds
         .all_coords()

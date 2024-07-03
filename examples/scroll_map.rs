@@ -52,7 +52,7 @@ fn setup_grid(
         .all_coords()
         .map(|hex| {
             let v = 1.0 - (hex.length() as f32 / MAP_RADIUS as f32);
-            let color = Color::rgb(v, v, v);
+            let color = Color::srgb(v, v, v);
             let material = materials.add(color);
             let pos = layout.hex_to_world_pos(hex);
             let entity = commands

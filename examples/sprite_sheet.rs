@@ -1,5 +1,5 @@
 use bevy::{prelude::*, utils::HashMap, window::PrimaryWindow};
-use glam::vec2;
+use glam::uvec2;
 use hexx::{shapes, *};
 
 const HEX_SIZE: Vec2 = Vec2::splat(20.0);
@@ -15,7 +15,7 @@ pub fn main() {
         }))
         .add_systems(Startup, (setup_camera, setup_grid))
         .add_systems(Update, handle_input)
-        .run()
+        .run();
 }
 
 /// 3D Orthogrpahic camera setup
@@ -36,7 +36,7 @@ fn setup_grid(
 ) {
     let texture = asset_server.load("kenney/hexagonTerrain_sheet.png");
     let atlas_layout =
-        TextureAtlasLayout::from_grid(vec2(120.0, 140.0), 7, 6, Some(vec2(2.0, 2.0)), None);
+        TextureAtlasLayout::from_grid(uvec2(120, 140), 7, 6, Some(uvec2(2, 2)), None);
     let atlas_layout = atlas_layouts.add(atlas_layout);
     let layout = HexLayout {
         orientation: HexOrientation::Pointy,
@@ -50,19 +50,21 @@ fn setup_grid(
             let pos = layout.hex_to_world_pos(coord);
             let index = i % (7 * 6);
             let entity = commands
-                .spawn(SpriteSheetBundle {
-                    sprite: Sprite {
-                        custom_size: Some(sprite_size),
+                .spawn((
+                    SpriteBundle {
+                        sprite: Sprite {
+                            custom_size: Some(sprite_size),
+                            ..default()
+                        },
+                        texture: texture.clone(),
+                        transform: Transform::from_xyz(pos.x, pos.y, 0.0),
                         ..default()
                     },
-                    texture: texture.clone(),
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                    atlas: TextureAtlas {
+                    TextureAtlas {
                         index,
                         layout: atlas_layout.clone(),
                     },
-                    ..default()
-                })
+                ))
                 .id();
             (coord, entity)
         })

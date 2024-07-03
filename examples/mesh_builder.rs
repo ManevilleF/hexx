@@ -259,25 +259,10 @@ fn gizmos(
 ) {
     let transform = transforms.get(info.mesh_entity).unwrap();
     // Global axis
-    draw.line(Vec3::NEG_X * 100.0, Vec3::X * 100.0, Color::RED.with_a(0.4));
-    draw.line(
-        Vec3::NEG_Y * 100.0,
-        Vec3::Y * 100.0,
-        Color::GREEN.with_a(0.4),
-    );
-    draw.line(
-        Vec3::NEG_Z * 100.0,
-        Vec3::Z * 100.0,
-        Color::BLUE.with_a(0.4),
-    );
+    draw.axes(Transform::default(), 100.0);
     // Local axis
     let radius = info.layout.hex_size.length() * params.scale.length();
-    draw.circle(Vec3::ZERO, transform.local_x(), radius, Color::RED)
-        .segments(64);
-    draw.circle(Vec3::ZERO, transform.local_y(), radius, Color::GREEN)
-        .segments(64);
-    draw.circle(Vec3::ZERO, transform.forward(), radius, Color::BLUE)
-        .segments(64);
+    draw.axes(*transform, radius);
 }
 
 fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {

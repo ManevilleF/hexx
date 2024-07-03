@@ -1,4 +1,5 @@
 use bevy::{
+    color::palettes::css::{BLACK, LIGHT_CYAN, WHITE},
     log,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
@@ -51,9 +52,9 @@ fn setup_grid(
         ..default()
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
-    let default_mat = materials.add(Color::WHITE);
-    let blocked_mat = materials.add(Color::BLACK);
-    let path_mat = materials.add(Color::CYAN);
+    let default_mat = materials.add(Color::Srgba(WHITE));
+    let blocked_mat = materials.add(Color::Srgba(BLACK));
+    let path_mat = materials.add(Color::Srgba(LIGHT_CYAN));
     let mut blocked_coords = HashSet::new();
     let entities = Hex::ZERO
         .spiral_range(0..=MAP_RADIUS)

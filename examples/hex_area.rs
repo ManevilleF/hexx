@@ -1,4 +1,5 @@
 use bevy::{
+    color::palettes::css::{GOLD, ORANGE, RED, WHITE},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::HashSet,
@@ -66,9 +67,9 @@ fn setup_grid(
         ..default()
     };
     // materials
-    let area_material = materials.add(Color::GOLD);
-    let default_material = materials.add(Color::WHITE);
-    let cursor_material = materials.add(Color::RED);
+    let area_material = materials.add(Color::Srgba(GOLD));
+    let default_material = materials.add(Color::Srgba(WHITE));
+    let cursor_material = materials.add(Color::Srgba(RED));
 
     // mesh
     let mut spawn_map = |layout: &HexLayout| {
@@ -198,7 +199,7 @@ fn gizmos(mut gizmos: Gizmos, area: Res<HexArea>, map: Res<Map>) {
     for layout in [&map.flat_layout, &map.pointy_layout] {
         for edge in &edges {
             let [a, b] = layout.edge_coordinates(*edge);
-            gizmos.line_2d(a, b, Color::ORANGE);
+            gizmos.line_2d(a, b, Color::Srgba(ORANGE));
         }
     }
 }
