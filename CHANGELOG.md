@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 * Added `Hex::as_u64` and `Hex::from_u64`
+* Bumped `bevy` to 0.14.x (#173)
+* Bumped bevy ecosystem dependencies (#173)
+* Updated examples (#173)
 
 ## 0.17.0
 
