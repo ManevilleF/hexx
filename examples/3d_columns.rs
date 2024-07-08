@@ -1,4 +1,5 @@
 use bevy::{
+    color::palettes::css::{WHITE, YELLOW},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     time::common_conditions::on_timer,
@@ -65,8 +66,8 @@ fn setup_grid(
         ..default()
     };
     // materials
-    let default_material = materials.add(Color::WHITE);
-    let highlighted_material = materials.add(Color::YELLOW);
+    let default_material = materials.add(Color::Srgba(WHITE));
+    let highlighted_material = materials.add(Color::Srgba(YELLOW));
     // mesh
     let mesh = hexagonal_column(&layout);
     let mesh_handle = meshes.add(mesh);

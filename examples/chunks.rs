@@ -1,4 +1,5 @@
 use bevy::{
+    color::palettes::css::{BLUE, RED, WHITE},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
@@ -7,7 +8,7 @@ use hexx::{shapes, *};
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: Vec2 = Vec2::splat(8.0);
 const CHUNK_SIZE: u32 = 5;
-const COLORS: [Color; 3] = [Color::WHITE, Color::BLUE, Color::RED];
+const COLORS: [Color; 3] = [Color::Srgba(BLUE), Color::Srgba(WHITE), Color::Srgba(RED)];
 
 pub fn main() {
     App::new()

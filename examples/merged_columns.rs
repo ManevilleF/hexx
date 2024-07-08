@@ -1,6 +1,7 @@
 use std::ops::Range;
 
 use bevy::{
+    color::palettes::css::{BLUE, RED, WHITE},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
@@ -9,7 +10,7 @@ use hexx::*;
 use rand::{thread_rng, Rng};
 
 /// Chunk colors
-const COLORS: [Color; 3] = [Color::WHITE, Color::BLUE, Color::RED];
+const COLORS: [Color; 3] = [Color::Srgba(BLUE), Color::Srgba(WHITE), Color::Srgba(RED)];
 
 pub fn main() {
     App::new()
