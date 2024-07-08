@@ -222,7 +222,13 @@
 //! The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or
 //! [`ColumnMeshBuilder`]
 #![forbid(unsafe_code)]
-#![warn(clippy::nursery, clippy::pedantic, clippy::cargo, missing_docs)]
+#![warn(
+    clippy::nursery,
+    clippy::pedantic,
+    clippy::cargo,
+    clippy::unwrap_used,
+    missing_docs
+)]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
 /// Non exhaustive collection of classic algorithms.
 #[cfg(feature = "algorithms")]
