@@ -72,10 +72,10 @@ fn show_ui(world: &mut World) {
             ui.heading("Global");
             egui::Grid::new("Grid").num_columns(2).show(ui, |ui| {
                 ui.label("Column Height");
-                ui.add(egui::DragValue::new(&mut params.height).clamp_range(1.0..=50.0));
+                ui.add(egui::DragValue::new(&mut params.height).range(1.0..=50.0));
                 ui.end_row();
                 ui.label("Side Subdivisions");
-                ui.add(egui::DragValue::new(&mut params.subdivisions).clamp_range(0..=50));
+                ui.add(egui::DragValue::new(&mut params.subdivisions).range(0..=50));
                 ui.end_row();
                 ui.label("Top Face");
                 ui.add(egui::Checkbox::without_text(&mut params.top_face));
@@ -160,27 +160,39 @@ fn show_ui(world: &mut World) {
             return;
         };
         let mut egui_context = egui_context.clone();
-        egui::Window::new("Visuals").show(egui_context.get_mut(), |ui| {
-            bevy_inspector::ui_for_resource::<AmbientLight>(world, ui);
-            let info = world.resource::<HexInfo>();
-            let mat = materials.get_mut(&info.material_handle).unwrap();
-            ui.collapsing("Material", |ui| {
-                bevy_inspector::ui_for_value(&mut mat.base_color, ui, world);
-                bevy_inspector::ui_for_value(&mut mat.double_sided, ui, world);
-                match &mut mat.cull_mode {
-                    Some(_) => {
-                        if ui.button("No Culling").clicked() {
-                            mat.cull_mode = None
+        let ctx = egui_context.get_mut();
+        let rect = ctx.screen_rect().with_min_x(250.0);
+        egui::Window::new("Visuals")
+            .constrain_to(rect)
+            .show(ctx, |ui| {
+                ui.collapsing("Ambient Light", |ui| {
+                    bevy_inspector::ui_for_resource::<AmbientLight>(world, ui);
+                });
+                let info = world.resource::<HexInfo>();
+                let mat = materials.get_mut(&info.material_handle).unwrap();
+                ui.collapsing("Material", |ui| {
+                    ui.horizontal(|ui| {
+                        ui.label("Base Color");
+                        bevy_inspector::ui_for_value(&mut mat.base_color, ui, world);
+                    });
+                    ui.horizontal(|ui| {
+                        ui.label("Double sided");
+                        bevy_inspector::ui_for_value(&mut mat.double_sided, ui, world);
+                    });
+                    match &mut mat.cull_mode {
+                        Some(_) => {
+                            if ui.button("No Culling").clicked() {
+                                mat.cull_mode = None
+                            }
+                        }
+                        None => {
+                            if ui.button("Cull back faces").clicked() {
+                                mat.cull_mode = Some(bevy::render::render_resource::Face::Back);
+                            }
                         }
                     }
-                    None => {
-                        if ui.button("Cull back faces").clicked() {
-                            mat.cull_mode = Some(bevy::render::render_resource::Face::Back);
-                        }
-                    }
-                }
+                });
             });
-        });
     });
 }
 
@@ -261,8 +273,12 @@ fn gizmos(
     // Global axis
     draw.axes(Transform::default(), 100.0);
     // Local axis
-    let radius = info.layout.hex_size.length() * params.scale.length();
-    draw.axes(*transform, radius);
+    let mut transform = *transform;
+    transform.scale.y += params.height / 2.0;
+    transform.scale.x += info.layout.hex_size.x;
+    transform.scale.z += info.layout.hex_size.y;
+    transform.scale *= params.scale;
+    draw.axes(transform, 1.0);
 }
 
 fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {

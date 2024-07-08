@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use bevy::{
-    color::palettes::css::{LIGHT_BLUE, LIMEGREEN, ORANGE, RED, VIOLET, WHITE, YELLOW},
+    color::palettes::css::{AQUA, LIMEGREEN, ORANGE, RED, VIOLET, WHITE, YELLOW},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
@@ -70,7 +70,7 @@ fn setup_grid(
     // materials
     let selected_material = materials.add(Color::Srgba(RED));
     let ring_material = materials.add(Color::Srgba(YELLOW));
-    let wedge_material = materials.add(Color::Srgba(LIGHT_BLUE));
+    let wedge_material = materials.add(Color::Srgba(AQUA));
     let dir_wedge_material = materials.add(Color::Srgba(VIOLET));
     let line_material = materials.add(Color::Srgba(ORANGE));
     let half_ring_material = materials.add(Color::Srgba(LIMEGREEN));

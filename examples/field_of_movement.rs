@@ -1,5 +1,5 @@
 use bevy::{
-    color::palettes::css::{DARK_GRAY, GREEN, WHITE, YELLOW},
+    color::palettes::css::{GRAY, LIME, WHITE, YELLOW},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::HashSet,
@@ -92,9 +92,9 @@ fn setup_grid(
     };
     let mesh = meshes.add(hexagonal_plane(&layout));
     let plains_mat = materials.add(Color::Srgba(WHITE));
-    let forest_mat = materials.add(Color::Srgba(GREEN));
+    let forest_mat = materials.add(Color::Srgba(LIME));
     let desert_mat = materials.add(Color::Srgba(YELLOW));
-    let wall_mat = materials.add(Color::Srgba(DARK_GRAY));
+    let wall_mat = materials.add(Color::Srgba(GRAY));
 
     let mut rng = rand::thread_rng();
 
