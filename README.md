@@ -353,6 +353,14 @@ and how to use two layouts on the same grid.
  > `cargo run --example 3d_columns`
 
  This example showcases the 3d hexagon columns procedural generation
+ 
+### 3d picking 
+ 
+![picking](docs/3d_picking.png "3d picking example")
+ 
+ > `cargo run --example 3d_picking`
+ 
+This example showcases how to use the camera ray to detect hovered 3d columns
 
 ### Mesh builder
 
