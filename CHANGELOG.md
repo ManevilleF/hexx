@@ -2,10 +2,11 @@
 
 ## [Unreleased]
 
-* Added `Hex::as_u64` and `Hex::from_u64`
+* Added `Hex::as_u64` and `Hex::from_u64` (#169)
 * Bumped `bevy` to 0.14.x (#173)
 * Bumped bevy ecosystem dependencies (#173)
 * Updated examples (#173)
+* Added a 3d picking exampe (#177)
 
 ## 0.17.0
 
