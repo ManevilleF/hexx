@@ -108,8 +108,7 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
     ///
     /// * `mode` - the insetting behaviour mode
     /// * `keep_inner_face` - If set to true the insetted face will be kept,
-    ///   otherwise
-    /// it will be removed
+    ///   otherwise it will be removed
     #[allow(clippy::cast_possible_truncation)]
     #[must_use]
     pub fn inset(self, mode: InsetScaleMode, scale: f32, keep_inner_face: bool) -> MeshInfo {

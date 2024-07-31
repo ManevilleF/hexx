@@ -698,8 +698,7 @@ impl Hex {
     /// Find in which [`VertexDirection`] wedge `rhs` is relative to `self`.
     ///
     /// > This method can be innaccurate in case of a *tie* between directions,
-    /// > prefer
-    /// using [`Self::diagonal_way_to`] instead
+    /// > prefer using [`Self::diagonal_way_to`] instead
     pub fn main_diagonal_to(self, rhs: Self) -> VertexDirection {
         self.diagonal_way_to(rhs).unwrap()
     }
@@ -723,8 +722,7 @@ impl Hex {
     /// Find in which [`EdgeDirection`] wedge `rhs` is relative to `self`
     ///
     /// > This method can be innaccurate in case of a *tie* between directions,
-    /// > prefer
-    /// using [`Self::way_to`] for accuracy
+    /// > prefer using [`Self::way_to`] for accuracy
     #[must_use]
     pub fn main_direction_to(self, rhs: Self) -> EdgeDirection {
         self.way_to(rhs).unwrap()

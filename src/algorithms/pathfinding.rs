@@ -46,7 +46,7 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
 /// * `start` - start node
 /// * `end` - destination node
 /// * `cost` - cost function taking a node pair (`a` -> `b`) and returning the
-/// logical cost to go from `a` to `b`
+///   logical cost to go from `a` to `b`
 ///
 /// # Examples
 ///
