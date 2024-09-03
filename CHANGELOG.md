@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.18.0
+
 * Fix `unexpected_cfgs` check complaining about `spirv` arch
 * Added `Hex::as_u64` and `Hex::from_u64` (#169)
 * Bumped `bevy` to 0.14.x (#173)
