@@ -73,6 +73,9 @@ bevy-inspector-egui = "0.25"
 bevy_egui = "0.28"
 approx = "0.5"
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_arch, values("spirv"))'] }
+
 [[example]]
 name = "hex_grid"
 path = "examples/hex_grid.rs"
