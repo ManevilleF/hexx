@@ -1,4 +1,4 @@
-use crate::{orientation::SQRT_3, Hex, HexOrientation, VertexDirection};
+use crate::{orientation::SQRT_3, EdgeDirection, Hex, HexOrientation, VertexDirection};
 use glam::Vec2;
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
@@ -104,10 +104,28 @@ impl HexLayout {
             .map(|c| (c * self.axis_scale()) + center)
     }
 
+    /// Retrieves all 6 edge corner pair coordinates of the given hexagonal coordinates
+    /// `hex`
+    #[must_use]
+    pub fn hex_edge_corners(&self, hex: Hex) -> [[Vec2; 2]; 6] {
+        let center = self.hex_to_world_pos(hex);
+        self.center_aligned_edge_corners()
+            .map(|p| p.map(|c| c * self.axis_scale() + center))
+    }
+
     #[must_use]
     /// Unscaled, non offsetted hex corners
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
         VertexDirection::ALL_DIRECTIONS.map(|dir| dir.unit_vector(self.orientation) * self.hex_size)
+    }
+
+    #[must_use]
+    /// Unscaled, non offsetted hex edges
+    pub(crate) fn center_aligned_edge_corners(&self) -> [[Vec2; 2]; 6] {
+        EdgeDirection::ALL_DIRECTIONS.map(|dir| {
+            dir.vertex_directions()
+                .map(|v| v.unit_vector(self.orientation) * self.hex_size)
+        })
     }
 
     #[inline]
