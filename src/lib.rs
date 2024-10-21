@@ -227,7 +227,9 @@
     clippy::pedantic,
     clippy::cargo,
     clippy::unwrap_used,
-    missing_docs
+    missing_docs,
+    nonstandard_style,
+    future_incompatible
 )]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
 /// Non exhaustive collection of classic algorithms.

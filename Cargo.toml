@@ -69,12 +69,14 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.8"
-bevy-inspector-egui = "0.25"
-bevy_egui = "0.28"
+bevy-inspector-egui = "0.27"
+bevy_egui = "0.30"
 approx = "0.5"
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_arch, values("spirv"))'] }
+unexpected_cfgs = { level = "warn", check-cfg = [
+    'cfg(target_arch, values("spirv"))',
+] }
 
 [[example]]
 name = "hex_grid"

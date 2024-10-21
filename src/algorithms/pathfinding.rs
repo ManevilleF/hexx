@@ -35,7 +35,8 @@ fn reconstruct_path(came_from: &HashMap<Hex, Hex>, end: Hex) -> Vec<Hex> {
     path
 }
 
-/// Performs A star pathfinding between `start` and `end`.
+/// Performs A star pathfinding between `start` and `end`
+///
 /// The `cost` parameter should give the cost of each coordinate (`Some`) or
 /// indicate the coordinate is not included in the pathfinding (`None`).
 /// This function already takes care of heuristics based on the distance between

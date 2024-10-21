@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Bump `bevy_egui` dev dependency to `0.30`
+* Bump `bevy_inspector_egui` dev dependency to `0.27`
+
 ## 0.18.0
 
 * Fix `unexpected_cfgs` check complaining about `spirv` arch
