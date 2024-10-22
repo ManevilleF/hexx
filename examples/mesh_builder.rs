@@ -114,7 +114,7 @@ fn show_ui(world: &mut World) {
                 ui.separator();
                 ui.heading("Sides UV options");
                 ui.horizontal(|ui| {
-                    egui::ComboBox::from_id_source("Side Uv mode")
+                    egui::ComboBox::from_id_salt("Side Uv mode")
                         .selected_text(params.sides_uvs_mode.label())
                         .show_ui(ui, |ui| {
                             let option = SideUVMode::Global;

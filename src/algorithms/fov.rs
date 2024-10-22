@@ -1,7 +1,8 @@
 use crate::{EdgeDirection, Hex};
 use std::collections::HashSet;
 
-/// Computes a field of view around `coord` in a given `range`.
+/// Computes a field of view around `coord` in a given `range`
+///
 /// This algorithm takes in account coordinates *visibility* through the
 /// `blocking` argument. (*Blocking* coordinates should return `true`)
 ///
@@ -30,7 +31,8 @@ pub fn range_fov(coord: Hex, range: u32, blocking: impl Fn(Hex) -> bool) -> Hash
 }
 
 /// Computes a field of view around `coord` in a given `range` towards
-/// `direction` with 120 degrees vision.
+/// `direction` with 120 degrees vision
+///
 /// This algorithm takes in account coordinates *visibility* through the
 /// `blocking` argument. (*Blocking* coordinates should return `true`)
 ///

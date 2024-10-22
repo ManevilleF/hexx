@@ -1,7 +1,8 @@
 use crate::Hex;
 use std::collections::{HashMap, HashSet};
 
-/// Computes a field of movement around `coord` given a `budget`.
+/// Computes a field of movement around `coord` given a `budget`
+///
 /// This algorithm takes a `cost` function, which calculates and
 /// returns the cost of movement through a given `Hex` tile.
 /// The `cost` function should return an `Option<u32>`.

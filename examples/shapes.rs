@@ -115,7 +115,7 @@ fn show_ui(world: &mut World) {
         world.resource_scope(|world, mut shape: Mut<Shape>| {
             ui.horizontal(|ui| {
                 ui.label("Shape");
-                egui::ComboBox::from_id_source("Shape")
+                egui::ComboBox::from_id_salt("Shape")
                     .selected_text(shape.label())
                     .show_ui(ui, |ui| {
                         for option in Shape::all_values() {
