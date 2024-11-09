@@ -36,14 +36,14 @@ features = ["derive"]
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.14"
+version = "0.15.0-rc.3"
 default-features = false
 features = ["glam"]
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.14"
+version = "0.15.0-rc.3"
 features = [
     "bevy_asset",
     "bevy_winit",
