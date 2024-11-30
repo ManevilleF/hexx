@@ -136,8 +136,8 @@ fn setup_grid(
         pointy_entities,
         flat_cursor_entity,
         pointy_cursor_entity,
-        area_material,
-        default_material,
+        area_material: area_material.into(),
+        default_material: default_material.into(),
     });
 }
 

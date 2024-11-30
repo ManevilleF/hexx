@@ -133,13 +133,13 @@ fn setup_grid(
     commands.insert_resource(Map {
         layout,
         entities,
-        selected_material,
-        ring_material,
-        default_material,
-        line_material,
-        half_ring_material,
-        wedge_material,
-        dir_wedge_material,
+        selected_material: selected_material.into(),
+        ring_material: ring_material.into(),
+        default_material: default_material.into(),
+        line_material: line_material.into(),
+        half_ring_material: half_ring_material.into(),
+        wedge_material: wedge_material.into(),
+        dir_wedge_material: dir_wedge_material.into(),
     });
 }
 
@@ -174,15 +174,15 @@ fn handle_input(
                 for entity in vec.iter().filter_map(|h| map.entities.get(h)) {
                     commands
                         .entity(*entity)
-                        .insert(map.default_material.clone_weak());
+                        .insert(MeshMaterial2d(map.default_material.clone_weak()));
                 }
             }
             commands
                 .entity(map.entities[&highlighted_hexes.selected])
-                .insert(map.default_material.clone_weak());
+                .insert(MeshMaterial2d(map.default_material.clone_weak()));
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(map.default_material.clone_weak());
+                .insert(MeshMaterial2d(map.default_material.clone_weak()));
             // Draw a line
             highlighted_hexes.line = Hex::ZERO.line_to(coord).collect();
             // Draw a rectiline path
@@ -207,7 +207,7 @@ fn handle_input(
             ] {
                 for h in vec {
                     if let Some(e) = map.entities.get(h) {
-                        commands.entity(*e).insert(mat.clone_weak());
+                        commands.entity(*e).insert(MeshMaterial2d(mat.clone_weak()));
                     }
                 }
             }
@@ -215,11 +215,11 @@ fn handle_input(
             highlighted_hexes.halfway = coord / 2;
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(map.selected_material.clone_weak());
+                .insert(MeshMaterial2d(map.selected_material.clone_weak()));
             // Make the selected tile red
             commands
                 .entity(entity)
-                .insert(map.selected_material.clone_weak());
+                .insert(MeshMaterial2d(map.selected_material.clone_weak()));
             highlighted_hexes.selected = coord;
         }
     }
