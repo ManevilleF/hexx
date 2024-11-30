@@ -1,7 +1,10 @@
 use bevy::{
     color::palettes::css::{WHITE, YELLOW},
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::{
+        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
+        render_resource::PrimitiveTopology,
+    },
     utils::HashMap,
     window::PrimaryWindow,
 };
@@ -27,6 +30,30 @@ pub fn main() {
         .run();
 }
 
+#[derive(
+    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
+)]
+#[reflect(Component, Default)]
+pub struct StandardMaterialHandle(pub Handle<StandardMaterial>);
+
+impl From<Handle<StandardMaterial>> for StandardMaterialHandle {
+    fn from(handle: Handle<StandardMaterial>) -> Self {
+        Self(handle)
+    }
+}
+
+impl From<StandardMaterialHandle> for AssetId<StandardMaterial> {
+    fn from(material: StandardMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
+impl From<&StandardMaterialHandle> for AssetId<StandardMaterial> {
+    fn from(material: &StandardMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
 #[derive(Debug, Resource)]
 struct Map {
     layout: HexLayout,
@@ -37,16 +64,14 @@ struct Map {
 
 /// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    let transform = Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(Camera3dBundle {
-        transform,
-        ..default()
-    });
-    let transform = Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(DirectionalLightBundle {
-        transform,
-        ..default()
-    });
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
+    commands.spawn((
+        DirectionalLight::default(),
+        Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
 }
 
 /// Hex grid setup
@@ -70,12 +95,11 @@ fn setup_grid(
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
-                .spawn(PbrBundle {
-                    transform: Transform::from_xyz(pos.x, -COLUMN_HEIGHT, pos.y),
-                    mesh: mesh_handle.clone(),
-                    material: default_material.clone_weak(),
-                    ..default()
-                })
+                .spawn((
+                    Mesh3d(mesh_handle.clone()),
+                    MeshMaterial3d(default_material.clone_weak()),
+                    Transform::from_xyz(pos.x, -COLUMN_HEIGHT, pos.y),
+                ))
                 .id();
             (hex, id)
         })
@@ -99,7 +123,7 @@ fn higlight_hovered(
     let (camera, cam_transform) = cameras.single();
     let Some(ray) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world(cam_transform, p).ok())
     else {
         return;
     };
@@ -114,10 +138,10 @@ fn higlight_hovered(
         };
         commands
             .entity(entity)
-            .insert(map.highlighted_material.clone_weak());
+            .insert(MeshMaterial3d(map.highlighted_material.clone_weak()));
         commands
             .entity(map.entities[&*highlighted])
-            .insert(map.default_material.clone_weak());
+            .insert(MeshMaterial3d(map.default_material.clone_weak()));
         *highlighted = coord;
     }
 }

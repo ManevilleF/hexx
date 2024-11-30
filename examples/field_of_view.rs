@@ -1,7 +1,10 @@
 use bevy::{
     color::palettes::css::{AQUA, BLACK, WHITE},
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::{
+        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
+        render_resource::PrimitiveTopology,
+    },
     utils::{HashMap, HashSet},
     window::PrimaryWindow,
 };
@@ -26,20 +29,44 @@ pub fn main() {
         .run();
 }
 
+#[derive(
+    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
+)]
+#[reflect(Component, Default)]
+pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
+
+impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
+    fn from(handle: Handle<ColorMaterial>) -> Self {
+        Self(handle)
+    }
+}
+
+impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
+impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: &ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
 #[derive(Debug, Resource)]
 struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub blocked_coords: HashSet<Hex>,
     pub visible_entities: HashSet<Entity>,
     pub layout: HexLayout,
-    pub default_mat: Handle<ColorMaterial>,
-    pub blocked_mat: Handle<ColorMaterial>,
-    pub visible_mat: Handle<ColorMaterial>,
+    pub default_mat: ColorMaterialHandle,
+    pub blocked_mat: ColorMaterialHandle,
+    pub visible_mat: ColorMaterialHandle,
 }
 
 /// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 fn setup_grid(
@@ -68,12 +95,11 @@ fn setup_grid(
                 default_mat.clone()
             };
             let entity = commands
-                .spawn(ColorMesh2dBundle {
-                    mesh: mesh.clone().into(),
-                    material,
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                    ..default()
-                })
+                .spawn((
+                    Mesh2d(mesh.clone()),
+                    MeshMaterial2d(material),
+                    Transform::from_xyz(pos.x, pos.y, 0.0),
+                ))
                 .id();
             (coord, entity)
         })
@@ -83,9 +109,9 @@ fn setup_grid(
         blocked_coords,
         visible_entities: Default::default(),
         layout,
-        default_mat,
-        blocked_mat,
-        visible_mat,
+        default_mat: default_mat.into(),
+        blocked_mat: blocked_mat.into(),
+        visible_mat: visible_mat.into(),
     })
 }
 
@@ -102,7 +128,7 @@ fn handle_input(
     let (camera, cam_transform) = cameras.single();
     if let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else {

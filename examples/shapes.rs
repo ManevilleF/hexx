@@ -4,6 +4,7 @@ use bevy::{
     ecs::system::RunSystemOnce,
     prelude::*,
     render::{
+        extract_component::ExtractComponent,
         mesh::{Indices, PrimitiveTopology},
         render_asset::RenderAssetUsages,
     },
@@ -31,11 +32,35 @@ fn main() {
         .run();
 }
 
+#[derive(
+    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
+)]
+#[reflect(Component, Default)]
+pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
+
+impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
+    fn from(handle: Handle<ColorMaterial>) -> Self {
+        Self(handle)
+    }
+}
+
+impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
+impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: &ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
 #[derive(Resource)]
 struct HexMap {
     layout: HexLayout,
     entity: Entity,
-    mat: Handle<ColorMaterial>,
+    mat: ColorMaterialHandle,
 }
 
 #[derive(Resource)]
@@ -82,13 +107,15 @@ impl Shape {
 }
 
 pub fn setup(mut commands: Commands, mut mats: ResMut<Assets<ColorMaterial>>) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
     let layout = HexLayout {
         hex_size: HEX_SIZE,
         ..default()
     };
     let mat = mats.add(Color::WHITE);
-    let entity = commands.spawn(SpatialBundle::default()).id();
+    let entity = commands
+        .spawn((Transform::default(), Visibility::default()))
+        .id();
     commands.insert_resource(HexMap {
         layout,
         mat,
@@ -156,25 +183,21 @@ fn generate(
     for coord in shape.coords() {
         let pos = map.layout.hex_to_world_pos(coord);
         commands
-            .spawn(ColorMesh2dBundle {
-                mesh: mesh.clone().into(),
-                material: map.mat.clone_weak(),
-                transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                ..default()
-            })
+            .spawn((
+                Mesh2d(mesh.clone()),
+                MeshMaterial2d(map.mat.clone_weak()),
+                Transform::from_xyz(pos.x, pos.y, 0.0),
+            ))
             .with_children(|b| {
-                b.spawn(Text2dBundle {
-                    text: Text::from_section(
-                        format!("{},{}", coord.x, coord.y),
-                        TextStyle {
-                            font_size: 7.0,
-                            color: Color::BLACK,
-                            ..default()
-                        },
-                    ),
-                    transform: Transform::from_xyz(0.0, 0.0, 10.0),
-                    ..default()
-                });
+                b.spawn((
+                    Text2d(format!("{},{}", coord.x, coord.y)),
+                    TextColor(Color::BLACK),
+                    TextFont {
+                        font_size: 7.0,
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, 0.0, 10.0),
+                ));
             })
             .set_parent(map.entity);
     }
