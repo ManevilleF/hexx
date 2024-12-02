@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Bump `bevy` dependency to 0.15
+* Bump `glam` dependency to 0.29
 * Bump `bevy_egui` dev dependency to `0.30`
 * Bump `bevy_inspector_egui` dev dependency to `0.27`
 
