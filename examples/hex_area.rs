@@ -1,7 +1,10 @@
 use bevy::{
     color::palettes::css::{GOLD, ORANGE, RED, WHITE},
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::{
+        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
+        render_resource::PrimitiveTopology,
+    },
     utils::HashSet,
     window::PrimaryWindow,
 };
@@ -31,6 +34,30 @@ struct HexArea {
     pub area: HashSet<Hex>,
 }
 
+#[derive(
+    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
+)]
+#[reflect(Component, Default)]
+pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
+
+impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
+    fn from(handle: Handle<ColorMaterial>) -> Self {
+        Self(handle)
+    }
+}
+
+impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
+impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: &ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
 #[derive(Debug, Resource)]
 struct Map {
     flat_layout: HexLayout,
@@ -39,13 +66,13 @@ struct Map {
     pointy_entities: HashMap<Hex, Entity>,
     flat_cursor_entity: Entity,
     pointy_cursor_entity: Entity,
-    area_material: Handle<ColorMaterial>,
-    default_material: Handle<ColorMaterial>,
+    area_material: ColorMaterialHandle,
+    default_material: ColorMaterialHandle,
 }
 
-/// 3D Orthogrpahic camera setup
+/// 2D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 /// Hex grid setup
@@ -77,24 +104,22 @@ fn setup_grid(
         let cursor_mesh = meshes.add(border_plane(layout));
 
         let cursor_entity = commands
-            .spawn(ColorMesh2dBundle {
-                mesh: cursor_mesh.into(),
-                material: cursor_material.clone(),
-                transform: Transform::from_xyz(0.0, 0.0, 10.0),
-                ..default()
-            })
+            .spawn((
+                Mesh2d(cursor_mesh),
+                MeshMaterial2d(cursor_material.clone()),
+                Transform::from_xyz(0.0, 0.0, 10.0),
+            ))
             .id();
         let entities = Hex::ZERO
             .range(15)
             .map(|hex| {
                 let pos = layout.hex_to_world_pos(hex);
                 let id = commands
-                    .spawn(ColorMesh2dBundle {
-                        transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                        mesh: mesh_handle.clone().into(),
-                        material: default_material.clone(),
-                        ..default()
-                    })
+                    .spawn((
+                        Mesh2d(mesh_handle.clone()),
+                        MeshMaterial2d(default_material.clone()),
+                        Transform::from_xyz(pos.x, pos.y, 0.0),
+                    ))
                     .id();
                 (hex, id)
             })
@@ -111,8 +136,8 @@ fn setup_grid(
         pointy_entities,
         flat_cursor_entity,
         pointy_cursor_entity,
-        area_material,
-        default_material,
+        area_material: area_material.into(),
+        default_material: default_material.into(),
     });
 }
 
@@ -130,7 +155,7 @@ fn handle_input(
     let (camera, cam_transform) = cameras.single();
     let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     else {
         return;
     };

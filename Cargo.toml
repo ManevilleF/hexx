@@ -36,30 +36,31 @@ features = ["derive"]
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.15.0-rc.3"
+version = "0.15"
 default-features = false
 features = ["glam"]
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.15.0-rc.3"
+version = "0.15"
 features = [
     "bevy_asset",
-    "bevy_winit",
     "bevy_core_pipeline",
+    "bevy_gizmos",
     "bevy_pbr",
     "bevy_render",
     "bevy_sprite",
     "bevy_text",
+    "bevy_window",
+    "bevy_winit",
     "default_font",
-    "png",
-    "x11",
-    "tonemapping_luts",
-    "bevy_gizmos",
-    "multi_threaded",
     # Faster compilation
     "dynamic_linking",
+    "multi_threaded",
+    "png",
+    "tonemapping_luts",
+    "x11",
 ]
 default-features = false
 
@@ -81,10 +82,12 @@ unexpected_cfgs = { level = "warn", check-cfg = [
 [[example]]
 name = "hex_grid"
 path = "examples/hex_grid.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "hex_area"
 path = "examples/hex_area.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "scroll_map"
@@ -93,14 +96,17 @@ path = "examples/scroll_map.rs"
 [[example]]
 name = "wrap_map"
 path = "examples/wrap_map.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "a_star"
 path = "examples/a_star.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "field_of_view"
 path = "examples/field_of_view.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "field_of_movement"
@@ -109,10 +115,12 @@ path = "examples/field_of_movement.rs"
 [[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "3d_picking"
 path = "examples/3d_picking.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "mesh_builder"

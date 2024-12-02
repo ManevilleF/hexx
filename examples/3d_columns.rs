@@ -1,7 +1,10 @@
 use bevy::{
     color::palettes::css::{WHITE, YELLOW},
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::{
+        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
+        render_resource::PrimitiveTopology,
+    },
     time::common_conditions::on_timer,
 };
 use hexx::{shapes, *};
@@ -28,11 +31,35 @@ pub fn main() {
         .run();
 }
 
+#[derive(
+    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
+)]
+#[reflect(Component, Default)]
+pub struct StandardMaterialHandle(pub Handle<StandardMaterial>);
+
+impl From<Handle<StandardMaterial>> for StandardMaterialHandle {
+    fn from(handle: Handle<StandardMaterial>) -> Self {
+        Self(handle)
+    }
+}
+
+impl From<StandardMaterialHandle> for AssetId<StandardMaterial> {
+    fn from(material: StandardMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
+impl From<&StandardMaterialHandle> for AssetId<StandardMaterial> {
+    fn from(material: &StandardMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
 #[derive(Debug, Resource)]
 struct Map {
     entities: HashMap<Hex, Entity>,
-    highlighted_material: Handle<StandardMaterial>,
-    default_material: Handle<StandardMaterial>,
+    highlighted_material: StandardMaterialHandle,
+    default_material: StandardMaterialHandle,
 }
 
 #[derive(Debug, Default, Resource)]
@@ -43,16 +70,14 @@ struct HighlightedHexes {
 
 /// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    let transform = Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(Camera3dBundle {
-        transform,
-        ..default()
-    });
-    let transform = Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(DirectionalLightBundle {
-        transform,
-        ..default()
-    });
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
+    commands.spawn((
+        DirectionalLight::default(),
+        Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
 }
 
 /// Hex grid setup
@@ -76,20 +101,19 @@ fn setup_grid(
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
-                .spawn(PbrBundle {
-                    transform: Transform::from_xyz(pos.x, hex.length() as f32 / 2.0, pos.y),
-                    mesh: mesh_handle.clone(),
-                    material: default_material.clone(),
-                    ..default()
-                })
+                .spawn((
+                    Mesh3d(mesh_handle.clone()),
+                    MeshMaterial3d(default_material.clone()),
+                    Transform::from_xyz(pos.x, hex.length() as f32 / 2.0, pos.y),
+                ))
                 .id();
             (hex, id)
         })
         .collect();
     commands.insert_resource(Map {
         entities,
-        highlighted_material,
-        default_material,
+        highlighted_material: highlighted_material.into(),
+        default_material: default_material.into(),
     });
 }
 

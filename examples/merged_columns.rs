@@ -44,11 +44,10 @@ struct Map(pub Entity);
 
 /// 3D camera setup
 fn setup_camera(mut commands: Commands) {
-    let transform = Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(Camera3dBundle {
-        transform,
-        ..default()
-    });
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
 }
 
 /// Hex grid setup
@@ -75,7 +74,11 @@ fn setup_grid(
     let materials = COLORS.map(|c| materials.add(c));
 
     let map_entity = commands
-        .spawn((SpatialBundle::default(), Name::new("Chunks")))
+        .spawn((
+            Name::new("Chunks"),
+            Transform::default(),
+            Visibility::default(),
+        ))
         .id();
     let mut rng = thread_rng();
     // For each chunk
@@ -108,12 +111,9 @@ fn setup_grid(
         commands
             .spawn((
                 Name::new(format!("Chunk {} {}", chunk.x, chunk.y)),
-                PbrBundle {
-                    mesh,
-                    material: materials[color_index].clone(),
-                    transform: Transform::from_xyz(pos.x, 0.0, pos.y),
-                    ..default()
-                },
+                Mesh3d(mesh),
+                MeshMaterial3d(materials[color_index].clone()),
+                Transform::from_xyz(pos.x, 0.0, pos.y),
             ))
             .set_parent(map_entity);
     }

@@ -25,7 +25,7 @@ pub fn main() {
 
 /// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 /// Hex grid setup
@@ -48,12 +48,11 @@ fn setup_grid(
         let pos = layout.hex_to_world_pos(hex);
         let hex_mod = hex.to_lower_res(CHUNK_SIZE);
         let color_index = (hex_mod.x - hex_mod.y).rem_euclid(3);
-        commands.spawn(ColorMesh2dBundle {
-            transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-            mesh: mesh_handle.clone().into(),
-            material: materials[color_index as usize].clone(),
-            ..default()
-        });
+        commands.spawn((
+            Mesh2d(mesh_handle.clone()),
+            MeshMaterial2d(materials[color_index as usize].clone()),
+            Transform::from_xyz(pos.x, pos.y, 0.0),
+        ));
     }
 }
 

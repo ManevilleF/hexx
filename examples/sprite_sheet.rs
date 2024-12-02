@@ -18,9 +18,8 @@ pub fn main() {
         .run();
 }
 
-/// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 #[derive(Debug, Resource)]
@@ -51,19 +50,16 @@ fn setup_grid(
             let index = i % (7 * 6);
             let entity = commands
                 .spawn((
-                    SpriteBundle {
-                        sprite: Sprite {
-                            custom_size: Some(sprite_size),
-                            ..default()
-                        },
-                        texture: texture.clone(),
-                        transform: Transform::from_xyz(pos.x, pos.y, 0.0),
+                    Sprite {
+                        custom_size: Some(sprite_size),
+                        image: texture.clone(),
+                        texture_atlas: Some(TextureAtlas {
+                            index,
+                            layout: atlas_layout.clone(),
+                        }),
                         ..default()
                     },
-                    TextureAtlas {
-                        index,
-                        layout: atlas_layout.clone(),
-                    },
+                    Transform::from_xyz(pos.x, pos.y, 0.0),
                 ))
                 .id();
             (coord, entity)
@@ -78,13 +74,13 @@ fn handle_input(
     windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<HexGrid>,
-    mut tiles: Query<&mut TextureAtlas>,
+    mut tiles: Query<&mut Sprite>,
 ) {
     let window = windows.single();
     let (camera, cam_transform) = cameras.single();
     if let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else {
@@ -93,9 +89,11 @@ fn handle_input(
         if !buttons.just_pressed(MouseButton::Left) {
             return;
         }
-        let Ok(mut atlas) = tiles.get_mut(entity) else {
+        let Ok(mut sprite) = tiles.get_mut(entity) else {
             return;
         };
-        atlas.index = (atlas.index + 1) % (7 * 6);
+        if let Some(atlas) = sprite.texture_atlas.as_mut() {
+            atlas.index = (atlas.index + 1) % (7 * 6);
+        }
     }
 }

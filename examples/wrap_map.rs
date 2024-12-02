@@ -2,7 +2,10 @@ use std::ops::Deref;
 
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::{
+        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
+        render_resource::PrimitiveTopology,
+    },
     utils::HashMap,
     window::PrimaryWindow,
 };
@@ -26,18 +29,42 @@ pub fn main() {
         .run();
 }
 
+#[derive(
+    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
+)]
+#[reflect(Component, Default)]
+pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
+
+impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
+    fn from(handle: Handle<ColorMaterial>) -> Self {
+        Self(handle)
+    }
+}
+
+impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
+impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
+    fn from(material: &ColorMaterialHandle) -> Self {
+        material.id()
+    }
+}
+
 #[derive(Debug, Resource)]
 struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub layout: HexLayout,
     pub bounds: HexBounds,
-    pub default_mat: Handle<ColorMaterial>,
-    pub selected_mat: Handle<ColorMaterial>,
+    pub default_mat: ColorMaterialHandle,
+    pub selected_mat: ColorMaterialHandle,
 }
 
-/// 3D Orthogrpahic camera setup
+/// 2D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 fn setup_grid(
@@ -58,12 +85,11 @@ fn setup_grid(
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let entity = commands
-                .spawn(ColorMesh2dBundle {
-                    mesh: mesh.clone().into(),
-                    material: default_mat.clone(),
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                    ..default()
-                })
+                .spawn((
+                    Mesh2d(mesh.clone().into()),
+                    MeshMaterial2d(default_mat.clone()),
+                    Transform::from_xyz(pos.x, pos.y, 0.0),
+                ))
                 .id();
             (hex, entity)
         })
