@@ -37,7 +37,7 @@ struct HexGrid {
     pub path_mat: Handle<ColorMaterial>,
 }
 
-/// 2D Orthogrpahic camera setup
+/// 2D camera setup
 fn setup_camera(mut commands: Commands) {
     commands.spawn(Camera2d);
 }

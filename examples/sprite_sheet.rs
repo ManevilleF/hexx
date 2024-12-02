@@ -18,6 +18,7 @@ pub fn main() {
         .run();
 }
 
+/// 2D camera setup
 fn setup_camera(mut commands: Commands) {
     commands.spawn(Camera2d);
 }
