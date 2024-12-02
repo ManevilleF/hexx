@@ -2,10 +2,7 @@ use std::ops::Deref;
 
 use bevy::{
     prelude::*,
-    render::{
-        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::HashMap,
     window::PrimaryWindow,
 };
@@ -29,37 +26,13 @@ pub fn main() {
         .run();
 }
 
-#[derive(
-    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
-)]
-#[reflect(Component, Default)]
-pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
-
-impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
-    fn from(handle: Handle<ColorMaterial>) -> Self {
-        Self(handle)
-    }
-}
-
-impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
-impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: &ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
 #[derive(Debug, Resource)]
 struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub layout: HexLayout,
     pub bounds: HexBounds,
-    pub default_mat: ColorMaterialHandle,
-    pub selected_mat: ColorMaterialHandle,
+    pub default_mat: Handle<ColorMaterial>,
+    pub selected_mat: Handle<ColorMaterial>,
 }
 
 /// 2D Orthogrpahic camera setup
@@ -86,7 +59,7 @@ fn setup_grid(
             let pos = layout.hex_to_world_pos(hex);
             let entity = commands
                 .spawn((
-                    Mesh2d(mesh.clone().into()),
+                    Mesh2d(mesh.clone()),
                     MeshMaterial2d(default_mat.clone()),
                     Transform::from_xyz(pos.x, pos.y, 0.0),
                 ))
@@ -115,7 +88,7 @@ fn handle_input(
     let (camera, cam_transform) = cameras.single();
     if let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         if hex_pos == *current_hex {
@@ -124,10 +97,10 @@ fn handle_input(
         let wrapped = grid.bounds.wrap(hex_pos);
         commands
             .entity(grid.entities[current_hex.deref()])
-            .insert(grid.default_mat.clone());
+            .insert(MeshMaterial2d(grid.default_mat.clone()));
         commands
             .entity(grid.entities[&wrapped])
-            .insert(grid.selected_mat.clone());
+            .insert(MeshMaterial2d(grid.selected_mat.clone()));
         *current_hex = wrapped;
     }
 }

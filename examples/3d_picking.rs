@@ -1,10 +1,7 @@
 use bevy::{
     color::palettes::css::{WHITE, YELLOW},
     prelude::*,
-    render::{
-        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::HashMap,
     window::PrimaryWindow,
 };
@@ -28,30 +25,6 @@ pub fn main() {
         .add_systems(Startup, (setup_camera, setup_grid))
         .add_systems(Update, higlight_hovered)
         .run();
-}
-
-#[derive(
-    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
-)]
-#[reflect(Component, Default)]
-pub struct StandardMaterialHandle(pub Handle<StandardMaterial>);
-
-impl From<Handle<StandardMaterial>> for StandardMaterialHandle {
-    fn from(handle: Handle<StandardMaterial>) -> Self {
-        Self(handle)
-    }
-}
-
-impl From<StandardMaterialHandle> for AssetId<StandardMaterial> {
-    fn from(material: StandardMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
-impl From<&StandardMaterialHandle> for AssetId<StandardMaterial> {
-    fn from(material: &StandardMaterialHandle) -> Self {
-        material.id()
-    }
 }
 
 #[derive(Debug, Resource)]

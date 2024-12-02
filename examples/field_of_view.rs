@@ -1,10 +1,7 @@
 use bevy::{
     color::palettes::css::{AQUA, BLACK, WHITE},
     prelude::*,
-    render::{
-        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::{HashMap, HashSet},
     window::PrimaryWindow,
 };
@@ -29,39 +26,15 @@ pub fn main() {
         .run();
 }
 
-#[derive(
-    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
-)]
-#[reflect(Component, Default)]
-pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
-
-impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
-    fn from(handle: Handle<ColorMaterial>) -> Self {
-        Self(handle)
-    }
-}
-
-impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
-impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: &ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
 #[derive(Debug, Resource)]
 struct HexGrid {
     pub entities: HashMap<Hex, Entity>,
     pub blocked_coords: HashSet<Hex>,
     pub visible_entities: HashSet<Entity>,
     pub layout: HexLayout,
-    pub default_mat: ColorMaterialHandle,
-    pub blocked_mat: ColorMaterialHandle,
-    pub visible_mat: ColorMaterialHandle,
+    pub default_mat: Handle<ColorMaterial>,
+    pub blocked_mat: Handle<ColorMaterial>,
+    pub visible_mat: Handle<ColorMaterial>,
 }
 
 /// 3D Orthogrpahic camera setup
@@ -109,9 +82,9 @@ fn setup_grid(
         blocked_coords,
         visible_entities: Default::default(),
         layout,
-        default_mat: default_mat.into(),
-        blocked_mat: blocked_mat.into(),
-        visible_mat: visible_mat.into(),
+        default_mat,
+        blocked_mat,
+        visible_mat,
     })
 }
 
@@ -137,11 +110,15 @@ fn handle_input(
         if buttons.just_pressed(MouseButton::Left) {
             if grid.blocked_coords.contains(&hex_pos) {
                 grid.blocked_coords.remove(&hex_pos);
-                commands.entity(entity).insert(grid.default_mat.clone());
+                commands
+                    .entity(entity)
+                    .insert(MeshMaterial2d(grid.default_mat.clone()));
             } else {
                 grid.blocked_coords.insert(hex_pos);
                 grid.visible_entities.remove(&entity);
-                commands.entity(entity).insert(grid.blocked_mat.clone());
+                commands
+                    .entity(entity)
+                    .insert(MeshMaterial2d(grid.blocked_mat.clone()));
             }
             return;
         }
@@ -150,7 +127,9 @@ fn handle_input(
         }
         *current = hex_pos;
         for entity in &grid.visible_entities {
-            commands.entity(*entity).insert(grid.default_mat.clone());
+            commands
+                .entity(*entity)
+                .insert(MeshMaterial2d(grid.default_mat.clone()));
         }
         let fov = range_fov(hex_pos, FOV_RADIUS, |h| {
             grid.blocked_coords.contains(&h) || h.ulength() > MAP_RADIUS
@@ -160,7 +139,9 @@ fn handle_input(
             .filter_map(|h| grid.entities.get(&h).copied())
             .collect();
         for entity in &entities {
-            commands.entity(*entity).insert(grid.visible_mat.clone());
+            commands
+                .entity(*entity)
+                .insert(MeshMaterial2d(grid.visible_mat.clone()));
         }
         grid.visible_entities = entities;
     }

@@ -82,12 +82,10 @@ unexpected_cfgs = { level = "warn", check-cfg = [
 [[example]]
 name = "hex_grid"
 path = "examples/hex_grid.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "hex_area"
 path = "examples/hex_area.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "scroll_map"
@@ -96,17 +94,14 @@ path = "examples/scroll_map.rs"
 [[example]]
 name = "wrap_map"
 path = "examples/wrap_map.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "a_star"
 path = "examples/a_star.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "field_of_view"
 path = "examples/field_of_view.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "field_of_movement"
@@ -115,17 +110,14 @@ path = "examples/field_of_movement.rs"
 [[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "3d_picking"
 path = "examples/3d_picking.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "mesh_builder"
 path = "examples/mesh_builder.rs"
-required-features = ["bevy_reflect"]
 
 [[example]]
 name = "chunks"

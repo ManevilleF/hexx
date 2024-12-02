@@ -1,10 +1,7 @@
 use bevy::{
     color::palettes::css::{WHITE, YELLOW},
     prelude::*,
-    render::{
-        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     time::common_conditions::on_timer,
 };
 use hexx::{shapes, *};
@@ -31,35 +28,11 @@ pub fn main() {
         .run();
 }
 
-#[derive(
-    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
-)]
-#[reflect(Component, Default)]
-pub struct StandardMaterialHandle(pub Handle<StandardMaterial>);
-
-impl From<Handle<StandardMaterial>> for StandardMaterialHandle {
-    fn from(handle: Handle<StandardMaterial>) -> Self {
-        Self(handle)
-    }
-}
-
-impl From<StandardMaterialHandle> for AssetId<StandardMaterial> {
-    fn from(material: StandardMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
-impl From<&StandardMaterialHandle> for AssetId<StandardMaterial> {
-    fn from(material: &StandardMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
 #[derive(Debug, Resource)]
 struct Map {
     entities: HashMap<Hex, Entity>,
-    highlighted_material: StandardMaterialHandle,
-    default_material: StandardMaterialHandle,
+    highlighted_material: Handle<StandardMaterial>,
+    default_material: Handle<StandardMaterial>,
 }
 
 #[derive(Debug, Default, Resource)]
@@ -112,8 +85,8 @@ fn setup_grid(
         .collect();
     commands.insert_resource(Map {
         entities,
-        highlighted_material: highlighted_material.into(),
-        default_material: default_material.into(),
+        highlighted_material,
+        default_material,
     });
 }
 
@@ -130,7 +103,7 @@ fn animate_rings(
     {
         commands
             .entity(*entity)
-            .insert(map.default_material.clone());
+            .insert(MeshMaterial3d(map.default_material.clone()));
     }
     highlighted_hexes.ring += 1;
     if highlighted_hexes.ring > MAP_RADIUS {
@@ -140,7 +113,9 @@ fn animate_rings(
     // Draw a ring
     for h in &highlighted_hexes.hexes {
         if let Some(e) = map.entities.get(h) {
-            commands.entity(*e).insert(map.highlighted_material.clone());
+            commands
+                .entity(*e)
+                .insert(MeshMaterial3d(map.highlighted_material.clone()));
         }
     }
 }

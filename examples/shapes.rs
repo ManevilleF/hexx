@@ -32,35 +32,11 @@ fn main() {
         .run();
 }
 
-#[derive(
-    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
-)]
-#[reflect(Component, Default)]
-pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
-
-impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
-    fn from(handle: Handle<ColorMaterial>) -> Self {
-        Self(handle)
-    }
-}
-
-impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
-impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: &ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
 #[derive(Resource)]
 struct HexMap {
     layout: HexLayout,
     entity: Entity,
-    mat: ColorMaterialHandle,
+    mat: Handle<ColorMaterial>,
 }
 
 #[derive(Resource)]

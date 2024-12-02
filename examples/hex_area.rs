@@ -1,10 +1,7 @@
 use bevy::{
     color::palettes::css::{GOLD, ORANGE, RED, WHITE},
     prelude::*,
-    render::{
-        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     utils::HashSet,
     window::PrimaryWindow,
 };
@@ -34,30 +31,6 @@ struct HexArea {
     pub area: HashSet<Hex>,
 }
 
-#[derive(
-    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
-)]
-#[reflect(Component, Default)]
-pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
-
-impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
-    fn from(handle: Handle<ColorMaterial>) -> Self {
-        Self(handle)
-    }
-}
-
-impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
-impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: &ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
 #[derive(Debug, Resource)]
 struct Map {
     flat_layout: HexLayout,
@@ -66,8 +39,8 @@ struct Map {
     pointy_entities: HashMap<Hex, Entity>,
     flat_cursor_entity: Entity,
     pointy_cursor_entity: Entity,
-    area_material: ColorMaterialHandle,
-    default_material: ColorMaterialHandle,
+    area_material: Handle<ColorMaterial>,
+    default_material: Handle<ColorMaterial>,
 }
 
 /// 2D Orthogrpahic camera setup
@@ -190,20 +163,24 @@ fn handle_input(
     for coord in to_add {
         area.area.insert(coord);
         let entity = map.flat_entities.get(&coord).unwrap();
-        commands.entity(*entity).insert(map.area_material.clone());
+        commands
+            .entity(*entity)
+            .insert(MeshMaterial2d(map.area_material.clone()));
         let entity = map.pointy_entities.get(&coord).unwrap();
-        commands.entity(*entity).insert(map.area_material.clone());
+        commands
+            .entity(*entity)
+            .insert(MeshMaterial2d(map.area_material.clone()));
     }
     for coord in to_remove {
         area.area.remove(&coord);
         let entity = map.flat_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(map.default_material.clone());
+            .insert(MeshMaterial2d(map.default_material.clone()));
         let entity = map.pointy_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(map.default_material.clone());
+            .insert(MeshMaterial2d(map.default_material.clone()));
     }
 }
 

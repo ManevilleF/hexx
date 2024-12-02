@@ -3,10 +3,7 @@ use std::collections::HashMap;
 use bevy::{
     color::palettes::css::{AQUA, LIMEGREEN, ORANGE, RED, VIOLET, WHITE, YELLOW},
     prelude::*,
-    render::{
-        extract_component::ExtractComponent, mesh::Indices, render_asset::RenderAssetUsages,
-        render_resource::PrimitiveTopology,
-    },
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
 };
 use hexx::{shapes, *};
@@ -42,41 +39,17 @@ struct HighlightedHexes {
     pub rotated: Vec<Hex>,
 }
 
-#[derive(
-    Component, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, ExtractComponent,
-)]
-#[reflect(Component, Default)]
-pub struct ColorMaterialHandle(pub Handle<ColorMaterial>);
-
-impl From<Handle<ColorMaterial>> for ColorMaterialHandle {
-    fn from(handle: Handle<ColorMaterial>) -> Self {
-        Self(handle)
-    }
-}
-
-impl From<ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
-impl From<&ColorMaterialHandle> for AssetId<ColorMaterial> {
-    fn from(material: &ColorMaterialHandle) -> Self {
-        material.id()
-    }
-}
-
 #[derive(Debug, Resource)]
 struct Map {
     layout: HexLayout,
     entities: HashMap<Hex, Entity>,
-    selected_material: ColorMaterialHandle,
-    ring_material: ColorMaterialHandle,
-    wedge_material: ColorMaterialHandle,
-    dir_wedge_material: ColorMaterialHandle,
-    line_material: ColorMaterialHandle,
-    half_ring_material: ColorMaterialHandle,
-    default_material: ColorMaterialHandle,
+    selected_material: Handle<ColorMaterial>,
+    ring_material: Handle<ColorMaterial>,
+    wedge_material: Handle<ColorMaterial>,
+    dir_wedge_material: Handle<ColorMaterial>,
+    line_material: Handle<ColorMaterial>,
+    half_ring_material: Handle<ColorMaterial>,
+    default_material: Handle<ColorMaterial>,
 }
 
 /// 2D Orthogrpahic camera setup
