@@ -118,6 +118,7 @@ path = "examples/3d_picking.rs"
 [[example]]
 name = "mesh_builder"
 path = "examples/mesh_builder.rs"
+required-features = ["bevy_reflect"]
 
 [[example]]
 name = "chunks"
