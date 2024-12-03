@@ -197,7 +197,7 @@
 //! If you want to generate 3D hexagonal mesh and use it in
 //! [bevy](bevyengine.org) you may do it this way:
 //!
-//!```rust
+//!```ignore
 //! use bevy::{
 //!     prelude::Mesh,
 //!     render::{
@@ -206,7 +206,7 @@
 //! };
 //! use hexx::MeshInfo;
 //!
-//! pub fn hexagonal_plane(mesh_info: MeshInfo) -> Mesh {
+//! pub fn hexagonal_mesh(mesh_info: MeshInfo) -> Mesh {
 //!     Mesh::new(
 //!         PrimitiveTopology::TriangleList,
 //!         // Means you won't edit the mesh afterwards, check bevy docs for more information

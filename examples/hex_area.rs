@@ -90,7 +90,7 @@ fn setup_grid(
                 let id = commands
                     .spawn((
                         Mesh2d(mesh_handle.clone()),
-                        MeshMaterial2d(default_material.clone()),
+                        MeshMaterial2d(default_material.clone_weak()),
                         Transform::from_xyz(pos.x, pos.y, 0.0),
                     ))
                     .id();
@@ -109,8 +109,8 @@ fn setup_grid(
         pointy_entities,
         flat_cursor_entity,
         pointy_cursor_entity,
-        area_material: area_material.into(),
-        default_material: default_material.into(),
+        area_material,
+        default_material,
     });
 }
 
@@ -165,22 +165,22 @@ fn handle_input(
         let entity = map.flat_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.area_material.clone()));
+            .insert(MeshMaterial2d(map.area_material.clone_weak()));
         let entity = map.pointy_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.area_material.clone()));
+            .insert(MeshMaterial2d(map.area_material.clone_weak()));
     }
     for coord in to_remove {
         area.area.remove(&coord);
         let entity = map.flat_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.default_material.clone()));
+            .insert(MeshMaterial2d(map.default_material.clone_weak()));
         let entity = map.pointy_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.default_material.clone()));
+            .insert(MeshMaterial2d(map.default_material.clone_weak()));
     }
 }
 

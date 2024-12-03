@@ -2,10 +2,10 @@
 
 ## [Unreleased]
 
-* Bump `bevy` dependency to 0.15
-* Bump `glam` dependency to 0.29
-* Bump `bevy_egui` dev dependency to `0.31`
-* Bump `bevy_inspector_egui` dev dependency to `0.28`
+* Bump `bevy` dependency to 0.15 (#181, #182)
+* Bump `glam` dependency to 0.29 (#181)
+* Bump `bevy_egui` dev dependency to `0.31` (#180, #181)
+* Bump `bevy_inspector_egui` dev dependency to `0.28` (#180, #181)
 
 ## 0.18.0
 

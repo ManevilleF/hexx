@@ -71,7 +71,7 @@ fn setup_grid(
             let entity = commands
                 .spawn((
                     Mesh2d(mesh.clone()),
-                    MeshMaterial2d(material.clone()),
+                    MeshMaterial2d(material.clone_weak()),
                     Transform::from_xyz(pos.x, pos.y, 0.0),
                 ))
                 .id();
@@ -113,13 +113,13 @@ fn handle_input(
                 grid.blocked_coords.remove(&hex_pos);
                 commands
                     .entity(entity)
-                    .insert(MeshMaterial2d(grid.default_mat.clone()));
+                    .insert(MeshMaterial2d(grid.default_mat.clone_weak()));
             } else {
                 grid.blocked_coords.insert(hex_pos);
                 grid.path_entities.remove(&entity);
                 commands
                     .entity(entity)
-                    .insert(MeshMaterial2d(grid.blocked_mat.clone()));
+                    .insert(MeshMaterial2d(grid.blocked_mat.clone_weak()));
             }
             return;
         }
@@ -131,7 +131,7 @@ fn handle_input(
         for entity in path_to_clear {
             commands
                 .entity(entity)
-                .insert(MeshMaterial2d(grid.default_mat.clone()));
+                .insert(MeshMaterial2d(grid.default_mat.clone_weak()));
         }
         let Some(path) = a_star(Hex::ZERO, hex_pos, |_, h| {
             (grid.entities.contains_key(&h) && !grid.blocked_coords.contains(&h)).then_some(1)
@@ -151,7 +151,7 @@ fn handle_input(
         for entity in &entities {
             commands
                 .entity(*entity)
-                .insert(MeshMaterial2d(grid.path_mat.clone()));
+                .insert(MeshMaterial2d(grid.path_mat.clone_weak()));
         }
         grid.path_entities = entities;
     }

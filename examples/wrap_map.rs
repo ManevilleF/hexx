@@ -60,7 +60,7 @@ fn setup_grid(
             let entity = commands
                 .spawn((
                     Mesh2d(mesh.clone()),
-                    MeshMaterial2d(default_mat.clone()),
+                    MeshMaterial2d(default_mat.clone_weak()),
                     Transform::from_xyz(pos.x, pos.y, 0.0),
                 ))
                 .id();

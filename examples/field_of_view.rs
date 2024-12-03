@@ -63,9 +63,9 @@ fn setup_grid(
             let pos = layout.hex_to_world_pos(coord);
             let material = if i % 10 == 0 {
                 blocked_coords.insert(coord);
-                blocked_mat.clone()
+                blocked_mat.clone_weak()
             } else {
-                default_mat.clone()
+                default_mat.clone_weak()
             };
             let entity = commands
                 .spawn((
@@ -112,13 +112,13 @@ fn handle_input(
                 grid.blocked_coords.remove(&hex_pos);
                 commands
                     .entity(entity)
-                    .insert(MeshMaterial2d(grid.default_mat.clone()));
+                    .insert(MeshMaterial2d(grid.default_mat.clone_weak()));
             } else {
                 grid.blocked_coords.insert(hex_pos);
                 grid.visible_entities.remove(&entity);
                 commands
                     .entity(entity)
-                    .insert(MeshMaterial2d(grid.blocked_mat.clone()));
+                    .insert(MeshMaterial2d(grid.blocked_mat.clone_weak()));
             }
             return;
         }
@@ -129,7 +129,7 @@ fn handle_input(
         for entity in &grid.visible_entities {
             commands
                 .entity(*entity)
-                .insert(MeshMaterial2d(grid.default_mat.clone()));
+                .insert(MeshMaterial2d(grid.default_mat.clone_weak()));
         }
         let fov = range_fov(hex_pos, FOV_RADIUS, |h| {
             grid.blocked_coords.contains(&h) || h.ulength() > MAP_RADIUS
@@ -141,7 +141,7 @@ fn handle_input(
         for entity in &entities {
             commands
                 .entity(*entity)
-                .insert(MeshMaterial2d(grid.visible_mat.clone()));
+                .insert(MeshMaterial2d(grid.visible_mat.clone_weak()));
         }
         grid.visible_entities = entities;
     }
