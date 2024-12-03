@@ -82,13 +82,15 @@ impl Shape {
 }
 
 pub fn setup(mut commands: Commands, mut mats: ResMut<Assets<ColorMaterial>>) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
     let layout = HexLayout {
         hex_size: HEX_SIZE,
         ..default()
     };
     let mat = mats.add(Color::WHITE);
-    let entity = commands.spawn(SpatialBundle::default()).id();
+    let entity = commands
+        .spawn((Transform::default(), Visibility::default()))
+        .id();
     commands.insert_resource(HexMap {
         layout,
         mat,
@@ -141,7 +143,7 @@ fn show_ui(world: &mut World) {
         });
     });
     if regenerate {
-        world.run_system_once(generate);
+        world.run_system_once(generate).unwrap();
     }
 }
 
@@ -156,25 +158,21 @@ fn generate(
     for coord in shape.coords() {
         let pos = map.layout.hex_to_world_pos(coord);
         commands
-            .spawn(ColorMesh2dBundle {
-                mesh: mesh.clone().into(),
-                material: map.mat.clone_weak(),
-                transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                ..default()
-            })
+            .spawn((
+                Mesh2d(mesh.clone()),
+                MeshMaterial2d(map.mat.clone_weak()),
+                Transform::from_xyz(pos.x, pos.y, 0.0),
+            ))
             .with_children(|b| {
-                b.spawn(Text2dBundle {
-                    text: Text::from_section(
-                        format!("{},{}", coord.x, coord.y),
-                        TextStyle {
-                            font_size: 7.0,
-                            color: Color::BLACK,
-                            ..default()
-                        },
-                    ),
-                    transform: Transform::from_xyz(0.0, 0.0, 10.0),
-                    ..default()
-                });
+                b.spawn((
+                    Text2d(format!("{},{}", coord.x, coord.y)),
+                    TextColor(Color::BLACK),
+                    TextFont {
+                        font_size: 7.0,
+                        ..default()
+                    },
+                    Transform::from_xyz(0.0, 0.0, 10.0),
+                ));
             })
             .set_parent(map.entity);
     }

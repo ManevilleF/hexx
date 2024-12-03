@@ -43,16 +43,14 @@ struct HighlightedHexes {
 
 /// 3D Orthogrpahic camera setup
 fn setup_camera(mut commands: Commands) {
-    let transform = Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(Camera3dBundle {
-        transform,
-        ..default()
-    });
-    let transform = Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(DirectionalLightBundle {
-        transform,
-        ..default()
-    });
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 60.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
+    commands.spawn((
+        DirectionalLight::default(),
+        Transform::from_xyz(60.0, 60.0, 00.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
 }
 
 /// Hex grid setup
@@ -76,12 +74,11 @@ fn setup_grid(
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
-                .spawn(PbrBundle {
-                    transform: Transform::from_xyz(pos.x, hex.length() as f32 / 2.0, pos.y),
-                    mesh: mesh_handle.clone(),
-                    material: default_material.clone(),
-                    ..default()
-                })
+                .spawn((
+                    Mesh3d(mesh_handle.clone()),
+                    MeshMaterial3d(default_material.clone()),
+                    Transform::from_xyz(pos.x, hex.length() as f32 / 2.0, pos.y),
+                ))
                 .id();
             (hex, id)
         })
@@ -106,7 +103,7 @@ fn animate_rings(
     {
         commands
             .entity(*entity)
-            .insert(map.default_material.clone());
+            .insert(MeshMaterial3d(map.default_material.clone()));
     }
     highlighted_hexes.ring += 1;
     if highlighted_hexes.ring > MAP_RADIUS {
@@ -116,7 +113,9 @@ fn animate_rings(
     // Draw a ring
     for h in &highlighted_hexes.hexes {
         if let Some(e) = map.entities.get(h) {
-            commands.entity(*e).insert(map.highlighted_material.clone());
+            commands
+                .entity(*e)
+                .insert(MeshMaterial3d(map.highlighted_material.clone()));
         }
     }
 }

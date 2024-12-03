@@ -52,9 +52,9 @@ struct Map {
     default_material: Handle<ColorMaterial>,
 }
 
-/// 3D Orthogrpahic camera setup
+/// 2D camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 /// Hex grid setup
@@ -83,25 +83,21 @@ fn setup_grid(
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
-                .spawn(ColorMesh2dBundle {
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                    mesh: mesh_handle.clone().into(),
-                    material: default_material.clone(),
-                    ..default()
-                })
+                .spawn((
+                    Mesh2d(mesh_handle.clone()),
+                    MeshMaterial2d(default_material.clone()),
+                    Transform::from_xyz(pos.x, pos.y, 0.0),
+                ))
                 .with_children(|b| {
-                    b.spawn(Text2dBundle {
-                        text: Text::from_section(
-                            format!("{},{}", hex.x, hex.y),
-                            TextStyle {
-                                font_size: 7.0,
-                                color: Color::BLACK,
-                                ..default()
-                            },
-                        ),
-                        transform: Transform::from_xyz(0.0, 0.0, 10.0),
-                        ..default()
-                    });
+                    b.spawn((
+                        Text2d(format!("{},{}", hex.x, hex.y)),
+                        TextColor(Color::BLACK),
+                        TextFont {
+                            font_size: 7.0,
+                            ..default()
+                        },
+                        Transform::from_xyz(0.0, 0.0, 10.0),
+                    ));
                 })
                 .id();
             (hex, id)
@@ -110,13 +106,13 @@ fn setup_grid(
     commands.insert_resource(Map {
         layout,
         entities,
-        selected_material,
-        ring_material,
-        default_material,
-        line_material,
-        half_ring_material,
-        wedge_material,
-        dir_wedge_material,
+        selected_material: selected_material.into(),
+        ring_material: ring_material.into(),
+        default_material: default_material.into(),
+        line_material: line_material.into(),
+        half_ring_material: half_ring_material.into(),
+        wedge_material: wedge_material.into(),
+        dir_wedge_material: dir_wedge_material.into(),
     });
 }
 
@@ -132,7 +128,7 @@ fn handle_input(
     let (camera, cam_transform) = cameras.single();
     if let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let coord = map.layout.world_pos_to_hex(pos);
         if let Some(entity) = map.entities.get(&coord).copied() {
@@ -151,15 +147,15 @@ fn handle_input(
                 for entity in vec.iter().filter_map(|h| map.entities.get(h)) {
                     commands
                         .entity(*entity)
-                        .insert(map.default_material.clone_weak());
+                        .insert(MeshMaterial2d(map.default_material.clone_weak()));
                 }
             }
             commands
                 .entity(map.entities[&highlighted_hexes.selected])
-                .insert(map.default_material.clone_weak());
+                .insert(MeshMaterial2d(map.default_material.clone_weak()));
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(map.default_material.clone_weak());
+                .insert(MeshMaterial2d(map.default_material.clone_weak()));
             // Draw a line
             highlighted_hexes.line = Hex::ZERO.line_to(coord).collect();
             // Draw a rectiline path
@@ -184,7 +180,7 @@ fn handle_input(
             ] {
                 for h in vec {
                     if let Some(e) = map.entities.get(h) {
-                        commands.entity(*e).insert(mat.clone_weak());
+                        commands.entity(*e).insert(MeshMaterial2d(mat.clone_weak()));
                     }
                 }
             }
@@ -192,11 +188,11 @@ fn handle_input(
             highlighted_hexes.halfway = coord / 2;
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(map.selected_material.clone_weak());
+                .insert(MeshMaterial2d(map.selected_material.clone_weak()));
             // Make the selected tile red
             commands
                 .entity(entity)
-                .insert(map.selected_material.clone_weak());
+                .insert(MeshMaterial2d(map.selected_material.clone_weak()));
             highlighted_hexes.selected = coord;
         }
     }

@@ -31,9 +31,9 @@ struct HexGrid {
     pub bounds: HexBounds,
 }
 
-/// 3D Orthogrpahic camera setup
+/// 2D camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 fn setup_grid(
@@ -56,12 +56,11 @@ fn setup_grid(
             let material = materials.add(color);
             let pos = layout.hex_to_world_pos(hex);
             let entity = commands
-                .spawn(ColorMesh2dBundle {
-                    mesh: mesh.clone().into(),
-                    material,
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                    ..default()
-                })
+                .spawn((
+                    Mesh2d(mesh.clone()),
+                    MeshMaterial2d(material),
+                    Transform::from_xyz(pos.x, pos.y, 0.0),
+                ))
                 .id();
             (hex, entity)
         })
@@ -84,7 +83,7 @@ fn handle_input(
     let (camera, cam_transform) = cameras.single();
     if let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         for h in hex_pos.range(grid.bounds.radius) {

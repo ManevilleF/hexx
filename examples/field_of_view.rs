@@ -37,9 +37,9 @@ struct HexGrid {
     pub visible_mat: Handle<ColorMaterial>,
 }
 
-/// 3D Orthogrpahic camera setup
+/// 2D camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 fn setup_grid(
@@ -68,12 +68,11 @@ fn setup_grid(
                 default_mat.clone()
             };
             let entity = commands
-                .spawn(ColorMesh2dBundle {
-                    mesh: mesh.clone().into(),
-                    material,
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                    ..default()
-                })
+                .spawn((
+                    Mesh2d(mesh.clone()),
+                    MeshMaterial2d(material),
+                    Transform::from_xyz(pos.x, pos.y, 0.0),
+                ))
                 .id();
             (coord, entity)
         })
@@ -102,7 +101,7 @@ fn handle_input(
     let (camera, cam_transform) = cameras.single();
     if let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else {
@@ -111,11 +110,15 @@ fn handle_input(
         if buttons.just_pressed(MouseButton::Left) {
             if grid.blocked_coords.contains(&hex_pos) {
                 grid.blocked_coords.remove(&hex_pos);
-                commands.entity(entity).insert(grid.default_mat.clone());
+                commands
+                    .entity(entity)
+                    .insert(MeshMaterial2d(grid.default_mat.clone()));
             } else {
                 grid.blocked_coords.insert(hex_pos);
                 grid.visible_entities.remove(&entity);
-                commands.entity(entity).insert(grid.blocked_mat.clone());
+                commands
+                    .entity(entity)
+                    .insert(MeshMaterial2d(grid.blocked_mat.clone()));
             }
             return;
         }
@@ -124,7 +127,9 @@ fn handle_input(
         }
         *current = hex_pos;
         for entity in &grid.visible_entities {
-            commands.entity(*entity).insert(grid.default_mat.clone());
+            commands
+                .entity(*entity)
+                .insert(MeshMaterial2d(grid.default_mat.clone()));
         }
         let fov = range_fov(hex_pos, FOV_RADIUS, |h| {
             grid.blocked_coords.contains(&h) || h.ulength() > MAP_RADIUS
@@ -134,7 +139,9 @@ fn handle_input(
             .filter_map(|h| grid.entities.get(&h).copied())
             .collect();
         for entity in &entities {
-            commands.entity(*entity).insert(grid.visible_mat.clone());
+            commands
+                .entity(*entity)
+                .insert(MeshMaterial2d(grid.visible_mat.clone()));
         }
         grid.visible_entities = entities;
     }

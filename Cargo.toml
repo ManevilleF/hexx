@@ -27,7 +27,7 @@ serde = ["dep:serde", "glam/serde"]
 bevy_reflect = ["dep:bevy_reflect"]
 
 [dependencies]
-glam = "0.27"
+glam = "0.29"
 
 [dependencies.serde]
 version = "1"
@@ -36,30 +36,31 @@ features = ["derive"]
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.14"
+version = "0.15"
 default-features = false
 features = ["glam"]
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.14"
+version = "0.15"
 features = [
     "bevy_asset",
-    "bevy_winit",
     "bevy_core_pipeline",
+    "bevy_gizmos",
     "bevy_pbr",
     "bevy_render",
     "bevy_sprite",
     "bevy_text",
+    "bevy_window",
+    "bevy_winit",
     "default_font",
-    "png",
-    "x11",
-    "tonemapping_luts",
-    "bevy_gizmos",
-    "multi_threaded",
     # Faster compilation
     "dynamic_linking",
+    "multi_threaded",
+    "png",
+    "tonemapping_luts",
+    "x11",
 ]
 default-features = false
 
@@ -69,8 +70,8 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.8"
-bevy-inspector-egui = "0.27"
-bevy_egui = "0.30"
+bevy-inspector-egui = "0.28"
+bevy_egui = "0.31"
 approx = "0.5"
 
 [lints.rust]

@@ -206,15 +206,9 @@ fn setup(
 ) {
     let texture = asset_server.load("uv_checker.png");
     let transform = Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(Camera3dBundle {
-        transform,
-        ..default()
-    });
+    commands.spawn((Camera3d::default(), transform));
     let transform = Transform::from_xyz(20.0, 0.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn(DirectionalLightBundle {
-        transform,
-        ..default()
-    });
+    commands.spawn((DirectionalLight::default(), transform));
     let layout = HexLayout::default();
     let mesh = ColumnMeshBuilder::new(&layout, params.height)
         .with_subdivisions(params.subdivisions)
@@ -229,11 +223,8 @@ fn setup(
     });
     let mesh_entity = commands
         .spawn((
-            PbrBundle {
-                mesh: mesh_handle.clone(),
-                material: material_handle.clone(),
-                ..default()
-            },
+            Mesh3d(mesh_handle.clone()),
+            MeshMaterial3d(material_handle.clone()),
             Wireframe,
         ))
         .id();
@@ -256,7 +247,7 @@ fn animate(
         if buttons.pressed(MouseButton::Left) {
             let mut transform = transforms.get_mut(info.mesh_entity).unwrap();
             let axis = Vec3::new(event.delta.y, event.delta.x, 0.0).normalize();
-            let angle = event.delta.length() * time.delta_seconds();
+            let angle = event.delta.length() * time.delta_secs();
             let quaternion = Quat::from_axis_angle(axis, angle);
             transform.rotate(quaternion);
         }

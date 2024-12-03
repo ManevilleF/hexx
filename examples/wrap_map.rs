@@ -35,9 +35,9 @@ struct HexGrid {
     pub selected_mat: Handle<ColorMaterial>,
 }
 
-/// 3D Orthogrpahic camera setup
+/// 2D camera setup
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
 }
 
 fn setup_grid(
@@ -58,12 +58,11 @@ fn setup_grid(
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let entity = commands
-                .spawn(ColorMesh2dBundle {
-                    mesh: mesh.clone().into(),
-                    material: default_mat.clone(),
-                    transform: Transform::from_xyz(pos.x, pos.y, 0.0),
-                    ..default()
-                })
+                .spawn((
+                    Mesh2d(mesh.clone()),
+                    MeshMaterial2d(default_mat.clone()),
+                    Transform::from_xyz(pos.x, pos.y, 0.0),
+                ))
                 .id();
             (hex, entity)
         })
@@ -89,7 +88,7 @@ fn handle_input(
     let (camera, cam_transform) = cameras.single();
     if let Some(pos) = window
         .cursor_position()
-        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p))
+        .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         if hex_pos == *current_hex {
@@ -98,10 +97,10 @@ fn handle_input(
         let wrapped = grid.bounds.wrap(hex_pos);
         commands
             .entity(grid.entities[current_hex.deref()])
-            .insert(grid.default_mat.clone());
+            .insert(MeshMaterial2d(grid.default_mat.clone()));
         commands
             .entity(grid.entities[&wrapped])
-            .insert(grid.selected_mat.clone());
+            .insert(MeshMaterial2d(grid.selected_mat.clone()));
         *current_hex = wrapped;
     }
 }
