@@ -58,8 +58,6 @@ features = [
     "bevy_window",
     "bevy_winit",
     "default_font",
-    # Faster compilation
-    "dynamic_linking",
     "multi_threaded",
     "png",
     "tonemapping_luts",
