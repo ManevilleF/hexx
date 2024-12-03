@@ -85,7 +85,7 @@ fn setup_grid(
             let id = commands
                 .spawn((
                     Mesh2d(mesh_handle.clone()),
-                    MeshMaterial2d(default_material.clone()),
+                    MeshMaterial2d(default_material.clone_weak()),
                     Transform::from_xyz(pos.x, pos.y, 0.0),
                 ))
                 .with_children(|b| {
@@ -106,13 +106,13 @@ fn setup_grid(
     commands.insert_resource(Map {
         layout,
         entities,
-        selected_material: selected_material.into(),
-        ring_material: ring_material.into(),
-        default_material: default_material.into(),
-        line_material: line_material.into(),
-        half_ring_material: half_ring_material.into(),
-        wedge_material: wedge_material.into(),
-        dir_wedge_material: dir_wedge_material.into(),
+        selected_material,
+        ring_material,
+        default_material,
+        line_material,
+        half_ring_material,
+        wedge_material,
+        dir_wedge_material,
     });
 }
 

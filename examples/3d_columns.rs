@@ -76,7 +76,7 @@ fn setup_grid(
             let id = commands
                 .spawn((
                     Mesh3d(mesh_handle.clone()),
-                    MeshMaterial3d(default_material.clone()),
+                    MeshMaterial3d(default_material.clone_weak()),
                     Transform::from_xyz(pos.x, hex.length() as f32 / 2.0, pos.y),
                 ))
                 .id();
@@ -103,7 +103,7 @@ fn animate_rings(
     {
         commands
             .entity(*entity)
-            .insert(MeshMaterial3d(map.default_material.clone()));
+            .insert(MeshMaterial3d(map.default_material.clone_weak()));
     }
     highlighted_hexes.ring += 1;
     if highlighted_hexes.ring > MAP_RADIUS {
@@ -115,7 +115,7 @@ fn animate_rings(
         if let Some(e) = map.entities.get(h) {
             commands
                 .entity(*e)
-                .insert(MeshMaterial3d(map.highlighted_material.clone()));
+                .insert(MeshMaterial3d(map.highlighted_material.clone_weak()));
         }
     }
 }
