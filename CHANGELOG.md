@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Fix: CI failures with `dynamic_linking` (#184)
 * Bump `bevy` dependency to 0.15 (#181, #182)
 * Bump `glam` dependency to 0.29 (#181)
 * Bump `bevy_egui` dev dependency to `0.31` (#180, #181)
