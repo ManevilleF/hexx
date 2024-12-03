@@ -4,7 +4,6 @@ use bevy::{
     ecs::system::RunSystemOnce,
     prelude::*,
     render::{
-        extract_component::ExtractComponent,
         mesh::{Indices, PrimitiveTopology},
         render_asset::RenderAssetUsages,
     },
@@ -144,7 +143,7 @@ fn show_ui(world: &mut World) {
         });
     });
     if regenerate {
-        world.run_system_once(generate);
+        world.run_system_once(generate).unwrap();
     }
 }
 
