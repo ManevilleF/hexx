@@ -197,7 +197,7 @@
 //! If you want to generate 3D hexagonal mesh and use it in
 //! [bevy](bevyengine.org) you may do it this way:
 //!
-//!```ignore
+//!```rust
 //! use bevy::{
 //!     prelude::Mesh,
 //!     render::{
