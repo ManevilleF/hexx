@@ -7,7 +7,7 @@
 use approx::assert_relative_eq;
 
 use super::*;
-use crate::HexOrientation;
+use crate::{Hex, HexLayout, HexOrientation};
 use std::f32::consts::PI;
 
 mod edge_directions {
@@ -187,10 +187,68 @@ mod edge_directions {
             assert_eq!(dir.diagonal_cw().direction_ccw(), dir);
         }
     }
+
+    #[test]
+    fn neigbhoring() {
+        let coord = Hex::ZERO;
+        for direction in EdgeDirection::ALL_DIRECTIONS {
+            let neighbor = coord.neighbor(direction);
+            let n_dir = coord.neighbor_direction(neighbor).unwrap();
+            assert_eq!(n_dir, direction);
+            let n_dir = coord.main_direction_to(neighbor);
+            assert_eq!(n_dir, direction);
+        }
+    }
+
+    #[test]
+    fn unit_vector() {
+        let coord = Hex::ZERO;
+        for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+            let layout = HexLayout::new(orientation);
+            for dir in EdgeDirection::ALL_DIRECTIONS {
+                let neighbor = coord.neighbor(dir);
+                let origin = layout.hex_to_world_pos(coord);
+                let neighbor = layout.hex_to_world_pos(neighbor);
+                let world_vector = (neighbor - origin).normalize();
+                let unit_vector = dir.unit_vector(orientation);
+                assert_relative_eq!(world_vector.x, unit_vector.x, epsilon = 0.00001);
+                assert_relative_eq!(world_vector.y, unit_vector.y, epsilon = 0.00001);
+            }
+        }
+    }
 }
 
 mod vertex_direction {
+    use core::f32;
+
     use super::*;
+
+    #[test]
+    fn neigbhoring() {
+        let coord = Hex::ZERO;
+        for direction in VertexDirection::ALL_DIRECTIONS {
+            let neighbor = coord.diagonal_neighbor(direction);
+            let n_dir = coord.main_diagonal_to(neighbor);
+            assert_eq!(n_dir, direction);
+        }
+    }
+
+    #[test]
+    fn unit_vector() {
+        let coord = Hex::ZERO;
+        for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+            let layout = HexLayout::new(orientation);
+            for dir in VertexDirection::ALL_DIRECTIONS {
+                let neighbor = coord.diagonal_neighbor(dir);
+                let origin = layout.hex_to_world_pos(coord);
+                let neighbor = layout.hex_to_world_pos(neighbor);
+                let world_vector = (neighbor - origin).normalize();
+                let unit_vector = dir.unit_vector(orientation);
+                assert_relative_eq!(world_vector.x, unit_vector.x, epsilon = 0.00001);
+                assert_relative_eq!(world_vector.y, unit_vector.y, epsilon = 0.00001);
+            }
+        }
+    }
 
     #[test]
     fn dir_neighbors() {
