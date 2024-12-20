@@ -2,9 +2,9 @@
 
 ## [Unreleased]
 
-* Added new offset coordinates conversion methods using a `HexOrientation` (#189)
-  * `Hex::to_even_offset` and `Hex::from_even_offset`
-  * `Hex::to_odd_offset` and `Hex::from_odd_offset`
+* (**BREAKING**) `HexOffsetMode` now has only 2 variants `Even` and `Odd`
+* (**BREAKING**) `Hex::to_offset_coordinates` and `Hex::from_offset_coordinates`
+  take a new `HexOrientation` parameter (#189)
 
 ## 0.19.1
 
