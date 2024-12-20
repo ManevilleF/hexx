@@ -83,9 +83,9 @@ fn setup_grid(
         blocked_coords,
         path_entities: Default::default(),
         layout,
-        default_mat: default_mat.into(),
-        blocked_mat: blocked_mat.into(),
-        path_mat: path_mat.into(),
+        default_mat,
+        blocked_mat,
+        path_mat,
     })
 }
 

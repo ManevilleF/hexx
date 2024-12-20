@@ -1,3 +1,4 @@
+#![allow(clippy::unwrap_used)]
 use super::*;
 
 #[test]
@@ -371,12 +372,21 @@ fn empty_line_to() {
 fn rectiline() {
     for start in Hex::ZERO.range(20) {
         for end in Hex::ZERO.range(20) {
+            let expected_len = start.unsigned_distance_to(end) as usize + 1;
+            // Clockwise
             let line = start.rectiline_to(end, true);
-            assert_eq!(line.len(), start.unsigned_distance_to(end) as usize + 1);
-            assert_eq!(line.len(), line.count());
+            assert_eq!(line.len(), expected_len);
+            let line: Vec<_> = line.collect();
+            assert_eq!(line.len(), expected_len);
+            assert_eq!(line.last().unwrap(), end);
+            assert_eq!(line[0], start);
+            // Counter clockwise
             let line = start.rectiline_to(end, false);
-            assert_eq!(line.len(), start.unsigned_distance_to(end) as usize + 1);
-            assert_eq!(line.len(), line.count());
+            assert_eq!(line.len(), expected_len);
+            let line: Vec<_> = line.collect();
+            assert_eq!(line.len(), expected_len);
+            assert_eq!(line.last().unwrap(), end);
+            assert_eq!(line[0], start);
         }
     }
 }

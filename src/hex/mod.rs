@@ -923,6 +923,8 @@ impl Hex {
     /// assert_eq!(line.len(), 6);
     /// let line: Vec<Hex> = line.collect();
     /// assert_eq!(line.len(), 6);
+    /// assert_eq!(line[0], start);
+    /// assert_eq!(line[5], end);
     /// ````
     pub fn rectiline_to(self, other: Self, clockwise: bool) -> impl ExactSizeIterator<Item = Self> {
         let delta = other.const_sub(self);
@@ -932,17 +934,17 @@ impl Hex {
             dirs.rotate_left(1);
         }
         // The two directions to apply
-        let [da, db] = dirs;
+        let [dir_a, dir_b] = dirs;
         // The amount of `da` is the distance between `delta` and the full projection of
         // `db`
-        let proj_b = db * count;
+        let proj_b = dir_b * count;
         let ca = proj_b.distance_to(delta);
 
         let iter = std::iter::once(self).chain((0..count).scan(self, move |p, i| {
-            if i <= ca {
-                *p += da;
+            if i < ca {
+                *p += dir_a;
             } else {
-                *p += db;
+                *p += dir_b;
             }
             Some(*p)
         }));

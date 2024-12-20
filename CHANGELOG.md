@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Fix: `Hex::rectiline_to` not reaching the `end` parameter (#188)
+* Examples clippy fixes (#188)
+
 ## 0.19.0
 
 * Fix: CI failures with `dynamic_linking` (#184)
