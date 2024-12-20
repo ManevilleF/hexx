@@ -1,4 +1,4 @@
-use crate::Hex;
+use crate::{Hex, HexOrientation};
 
 /// Layout mode for [doubled] coordinates conversion. See
 /// [`Hex::to_doubled_coordinates`] and [`Hex::from_doubled_coordinates`].
@@ -51,6 +51,14 @@ impl Hex {
     ///
     /// The coordinates are returned as `[COLUMN, ROW]`
     ///
+    /// # Note:
+    ///
+    /// For most use cases using [`OffsetHexMode`] directly is not relevant as
+    /// the offset coordinate conversion would depend on the [`HexOrientation`].
+    /// For this cases prefer
+    /// - [`Hex::to_even_offset`]
+    /// - [`Hex::to_odd_offset`]
+    ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     #[inline]
     #[must_use]
@@ -60,6 +68,30 @@ impl Hex {
             OffsetHexMode::OddColumns => [self.x, self.y + (self.x - (self.x & 1)) / 2],
             OffsetHexMode::EvenRows => [self.x + (self.y + (self.y & 1)) / 2, self.y],
             OffsetHexMode::OddRows => [self.x + (self.y - (self.y & 1)) / 2, self.y],
+        }
+    }
+
+    /// Converts `self` to even [offset] coordinates according to the given `orientation`.
+    ///
+    /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
+    #[inline]
+    #[must_use]
+    pub const fn to_even_offset(self, orientation: HexOrientation) -> [i32; 2] {
+        match orientation {
+            HexOrientation::Pointy => self.to_offset_coordinates(OffsetHexMode::EvenRows),
+            HexOrientation::Flat => self.to_offset_coordinates(OffsetHexMode::EvenColumns),
+        }
+    }
+
+    /// Converts `self` to odd [offset] coordinates according to the given `orientation`.
+    ///
+    /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
+    #[inline]
+    #[must_use]
+    pub const fn to_odd_offset(self, orientation: HexOrientation) -> [i32; 2] {
+        match orientation {
+            HexOrientation::Pointy => self.to_offset_coordinates(OffsetHexMode::OddRows),
+            HexOrientation::Flat => self.to_offset_coordinates(OffsetHexMode::OddColumns),
         }
     }
 
@@ -126,6 +158,34 @@ impl Hex {
             OffsetHexMode::OddRows => Self::new(col - (row - (row & 1)) / 2, row),
         }
     }
+
+    /// Converts even [offset] to [axial] coordinates according to the given `orientation`.
+    ///
+    /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
+    /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
+    #[inline]
+    #[must_use]
+    pub const fn from_even_offset(coord: [i32; 2], orientation: HexOrientation) -> Self {
+        match orientation {
+            HexOrientation::Pointy => Self::from_offset_coordinates(coord, OffsetHexMode::EvenRows),
+            HexOrientation::Flat => {
+                Self::from_offset_coordinates(coord, OffsetHexMode::EvenColumns)
+            }
+        }
+    }
+
+    /// Converts odd [offset] to [axial] coordinates according to the given `orientation`.
+    ///
+    /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
+    /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
+    #[inline]
+    #[must_use]
+    pub const fn from_odd_offset(coord: [i32; 2], orientation: HexOrientation) -> Self {
+        match orientation {
+            HexOrientation::Pointy => Self::from_offset_coordinates(coord, OffsetHexMode::OddRows),
+            HexOrientation::Flat => Self::from_offset_coordinates(coord, OffsetHexMode::OddColumns),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -154,6 +214,28 @@ mod tests {
             ] {
                 let offset = hex.to_offset_coordinates(mode);
                 let converted = Hex::from_offset_coordinates(offset, mode);
+                assert_eq!(converted, hex);
+            }
+        }
+    }
+
+    #[test]
+    fn even_offset_coordinates() {
+        for hex in Hex::ZERO.range(20) {
+            for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+                let offset = hex.to_even_offset(orientation);
+                let converted = Hex::from_even_offset(offset, orientation);
+                assert_eq!(converted, hex);
+            }
+        }
+    }
+
+    #[test]
+    fn odd_offset_coordinates() {
+        for hex in Hex::ZERO.range(20) {
+            for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+                let offset = hex.to_odd_offset(orientation);
+                let converted = Hex::from_odd_offset(offset, orientation);
                 assert_eq!(converted, hex);
             }
         }

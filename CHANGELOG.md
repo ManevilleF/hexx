@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* Added new offset coordinates conversion methods using a `HexOrientation` (#189)
+  * `Hex::to_even_offset` and `Hex::from_even_offset`
+  * `Hex::to_odd_offset` and `Hex::from_odd_offset`
+
 ## 0.19.1
 
 * Fix: `Hex::rectiline_to` not reaching the `end` parameter (#188)
