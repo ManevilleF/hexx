@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 * (**BREAKING**) `HexLayout` Y axis is no longer inverted by default (#187)
+* `HexLayout` builder patter (#187)
 
 ## 0.19.1
 
