@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.19.1
+
 * Fix: `Hex::rectiline_to` not reaching the `end` parameter (#188)
 * Examples clippy fixes (#188)
 
