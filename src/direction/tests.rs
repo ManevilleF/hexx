@@ -1,7 +1,8 @@
 #![allow(
     clippy::enum_glob_use,
     clippy::cast_possible_truncation,
-    clippy::cast_precision_loss
+    clippy::cast_precision_loss,
+    clippy::unwrap_used
 )]
 
 use approx::assert_relative_eq;
