@@ -6,7 +6,7 @@ use glam::Vec2;
 ///
 /// # Axis
 ///
-/// By default, the [`Hex`] `y` axis is pointing down and the `x` axis is
+/// By default, the [`Hex`] `y` axis is pointing up and the `x` axis is
 /// pointing right but you have the option to invert them using `invert_x` and
 /// `invert_y` This may be useful depending on the coordinate system of your
 /// display.
@@ -23,7 +23,7 @@ use glam::Vec2;
 ///     origin: Vec2::new(1.0, 2.0),
 ///     // We define the world space size of the hexagons
 ///     hex_size: Vec2::new(1.0, 1.0),
-///     // We invert the y axis
+///     // We invert the y axis which will now go down
 ///     invert_y: true,
 ///     // But not the x axis
 ///     invert_x: false,
@@ -32,6 +32,20 @@ use glam::Vec2;
 /// let world_pos = layout.hex_to_world_pos(Hex::ZERO);
 /// // You can also find which hexagon is at a given world/screen position
 /// let hex_pos = layout.world_pos_to_hex(Vec2::new(1.23, 45.678));
+/// ```
+///
+/// # Builder
+///
+/// `HexLayout` provides a builder pattern:
+///
+/// ```rust
+/// # use hexx::*;
+///
+/// let layout = HexLayout::new(HexOrientation::Flat)
+///     .with_size(Vec2::new(2.0, 3.0)) // Individual Hexagon size
+///     .with_origin(Vec2::new(-1.0, 0.0)) // World origin
+///     .invert_x() // Invert the x axis, which will now go left
+///     .invert_y(); // Invert the y axis, which will now go down
 /// ```
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
