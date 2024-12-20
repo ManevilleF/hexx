@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* (**BREAKING**) `HexLayout` Y axis is no longer inverted by default (#187)
+
 ## 0.19.1
 
 * Fix: `Hex::rectiline_to` not reaching the `end` parameter (#188)

@@ -114,7 +114,7 @@ impl HexLayout {
     /// Returns a signum axis coefficient, allowing for inverted axis
     const fn axis_scale(&self) -> Vec2 {
         let x = if self.invert_x { -1.0 } else { 1.0 };
-        let y = if self.invert_y { 1.0 } else { -1.0 };
+        let y = if self.invert_y { -1.0 } else { 1.0 };
         Vec2::new(x, y)
     }
 
@@ -165,15 +165,59 @@ impl HexLayout {
     }
 }
 
-impl Default for HexLayout {
-    fn default() -> Self {
+// Builder pattern
+impl HexLayout {
+    #[must_use]
+    #[inline]
+    /// Constructs a new layout with the given `orientation` and default
+    /// values
+    pub const fn new(orientation: HexOrientation) -> Self {
         Self {
-            orientation: HexOrientation::default(),
+            orientation,
             origin: Vec2::ZERO,
             hex_size: Vec2::ONE,
             invert_x: false,
             invert_y: false,
         }
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specifies the world/pixel origin of the layout
+    pub const fn with_origin(mut self, origin: Vec2) -> Self {
+        self.origin = origin;
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specifies the world/pixel size of individual hexagons
+    pub const fn with_size(mut self, hex_size: Vec2) -> Self {
+        self.hex_size = hex_size;
+        self
+    }
+
+    /// Inverts the world/pixel `x` axis
+    #[must_use]
+    #[inline]
+    pub const fn invert_x(mut self) -> Self {
+        self.invert_x = true;
+        self
+    }
+
+    /// Inverts the world/pixel `y` axis
+    #[must_use]
+    #[inline]
+    pub const fn invert_y(mut self) -> Self {
+        self.invert_y = true;
+        self
+    }
+}
+
+impl Default for HexLayout {
+    #[inline]
+    fn default() -> Self {
+        Self::new(HexOrientation::default())
     }
 }
 
@@ -184,12 +228,9 @@ mod tests {
     #[test]
     fn flat_corners() {
         let point = Hex::new(0, 0);
-        let layout = HexLayout {
-            orientation: HexOrientation::Flat,
-            origin: Vec2::ZERO,
-            hex_size: Vec2::new(10., 10.),
-            ..Default::default()
-        };
+        let layout = HexLayout::new(HexOrientation::Flat)
+            .with_size(Vec2::new(10., 10.))
+            .invert_y();
         let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
             corners,
@@ -202,17 +243,27 @@ mod tests {
                 Vec2::new(5.0, 9.0),
             ]
         );
+        let layout = HexLayout::new(HexOrientation::Flat).with_size(Vec2::new(10., 10.));
+        let corners = layout.hex_corners(point).map(Vec2::round);
+        assert_eq!(
+            corners,
+            [
+                Vec2::new(10.0, 0.0),
+                Vec2::new(5.0, 9.0),
+                Vec2::new(-5.0, 9.0),
+                Vec2::new(-10.0, 0.0),
+                Vec2::new(-5.0, -9.0),
+                Vec2::new(5.0, -9.0),
+            ]
+        );
     }
 
     #[test]
     fn pointy_corners() {
         let point = Hex::new(0, 0);
-        let layout = HexLayout {
-            orientation: HexOrientation::Pointy,
-            origin: Vec2::ZERO,
-            hex_size: Vec2::new(10., 10.),
-            ..Default::default()
-        };
+        let layout = HexLayout::new(HexOrientation::Pointy)
+            .with_size(Vec2::new(10., 10.))
+            .invert_y();
         let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
             corners,
@@ -223,6 +274,19 @@ mod tests {
                 Vec2::new(-9.0, -5.0),
                 Vec2::new(-9.0, 5.0),
                 Vec2::new(0.0, 10.0),
+            ]
+        );
+        let layout = HexLayout::new(HexOrientation::Pointy).with_size(Vec2::new(10., 10.));
+        let corners = layout.hex_corners(point).map(Vec2::round);
+        assert_eq!(
+            corners,
+            [
+                Vec2::new(9.0, -5.0),
+                Vec2::new(9.0, 5.0),
+                Vec2::new(-0.0, 10.0),
+                Vec2::new(-9.0, 5.0),
+                Vec2::new(-9.0, -5.0),
+                Vec2::new(0.0, -10.0),
             ]
         );
     }
