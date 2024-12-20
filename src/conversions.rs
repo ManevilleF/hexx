@@ -71,7 +71,8 @@ impl Hex {
         }
     }
 
-    /// Converts `self` to even [offset] coordinates according to the given `orientation`.
+    /// Converts `self` to even [offset] coordinates according to the given
+    /// `orientation`.
     ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     #[inline]
@@ -83,7 +84,8 @@ impl Hex {
         }
     }
 
-    /// Converts `self` to odd [offset] coordinates according to the given `orientation`.
+    /// Converts `self` to odd [offset] coordinates according to the given
+    /// `orientation`.
     ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     #[inline]
@@ -159,7 +161,8 @@ impl Hex {
         }
     }
 
-    /// Converts even [offset] to [axial] coordinates according to the given `orientation`.
+    /// Converts even [offset] to [axial] coordinates according to the given
+    /// `orientation`.
     ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
@@ -174,7 +177,8 @@ impl Hex {
         }
     }
 
-    /// Converts odd [offset] to [axial] coordinates according to the given `orientation`.
+    /// Converts odd [offset] to [axial] coordinates according to the given
+    /// `orientation`.
     ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
