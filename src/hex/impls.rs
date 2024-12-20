@@ -7,6 +7,12 @@ use std::{
     },
 };
 
+impl PartialEq<Hex> for &Hex {
+    fn eq(&self, other: &Hex) -> bool {
+        (*self).eq(other)
+    }
+}
+
 impl Add<Self> for Hex {
     type Output = Self;
 
