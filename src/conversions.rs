@@ -1,4 +1,4 @@
-use crate::Hex;
+use crate::{Hex, HexOrientation};
 
 /// Layout mode for [doubled] coordinates conversion. See
 /// [`Hex::to_doubled_coordinates`] and [`Hex::from_doubled_coordinates`].
@@ -18,18 +18,19 @@ pub enum DoubledHexMode {
 /// [`Hex::to_offset_coordinates`] and [`Hex::from_offset_coordinates`].
 ///
 /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OffsetHexMode {
-    /// Vertical layout, shoves even columns down
-    EvenColumns,
-    /// Vertical layout, shoves odd columns down
-    OddColumns,
-    /// Horizontal layout, shoves even rows right
-    EvenRows,
-    #[default]
-    /// Horizontal layout, shoves odd rows right
-    OddRows,
+    /// Depending on the orientation:
+    ///
+    /// * Flat: Vertical layout, shoves even columns down
+    /// * Pointy: Horizontal layout, shoves even rows right
+    Even,
+    /// Depending on the orientation:
+    ///
+    /// * Flat: Vertical layout, shoves odd columns down
+    /// * Pointy: Horizontal layout, shoves odd rows right
+    Odd,
 }
 
 impl Hex {
@@ -47,19 +48,32 @@ impl Hex {
         }
     }
 
-    /// Converts `self` to [offset] coordinates according to the given `mode`.
+    /// Converts `self` to [offset] coordinates according to the given `mode`
+    /// and `orientation`
     ///
     /// The coordinates are returned as `[COLUMN, ROW]`
     ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     #[inline]
     #[must_use]
-    pub const fn to_offset_coordinates(self, mode: OffsetHexMode) -> [i32; 2] {
-        match mode {
-            OffsetHexMode::EvenColumns => [self.x, self.y + (self.x + (self.x & 1)) / 2],
-            OffsetHexMode::OddColumns => [self.x, self.y + (self.x - (self.x & 1)) / 2],
-            OffsetHexMode::EvenRows => [self.x + (self.y + (self.y & 1)) / 2, self.y],
-            OffsetHexMode::OddRows => [self.x + (self.y - (self.y & 1)) / 2, self.y],
+    pub const fn to_offset_coordinates(
+        self,
+        mode: OffsetHexMode,
+        orientation: HexOrientation,
+    ) -> [i32; 2] {
+        match (mode, orientation) {
+            (OffsetHexMode::Even, HexOrientation::Flat) => {
+                [self.x, self.y + (self.x + (self.x & 1)) / 2]
+            }
+            (OffsetHexMode::Even, HexOrientation::Pointy) => {
+                [self.x + (self.y + (self.y & 1)) / 2, self.y]
+            }
+            (OffsetHexMode::Odd, HexOrientation::Flat) => {
+                [self.x, self.y + (self.x - (self.x & 1)) / 2]
+            }
+            (OffsetHexMode::Odd, HexOrientation::Pointy) => {
+                [self.x + (self.y - (self.y & 1)) / 2, self.y]
+            }
         }
     }
 
@@ -112,18 +126,31 @@ impl Hex {
         }
     }
 
-    /// Converts [offset] to [axial] coordinates according to the given `mode`.
+    /// Converts [offset] to [axial] coordinates according to the given `mode`
+    /// and `orientation`
     ///
     /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
     /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
     #[inline]
     #[must_use]
-    pub const fn from_offset_coordinates([col, row]: [i32; 2], mode: OffsetHexMode) -> Self {
-        match mode {
-            OffsetHexMode::EvenColumns => Self::new(col, row - (col + (col & 1)) / 2),
-            OffsetHexMode::OddColumns => Self::new(col, row - (col - (col & 1)) / 2),
-            OffsetHexMode::EvenRows => Self::new(col - (row + (row & 1)) / 2, row),
-            OffsetHexMode::OddRows => Self::new(col - (row - (row & 1)) / 2, row),
+    pub const fn from_offset_coordinates(
+        [col, row]: [i32; 2],
+        mode: OffsetHexMode,
+        orientation: HexOrientation,
+    ) -> Self {
+        match (mode, orientation) {
+            (OffsetHexMode::Even, HexOrientation::Flat) => {
+                Self::new(col, row - (col + (col & 1)) / 2)
+            }
+            (OffsetHexMode::Odd, HexOrientation::Flat) => {
+                Self::new(col, row - (col - (col & 1)) / 2)
+            }
+            (OffsetHexMode::Even, HexOrientation::Pointy) => {
+                Self::new(col - (row + (row & 1)) / 2, row)
+            }
+            (OffsetHexMode::Odd, HexOrientation::Pointy) => {
+                Self::new(col - (row - (row & 1)) / 2, row)
+            }
         }
     }
 }
@@ -146,15 +173,12 @@ mod tests {
     #[test]
     fn offset_coordinates() {
         for hex in Hex::ZERO.range(20) {
-            for mode in [
-                OffsetHexMode::OddRows,
-                OffsetHexMode::OddColumns,
-                OffsetHexMode::EvenColumns,
-                OffsetHexMode::EvenRows,
-            ] {
-                let offset = hex.to_offset_coordinates(mode);
-                let converted = Hex::from_offset_coordinates(offset, mode);
-                assert_eq!(converted, hex);
+            for mode in [OffsetHexMode::Even, OffsetHexMode::Odd] {
+                for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+                    let offset = hex.to_offset_coordinates(mode, orientation);
+                    let converted = Hex::from_offset_coordinates(offset, mode, orientation);
+                    assert_eq!(converted, hex);
+                }
             }
         }
     }
