@@ -21,12 +21,8 @@ use glam::Vec2;
 ///     orientation: HexOrientation::Flat,
 ///     // We define the world space origin equivalent of `Hex::ZERO` in hex space
 ///     origin: Vec2::new(1.0, 2.0),
-///     // We define the world space size of the hexagons
-///     hex_size: Vec2::new(1.0, 1.0),
-///     // We invert the y axis which will now go down
-///     invert_y: true,
-///     // But not the x axis
-///     invert_x: false,
+///     // We define the world space scale of the hexagons
+///     scale: Vec2::new(1.0, 1.0),
 /// };
 /// // You can now find the world positon (center) of any given hexagon
 /// let world_pos = layout.hex_to_world_pos(Hex::ZERO);
@@ -41,11 +37,13 @@ use glam::Vec2;
 /// ```rust
 /// # use hexx::*;
 ///
-/// let layout = HexLayout::new(HexOrientation::Flat)
-///     .with_size(Vec2::new(2.0, 3.0)) // Individual Hexagon size
-///     .with_origin(Vec2::new(-1.0, 0.0)) // World origin
-///     .invert_x() // Invert the x axis, which will now go left
-///     .invert_y(); // Invert the y axis, which will now go down
+/// let mut layout = HexLayout::new(HexOrientation::Flat)
+///     .with_scale(Vec2::new(2.0, 3.0)) // Individual Hexagon size
+///     .with_origin(Vec2::new(-1.0, 0.0)); // World origin
+/// // Invert the x axis, which will now go left. Will change `scale.x` to `-2.0`
+/// layout.invert_x();
+/// // Invert the y axis, which will now go down. Will change `scale.y` to `-3.0`
+/// layout.invert_y();
 /// ```
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -57,12 +55,52 @@ pub struct HexLayout {
     /// [`Vec2::ZERO`]
     pub origin: Vec2,
     /// The size of individual hexagons in world/pixel space. The size can be
-    /// irregular
-    pub hex_size: Vec2,
-    /// If set to `true`, the `Hex` `x` axis will be inverted
-    pub invert_x: bool,
-    /// If set to `true`, the `Hex` `y` axis will be inverted
-    pub invert_y: bool,
+    /// irregular or negative
+    pub scale: Vec2,
+}
+
+impl HexLayout {
+    /// Inverts the layout `X` axis
+    pub fn invert_x(&mut self) {
+        self.scale.x *= -1.0;
+    }
+
+    /// Inverts the layout `Y` axis
+    pub fn invert_y(&mut self) {
+        self.scale.y *= -1.0;
+    }
+
+    /// Transforms a local hex space vector to world space
+    /// by applying the layout `scale`
+    #[must_use]
+    #[inline]
+    pub fn transform_vector(&self, vector: Vec2) -> Vec2 {
+        vector * self.scale
+    }
+
+    /// Transforms a local hex point to world space
+    /// by applying the layout `scale` and `origin`
+    #[must_use]
+    #[inline]
+    pub fn transform_point(&self, point: Vec2) -> Vec2 {
+        self.origin + self.transform_vector(point)
+    }
+
+    /// Transforms a world space vector to local hex space
+    /// by applying the layout `scale`
+    #[must_use]
+    #[inline]
+    pub fn inverse_transform_vector(&self, vector: Vec2) -> Vec2 {
+        vector / self.scale
+    }
+
+    /// Transforms a world pace point to local hex space
+    /// by applying the layout `scale` and `origin`
+    #[must_use]
+    #[inline]
+    pub fn inverse_transform_point(&self, point: Vec2) -> Vec2 {
+        self.inverse_transform_vector(point - self.origin)
+    }
 }
 
 impl HexLayout {
@@ -79,7 +117,7 @@ impl HexLayout {
     /// ignoring [`HexLayout::origin`]
     pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Hex) -> Vec2 {
         let [x, y] = self.orientation.forward(hex.to_array_f32());
-        Vec2::new(x, y) * self.hex_size * self.axis_scale()
+        self.transform_vector(Vec2::new(x, y))
     }
 
     #[must_use]
@@ -88,7 +126,7 @@ impl HexLayout {
     /// coordinates
     pub fn fract_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
         let [x, y] = self.orientation.forward(hex.to_array());
-        Vec2::new(x, y) * self.hex_size * self.axis_scale() + self.origin
+        self.transform_point(Vec2::new(x, y))
     }
 
     #[must_use]
@@ -104,7 +142,7 @@ impl HexLayout {
     /// Computes world/pixel coordinates `pos` into fractional hexagonal
     /// coordinates
     pub fn world_pos_to_fract_hex(&self, pos: Vec2) -> Vec2 {
-        let point = (pos - self.origin) * self.axis_scale() / self.hex_size;
+        let point = self.inverse_transform_point(pos);
         let [x, y] = self.orientation.inverse(point.to_array());
         Vec2::new(x, y)
     }
@@ -114,22 +152,14 @@ impl HexLayout {
     /// `hex`
     pub fn hex_corners(&self, hex: Hex) -> [Vec2; 6] {
         let center = self.hex_to_world_pos(hex);
-        self.center_aligned_hex_corners()
-            .map(|c| (c * self.axis_scale()) + center)
+        self.center_aligned_hex_corners().map(|c| c + center)
     }
 
     #[must_use]
     /// Unscaled, non offsetted hex corners
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
-        VertexDirection::ALL_DIRECTIONS.map(|dir| dir.unit_vector(self.orientation) * self.hex_size)
-    }
-
-    #[inline]
-    /// Returns a signum axis coefficient, allowing for inverted axis
-    const fn axis_scale(&self) -> Vec2 {
-        let x = if self.invert_x { -1.0 } else { 1.0 };
-        let y = if self.invert_y { -1.0 } else { 1.0 };
-        Vec2::new(x, y)
+        VertexDirection::ALL_DIRECTIONS
+            .map(|dir| self.transform_vector(dir.unit_vector(self.orientation)))
     }
 
     #[inline]
@@ -137,7 +167,7 @@ impl HexLayout {
     /// Returns the size of the bounding box/rect of an hexagon
     /// This uses both the `hex_size` and `orientation` of the layout.
     pub fn rect_size(&self) -> Vec2 {
-        self.hex_size
+        self.scale
             * match self.orientation {
                 HexOrientation::Pointy => Vec2::new(SQRT_3, 2.0),
                 HexOrientation::Flat => Vec2::new(2.0, SQRT_3),
@@ -175,7 +205,7 @@ impl HexLayout {
     }
 
     fn __vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
-        vertex.direction.unit_vector(self.orientation) * self.hex_size * self.axis_scale()
+        self.transform_vector(vertex.direction.unit_vector(self.orientation))
     }
 }
 
@@ -189,9 +219,7 @@ impl HexLayout {
         Self {
             orientation,
             origin: Vec2::ZERO,
-            hex_size: Vec2::ONE,
-            invert_x: false,
-            invert_y: false,
+            scale: Vec2::ONE,
         }
     }
 
@@ -205,25 +233,9 @@ impl HexLayout {
 
     #[must_use]
     #[inline]
-    /// Specifies the world/pixel size of individual hexagons
-    pub const fn with_size(mut self, hex_size: Vec2) -> Self {
-        self.hex_size = hex_size;
-        self
-    }
-
-    /// Inverts the world/pixel `x` axis
-    #[must_use]
-    #[inline]
-    pub const fn invert_x(mut self) -> Self {
-        self.invert_x = true;
-        self
-    }
-
-    /// Inverts the world/pixel `y` axis
-    #[must_use]
-    #[inline]
-    pub const fn invert_y(mut self) -> Self {
-        self.invert_y = true;
+    /// Specifies the world/pixel scale of individual hexagons
+    pub const fn with_scale(mut self, scale: Vec2) -> Self {
+        self.scale = scale;
         self
     }
 }
@@ -242,32 +254,30 @@ mod tests {
     #[test]
     fn flat_corners() {
         let point = Hex::new(0, 0);
-        let layout = HexLayout::new(HexOrientation::Flat)
-            .with_size(Vec2::new(10., 10.))
-            .invert_y();
+        let mut layout = HexLayout::new(HexOrientation::Flat).with_scale(Vec2::new(10., 10.));
         let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
             corners,
             [
                 Vec2::new(10.0, 0.0),
-                Vec2::new(5.0, -9.0),
-                Vec2::new(-5.0, -9.0),
-                Vec2::new(-10.0, 0.0),
-                Vec2::new(-5.0, 9.0),
                 Vec2::new(5.0, 9.0),
+                Vec2::new(-5.0, 9.0),
+                Vec2::new(-10.0, 0.0),
+                Vec2::new(-5.0, -9.0),
+                Vec2::new(5.0, -9.0),
             ]
         );
-        let layout = HexLayout::new(HexOrientation::Flat).with_size(Vec2::new(10., 10.));
+        layout.invert_y();
         let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
             corners,
             [
                 Vec2::new(10.0, 0.0),
-                Vec2::new(5.0, 9.0),
-                Vec2::new(-5.0, 9.0),
-                Vec2::new(-10.0, 0.0),
-                Vec2::new(-5.0, -9.0),
                 Vec2::new(5.0, -9.0),
+                Vec2::new(-5.0, -9.0),
+                Vec2::new(-10.0, 0.0),
+                Vec2::new(-5.0, 9.0),
+                Vec2::new(5.0, 9.0),
             ]
         );
     }
@@ -275,22 +285,7 @@ mod tests {
     #[test]
     fn pointy_corners() {
         let point = Hex::new(0, 0);
-        let layout = HexLayout::new(HexOrientation::Pointy)
-            .with_size(Vec2::new(10., 10.))
-            .invert_y();
-        let corners = layout.hex_corners(point).map(Vec2::round);
-        assert_eq!(
-            corners,
-            [
-                Vec2::new(9.0, 5.0),
-                Vec2::new(9.0, -5.0),
-                Vec2::new(-0.0, -10.0),
-                Vec2::new(-9.0, -5.0),
-                Vec2::new(-9.0, 5.0),
-                Vec2::new(0.0, 10.0),
-            ]
-        );
-        let layout = HexLayout::new(HexOrientation::Pointy).with_size(Vec2::new(10., 10.));
+        let mut layout = HexLayout::new(HexOrientation::Pointy).with_scale(Vec2::new(10., 10.));
         let corners = layout.hex_corners(point).map(Vec2::round);
         assert_eq!(
             corners,
@@ -301,6 +296,19 @@ mod tests {
                 Vec2::new(-9.0, 5.0),
                 Vec2::new(-9.0, -5.0),
                 Vec2::new(0.0, -10.0),
+            ]
+        );
+        layout.invert_y();
+        let corners = layout.hex_corners(point).map(Vec2::round);
+        assert_eq!(
+            corners,
+            [
+                Vec2::new(9.0, 5.0),
+                Vec2::new(9.0, -5.0),
+                Vec2::new(-0.0, -10.0),
+                Vec2::new(-9.0, -5.0),
+                Vec2::new(-9.0, 5.0),
+                Vec2::new(0.0, 10.0),
             ]
         );
     }

@@ -40,7 +40,7 @@ fn setup_grid(
     let atlas_layout = atlas_layouts.add(atlas_layout);
     let layout = HexLayout {
         orientation: HexOrientation::Pointy,
-        hex_size: HEX_SIZE,
+        scale: HEX_SIZE,
         ..default()
     };
     let sprite_size = layout.rect_size();

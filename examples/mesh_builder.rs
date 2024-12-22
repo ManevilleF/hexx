@@ -266,8 +266,8 @@ fn gizmos(
     // Local axis
     let mut transform = *transform;
     transform.scale.y += params.height / 2.0;
-    transform.scale.x += info.layout.hex_size.x;
-    transform.scale.z += info.layout.hex_size.y;
+    transform.scale.x += info.layout.scale.x;
+    transform.scale.z += info.layout.scale.y;
     transform.scale *= params.scale;
     draw.axes(transform, 1.0);
 }

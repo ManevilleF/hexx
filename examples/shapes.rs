@@ -84,7 +84,7 @@ impl Shape {
 pub fn setup(mut commands: Commands, mut mats: ResMut<Assets<ColorMaterial>>) {
     commands.spawn(Camera2d);
     let layout = HexLayout {
-        hex_size: HEX_SIZE,
+        scale: HEX_SIZE,
         ..default()
     };
     let mat = mats.add(Color::WHITE);
@@ -111,6 +111,10 @@ fn show_ui(world: &mut World) {
             ui.horizontal(|ui| {
                 ui.label("Orientation");
                 bevy_inspector::ui_for_value(&mut map.layout.orientation, ui, world);
+            });
+            ui.horizontal(|ui| {
+                ui.label("scale");
+                bevy_inspector::ui_for_value(&mut map.layout.scale, ui, world);
             });
         });
 

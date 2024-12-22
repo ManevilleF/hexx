@@ -386,6 +386,9 @@ impl VertexDirection {
     #[inline]
     #[must_use]
     /// Returns the unit vector of the direction in the given `orientation`
+    ///
+    /// The vector is normalized and in local hex space. To use within a
+    /// [`HexLayout`] use [`HexLayout::transform_vector`]
     pub fn unit_vector(self, orientation: HexOrientation) -> Vec2 {
         let angle = self.angle(orientation);
         Vec2::new(angle.cos(), angle.sin())

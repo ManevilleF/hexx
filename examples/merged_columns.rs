@@ -66,7 +66,7 @@ fn setup_grid(
         commands.entity(map.0).despawn_recursive();
     }
     let layout = HexLayout {
-        hex_size: settings.hex_size,
+        scale: settings.hex_size,
         ..default()
     };
     // Materials shouldn't be added to assets every time, this is just to keep the
