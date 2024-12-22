@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* (**BREAKING**) `HexOffsetMode` now has only 2 variants `Even` and `Odd`
+* (**BREAKING**) `Hex::to_offset_coordinates` and `Hex::from_offset_coordinates`
+  take a new `HexOrientation` parameter (#189)
+
 ## 0.19.1
 
 * Fix: `Hex::rectiline_to` not reaching the `end` parameter (#188)
