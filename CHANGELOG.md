@@ -16,6 +16,7 @@
   - `inverse_transform_vector`
   - `invert_x`
   - `invert_y`
+* Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
 
 ## 0.19.1
 

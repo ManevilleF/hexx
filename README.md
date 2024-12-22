@@ -120,7 +120,7 @@
 
  // Define your layout
  let layout = HexLayout {
-     hex_size: Vec2::new(1.0, 1.0),
+     scale: Vec2::new(1.0, 1.0),
      orientation: HexOrientation::Flat,
      ..Default::default()
  };
