@@ -55,16 +55,14 @@ fn setup_grid(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let flat_layout = HexLayout {
-        hex_size: HEX_SIZE,
+        scale: HEX_SIZE,
         orientation: HexOrientation::Flat,
         origin: Vec2::new(-480.0, 0.0),
-        ..default()
     };
     let pointy_layout = HexLayout {
-        hex_size: HEX_SIZE,
+        scale: HEX_SIZE,
         orientation: HexOrientation::Pointy,
         origin: Vec2::new(480.0, 0.0),
-        ..default()
     };
     // materials
     let area_material = materials.add(Color::Srgba(GOLD));

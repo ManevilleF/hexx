@@ -54,7 +54,7 @@ fn setup_grid(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let layout = HexLayout {
-        hex_size: HEX_SIZE,
+        scale: HEX_SIZE,
         ..default()
     };
     // materials

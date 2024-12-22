@@ -1,5 +1,4 @@
 use std::ops::Deref;
-
 pub(crate) const SQRT_3: f32 = 1.732_050_8;
 
 /// Pointy orientation matrices and offset

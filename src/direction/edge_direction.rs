@@ -3,7 +3,7 @@ use crate::{
         DIRECTION_ANGLE_DEGREES, DIRECTION_ANGLE_OFFSET_DEGREES, DIRECTION_ANGLE_OFFSET_RAD,
         DIRECTION_ANGLE_RAD,
     },
-    Hex, HexOrientation, VertexDirection,
+    Hex, HexLayout, HexOrientation, VertexDirection,
 };
 use glam::Vec2;
 use std::{f32::consts::TAU, fmt::Debug};
@@ -384,10 +384,25 @@ impl EdgeDirection {
 
     #[inline]
     #[must_use]
-    /// Returns the unit vector of the direction in the given `orientation`
+    /// Returns the unit vector of the direction in the given `orientation`.
+    ///
+    /// The vector is normalized and in local hex space. To use within a
+    /// [`HexLayout`] use [`HexLayout::transform_vector`] or
+    /// [`Self::world_unit_vector`]
     pub fn unit_vector(self, orientation: HexOrientation) -> Vec2 {
         let angle = self.angle(orientation);
         Vec2::new(angle.cos(), angle.sin())
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the unit vector of the direction in the given `layout`.
+    ///
+    /// The vector is provided in pixel/workd space. To use in local hex
+    /// space use [`Self::unit_vector`]
+    pub fn world_unit_vector(self, layout: &HexLayout) -> Vec2 {
+        let vector = self.unit_vector(layout.orientation);
+        layout.transform_vector(vector)
     }
 
     #[inline]

@@ -7,6 +7,16 @@
   take a new `HexOrientation` parameter (#189)
 * (**BREAKING**) `HexLayout` Y axis is no longer inverted by default (#187)
 * `HexLayout` builder patter (#187)
+* (**BREAKING**) `HexLayout` removed the `invert_x` and `invert_y` fields (#190)
+* (**BREAKING**) `HexLayout` `hex_size` field is now `scale` (#190)
+* Added the following `HexLayout` methods: (#190)
+  - `transform_point`
+  - `transform_vector`
+  - `inverse_transform_point`
+  - `inverse_transform_vector`
+  - `invert_x`
+  - `invert_y`
+* Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
 
 ## 0.19.1
 
