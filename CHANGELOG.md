@@ -5,6 +5,8 @@
 * (**BREAKING**) `HexOffsetMode` now has only 2 variants `Even` and `Odd`
 * (**BREAKING**) `Hex::to_offset_coordinates` and `Hex::from_offset_coordinates`
   take a new `HexOrientation` parameter (#189)
+* (**BREAKING**) `HexLayout` Y axis is no longer inverted by default (#187)
+* `HexLayout` builder patter (#187)
 
 ## 0.19.1
 
