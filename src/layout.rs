@@ -1,5 +1,5 @@
 use crate::{orientation::SQRT_3, Hex, HexOrientation, VertexDirection};
-use glam::Vec2;
+use glam::{Mat2, Vec2};
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
 /// coordinate system and the hexagonal coordinate system.
@@ -70,8 +70,15 @@ impl HexLayout {
         self.scale.y *= -1.0;
     }
 
+    /// Computes the scale matrix of the layout.
+    ///
+    /// Note that it doesn't include the hex to world space transformation
+    pub fn scale_matrix(&self) -> Mat2 {
+        Mat2::from_diagonal(self.scale)
+    }
+
     /// Transforms a local hex space vector to world space
-    /// by applying the layout `scale`
+    /// by applying the layout `scale` but NOT the origin
     #[must_use]
     #[inline]
     pub fn transform_vector(&self, vector: Vec2) -> Vec2 {
@@ -87,7 +94,7 @@ impl HexLayout {
     }
 
     /// Transforms a world space vector to local hex space
-    /// by applying the layout `scale`
+    /// by applying the layout `scale` but NOT the origin
     #[must_use]
     #[inline]
     pub fn inverse_transform_vector(&self, vector: Vec2) -> Vec2 {
@@ -116,8 +123,8 @@ impl HexLayout {
     /// Computes hexagonal coordinates `hex` into world/pixel coordinates but
     /// ignoring [`HexLayout::origin`]
     pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Hex) -> Vec2 {
-        let [x, y] = self.orientation.forward(hex.to_array_f32());
-        self.transform_vector(Vec2::new(x, y))
+        let p = self.orientation.forward(hex.as_vec2());
+        self.transform_vector(p)
     }
 
     #[must_use]
@@ -125,8 +132,8 @@ impl HexLayout {
     /// Computes fractional hexagonal coordinates `hex` into world/pixel
     /// coordinates
     pub fn fract_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
-        let [x, y] = self.orientation.forward(hex.to_array());
-        self.transform_point(Vec2::new(x, y))
+        let p = self.orientation.forward(hex);
+        self.transform_point(p)
     }
 
     #[must_use]
@@ -143,8 +150,7 @@ impl HexLayout {
     /// coordinates
     pub fn world_pos_to_fract_hex(&self, pos: Vec2) -> Vec2 {
         let point = self.inverse_transform_point(pos);
-        let [x, y] = self.orientation.inverse(point.to_array());
-        Vec2::new(x, y)
+        self.orientation.inverse(point)
     }
 
     #[must_use]
@@ -167,10 +173,13 @@ impl HexLayout {
     /// Returns the size of the bounding box/rect of an hexagon
     /// This uses both the `hex_size` and `orientation` of the layout.
     pub fn rect_size(&self) -> Vec2 {
+        const FLAT_RECT: Vec2 = Vec2::new(2.0, SQRT_3);
+        const POINTY_RECT: Vec2 = Vec2::new(SQRT_3, 2.0);
+
         self.scale
             * match self.orientation {
-                HexOrientation::Pointy => Vec2::new(SQRT_3, 2.0),
-                HexOrientation::Flat => Vec2::new(2.0, SQRT_3),
+                HexOrientation::Pointy => POINTY_RECT,
+                HexOrientation::Flat => FLAT_RECT,
             }
     }
 }

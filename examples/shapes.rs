@@ -108,6 +108,7 @@ fn show_ui(world: &mut World) {
     let mut egui_context = egui_context.clone();
     egui::Window::new("Options").show(egui_context.get_mut(), |ui| {
         world.resource_scope(|world, mut map: Mut<HexMap>| {
+            ui.heading("Layout");
             ui.horizontal(|ui| {
                 ui.label("Orientation");
                 bevy_inspector::ui_for_value(&mut map.layout.orientation, ui, world);
@@ -118,9 +119,11 @@ fn show_ui(world: &mut World) {
             });
         });
 
+        ui.separator();
+
         world.resource_scope(|world, mut shape: Mut<Shape>| {
             ui.horizontal(|ui| {
-                ui.label("Shape");
+                ui.heading("Shape");
                 egui::ComboBox::from_id_salt("Shape")
                     .selected_text(shape.label())
                     .show_ui(ui, |ui| {

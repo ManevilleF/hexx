@@ -391,8 +391,8 @@ impl VertexDirection {
     /// [`HexLayout`] use [`HexLayout::transform_vector`] or
     /// [`Self::world_unit_vector`]
     pub fn unit_vector(self, orientation: HexOrientation) -> Vec2 {
-        let angle = self.angle(orientation);
-        Vec2::new(angle.cos(), angle.sin())
+        let (sin, cos) = self.angle(orientation).sin_cos();
+        Vec2::new(cos, sin)
     }
 
     #[inline]
