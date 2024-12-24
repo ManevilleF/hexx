@@ -73,7 +73,9 @@ impl HexLayout {
     /// Computes the scale matrix of the layout.
     ///
     /// Note that it doesn't include the hex to world space transformation
-    pub fn scale_matrix(&self) -> Mat2 {
+    #[must_use]
+    #[inline]
+    pub const fn scale_matrix(&self) -> Mat2 {
         Mat2::from_diagonal(self.scale)
     }
 

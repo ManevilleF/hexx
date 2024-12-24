@@ -1,18 +1,25 @@
 use std::ops::Deref;
 
-use glam::{Mat2, Vec2};
+use glam::{vec2, Mat2, Vec2};
 pub(crate) const SQRT_3: f32 = 1.732_050_8;
+
+// Mat2 shearing factor
+const FORWARD_SHEAR: f32 = SQRT_3 / 2.0;
+const INVERSE_SHEAR: f32 = -1.0 / 3.0;
+// Mat2 scale diagonal
+const FORWARD_SCALE: Vec2 = vec2(SQRT_3, 3.0 / 2.0);
+const INVERSE_SCALE: Vec2 = vec2(SQRT_3 / 3.0, 2.0 / 3.0);
 
 /// Pointy orientation matrices and offset
 const POINTY_ORIENTATION: HexOrientationData = HexOrientationData {
-    forward_matrix: Mat2::from_cols_array(&[SQRT_3, 0.0, SQRT_3 / 2.0, 3.0 / 2.0]),
-    inverse_matrix: Mat2::from_cols_array(&[SQRT_3 / 3.0, 0.0, -1.0 / 3.0, 2.0 / 3.0]),
+    forward_matrix: Mat2::from_cols_array(&[FORWARD_SCALE.x, 0.0, FORWARD_SHEAR, FORWARD_SCALE.y]),
+    inverse_matrix: Mat2::from_cols_array(&[INVERSE_SCALE.x, 0.0, INVERSE_SHEAR, INVERSE_SCALE.y]),
 };
 
 /// Flat orientation matrices and offset
 const FLAT_ORIENTATION: HexOrientationData = HexOrientationData {
-    forward_matrix: Mat2::from_cols_array(&[3.0 / 2.0, SQRT_3 / 2.0, 0.0, SQRT_3]),
-    inverse_matrix: Mat2::from_cols_array(&[2.0 / 3.0, -1.0 / 3.0, 0.0, SQRT_3 / 3.0]),
+    forward_matrix: Mat2::from_cols_array(&[FORWARD_SCALE.y, FORWARD_SHEAR, 0.0, FORWARD_SCALE.x]),
+    inverse_matrix: Mat2::from_cols_array(&[INVERSE_SCALE.y, INVERSE_SHEAR, 0.0, INVERSE_SCALE.x]),
 };
 
 /// [`HexOrientation`] inner data, retrieved by
