@@ -74,7 +74,7 @@ impl HexLayout {
     /// by applying the layout `scale` but NOT the origin
     #[must_use]
     #[inline]
-    pub fn scale_vector(&self, vector: Vec2) -> Vec2 {
+    pub fn transform_vector(&self, vector: Vec2) -> Vec2 {
         vector * self.scale
     }
 
@@ -82,15 +82,15 @@ impl HexLayout {
     /// by applying the layout `scale` and `origin`
     #[must_use]
     #[inline]
-    pub fn scale_point(&self, point: Vec2) -> Vec2 {
-        self.origin + self.scale_vector(point)
+    pub fn transform_point(&self, point: Vec2) -> Vec2 {
+        self.origin + self.transform_vector(point)
     }
 
     /// Transforms a world space vector to local hex space
     /// by applying the layout `scale` but NOT the origin
     #[must_use]
     #[inline]
-    pub fn inverse_scale_vector(&self, vector: Vec2) -> Vec2 {
+    pub fn inverse_transform_vector(&self, vector: Vec2) -> Vec2 {
         vector / self.scale
     }
 
@@ -98,8 +98,8 @@ impl HexLayout {
     /// by applying the layout `scale` and `origin`
     #[must_use]
     #[inline]
-    pub fn inverse_scale_point(&self, point: Vec2) -> Vec2 {
-        self.inverse_scale_vector(point - self.origin)
+    pub fn inverse_transform_point(&self, point: Vec2) -> Vec2 {
+        self.inverse_transform_vector(point - self.origin)
     }
 }
 
@@ -117,7 +117,7 @@ impl HexLayout {
     /// ignoring [`HexLayout::origin`]
     pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Hex) -> Vec2 {
         let p = self.orientation.forward(hex.as_vec2());
-        self.scale_vector(p)
+        self.transform_vector(p)
     }
 
     #[must_use]
@@ -126,7 +126,7 @@ impl HexLayout {
     /// coordinates
     pub fn fract_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
         let p = self.orientation.forward(hex);
-        self.scale_point(p)
+        self.transform_point(p)
     }
 
     #[must_use]
@@ -142,7 +142,7 @@ impl HexLayout {
     /// Computes world/pixel coordinates `pos` into fractional hexagonal
     /// coordinates
     pub fn world_pos_to_fract_hex(&self, pos: Vec2) -> Vec2 {
-        let point = self.inverse_scale_point(pos);
+        let point = self.inverse_transform_point(pos);
         self.orientation.inverse(point)
     }
 

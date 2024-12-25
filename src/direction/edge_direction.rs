@@ -402,7 +402,7 @@ impl EdgeDirection {
     /// space use [`Self::unit_vector`]
     pub fn world_unit_vector(self, layout: &HexLayout) -> Vec2 {
         let vector = self.unit_vector(layout.orientation);
-        layout.scale_vector(vector)
+        layout.transform_vector(vector)
     }
 
     #[inline]
