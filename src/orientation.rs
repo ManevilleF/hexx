@@ -67,9 +67,6 @@ impl HexOrientationData {
     #[must_use]
     /// Constructs forward and inverse matrices for a [`Flat`] orientation.
     ///
-    /// Takes a `stretch_factor` to allow for non uniform hexagons stretched
-    /// horizontally
-    ///
     /// [`Flat`]: HexOrientation::Flat
     pub const fn flat() -> Self {
         Self {
@@ -90,9 +87,6 @@ impl HexOrientationData {
 
     #[must_use]
     /// Constructs forward and inverse matrices for a [`Flat`] orientation.
-    ///
-    /// Takes a `stretch_factor` to allow for non uniform hexagons stretched
-    /// vertically
     ///
     /// [`Pointy`]: HexOrientation::Pointy
     pub const fn pointy() -> Self {
@@ -156,5 +150,17 @@ impl Deref for HexOrientation {
 
     fn deref(&self) -> &Self::Target {
         self.orientation_data()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn matrix_validity() {
+        for data in [HexOrientationData::flat(), HexOrientationData::pointy()] {
+            assert_eq!(data.inverse_matrix, data.forward_matrix.inverse());
+        }
     }
 }

@@ -71,7 +71,7 @@ impl HexLayout {
     }
 
     /// Transforms a local hex space vector to world space
-    /// by applying the layout `scale` but NOT the origin NOR stretch
+    /// by applying the layout `scale` but NOT the origin
     #[must_use]
     #[inline]
     pub fn scale_vector(&self, vector: Vec2) -> Vec2 {
@@ -79,7 +79,7 @@ impl HexLayout {
     }
 
     /// Transforms a local hex point to world space
-    /// by applying the layout `scale` and `origin` but NOT stretch
+    /// by applying the layout `scale` and `origin`
     #[must_use]
     #[inline]
     pub fn scale_point(&self, point: Vec2) -> Vec2 {
@@ -87,7 +87,7 @@ impl HexLayout {
     }
 
     /// Transforms a world space vector to local hex space
-    /// by applying the layout `scale` but NOT the origin NOT stretch
+    /// by applying the layout `scale` but NOT the origin
     #[must_use]
     #[inline]
     pub fn inverse_scale_vector(&self, vector: Vec2) -> Vec2 {
@@ -95,7 +95,7 @@ impl HexLayout {
     }
 
     /// Transforms a world pace point to local hex space
-    /// by applying the layout `scale` and `origin` but NOT stretch
+    /// by applying the layout `scale` and `origin`
     #[must_use]
     #[inline]
     pub fn inverse_scale_point(&self, point: Vec2) -> Vec2 {
@@ -263,8 +263,6 @@ impl HexLayout {
     /// # Note
     ///
     /// For most use cases prefer [`Self::with_hex_size`] instead.
-    /// For irregular hexagons, better results are usually achieved with
-    /// [`Self::with_stretch`]
     pub const fn with_scale(mut self, scale: Vec2) -> Self {
         self.scale = scale;
         self
