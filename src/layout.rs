@@ -1,5 +1,5 @@
 use crate::{orientation::SQRT_3, Hex, HexOrientation, VertexDirection};
-use glam::{Mat2, Vec2};
+use glam::Vec2;
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*
 /// coordinate system and the hexagonal coordinate system.
@@ -37,7 +37,7 @@ use glam::{Mat2, Vec2};
 /// ```rust
 /// # use hexx::*;
 ///
-/// let mut layout = HexLayout::new(HexOrientation::Flat)
+/// let mut layout = HexLayout::flat()
 ///     .with_scale(Vec2::new(2.0, 3.0)) // Individual Hexagon size
 ///     .with_origin(Vec2::new(-1.0, 0.0)); // World origin
 /// // Invert the x axis, which will now go left. Will change `scale.x` to `-2.0`
@@ -54,7 +54,7 @@ pub struct HexLayout {
     /// The origin of the hexagonal representation in world/pixel space, usually
     /// [`Vec2::ZERO`]
     pub origin: Vec2,
-    /// The size of individual hexagons in world/pixel space. The size can be
+    /// The size of individual hexagons in world/pixel space. The scale can be
     /// irregular or negative
     pub scale: Vec2,
 }
@@ -70,45 +70,36 @@ impl HexLayout {
         self.scale.y *= -1.0;
     }
 
-    /// Computes the scale matrix of the layout.
-    ///
-    /// Note that it doesn't include the hex to world space transformation
-    #[must_use]
-    #[inline]
-    pub const fn scale_matrix(&self) -> Mat2 {
-        Mat2::from_diagonal(self.scale)
-    }
-
     /// Transforms a local hex space vector to world space
-    /// by applying the layout `scale` but NOT the origin
+    /// by applying the layout `scale` but NOT the origin NOR stretch
     #[must_use]
     #[inline]
-    pub fn transform_vector(&self, vector: Vec2) -> Vec2 {
+    pub fn scale_vector(&self, vector: Vec2) -> Vec2 {
         vector * self.scale
     }
 
     /// Transforms a local hex point to world space
-    /// by applying the layout `scale` and `origin`
+    /// by applying the layout `scale` and `origin` but NOT stretch
     #[must_use]
     #[inline]
-    pub fn transform_point(&self, point: Vec2) -> Vec2 {
-        self.origin + self.transform_vector(point)
+    pub fn scale_point(&self, point: Vec2) -> Vec2 {
+        self.origin + self.scale_vector(point)
     }
 
     /// Transforms a world space vector to local hex space
-    /// by applying the layout `scale` but NOT the origin
+    /// by applying the layout `scale` but NOT the origin NOT stretch
     #[must_use]
     #[inline]
-    pub fn inverse_transform_vector(&self, vector: Vec2) -> Vec2 {
+    pub fn inverse_scale_vector(&self, vector: Vec2) -> Vec2 {
         vector / self.scale
     }
 
     /// Transforms a world pace point to local hex space
-    /// by applying the layout `scale` and `origin`
+    /// by applying the layout `scale` and `origin` but NOT stretch
     #[must_use]
     #[inline]
-    pub fn inverse_transform_point(&self, point: Vec2) -> Vec2 {
-        self.inverse_transform_vector(point - self.origin)
+    pub fn inverse_scale_point(&self, point: Vec2) -> Vec2 {
+        self.inverse_scale_vector(point - self.origin)
     }
 }
 
@@ -126,7 +117,7 @@ impl HexLayout {
     /// ignoring [`HexLayout::origin`]
     pub(crate) fn hex_to_center_aligned_world_pos(&self, hex: Hex) -> Vec2 {
         let p = self.orientation.forward(hex.as_vec2());
-        self.transform_vector(p)
+        self.scale_vector(p)
     }
 
     #[must_use]
@@ -135,7 +126,7 @@ impl HexLayout {
     /// coordinates
     pub fn fract_hex_to_world_pos(&self, hex: Vec2) -> Vec2 {
         let p = self.orientation.forward(hex);
-        self.transform_point(p)
+        self.scale_point(p)
     }
 
     #[must_use]
@@ -151,7 +142,7 @@ impl HexLayout {
     /// Computes world/pixel coordinates `pos` into fractional hexagonal
     /// coordinates
     pub fn world_pos_to_fract_hex(&self, pos: Vec2) -> Vec2 {
-        let point = self.inverse_transform_point(pos);
+        let point = self.inverse_scale_point(pos);
         self.orientation.inverse(point)
     }
 
@@ -166,8 +157,7 @@ impl HexLayout {
     #[must_use]
     /// Unscaled, non offsetted hex corners
     pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
-        VertexDirection::ALL_DIRECTIONS
-            .map(|dir| self.transform_vector(dir.unit_vector(self.orientation)))
+        VertexDirection::ALL_DIRECTIONS.map(|dir| dir.world_unit_vector(self))
     }
 
     #[inline]
@@ -216,7 +206,7 @@ impl HexLayout {
     }
 
     fn __vertex_coordinates(&self, vertex: crate::GridVertex) -> Vec2 {
-        self.transform_vector(vertex.direction.unit_vector(self.orientation))
+        vertex.direction.world_unit_vector(self)
     }
 }
 
@@ -236,6 +226,22 @@ impl HexLayout {
 
     #[must_use]
     #[inline]
+    /// Constructs a new flat layout with default
+    /// values
+    pub const fn flat() -> Self {
+        Self::new(HexOrientation::Flat)
+    }
+
+    #[must_use]
+    #[inline]
+    /// Constructs a new pointylayout with default
+    /// values
+    pub const fn pointy() -> Self {
+        Self::new(HexOrientation::Pointy)
+    }
+
+    #[must_use]
+    #[inline]
     /// Specifies the world/pixel origin of the layout
     pub const fn with_origin(mut self, origin: Vec2) -> Self {
         self.origin = origin;
@@ -244,7 +250,21 @@ impl HexLayout {
 
     #[must_use]
     #[inline]
-    /// Specifies the world/pixel scale of individual hexagons
+    /// Specifies the world/pixel regular size of individual hexagons
+    pub const fn with_hex_size(mut self, size: f32) -> Self {
+        self.scale = Vec2::splat(size);
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specifies the world/pixel scale of individual hexagons.
+    ///
+    /// # Note
+    ///
+    /// For most use cases prefer [`Self::with_hex_size`] instead.
+    /// For irregular hexagons, better results are usually achieved with
+    /// [`Self::with_stretch`]
     pub const fn with_scale(mut self, scale: Vec2) -> Self {
         self.scale = scale;
         self

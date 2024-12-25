@@ -9,7 +9,7 @@ use bevy::{
 use hexx::{shapes, *};
 
 /// World size of the hexagons (outer radius)
-const HEX_SIZE: Vec2 = Vec2::splat(13.0);
+const HEX_SIZE: f32 = 13.0;
 
 pub fn main() {
     App::new()
@@ -63,10 +63,7 @@ fn setup_grid(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let layout = HexLayout {
-        scale: HEX_SIZE,
-        ..default()
-    };
+    let layout = HexLayout::flat().with_hex_size(HEX_SIZE);
     // materials
     let selected_material = materials.add(Color::Srgba(RED));
     let ring_material = materials.add(Color::Srgba(YELLOW));
