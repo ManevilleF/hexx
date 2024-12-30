@@ -17,6 +17,7 @@
   - `invert_x`
   - `invert_y`
 * Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
+* Orientation matrices are now `glam::Mat2` (#191)
 
 ## 0.19.1
 

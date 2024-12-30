@@ -15,7 +15,6 @@ const INVERSE_SCALE: Vec2 = vec2(SQRT_3 / 3.0, 2.0 / 3.0);
 ///
 /// * The horizontal distance is `sqrt(3) * size`.
 /// * The vertical distance is `3/2 * size`.
-///
 // SQRT_3       SQRT_3 / 2
 // 0            3 / 2
 const POINTY_ORIENTATION: HexOrientationData = HexOrientationData::pointy();
