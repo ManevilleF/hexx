@@ -5,11 +5,12 @@ use bevy::{
     utils::HashSet,
     window::PrimaryWindow,
 };
+use glam::vec2;
 use hexx::*;
 use std::collections::HashMap;
 
 /// World size of the hexagons (outer radius)
-const HEX_SIZE: Vec2 = Vec2::splat(15.0);
+const HEX_SIZE: f32 = 15.0;
 
 pub fn main() {
     App::new()
@@ -54,16 +55,12 @@ fn setup_grid(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let flat_layout = HexLayout {
-        scale: HEX_SIZE,
-        orientation: HexOrientation::Flat,
-        origin: Vec2::new(-480.0, 0.0),
-    };
-    let pointy_layout = HexLayout {
-        scale: HEX_SIZE,
-        orientation: HexOrientation::Pointy,
-        origin: Vec2::new(480.0, 0.0),
-    };
+    let flat_layout = HexLayout::flat()
+        .with_hex_size(HEX_SIZE)
+        .with_origin(vec2(-480.0, 0.0));
+    let pointy_layout = HexLayout::pointy()
+        .with_hex_size(HEX_SIZE)
+        .with_origin(vec2(480.0, 0.0));
     // materials
     let area_material = materials.add(Color::Srgba(GOLD));
     let default_material = materials.add(Color::Srgba(WHITE));
