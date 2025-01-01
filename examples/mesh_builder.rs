@@ -116,7 +116,7 @@ fn show_ui(world: &mut World) {
                 ui.separator();
                 ui.heading("Sides Options");
                 ui.horizontal(|ui| {
-                    egui::ComboBox::from_id_source("Side Edit Mode")
+                    egui::ComboBox::from_id_salt("Side Edit Mode")
                         .selected_text(params.sides_edit_mode.label())
                         .show_ui(ui, |ui| {
                             let option = SideEditMode::Global;

@@ -70,6 +70,8 @@ impl Quad {
         }
     }
 
+    /// Same as [`Quad::new`] but the UV `y` values are bounded based on
+    /// [`min_height`, `max_height`]
     #[must_use]
     pub(crate) fn new_bounded(
         sides: [Vec2; 2],
@@ -77,7 +79,7 @@ impl Quad {
         top_height: f32,
         [min_height, max_height]: [f32; 2],
     ) -> Self {
-        let mut quad = Quad::new(sides, bottom_height, top_height);
+        let mut quad = Self::new(sides, bottom_height, top_height);
         let bottom_v = (bottom_height - min_height) / (max_height - min_height);
         let top_v = (top_height - min_height) / (max_height - min_height);
         quad.uvs[0][1] = bottom_v;
@@ -127,13 +129,14 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
         self.uvs.iter().sum::<Vec2>() / VERTS as f32
     }
 
+    /// Applies the face options to the face and returns a mesh
+    #[must_use]
     pub fn apply_options(mut self, opts: &FaceOptions) -> MeshInfo {
         opts.uv.alter_uvs(&mut self.uvs);
-        let mesh = match opts.insetting {
+        match opts.insetting {
             None => self.into(),
             Some(inset) => self.inset(inset.mode, inset.scale, inset.keep_inner_face),
-        };
-        mesh
+        }
     }
 
     /// Performs an _inset_ operition on the mesh, assuming the mesh is a

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ops::RangeInclusive};
+use std::collections::HashMap;
 
 use bevy::{
     ecs::system::RunSystemOnce,
@@ -175,7 +175,6 @@ fn show_ui(world: &mut World) {
 /// 3D Orthogrpahic camera setup
 fn setup(
     mut commands: Commands,
-    params: Res<BuilderParams>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
@@ -263,7 +262,7 @@ fn generate(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<A
         new_mesh = new_mesh.with_side_options(opts);
     }
     if params.fill_holes {
-        new_mesh = new_mesh.fill_holes();
+        new_mesh = new_mesh.with_default_height(0.0);
     }
     let new_mesh = compute_mesh(new_mesh.build());
     // println!("Mesh has {} vertices", new_mesh.count_vertices());

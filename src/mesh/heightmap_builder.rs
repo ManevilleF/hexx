@@ -3,17 +3,50 @@ use crate::{EdgeDirection, Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 use glam::{Quat, Vec3};
 use std::collections::HashMap;
 
+/// Builder struct to customize hex column heightmap mesh generation.
+///
+/// # Example
+///
+/// ```rust
+/// # use hexx::*;
+/// let map = [
+///    hex(0,0), 0.0,
+///    hex(1, 0), 2.0,
+///    // ...
+/// ].into();
+/// let layout = HexLayout::default();
+/// let mesh = ColumnMeshBuilder::new(&layout, &map)
+///     .with_offset(Vec3::new(1.2, 3.45, 6.7))
+///     .without_top_face()
+///     .build();
+/// ```
+///
+/// To specify a default height, and enable side quads at the map edges
+/// (No niehgbor found in a direction) use [`Self::with_default_height`]
+///
+/// # Note
+///
+/// Transform operations (Scale, Rotate, Translate) through the methods
+///
+/// - Scale: [`Self::with_scale`]
+/// - Rotate: [`Self::with_rotation`]
+/// - Translate: [`Self::with_offset`]
+///
+/// Are executed in that order, or **SRT**
 pub struct HeightMapMeshBuilder<'l, 'm> {
     /// The hexagonal layout, used to compute vertex positions
     pub layout: &'l HexLayout,
     /// The column height on missing neighbor
     pub base_height: Option<f32>,
+    /// Map between the coordinates and the associated height
     pub map: &'m HashMap<Hex, f32>,
-    /// Top hexagonal face builder
+    /// Top hexagonal face options. If `None` no top faces will be generated
     pub top_face_options: Option<FaceOptions>,
+    /// Side quad face options. If `None` no side quads will be generated
     pub side_options: Option<FaceOptions>,
-    pub center_aligned: bool,
-    pub fill_holes: bool,
+    /// Specifies a default height for side quads to be generated at the border
+    /// of the map or if holes are present in `map`.
+    pub default_height: Option<f32>,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
     /// Optional custom scale factor for the mesh vertex positions
@@ -26,6 +59,8 @@ pub struct HeightMapMeshBuilder<'l, 'm> {
 }
 
 impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
+    /// Setup a new builder using the given `layout` and height `map`
+    #[must_use]
     pub const fn new(layout: &'l HexLayout, map: &'m HashMap<Hex, f32>) -> Self {
         Self {
             layout,
@@ -33,8 +68,7 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
             base_height: None,
             top_face_options: Some(FaceOptions::new()),
             side_options: Some(FaceOptions::new()),
-            center_aligned: false,
-            fill_holes: false,
+            default_height: None,
             offset: None,
             scale: None,
             rotation: None,
@@ -116,33 +150,29 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
     #[inline]
     pub const fn with_cap_inset_options(mut self, inset: InsetOptions) -> Self {
         if let Some(opts) = &mut self.top_face_options {
-            opts.insetting = Some(inset)
+            opts.insetting = Some(inset);
         }
         self
     }
 
+    /// Specifies a default height for side quads to be generated at the border
+    /// of the map or if holes are present in the height map
     #[must_use]
     #[inline]
-    /// Generates sides in the case of missing neighbor
-    pub const fn fill_holes(mut self) -> Self {
-        self.fill_holes = true;
+    pub const fn with_default_height(mut self, default_height: f32) -> Self {
+        self.default_height = Some(default_height);
         self
     }
 
-    #[must_use]
-    #[inline]
-    /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
-    /// around `(0.0, 0.0)`.
-    pub const fn center_aligned(mut self) -> Self {
-        self.center_aligned = true;
-        self
-    }
-
+    /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
         // We create the final mesh
         let mut mesh = MeshInfo::default();
 
-        let min = self.map.values().copied().reduce(f32::min).unwrap_or(0.0);
+        let mut min = self.map.values().copied().reduce(f32::min).unwrap_or(0.0);
+        if let Some(default_height) = self.default_height {
+            min = min.min(default_height);
+        }
         let max = self.map.values().copied().reduce(f32::max).unwrap_or(0.0);
 
         for (&hex, &height) in self.map {
@@ -167,8 +197,9 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
                 for (dir, opt_height) in dir_heights {
                     let points = corners[dir.index() as usize];
                     let Some(other_height) = opt_height else {
-                        if self.fill_holes {
-                            let quad = Quad::new_bounded(points, min, height, [min, max]);
+                        if let Some(default_height) = self.default_height {
+                            let quad =
+                                Quad::new_bounded(points, default_height, height, [min, max]);
                             mesh.merge_with(quad.apply_options(side_opts));
                         }
                         continue;
@@ -191,7 +222,7 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
         }
         // **T** - We offset the vertex positions after scaling and rotating
         if let Some(offset) = self.offset {
-            mesh = mesh.with_offset(offset)
+            mesh = mesh.with_offset(offset);
         }
         mesh
     }
