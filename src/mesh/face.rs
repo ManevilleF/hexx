@@ -38,8 +38,8 @@ impl Tri {
 }
 
 impl Quad {
-    /// Construct a regular quad from two [`left`, `right`] 2d positions for x and z
-    /// and a `bottom_height` and `top_height` for y
+    /// Construct a regular quad from two [`left`, `right`] 2d positions for x
+    /// and z and a `bottom_height` and `top_height` for y
     ///
     /// # Arguments
     ///

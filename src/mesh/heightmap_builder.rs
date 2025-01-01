@@ -10,10 +10,11 @@ use std::collections::HashMap;
 /// ```rust
 /// # use hexx::*;
 /// let map = [
-///    hex(0,0), 0.0,
-///    hex(1, 0), 2.0,
-///    // ...
-/// ].into();
+///     (hex(0, 0), 0.0),
+///     (hex(1, 0), 2.0),
+///     // ...
+/// ]
+/// .into();
 /// let layout = HexLayout::default();
 /// let mesh = ColumnMeshBuilder::new(&layout, &map)
 ///     .with_offset(Vec3::new(1.2, 3.45, 6.7))

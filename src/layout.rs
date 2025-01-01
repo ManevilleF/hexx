@@ -154,8 +154,8 @@ impl HexLayout {
         self.center_aligned_hex_corners().map(|c| c + center)
     }
 
-    /// Retrieves all 6 edge corner pair coordinates of the given hexagonal coordinates
-    /// `hex`
+    /// Retrieves all 6 edge corner pair coordinates of the given hexagonal
+    /// coordinates `hex`
     #[must_use]
     pub fn hex_edge_corners(&self, hex: Hex) -> [[Vec2; 2]; 6] {
         let center = self.hex_to_world_pos(hex);
