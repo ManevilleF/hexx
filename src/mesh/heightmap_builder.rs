@@ -57,6 +57,8 @@ pub struct HeightMapMeshBuilder<'l, 'm> {
     ///
     /// By default the mesh is *facing* up (**Y** axis)
     pub rotation: Option<Quat>,
+    /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
+    pub center_aligned: bool,
 }
 
 impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
@@ -73,6 +75,7 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
             offset: None,
             scale: None,
             rotation: None,
+            center_aligned: false,
         }
     }
 
@@ -122,6 +125,7 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
         self.side_options = None;
         self
     }
+
     #[must_use]
     #[inline]
     /// Specify custom face options for the column sides
@@ -165,6 +169,15 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
         self
     }
 
+    #[must_use]
+    #[inline]
+    /// Ignores the [`HexLayout::origin`] offset, generating a mesh centered
+    /// around `(0.0, 0.0)`.
+    pub const fn center_aligned(mut self) -> Self {
+        self.center_aligned = true;
+        self
+    }
+
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
         // We create the final mesh
@@ -180,6 +193,7 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
             if let Some(opts) = &self.top_face_options {
                 let mut plane = PlaneMeshBuilder::new(self.layout)
                     .at(hex)
+                    .center_aligned()
                     .with_offset(Vec3::Y * height)
                     .with_uv_options(opts.uv);
                 if let Some(inset) = opts.insetting {
@@ -224,6 +238,9 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
         // **T** - We offset the vertex positions after scaling and rotating
         if let Some(offset) = self.offset {
             mesh = mesh.with_offset(offset);
+        }
+        if !self.center_aligned {
+            mesh = mesh.with_offset(Vec3::new(self.layout.origin.x, 0.0, self.layout.origin.y));
         }
         mesh
     }

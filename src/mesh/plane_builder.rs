@@ -99,10 +99,25 @@ impl<'l> PlaneMeshBuilder<'l> {
         self
     }
 
+    /// Specify custom Face options
+    #[must_use]
+    pub const fn with_face_options(mut self, options: FaceOptions) -> Self {
+        self.face_options = options;
+        self
+    }
+
     /// Specify custom UV mapping options
     #[must_use]
     pub const fn with_uv_options(mut self, uv_options: UVOptions) -> Self {
         self.face_options.uv = uv_options;
+        self
+    }
+
+    /// Specify insetting option for the hexagonal face
+    #[must_use]
+    #[inline]
+    pub const fn with_inset_options(mut self, opts: InsetOptions) -> Self {
+        self.face_options.insetting = Some(opts);
         self
     }
 
@@ -112,14 +127,6 @@ impl<'l> PlaneMeshBuilder<'l> {
     /// around `(0.0, 0.0)`.
     pub const fn center_aligned(mut self) -> Self {
         self.center_aligned = true;
-        self
-    }
-
-    /// Specify insetting option for the hexagonal face
-    #[must_use]
-    #[inline]
-    pub const fn with_inset_options(mut self, opts: InsetOptions) -> Self {
-        self.face_options.insetting = Some(opts);
         self
     }
 

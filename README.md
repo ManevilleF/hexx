@@ -232,8 +232,8 @@
  }
  ```
 
- The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or
- [`ColumnMeshBuilder`]
+ The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`],
+ [`ColumnMeshBuilder`] or [`HeightMapMeshBuilder`]
 
 <!-- cargo-sync-readme end -->
 
@@ -289,7 +289,7 @@ impl PartialOrd for OrdByYX {
 
 ![hex_grid](docs/hex_grid.png "hex grid example")
 
- > `cargo run --example hex_grid`
+> `cargo run --example hex_grid`
 
 This example showcases hex ranges, rings, wedges, rotation, and lines
 
@@ -297,7 +297,7 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ![hex_grid](docs/hex_area.png "hex area example")
 
- > `cargo run --example hex_area`
+> `cargo run --example hex_area`
 
 This example showcases how to generate hexagonal areas using grid utilities and gizmos
 and how to use two layouts on the same grid.
@@ -306,59 +306,59 @@ and how to use two layouts on the same grid.
 
 ![scroll_map](docs/scroll_map.gif "scroll map example")
 
- > `cargo run --example scroll_map`
+> `cargo run --example scroll_map`
 
- This example showcases the `HexMap` struct for scrolling maps
+This example showcases the `HexMap` struct for scrolling maps
 
 ### Wrap Map
 
 ![wrap_map](docs/wrap_map.gif "wrap map example")
 
- > `cargo run --example wrap_map`
+> `cargo run --example wrap_map`
 
- This example showcases the `HexMap` struct for looping/wrapping map
+This example showcases the `HexMap` struct for looping/wrapping map
 
 ### A Star pathfinding
 
 ![a_star](docs/a_star.png "A star example")
 
- > `cargo run --example a_star`
+> `cargo run --example a_star`
 
- This example showcases the A star algorithm, with an interactive pathfinding
- between the origin and your cursor. Clicking on tile toggles their availability
+This example showcases the A star algorithm, with an interactive pathfinding
+between the origin and your cursor. Clicking on tile toggles their availability
 
 ### Field of view
 
 ![fov](docs/fov.png "Field of View example")
 
- > `cargo run --example field_of_view`
+> `cargo run --example field_of_view`
 
- This example showcases the FOV algorithm, with an interactive range fov around
- your cursor.
- Clicking on tile toggles their visibility.
+This example showcases the FOV algorithm, with an interactive range fov around
+your cursor.
+Clicking on tile toggles their visibility.
 
 ### Field of movement
 
 ![fov](docs/field_of_movement.gif "Field of movement example")
 
- > `cargo run --example field_of_movement`
+> `cargo run --example field_of_movement`
 
- This example showcases the field of movement algorithm, interactively displaying
- the accessible range of movement around the cursor.
+This example showcases the field of movement algorithm, interactively displaying
+the accessible range of movement around the cursor.
 
 ### 3d columns
 
 ![columns](docs/3d_columns.png "3d columns example")
 
- > `cargo run --example 3d_columns`
+> `cargo run --example 3d_columns`
 
- This example showcases the 3d hexagon columns procedural generation
+This example showcases the 3d hexagon columns procedural generation
 
 ### 3d picking
 
 ![picking](docs/3d_picking.png "3d picking example")
 
- > `cargo run --example 3d_picking`
+> `cargo run --example 3d_picking`
 
 This example showcases how to use the camera ray to detect hovered 3d columns
 
@@ -366,40 +366,48 @@ This example showcases how to use the camera ray to detect hovered 3d columns
 
 ![mesh](docs/mesh_builder.png "Mesh builder example")
 
- > `cargo run --example mesh_builder --features bevy_reflect`
+> `cargo run --example mesh_builder --features bevy_reflect`
 
- This example showcases the hexagon columns procedural generation customization options
+This example showcases the hexagon columns procedural generation customization options
+
+### Height Map Mesh builder
+
+![mesh](docs/heightmap_builder.png "Height Map Mesh builder example")
+
+> `cargo run --example heightmap_builder --features bevy_reflect`
+
+This example showcases the hexagon 3D height map procedural generation customization options
 
 ### Chunks
 
 ![chunks](docs/chunks.png "Chunks example")
 
- > `cargo run --example chunks`
+> `cargo run --example chunks`
 
- This example showcases the hexagon resolution system, allowing to tile coordinates
- in evenly sized chunks
+This example showcases the hexagon resolution system, allowing to tile coordinates
+in evenly sized chunks
 
 ### Merged Chunks
 
 ![merged_chunks](docs/merged_columns.png "Merged Chunks example")
 
- > `cargo run --example merged_columns --features bevy_reflect`
+> `cargo run --example merged_columns --features bevy_reflect`
 
- This example showcases how to build a simple hex chunk system with each chunk
- being a single mesh
+This example showcases how to build a simple hex chunk system with each chunk
+being a single mesh
 
 ### Sprite Sheet
 
 ![sprite_sheet](docs/sprite_sheet.png "Sprite Sheet example")
 
- > `cargo run --example sprite_sheet`
+> `cargo run --example sprite_sheet`
 
- This example showcases how to use hexx with 2D sprite sheet.
+This example showcases how to use hexx with 2D sprite sheet.
 
 ### Shapes
 
 ![shapes](docs/shapes.png "Shapes example")
 
- > `cargo run --example shapes --features bevy_reflect`
+> `cargo run --example shapes --features bevy_reflect`
 
- This example showcases how to use hexx shapes module
+This example showcases how to use hexx shapes module

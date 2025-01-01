@@ -2,9 +2,8 @@
 
 ## [Unreleased]
 
-* (**BREAKING**) `HexOffsetMode` now has only 2 variants `Even` and `Odd`
-* (**BREAKING**) `Hex::to_offset_coordinates` and `Hex::from_offset_coordinates`
-  take a new `HexOrientation` parameter (#189)
+### HexLayout
+
 * (**BREAKING**) `HexLayout` Y axis is no longer inverted by default (#187)
 * `HexLayout` builder patter (#187)
 * (**BREAKING**) `HexLayout` removed the `invert_x` and `invert_y` fields (#190)
@@ -16,8 +15,25 @@
   - `inverse_transform_vector`
   - `invert_x`
   - `invert_y`
-* Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
-* Orientation matrices are now `glam::Mat2` (#191)
+* Added `hex_edge_corners` utility method (#170)
+
+### Mesh generation (#170)
+
+* (**BREAKING**)`ColumnMeshBuilder` can now disable some side quads
+* (**BREAKING**) `ColumnMeshBuilder` and `PlaneMeshBuilder` now use a centralized
+`FaceOptions` for UV and inset options
+* Added `PlaneMeshBuilder::with_face_options` builder method
+* Added `Face::apply_options` taking a `FaceOptions` parameter
+* Renamed `Quad::from_bottom` to `Quad::new`
+* Added a new `HeightMapMeshBuilder` with its associated `heightmap_builder` example
+
+## Misc
+
+* (**BREAKING**) `HexOffsetMode` now has only 2 variants `Even` and `Odd`
+* (**BREAKING**) `Hex::to_offset_coordinates` and `Hex::from_offset_coordinates`
+  take a new `HexOrientation` parameter (#189)
+  * Orientation matrices are now `glam::Mat2` (#191)
+  * Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
 
 ## 0.19.1
 
