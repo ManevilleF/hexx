@@ -1,6 +1,8 @@
 use crate::{HexLayout, InsetScaleMode, MeshInfo, UVOptions, BASE_FACING};
 use glam::{Vec2, Vec3};
 
+use super::FaceOptions;
+
 type VertexIdx = u16;
 
 /// Structure storing three vertex indices
@@ -36,19 +38,26 @@ impl Tri {
 }
 
 impl Quad {
-    /// Construct a regular quad from two [`left`, `right`] bottom positions
-    /// and a `height`
+    /// Construct a regular quad from two [`left`, `right`] 2d positions for x
+    /// and z and a `bottom_height` and `top_height` for y
     ///
     /// # Arguments
-    /// * `[left, right]` - the two bottom vertex positions
-    /// * `normal` - the normal to be applied to all 4 vertices
-    /// * `height` - the top vertices distance to the bottom ones alogn the Y
-    ///   axis
+    ///
+    /// * `[left, right]` - the two bottom 2d vertex positions
+    /// * `bottom_height` - the bottom vertices Y value
+    /// * `top_height` - the top vertices Y value
     #[must_use]
-    pub fn from_bottom([left, right]: [Vec3; 2], normal: Vec3, height: f32) -> Self {
-        let offset = BASE_FACING * height;
+    pub fn new([left, right]: [Vec2; 2], bottom_height: f32, top_height: f32) -> Self {
+        let normal = (left + right).normalize();
+        let normal = Vec3::new(normal.x, 0.0, normal.y);
+        let positions = [
+            Vec3::new(right.x, bottom_height, right.y),
+            Vec3::new(right.x, top_height, right.y),
+            Vec3::new(left.x, top_height, left.y),
+            Vec3::new(left.x, bottom_height, left.y),
+        ];
         Self {
-            positions: [right, right + offset, left + offset, left],
+            positions,
             normals: [normal; 4],
             uvs: [Vec2::X, Vec2::ONE, Vec2::Y, Vec2::ZERO],
             // 2 - 1
@@ -59,6 +68,25 @@ impl Quad {
                 Tri([0, 3, 2]), // Tri 2
             ],
         }
+    }
+
+    /// Same as [`Quad::new`] but the UV `y` values are bounded based on
+    /// [`min_height`, `max_height`]
+    #[must_use]
+    pub(crate) fn new_bounded(
+        sides: [Vec2; 2],
+        bottom_height: f32,
+        top_height: f32,
+        [min_height, max_height]: [f32; 2],
+    ) -> Self {
+        let mut quad = Self::new(sides, bottom_height, top_height);
+        let bottom_v = (bottom_height - min_height) / (max_height - min_height);
+        let top_v = (top_height - min_height) / (max_height - min_height);
+        quad.uvs[0][1] = bottom_v;
+        quad.uvs[1][1] = top_v;
+        quad.uvs[2][1] = top_v;
+        quad.uvs[3][1] = bottom_v;
+        quad
     }
 }
 
@@ -99,6 +127,16 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
     #[allow(clippy::cast_precision_loss)]
     pub fn uv_centroid(&self) -> Vec2 {
         self.uvs.iter().sum::<Vec2>() / VERTS as f32
+    }
+
+    /// Applies the face options to the face and returns a mesh
+    #[must_use]
+    pub fn apply_options(mut self, opts: &FaceOptions) -> MeshInfo {
+        opts.uv.alter_uvs(&mut self.uvs);
+        match opts.insetting {
+            None => self.into(),
+            Some(inset) => self.inset(inset.mode, inset.scale, inset.keep_inner_face),
+        }
     }
 
     /// Performs an _inset_ operition on the mesh, assuming the mesh is a
