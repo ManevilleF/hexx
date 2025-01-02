@@ -16,7 +16,7 @@ use std::collections::HashMap;
 /// ]
 /// .into();
 /// let layout = HexLayout::default();
-/// let mesh = ColumnMeshBuilder::new(&layout, &map)
+/// let mesh = HeightMapMeshBuilder::new(&layout, &map)
 ///     .with_offset(Vec3::new(1.2, 3.45, 6.7))
 ///     .without_top_face()
 ///     .build();
