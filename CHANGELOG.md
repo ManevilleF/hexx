@@ -33,8 +33,6 @@
 * (**BREAKING**) `HexOffsetMode` now has only 2 variants `Even` and `Odd`
 * (**BREAKING**) `Hex::to_offset_coordinates` and `Hex::from_offset_coordinates`
   take a new `HexOrientation` parameter (#189)
-  * Orientation matrices are now `glam::Mat2` (#191)
-  * Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
 * Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
 * Orientation matrices are now `glam::Mat2` (#191)
 
