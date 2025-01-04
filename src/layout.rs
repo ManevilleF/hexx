@@ -320,6 +320,8 @@ impl Default for HexLayout {
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_relative_eq;
+
     use super::*;
 
     #[test]
@@ -387,17 +389,24 @@ mod tests {
     #[test]
     fn rect_size() {
         let sizes = [
-            Vec2::ONE,
             Vec2::ZERO,
+            Vec2::ONE,
+            Vec2::X,
+            Vec2::Y,
+            Vec2::NEG_ONE,
+            Vec2::NEG_X,
+            Vec2::NEG_Y,
             Vec2::new(10.0, 5.0),
-            Vec2::new(10.0, 31.1),
-            Vec2::new(10.0, 25.0),
-            Vec2::new(10.0, -54.0),
+            Vec2::new(-10.0, 31.1),
+            Vec2::new(110.0, 25.0),
+            Vec2::new(-210.54, -54.0),
         ];
         for size in sizes {
             for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
                 let layout = HexLayout::new(orientation).with_rect_size(size);
-                assert_eq!(layout.rect_size(), size);
+                let rect = layout.rect_size();
+                assert_relative_eq!(rect.x, size.x, epsilon = 0.00001);
+                assert_relative_eq!(rect.y, size.y, epsilon = 0.00001);
             }
         }
     }

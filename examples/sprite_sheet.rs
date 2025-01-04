@@ -2,7 +2,8 @@ use bevy::{prelude::*, utils::HashMap, window::PrimaryWindow};
 use glam::uvec2;
 use hexx::{shapes, *};
 
-const SPRITE_SIZE: Vec2 = Vec2::splat(20.0);
+// 10% of the real individual texture sizes
+const SPRITE_SIZE: Vec2 = Vec2::new(24.0, 28.0);
 
 pub fn main() {
     App::new()
