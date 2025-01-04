@@ -2,9 +2,10 @@ use glam::{vec2, Mat2, Vec2};
 use std::ops::Deref;
 
 pub(crate) const SQRT_3: f32 = 1.732_050_8;
+pub(crate) const HALF_SQRT_3: f32 = SQRT_3 / 2.0;
 
 // Mat2 shearing factor
-const FORWARD_SHEAR: f32 = SQRT_3 / 2.0;
+const FORWARD_SHEAR: f32 = HALF_SQRT_3;
 const INVERSE_SHEAR: f32 = -1.0 / 3.0;
 
 // Mat2 scale diagonal.

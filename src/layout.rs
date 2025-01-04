@@ -45,6 +45,15 @@ use glam::Vec2;
 /// // Invert the y axis, which will now go down. Will change `scale.y` to `-3.0`
 /// layout.invert_y();
 /// ```
+///
+/// ## Working with Sprites
+///
+/// If you intend to use the hexagonal grid to place images/sprites you may use
+/// `HexLayout::with_rect_size` to make the hexagon scale fit the your sprite
+/// dimensions.
+///
+/// You can also retrieve the matching rect size from any layout using
+/// `HexLayout::rect_size()`
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
@@ -272,6 +281,23 @@ impl HexLayout {
         self
     }
 
+    #[inline]
+    #[must_use]
+    /// Specifies the world/pixel size of individual hexagons to match
+    /// the given `rect_size`. This is useful if you want hexagons
+    /// to match a sprite size
+    pub fn with_rect_size(self, rect_size: Vec2) -> Self {
+        const FLAT_RECT: Vec2 = Vec2::new(0.5, 1.0 / SQRT_3);
+        const POINTY_RECT: Vec2 = Vec2::new(1.0 / SQRT_3, 0.5);
+
+        let scale = rect_size
+            * match self.orientation {
+                HexOrientation::Pointy => POINTY_RECT,
+                HexOrientation::Flat => FLAT_RECT,
+            };
+        self.with_scale(scale)
+    }
+
     #[must_use]
     #[inline]
     /// Specifies the world/pixel scale of individual hexagons.
@@ -294,6 +320,8 @@ impl Default for HexLayout {
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_relative_eq;
+
     use super::*;
 
     #[test]
@@ -356,5 +384,30 @@ mod tests {
                 Vec2::new(0.0, 10.0),
             ]
         );
+    }
+
+    #[test]
+    fn rect_size() {
+        let sizes = [
+            Vec2::ZERO,
+            Vec2::ONE,
+            Vec2::X,
+            Vec2::Y,
+            Vec2::NEG_ONE,
+            Vec2::NEG_X,
+            Vec2::NEG_Y,
+            Vec2::new(10.0, 5.0),
+            Vec2::new(-10.0, 31.1),
+            Vec2::new(110.0, 25.0),
+            Vec2::new(-210.54, -54.0),
+        ];
+        for size in sizes {
+            for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+                let layout = HexLayout::new(orientation).with_rect_size(size);
+                let rect = layout.rect_size();
+                assert_relative_eq!(rect.x, size.x, epsilon = 0.00001);
+                assert_relative_eq!(rect.y, size.y, epsilon = 0.00001);
+            }
+        }
     }
 }

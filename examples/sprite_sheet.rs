@@ -2,7 +2,8 @@ use bevy::{prelude::*, utils::HashMap, window::PrimaryWindow};
 use glam::uvec2;
 use hexx::{shapes, *};
 
-const HEX_SIZE: Vec2 = Vec2::splat(20.0);
+// 10% of the real individual texture sizes
+const SPRITE_SIZE: Vec2 = Vec2::new(24.0, 28.0);
 
 pub fn main() {
     App::new()
@@ -38,12 +39,7 @@ fn setup_grid(
     let atlas_layout =
         TextureAtlasLayout::from_grid(uvec2(120, 140), 7, 6, Some(uvec2(2, 2)), None);
     let atlas_layout = atlas_layouts.add(atlas_layout);
-    let layout = HexLayout {
-        orientation: HexOrientation::Pointy,
-        scale: HEX_SIZE,
-        ..default()
-    };
-    let sprite_size = layout.rect_size();
+    let layout = HexLayout::new(HexOrientation::Pointy).with_rect_size(SPRITE_SIZE);
     let entities = shapes::pointy_rectangle([-14, 14, -16, 16])
         .enumerate()
         .map(|(i, coord)| {
@@ -52,7 +48,7 @@ fn setup_grid(
             let entity = commands
                 .spawn((
                     Sprite {
-                        custom_size: Some(sprite_size),
+                        custom_size: Some(SPRITE_SIZE),
                         image: texture.clone(),
                         texture_atlas: Some(TextureAtlas {
                             index,
