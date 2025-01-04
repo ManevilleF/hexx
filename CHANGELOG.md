@@ -15,6 +15,7 @@
   - `inverse_transform_vector`
   - `invert_x`
   - `invert_y`
+* Added `HexLayout::with_rect_size` to construct hexagons matching sprite dimensions (#194)
 * Added `hex_edge_corners` utility method (#170)
 
 ### Mesh generation (#170)
@@ -34,6 +35,8 @@
   take a new `HexOrientation` parameter (#189)
   * Orientation matrices are now `glam::Mat2` (#191)
   * Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
+* Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
+* Orientation matrices are now `glam::Mat2` (#191)
 
 ## 0.19.1
 

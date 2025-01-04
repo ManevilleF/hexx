@@ -45,6 +45,15 @@ use glam::Vec2;
 /// // Invert the y axis, which will now go down. Will change `scale.y` to `-3.0`
 /// layout.invert_y();
 /// ```
+///
+/// ## Working with Sprites
+///
+/// If you intend to use the hexagonal grid to place images/sprites you may use
+/// `HexLayout::with_rect_size` to make the hexagon scale fit the your sprite
+/// dimensions.
+///
+/// You can also retrieve the matching rect size from any layout using
+/// `HexLayout::rect_size()`
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
