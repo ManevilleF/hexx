@@ -272,6 +272,23 @@ impl HexLayout {
         self
     }
 
+    #[inline]
+    #[must_use]
+    /// Specifies the world/pixel size of individual hexagons to match
+    /// the given `rect_size`. This is useful if you want hexagons
+    /// to match a sprite size
+    pub fn with_rect_size(self, rect_size: Vec2) -> Self {
+        const FLAT_RECT: Vec2 = Vec2::new(0.5, 1.0 / SQRT_3);
+        const POINTY_RECT: Vec2 = Vec2::new(1.0 / SQRT_3, 0.5);
+
+        let scale = rect_size
+            * match self.orientation {
+                HexOrientation::Pointy => POINTY_RECT,
+                HexOrientation::Flat => FLAT_RECT,
+            };
+        self.with_scale(scale)
+    }
+
     #[must_use]
     #[inline]
     /// Specifies the world/pixel scale of individual hexagons.
@@ -356,5 +373,23 @@ mod tests {
                 Vec2::new(0.0, 10.0),
             ]
         );
+    }
+
+    #[test]
+    fn rect_size() {
+        let sizes = [
+            Vec2::ONE,
+            Vec2::ZERO,
+            Vec2::new(10.0, 5.0),
+            Vec2::new(10.0, 31.1),
+            Vec2::new(10.0, 25.0),
+            Vec2::new(10.0, -54.0),
+        ];
+        for size in sizes {
+            for orientation in [HexOrientation::Flat, HexOrientation::Pointy] {
+                let layout = HexLayout::new(orientation).with_rect_size(size);
+                assert_eq!(layout.rect_size(), size);
+            }
+        }
     }
 }
