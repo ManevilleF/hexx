@@ -219,8 +219,8 @@
 //! }
 //! ```
 //!
-//! The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`] or
-//! [`ColumnMeshBuilder`]
+//! The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`],
+//! [`ColumnMeshBuilder`] or [`HeightMapMeshBuilder`]
 #![forbid(unsafe_code)]
 #![warn(
     clippy::nursery,

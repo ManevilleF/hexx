@@ -122,6 +122,11 @@ path = "examples/mesh_builder.rs"
 required-features = ["bevy_reflect"]
 
 [[example]]
+name = "heightmap_builder"
+path = "examples/heightmap_builder.rs"
+required-features = ["bevy_reflect"]
+
+[[example]]
 name = "chunks"
 path = "examples/chunks.rs"
 

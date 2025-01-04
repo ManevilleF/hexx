@@ -1,7 +1,9 @@
 use glam::{Quat, Vec3};
 
-use super::{utils::Quad, MeshInfo, BASE_FACING};
-use crate::{Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions};
+use super::{face::Quad, MeshInfo, BASE_FACING};
+use crate::{
+    EdgeDirection, FaceOptions, Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions,
+};
 
 /// Builder struct to customize hex column mesh generation.
 ///
@@ -59,10 +61,9 @@ pub struct ColumnMeshBuilder<'l> {
     pub top_face: Option<PlaneMeshBuilder<'l>>,
     /// Bottom hexagonal face builder
     pub bottom_face: Option<PlaneMeshBuilder<'l>>,
-    /// UV mapping options for the column sides
-    pub sides_uv_options: [UVOptions; 6],
-    /// Quad inset options for the column sides
-    pub sides_inset_options: Option<InsetOptions>,
+    /// Options for the column side quads. If `None` the side quad will not be
+    /// generated
+    pub sides_options: [Option<FaceOptions>; 6],
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
 }
@@ -81,9 +82,8 @@ impl<'l> ColumnMeshBuilder<'l> {
             scale: None,
             top_face: Some(PlaneMeshBuilder::new(layout)),
             bottom_face: Some(PlaneMeshBuilder::new(layout)),
-            sides_uv_options: [UVOptions::new(); 6],
+            sides_options: [Some(FaceOptions::new()); 6],
             center_aligned: false,
-            sides_inset_options: None,
         }
     }
 
@@ -179,7 +179,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Specify custom uv options for the top/bottom caps triangles
     ///
     /// Note:
-    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
+    /// this won't have any effect if `top_face` and `bottom_face` are disabled
     pub const fn with_caps_uv_options(mut self, uv_options: UVOptions) -> Self {
         if let Some(builder) = self.top_face {
             self.top_face = Some(builder.with_uv_options(uv_options));
@@ -193,7 +193,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     /// Specify inset option for the top/bottom caps faces
     ///
     /// Note:
-    /// this won't have any effect if `top_cap` and `bottom_cap` are disabled
+    /// this won't have any effect if `top_face` and `bottom_face` are disabled
     #[must_use]
     #[inline]
     pub const fn with_caps_inset_options(mut self, opts: InsetOptions) -> Self {
@@ -208,39 +208,49 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     #[must_use]
     #[inline]
-    /// Specify custom global uv options for the side quad triangles.
+    /// Specify custom global options for the side quad triangles.
     ///
     /// To customize each side quad, prefer
-    /// [`Self::with_multi_sides_uv_options`]
-    pub const fn with_sides_uv_options(mut self, uv_options: UVOptions) -> Self {
-        self.sides_uv_options = [uv_options; 6];
+    /// [`Self::with_multi_sides_options`]
+    pub const fn with_sides_options(mut self, options: FaceOptions) -> Self {
+        self.sides_options = [Some(options); 6];
         self
     }
 
     #[must_use]
     #[inline]
-    /// Specify custom uv options for each of the side quad triangles.
+    #[allow(clippy::cast_possible_truncation)]
+    /// Specify custom options for each of the side quad triangles.
     ///
-    /// For a global setting prefer [`Self::with_sides_uv_options`]
-    pub fn with_sides_uv_options_fn(mut self, uv_options: impl Fn(usize) -> UVOptions) -> Self {
-        self.sides_uv_options = std::array::from_fn(uv_options);
-        self
-    }
-    #[must_use]
-    #[inline]
-    /// Specify custom uv options for each of the side quad triangles.
-    ///
-    /// For a global setting prefer [`Self::with_sides_uv_options`]
-    pub const fn with_multi_sides_uv_options(mut self, uv_options: [UVOptions; 6]) -> Self {
-        self.sides_uv_options = uv_options;
+    /// For a global setting prefer [`Self::with_sides_options`]
+    pub fn with_sides_options_fn(
+        mut self,
+        options: impl Fn(EdgeDirection) -> Option<FaceOptions>,
+    ) -> Self {
+        self.sides_options = std::array::from_fn(|i| options(EdgeDirection(i as u8)));
         self
     }
 
     #[must_use]
     #[inline]
-    /// Specify custom global inset options for the side quads
-    pub const fn with_sides_inset_options(mut self, options: InsetOptions) -> Self {
-        self.sides_inset_options = Some(options);
+    /// Specify options for each of the side quad triangles.
+    ///
+    /// For a global setting prefer [`Self::with_sides_options`]
+    pub fn with_multi_sides_options(mut self, options: [FaceOptions; 6]) -> Self {
+        self.sides_options = options.map(Some);
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify custom options for each of the side quad triangles.
+    ///
+    /// For a global setting prefer [`Self::with_sides_options`]
+    pub const fn with_multi_custom_sides_options(
+        mut self,
+        options: [Option<FaceOptions>; 6],
+    ) -> Self {
+        self.sides_options = options;
         self
     }
 
@@ -270,19 +280,17 @@ impl<'l> ColumnMeshBuilder<'l> {
         // Column sides
         let subidivisions = self.subdivisions.unwrap_or(0).max(1);
         let delta = self.height / subidivisions as f32;
-        let [a, b, c, d, e, f] = self.layout.center_aligned_hex_corners();
-        let corners = [[a, b], [b, c], [c, d], [d, e], [e, f], [f, a]];
+        let corners = self.layout.center_aligned_edge_corners();
         (0..6).for_each(|side| {
             let [left, right] = corners[side];
-            let normal = (left + right).normalize();
+            let Some(options) = self.sides_options[side] else {
+                return;
+            };
             for div in 0..subidivisions {
-                let height = delta * div as f32;
-                let left = Vec3::new(left.x, height, left.y);
-                let right = Vec3::new(right.x, height, right.y);
-                let mut quad =
-                    Quad::from_bottom([left, right], Vec3::new(normal.x, 0.0, normal.y), delta);
-                self.sides_uv_options[side].alter_uvs(&mut quad.uvs);
-                let quad = if let Some(opts) = self.sides_inset_options {
+                let bottom_height = delta * div as f32;
+                let mut quad = Quad::new([left, right], bottom_height, bottom_height + delta);
+                options.uv.alter_uvs(&mut quad.uvs);
+                let quad = if let Some(opts) = options.insetting {
                     quad.inset(opts.mode, opts.scale, opts.keep_inner_face)
                 } else {
                     quad.into()

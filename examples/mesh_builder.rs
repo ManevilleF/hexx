@@ -4,9 +4,11 @@ use bevy::{
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
-use bevy_egui::{egui, EguiContext, EguiPlugin};
+use bevy_egui::{
+    egui::{self, Ui},
+    EguiContext, EguiPlugin,
+};
 use bevy_inspector_egui::bevy_inspector;
-use glam::vec2;
 use hexx::*;
 
 #[derive(Debug, Resource)]
@@ -18,12 +20,12 @@ struct HexInfo {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum SideUVMode {
+enum SideEditMode {
     Global,
     Multi,
 }
 
-impl SideUVMode {
+impl SideEditMode {
     pub fn label(&self) -> &'static str {
         match self {
             Self::Global => "Global",
@@ -39,9 +41,9 @@ struct BuilderParams {
     pub top_face: bool,
     pub bottom_face: bool,
     pub scale: Vec3,
-    pub sides_uvs_mode: SideUVMode,
-    pub sides_inset: Option<InsetOptions>,
-    pub sides_uvs: [UVOptions; 6],
+    pub sides_edit_mode: SideEditMode,
+    pub side_glob_options: FaceOptions,
+    pub sides_options: [Option<FaceOptions>; 6],
     pub caps_uvs: UVOptions,
     pub caps_inset: Option<InsetOptions>,
 }
@@ -112,46 +114,76 @@ fn show_ui(world: &mut World) {
                     });
                 });
                 ui.separator();
-                ui.heading("Sides UV options");
+                ui.heading("Sides Options");
                 ui.horizontal(|ui| {
-                    egui::ComboBox::from_id_salt("Side Uv mode")
-                        .selected_text(params.sides_uvs_mode.label())
+                    egui::ComboBox::from_id_salt("Side Edit Mode")
+                        .selected_text(params.sides_edit_mode.label())
                         .show_ui(ui, |ui| {
-                            let option = SideUVMode::Global;
-                            ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
-                            let option = SideUVMode::Multi;
-                            ui.selectable_value(&mut params.sides_uvs_mode, option, option.label());
+                            let option = SideEditMode::Global;
+                            ui.selectable_value(
+                                &mut params.sides_edit_mode,
+                                option,
+                                option.label(),
+                            );
+                            let option = SideEditMode::Multi;
+                            ui.selectable_value(
+                                &mut params.sides_edit_mode,
+                                option,
+                                option.label(),
+                            );
                         })
                 });
-                match params.sides_uvs_mode {
-                    SideUVMode::Global => {
-                        if bevy_inspector::ui_for_value(&mut params.sides_uvs[0], ui, world) {
-                            params.sides_uvs = [params.sides_uvs[0]; 6];
-                        }
+
+                let mut side_opts = |ui: &mut Ui, options: &mut FaceOptions| {
+                    ui.scope(|ui| {
+                        ui.label("UV");
+                        bevy_inspector::ui_for_value(&mut options.uv, ui, world);
+                        ui.horizontal(|ui| {
+                            ui.label("Insetting");
+                            if options.insetting.is_none() {
+                                if ui.button("Enable").clicked() {
+                                    options.insetting = Some(InsetOptions {
+                                        keep_inner_face: true,
+                                        scale: 0.2,
+                                        mode: InsetScaleMode::default(),
+                                    })
+                                }
+                            } else if ui.button("Disable").clicked() {
+                                options.insetting = None;
+                            }
+                        });
+                        ui.scope(|ui| {
+                            if let Some(inset) = &mut options.insetting {
+                                bevy_inspector::ui_for_value(inset, ui, world);
+                            }
+                        });
+                    });
+                };
+
+                match params.sides_edit_mode {
+                    SideEditMode::Global => {
+                        side_opts(ui, &mut params.side_glob_options);
                     }
-                    SideUVMode::Multi => {
-                        bevy_inspector::ui_for_value(&mut params.sides_uvs, ui, world);
+                    SideEditMode::Multi => {
+                        for dir in EdgeDirection::ALL_DIRECTIONS {
+                            let option = &mut params.sides_options[dir.index() as usize];
+                            ui.add_space(10.0);
+                            ui.strong(format!("{dir:?}"));
+                            if option.is_none() {
+                                if ui.button("Enable").clicked() {
+                                    *option = Some(FaceOptions::new());
+                                }
+                            } else if ui.button("Disable").clicked() {
+                                *option = None;
+                            }
+                            if let Some(opts) = option {
+                                ui.push_id(dir, |ui| {
+                                    side_opts(ui, opts);
+                                });
+                            }
+                        }
                     }
                 }
-
-                ui.heading("Sides Inset options");
-                ui.push_id("Sides inset", |ui| match &mut params.sides_inset {
-                    Some(opts) => {
-                        bevy_inspector::ui_for_value(opts, ui, world);
-                        if ui.button("Disable").clicked() {
-                            params.sides_inset = None;
-                        }
-                    }
-                    None => {
-                        if ui.button("Enable").clicked() {
-                            params.sides_inset = Some(InsetOptions {
-                                keep_inner_face: true,
-                                scale: 0.2,
-                                mode: InsetScaleMode::default(),
-                            })
-                        }
-                    }
-                });
             });
         });
     });
@@ -281,9 +313,9 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
         .with_offset(Vec3::NEG_Y * params.height / 2.0 * params.scale.y)
         .with_scale(params.scale)
         .with_caps_uv_options(params.caps_uvs)
-        .with_multi_sides_uv_options(match params.sides_uvs_mode {
-            SideUVMode::Global => [params.sides_uvs[0]; 6],
-            SideUVMode::Multi => params.sides_uvs,
+        .with_multi_custom_sides_options(match params.sides_edit_mode {
+            SideEditMode::Global => [Some(params.side_glob_options); 6],
+            SideEditMode::Multi => params.sides_options,
         });
     if !params.top_face {
         new_mesh = new_mesh.without_top_face();
@@ -293,9 +325,6 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     }
     if let Some(opts) = params.caps_inset {
         new_mesh = new_mesh.with_caps_inset_options(opts);
-    }
-    if let Some(opts) = params.sides_inset {
-        new_mesh = new_mesh.with_sides_inset_options(opts);
     }
     let new_mesh = compute_mesh(new_mesh.build());
     // println!("Mesh has {} vertices", new_mesh.count_vertices());
@@ -322,9 +351,9 @@ impl Default for BuilderParams {
             subdivisions: 3,
             top_face: true,
             bottom_face: true,
-            sides_uvs_mode: SideUVMode::Global,
-            sides_uvs: [UVOptions::new().with_scale_factor(vec2(0.3, 1.0)); 6],
-            sides_inset: None,
+            sides_edit_mode: SideEditMode::Global,
+            side_glob_options: FaceOptions::new(),
+            sides_options: [Some(FaceOptions::new()); 6],
             caps_uvs: UVOptions::new(),
             scale: Vec3::ONE,
             caps_inset: None,
