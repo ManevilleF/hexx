@@ -30,6 +30,7 @@
 
 ### Storage
 
+* Fixed `HexagonalMap` access returning values for indices out of bounds.
 * (**BREAKING**) Moved common methods of storage structs to a `HexStore` trait.
 * `std::collections::HashMap<Hex, T>` implements `HexStore`
 * All `HexStore` types now have the following methods:

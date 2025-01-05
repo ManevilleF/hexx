@@ -17,6 +17,14 @@ use super::HexStore;
 ///
 /// If your use case doesn't match all of the above, use a [`HashMap`] instead
 ///
+/// ## Performance agains [`HashMap`]
+///
+/// This struct is uses less memory and the larger the map, the faster `get`
+/// operations are agains a hashmap, approximately 10x faster
+///
+/// But for iterating this storage is *less* performant than a hashmap
+/// approximately 3x slower
+///
 /// [`HashMap`]: std::collections::HashMap
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
@@ -37,7 +45,11 @@ impl HexagonalMapMetadata {
     const fn offset(&self) -> Hex {
         Hex::splat(self.bounds.radius as i32).const_sub(self.bounds.center)
     }
+
     fn hex_to_idx(&self, idx: Hex) -> Option<[usize; 2]> {
+        if !self.bounds.is_in_bounds(idx) {
+            return None;
+        }
         let key = idx + self.offset();
         let x = u32::try_from(key.x).ok()?;
         let y = u32::try_from(key.y).ok()?;
@@ -221,6 +233,9 @@ mod tests {
 
                 for (k, v) in &expected {
                     assert_eq!(*v, map[k]);
+                }
+                for k in center.range(radius + 1) {
+                    assert_eq!(expected.get(&k), map.get(k));
                 }
 
                 for k in map.bounds().all_coords() {

@@ -10,7 +10,7 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hexagonal Storage");
     group
         .significance_level(0.1)
-        .measurement_time(Duration::from_secs(7))
+        .measurement_time(Duration::from_secs(8))
         .sample_size(100);
 
     let get_value = |h: Hex| h.length();

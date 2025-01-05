@@ -20,8 +20,8 @@ use super::HexStore;
 ///
 /// ## Performance agains [`HashMap`]
 ///
-/// The larger the map, the faster `get` operations are agains a hashmap,
-/// approximately 10x to 100x faster
+/// This struct is uses less memory and the larger the map, the faster `get`
+/// operations are agains a hashmap, approximately 10x to 100x faster
 ///
 /// But for iterating this storage is *slightly less* performant than a hashmap
 ///
@@ -227,6 +227,9 @@ mod tests {
                     assert_eq!(map.len(), (rows * columns) as usize);
                     for (k, v) in &expected {
                         assert_eq!(*v, map[k]);
+                    }
+                    for k in rombus(origin, rows + 1, columns + 1) {
+                        assert_eq!(expected.get(&k), map.get(k));
                     }
                 }
             }
