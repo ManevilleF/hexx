@@ -18,6 +18,13 @@ use super::HexStore;
 ///
 /// If your use case doesn't match all of the above, use a [`HashMap`] instead
 ///
+/// ## Performance agains [`HashMap`]
+///
+/// The larger the map, the faster `get` operations are agains a hashmap,
+/// approximately 10x to 100x faster
+///
+/// But for iterating this storage is *slightly less* performant than a hashmap
+///
 /// [`HashMap`]: std::collections::HashMap
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]

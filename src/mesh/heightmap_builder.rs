@@ -8,7 +8,9 @@ use glam::{Quat, Vec3};
 ///
 /// ```rust
 /// # use hexx::*;
-/// let map = [
+/// # use std::collections::HashMap;
+///
+/// let map: HashMap<Hex, f32> = [
 ///     (hex(0, 0), 0.0),
 ///     (hex(1, 0), 2.0),
 ///     // ...

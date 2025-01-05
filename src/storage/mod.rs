@@ -50,8 +50,8 @@ storage_impl!(RombusMap<T>);
 /// Trait grouping common features for hexagonal storage types.
 ///
 /// Implemented for
-/// - [`HexagonalMap<T>`](crate::HexagonalMap)
-/// - [`RombusMap<T>`](crate::RombusMap)
+/// - [`HexagonalMap<T>`](HexagonalMap)
+/// - [`RombusMap<T>`](RombusMap)
 /// - [`HashMap<Hex, T>`](std::collections::HashMap)
 pub trait HexStore<T> {
     /// Returns a reference the stored value associated with `idx`.

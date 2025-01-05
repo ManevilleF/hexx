@@ -252,7 +252,6 @@ pub mod mesh;
 pub mod orientation;
 /// Map shapes generation functions
 pub mod shapes;
-/// Hex optimized collections
 pub mod storage;
 
 #[doc(inline)]
