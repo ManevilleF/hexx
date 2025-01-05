@@ -1,9 +1,8 @@
-use std::{
-    fmt::Debug,
-    slice::{Iter, IterMut},
-};
+use std::fmt::Debug;
 
 use crate::Hex;
+
+use super::HexStore;
 
 /// [`Vec`] Based storage for rombus maps.
 ///
@@ -24,9 +23,45 @@ use crate::Hex;
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct RombusMap<T> {
     inner: Vec<T>,
+    meta: RombusMetadata,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+struct RombusMetadata {
     origin: Hex,
     rows: u32,
     columns: u32,
+}
+
+impl RombusMetadata {
+    fn hex_to_idx(&self, idx: Hex) -> Option<usize> {
+        let hex = idx - self.origin;
+        let x = u32::try_from(hex.x).ok()?;
+        if x >= self.columns {
+            return None;
+        }
+        let y = u32::try_from(hex.y).ok()?;
+        if y >= self.rows {
+            return None;
+        }
+        Some((y * self.columns + x) as usize)
+    }
+
+    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    fn idx_to_hex(&self, idx: usize) -> Hex {
+        let idx = idx as u32;
+        debug_assert!(
+            idx < (self.columns * self.rows),
+            "idx `{idx}` is out of bounds"
+        );
+
+        let x = (idx % self.columns) as i32;
+        let y = (idx / self.columns) as i32;
+
+        Hex { x, y } + self.origin
+    }
 }
 
 impl<T> RombusMap<T> {
@@ -59,49 +94,12 @@ impl<T> RombusMap<T> {
         }
         Self {
             inner,
-            origin,
-            rows,
-            columns,
+            meta: RombusMetadata {
+                origin,
+                rows,
+                columns,
+            },
         }
-    }
-
-    fn hex_to_idx(&self, idx: Hex) -> Option<usize> {
-        let hex = idx - self.origin;
-        let x = u32::try_from(hex.x).ok()?;
-        if x >= self.columns {
-            return None;
-        }
-        let y = u32::try_from(hex.y).ok()?;
-        if y >= self.rows {
-            return None;
-        }
-        Some((y * self.columns + x) as usize)
-    }
-
-    #[must_use]
-    /// Returns a reference the stored value associated with `idx`.
-    /// Returns `None` if `idx` is out of bounds
-    pub fn get(&self, hex: Hex) -> Option<&T> {
-        let index = self.hex_to_idx(hex)?;
-        self.inner.get(index)
-    }
-
-    #[must_use]
-    /// Returns a mutable reference the stored value associated with `idx`.
-    /// Returns `None` if `idx` is out of bounds
-    pub fn get_mut(&mut self, hex: Hex) -> Option<&mut T> {
-        let index = self.hex_to_idx(hex)?;
-        self.inner.get_mut(index)
-    }
-
-    /// Returns an iterator over the storage, in `y` order
-    pub fn iter(&self) -> Iter<T> {
-        self.inner.iter()
-    }
-
-    /// Returns an iterator over the storage, in `y` order
-    pub fn iter_mut(&mut self) -> IterMut<T> {
-        self.inner.iter_mut()
     }
 
     #[must_use]
@@ -119,40 +117,60 @@ impl<T> RombusMap<T> {
     #[must_use]
     /// Amount of rows
     pub const fn rows(&self) -> u32 {
-        self.rows
+        self.meta.rows
     }
 
     #[must_use]
     /// Amount of columns
     pub const fn columns(&self) -> u32 {
-        self.columns
+        self.meta.columns
     }
 }
 
-impl<T> IntoIterator for RombusMap<T> {
-    type Item = T;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.inner.into_iter()
+impl<T> HexStore<T> for RombusMap<T> {
+    fn get(&self, hex: crate::Hex) -> Option<&T> {
+        let index = self.meta.hex_to_idx(hex)?;
+        self.inner.get(index)
     }
-}
 
-impl<'a, T> IntoIterator for &'a RombusMap<T> {
-    type Item = &'a T;
-    type IntoIter = Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+    fn get_mut(&mut self, hex: crate::Hex) -> Option<&mut T> {
+        let index = self.meta.hex_to_idx(hex)?;
+        self.inner.get_mut(index)
     }
-}
 
-impl<'a, T> IntoIterator for &'a mut RombusMap<T> {
-    type Item = &'a mut T;
-    type IntoIter = IterMut<'a, T>;
+    fn values<'s>(&'s self) -> impl ExactSizeIterator<Item = &'s T>
+    where
+        T: 's,
+    {
+        self.inner.iter()
+    }
 
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+    fn values_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = &'s mut T>
+    where
+        T: 's,
+    {
+        self.inner.iter_mut()
+    }
+
+    fn iter<'s>(&'s self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s T)>
+    where
+        T: 's,
+    {
+        self.values().enumerate().map(|(i, value)| {
+            let hex = self.meta.idx_to_hex(i);
+            (hex, value)
+        })
+    }
+
+    fn iter_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s mut T)>
+    where
+        T: 's,
+    {
+        let meta = self.meta;
+        self.values_mut().enumerate().map(move |(i, value)| {
+            let hex = meta.idx_to_hex(i);
+            (hex, value)
+        })
     }
 }
 
@@ -163,9 +181,7 @@ where
     fn clone(&self) -> Self {
         Self {
             inner: self.inner.clone(),
-            origin: self.origin,
-            rows: self.rows,
-            columns: self.columns,
+            meta: self.meta,
         }
     }
 }
@@ -177,18 +193,15 @@ where
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("RombusMap")
             .field("inner", &self.inner)
-            .field("origin", &self.origin)
-            .field("rows", &self.rows)
-            .field("columns", &self.columns)
+            .field("meta", &self.meta)
             .finish()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use bevy::utils::HashMap;
-
     use crate::shapes::rombus;
+    use std::collections::HashMap;
 
     use super::*;
 
@@ -208,6 +221,25 @@ mod tests {
                     for (k, v) in &expected {
                         assert_eq!(*v, map[k]);
                     }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn iter() {
+        for origin in Hex::ZERO.range(20) {
+            for rows in 0_u32..25 {
+                for columns in 0_u32..25 {
+                    let expected: HashMap<Hex, usize> = rombus(origin, rows, columns)
+                        .enumerate()
+                        .map(|(i, h)| (h, i))
+                        .collect();
+
+                    let map = RombusMap::new(origin, rows, columns, |h| expected[&h]);
+
+                    let iter: HashMap<Hex, usize> = map.iter().map(|(k, v)| (k, *v)).collect();
+                    assert_eq!(expected, iter);
                 }
             }
         }

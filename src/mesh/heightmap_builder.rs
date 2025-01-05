@@ -1,7 +1,6 @@
 use super::{face::Quad, FaceOptions, InsetOptions, MeshInfo};
-use crate::{EdgeDirection, Hex, HexLayout, PlaneMeshBuilder, UVOptions};
+use crate::{storage::HexStore, EdgeDirection, HexLayout, PlaneMeshBuilder, UVOptions};
 use glam::{Quat, Vec3};
-use std::collections::HashMap;
 
 /// Builder struct to customize hex column heightmap mesh generation.
 ///
@@ -34,13 +33,13 @@ use std::collections::HashMap;
 /// - Translate: [`Self::with_offset`]
 ///
 /// Are executed in that order, or **SRT**
-pub struct HeightMapMeshBuilder<'l, 'm> {
+pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     /// The hexagonal layout, used to compute vertex positions
     pub layout: &'l HexLayout,
     /// The column height on missing neighbor
     pub base_height: Option<f32>,
     /// Map between the coordinates and the associated height
-    pub map: &'m HashMap<Hex, f32>,
+    pub map: &'m HeightMap,
     /// Top hexagonal face options. If `None` no top faces will be generated
     pub top_face_options: Option<FaceOptions>,
     /// Side quad face options. If `None` no side quads will be generated
@@ -61,10 +60,20 @@ pub struct HeightMapMeshBuilder<'l, 'm> {
     pub center_aligned: bool,
 }
 
-impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
-    /// Setup a new builder using the given `layout` and height `map`
+impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
+    /// Setup a new builder using the given `layout` and height `map`.
+    ///
+    /// # Arguments
+    ///
+    /// * `layout` - the associated hexagonal horizontal layout
+    /// * `map` - The heightmap values.
+    ///
+    /// Accepted values for `map` are:
+    /// - [`HexagonalMap<f32>`](crate::storage::HexagonalMap)
+    /// - [`RombusMap<f32>`](crate::storage::RombusMap)
+    /// - [`HashMap<Hex, f32>`](std::collections::HashMap)
     #[must_use]
-    pub const fn new(layout: &'l HexLayout, map: &'m HashMap<Hex, f32>) -> Self {
+    pub const fn new(layout: &'l HexLayout, map: &'m HeightMap) -> Self {
         Self {
             layout,
             map,
@@ -189,7 +198,7 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
         }
         let max = self.map.values().copied().reduce(f32::max).unwrap_or(0.0);
 
-        for (&hex, &height) in self.map {
+        for (hex, &height) in self.map.iter() {
             if let Some(opts) = &self.top_face_options {
                 let mut plane = PlaneMeshBuilder::new(self.layout)
                     .at(hex)
@@ -203,12 +212,8 @@ impl<'l, 'm> HeightMapMeshBuilder<'l, 'm> {
             }
             if let Some(side_opts) = &self.side_options {
                 let corners = self.layout.hex_edge_corners(hex);
-                let dir_heights = EdgeDirection::ALL_DIRECTIONS.map(|dir| {
-                    (
-                        dir,
-                        self.map.get(&(hex + dir)).copied().or(self.base_height),
-                    )
-                });
+                let dir_heights = EdgeDirection::ALL_DIRECTIONS
+                    .map(|dir| (dir, self.map.get(hex + dir).copied().or(self.base_height)));
                 for (dir, opt_height) in dir_heights {
                     let points = corners[dir.index() as usize];
                     let Some(other_height) = opt_height else {

@@ -1,8 +1,7 @@
-use crate::{Hex, HexBounds};
-use std::{
-    fmt,
-    slice::{Iter, IterMut},
-};
+use crate::{hex::ExactSizeHexIterator, Hex, HexBounds};
+use std::fmt;
+
+use super::HexStore;
 
 /// [`Vec`] Based storage for hexagonal maps.
 ///
@@ -23,7 +22,38 @@ use std::{
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct HexagonalMap<T> {
     inner: Vec<Vec<T>>,
+    meta: HexagonalMapMetadata,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+struct HexagonalMapMetadata {
     bounds: HexBounds,
+}
+
+impl HexagonalMapMetadata {
+    #[allow(clippy::cast_possible_wrap)]
+    const fn offset(&self) -> Hex {
+        Hex::splat(self.bounds.radius as i32).const_sub(self.bounds.center)
+    }
+    fn hex_to_idx(&self, idx: Hex) -> Option<[usize; 2]> {
+        let key = idx + self.offset();
+        let x = u32::try_from(key.x).ok()?;
+        let y = u32::try_from(key.y).ok()?;
+        Some([
+            y as usize,
+            x.saturating_sub(self.bounds.radius.saturating_sub(y)) as usize,
+        ])
+    }
+
+    #[allow(clippy::cast_possible_wrap, clippy::cast_possible_truncation)]
+    fn idx_to_hex(&self, [y, x]: [usize; 2]) -> Hex {
+        let x = (x as u32).saturating_add(self.bounds.radius.saturating_sub(y as u32)) as i32;
+        let y = y as i32;
+
+        Hex { x, y } - self.offset()
+    }
 }
 
 impl<T> HexagonalMap<T> {
@@ -61,82 +91,90 @@ impl<T> HexagonalMap<T> {
                     .collect()
             })
             .collect();
-        Self { inner, bounds }
+        Self {
+            inner,
+            meta: HexagonalMapMetadata { bounds },
+        }
     }
 
     #[inline]
     #[must_use]
     /// Returns the associated coordinate bounds
     pub const fn bounds(&self) -> &HexBounds {
-        &self.bounds
-    }
-
-    #[allow(clippy::cast_possible_wrap)]
-    const fn offset(&self) -> Hex {
-        Hex::splat(self.bounds.radius as i32).const_sub(self.bounds.center)
-    }
-
-    fn hex_to_idx(&self, idx: Hex) -> Option<[usize; 2]> {
-        let key = idx + self.offset();
-        let x = u32::try_from(key.x).ok()?;
-        let y = u32::try_from(key.y).ok()?;
-        Some([
-            y as usize,
-            x.saturating_sub(self.bounds.radius.saturating_sub(y)) as usize,
-        ])
+        &self.meta.bounds
     }
 
     #[must_use]
-    /// Returns a reference the stored value associated with `idx`.
-    /// Returns `None` if `idx` is out of bounds
-    pub fn get(&self, idx: Hex) -> Option<&T> {
-        let [y, x] = self.hex_to_idx(idx)?;
+    /// Map storage length
+    pub const fn len(&self) -> usize {
+        self.meta.bounds.hex_count()
+    }
+
+    #[must_use]
+    /// Returns `true` if `len` is zero
+    pub fn is_empty(&self) -> bool {
+        self.inner.is_empty()
+    }
+}
+
+impl<T> HexStore<T> for HexagonalMap<T> {
+    fn get(&self, hex: crate::Hex) -> Option<&T> {
+        let [y, x] = self.meta.hex_to_idx(hex)?;
         self.inner.get(y).and_then(|v| v.get(x))
     }
 
-    /// Returns a mutable reference the stored value associated with `idx`.
-    /// Returns `None` if `idx` is out of bounds
-    #[must_use]
-    pub fn get_mut(&mut self, idx: Hex) -> Option<&mut T> {
-        let [y, x] = self.hex_to_idx(idx)?;
+    fn get_mut(&mut self, hex: crate::Hex) -> Option<&mut T> {
+        let [y, x] = self.meta.hex_to_idx(hex)?;
         self.inner.get_mut(y).and_then(|v| v.get_mut(x))
     }
 
-    /// Returns an iterator over the storage, in `y` order
-    pub fn iter(&self) -> Iter<Vec<T>> {
-        self.inner.iter()
+    fn values<'s>(&'s self) -> impl ExactSizeIterator<Item = &'s T>
+    where
+        T: 's,
+    {
+        ExactSizeHexIterator {
+            count: self.len(),
+            iter: self.inner.iter().flatten(),
+        }
     }
 
-    /// Returns an iterator over the storage, in `y` order
-    pub fn iter_mut(&mut self) -> IterMut<Vec<T>> {
-        self.inner.iter_mut()
+    fn values_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = &'s mut T>
+    where
+        T: 's,
+    {
+        ExactSizeHexIterator {
+            count: self.len(),
+            iter: self.inner.iter_mut().flatten(),
+        }
     }
-}
 
-impl<T> IntoIterator for HexagonalMap<T> {
-    type Item = Vec<T>;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.inner.into_iter()
+    fn iter<'s>(&'s self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s T)>
+    where
+        T: 's,
+    {
+        let count = self.len();
+        let iter = self.inner.iter().enumerate().flat_map(move |(y, arr)| {
+            arr.iter().enumerate().map(move |(x, value)| {
+                let hex = self.meta.idx_to_hex([y, x]);
+                (hex, value)
+            })
+        });
+        ExactSizeHexIterator { iter, count }
     }
-}
 
-impl<'a, T> IntoIterator for &'a HexagonalMap<T> {
-    type Item = &'a Vec<T>;
-    type IntoIter = Iter<'a, Vec<T>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut HexagonalMap<T> {
-    type Item = &'a mut Vec<T>;
-    type IntoIter = IterMut<'a, Vec<T>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+    fn iter_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s mut T)>
+    where
+        T: 's,
+    {
+        let count = self.len();
+        let meta = self.meta;
+        let iter = self.inner.iter_mut().enumerate().flat_map(move |(y, arr)| {
+            arr.iter_mut().enumerate().map(move |(x, value)| {
+                let hex = meta.idx_to_hex([y, x]);
+                (hex, value)
+            })
+        });
+        ExactSizeHexIterator { iter, count }
     }
 }
 
@@ -146,8 +184,8 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HexagonalMap")
-            .field("bounds", &self.bounds)
             .field("inner", &self.inner)
+            .field("meta", &self.meta)
             .finish()
     }
 }
@@ -159,21 +197,20 @@ where
     fn clone(&self) -> Self {
         Self {
             inner: self.inner.clone(),
-            bounds: self.bounds,
+            meta: self.meta,
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use bevy::utils::HashMap;
-
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn validity() {
         for center in Hex::ZERO.range(20) {
-            for radius in 0_u32..25 {
+            for radius in 0_u32..30 {
                 let expected: HashMap<Hex, usize> = center
                     .range(radius)
                     .enumerate()
@@ -189,6 +226,24 @@ mod tests {
                 for k in map.bounds().all_coords() {
                     assert_eq!(map[k], expected[&k]);
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn iter() {
+        for center in Hex::ZERO.range(20) {
+            for radius in 0_u32..30 {
+                let expected: HashMap<Hex, usize> = center
+                    .range(radius)
+                    .enumerate()
+                    .map(|(i, h)| (h, i))
+                    .collect();
+
+                let map = HexagonalMap::new(center, radius, |h| expected[&h]);
+                let iter: HashMap<Hex, usize> = map.iter().map(|(k, v)| (k, *v)).collect();
+
+                assert_eq!(iter, expected);
             }
         }
     }
