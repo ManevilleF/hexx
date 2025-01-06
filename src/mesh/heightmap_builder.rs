@@ -1,6 +1,11 @@
 use super::{face::Quad, FaceOptions, InsetOptions, MeshInfo};
 use crate::{storage::HexStore, EdgeDirection, HexLayout, PlaneMeshBuilder, UVOptions};
 use glam::{Quat, Vec3};
+use std::collections::HashMap;
+use std::sync::Arc;
+
+type CapOptionsFn = dyn Fn(Hex) -> Option<FaceOptions>;
+type SideOptionsFn = dyn Fn(Hex, Hex) -> Option<FaceOptions>;
 
 /// Builder struct to customize hex column heightmap mesh generation.
 ///
@@ -60,6 +65,12 @@ pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     pub rotation: Option<Quat>,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
+    /// Optional function pointer to specify custom [`FaceOption`] for some
+    /// top faces
+    pub custom_caps_options: Option<Arc<CapOptionsFn>>,
+    /// Optional function pointer to specify custom [`FaceOption`] for some
+    /// side quads.
+    pub custom_sides_options: Option<Arc<SideOptionsFn>>,
 }
 
 impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
@@ -87,6 +98,8 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
             scale: None,
             rotation: None,
             center_aligned: false,
+            custom_caps_options: None,
+            custom_sides_options: None,
         }
     }
 
@@ -123,9 +136,54 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
 
     #[must_use]
     #[inline]
-    /// Specify custom face options for the top cap triangles
+    /// Specify global face options for the top cap triangles
     pub const fn with_cap_options(mut self, options: FaceOptions) -> Self {
         self.top_face_options = Some(options);
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify global uv options for the top cap triangles
+    ///
+    /// Note:
+    /// this won't have any effect if `top_face_options` is disabled
+    pub const fn with_cap_uv_options(mut self, uv_options: UVOptions) -> Self {
+        if let Some(opts) = &mut self.top_face_options {
+            opts.uv = uv_options;
+        }
+        self
+    }
+
+    /// Specify global insetting option for the top cap face
+    ///
+    /// Note:
+    /// this won't have any effect if `top_face_options` is disabled
+    #[must_use]
+    #[inline]
+    pub const fn with_cap_inset_options(mut self, inset: InsetOptions) -> Self {
+        if let Some(opts) = &mut self.top_face_options {
+            opts.insetting = Some(inset);
+        }
+        self
+    }
+
+    /// Specify custom face options for the top cap faces to override the global
+    /// `top_face_options` parameters.
+    ///
+    /// For each coordinate in the heightmap the function will be called. If it
+    /// returns a `Some(opts)` then `opts` will be used for that face, otherwise
+    /// the global `top_face_options` will be used
+    ///
+    /// Notes:
+    /// * this won't have any effect if `top_face_options` is disabled
+    #[must_use]
+    #[inline]
+    pub fn with_custom_cap_options(
+        mut self,
+        func: impl Fn(Hex) -> Option<FaceOptions> + 'static,
+    ) -> Self {
+        self.custom_caps_options = Some(Arc::new(func));
         self
     }
 
@@ -139,35 +197,29 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
 
     #[must_use]
     #[inline]
-    /// Specify custom face options for the column sides
+    /// Specify global face options for the column sides
     pub const fn with_side_options(mut self, options: FaceOptions) -> Self {
         self.side_options = Some(options);
         self
     }
 
+    /// Specify custom sides options for the side faces to override the global
+    /// `side_options` parameters.
+    ///
+    /// For each neighboring coordinate pair in the heightmap the function will
+    /// be called. If it returns a `Some(opts)` then `opts` will be used for
+    /// that face, otherwise the global `side_option` will be used
+    ///
+    /// Notes:
+    /// * this won't have any effect if `side_options` is disabled
+    /// * Each hexagonal pair will be called *twice* but applied only *once*.
     #[must_use]
     #[inline]
-    /// Specify custom uv options for the top cap triangles
-    ///
-    /// Note:
-    /// this won't have any effect if `top_face_options` is disabled
-    pub const fn with_cap_uv_options(mut self, uv_options: UVOptions) -> Self {
-        if let Some(opts) = &mut self.top_face_options {
-            opts.uv = uv_options;
-        }
-        self
-    }
-
-    /// Specify inset option for the top cap face
-    ///
-    /// Note:
-    /// this won't have any effect if `top_face_options` is disabled
-    #[must_use]
-    #[inline]
-    pub const fn with_cap_inset_options(mut self, inset: InsetOptions) -> Self {
-        if let Some(opts) = &mut self.top_face_options {
-            opts.insetting = Some(inset);
-        }
+    pub fn with_custom_sides_options(
+        mut self,
+        func: impl Fn(Hex, Hex) -> Option<FaceOptions> + 'static,
+    ) -> Self {
+        self.custom_sides_options = Some(Arc::new(func));
         self
     }
 
@@ -201,7 +253,14 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
         let max = self.map.values().copied().reduce(f32::max).unwrap_or(0.0);
 
         for (hex, &height) in self.map.iter() {
-            if let Some(opts) = &self.top_face_options {
+            if let Some(opts) = self.top_face_options {
+                // Maybe custom options
+                let opts = self
+                    .custom_caps_options
+                    .as_ref()
+                    .and_then(|f| f(hex))
+                    .unwrap_or(opts);
+
                 let mut plane = PlaneMeshBuilder::new(self.layout)
                     .at(hex)
                     .center_aligned()
@@ -212,17 +271,24 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
                 }
                 mesh.merge_with(plane.build());
             }
-            if let Some(side_opts) = &self.side_options {
+            if let Some(side_opts) = self.side_options {
                 let corners = self.layout.hex_edge_corners(hex);
                 let dir_heights = EdgeDirection::ALL_DIRECTIONS
                     .map(|dir| (dir, self.map.get(hex + dir).copied().or(self.base_height)));
                 for (dir, opt_height) in dir_heights {
+                    // Maybe custom options
+                    let side_opts = self
+                        .custom_sides_options
+                        .as_ref()
+                        .and_then(|f| f(hex, hex + dir))
+                        .unwrap_or(side_opts);
+
                     let points = corners[dir.index() as usize];
                     let Some(other_height) = opt_height else {
                         if let Some(default_height) = self.default_height {
                             let quad =
                                 Quad::new_bounded(points, default_height, height, [min, max]);
-                            mesh.merge_with(quad.apply_options(side_opts));
+                            mesh.merge_with(quad.apply_options(&side_opts));
                         }
                         continue;
                     };
@@ -230,7 +296,7 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
                         continue;
                     }
                     let quad = Quad::new_bounded(points, other_height, height, [min, max]);
-                    mesh.merge_with(quad.apply_options(side_opts));
+                    mesh.merge_with(quad.apply_options(&side_opts));
                 }
             }
         }
