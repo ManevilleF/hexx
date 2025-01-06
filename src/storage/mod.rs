@@ -7,9 +7,11 @@
 //!
 //! [this article]: https://www.redblobgames.com/grids/hexagons/#map-storage
 mod hexagonal;
+mod rectangle;
 mod rombus;
 
 pub use hexagonal::HexagonalMap;
+pub use rectangle::RectangleMap;
 pub use rombus::RombusMap;
 
 macro_rules! storage_impl {
@@ -46,6 +48,7 @@ macro_rules! storage_impl {
 
 storage_impl!(HexagonalMap<T>);
 storage_impl!(RombusMap<T>);
+storage_impl!(RectangleMap<T>);
 
 /// Trait grouping common features for hexagonal storage types.
 ///

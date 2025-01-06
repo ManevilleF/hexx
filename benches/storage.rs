@@ -4,6 +4,7 @@ use hexx::{
     storage::{HexStore, HexagonalMap, RombusMap},
     *,
 };
+use shapes::Rombus;
 use std::{collections::HashMap, time::Duration};
 
 pub fn hexagonal_map_benchmark(c: &mut Criterion) {
@@ -61,7 +62,12 @@ pub fn rombus_map_benchmark(c: &mut Criterion) {
         let hash_map: HashMap<_, _> = rombus(Hex::ZERO, dist, dist)
             .map(|hex| (hex, get_value(hex)))
             .collect();
-        let rombus_map = RombusMap::new(Hex::ZERO, dist, dist, get_value);
+        let rombus = Rombus {
+            origin: Hex::ZERO,
+            rows: dist,
+            columns: dist,
+        };
+        let rombus_map = RombusMap::new(rombus, get_value);
         group.bench_with_input(BenchmarkId::new("HashMap_get", dist), &dist, |b, dist| {
             b.iter(|| {
                 for c in rombus(black_box(Hex::ZERO), *dist, *dist) {

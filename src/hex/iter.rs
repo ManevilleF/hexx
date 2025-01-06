@@ -93,4 +93,12 @@ where
     }
 }
 
-impl<I> ExactSizeIterator for ExactSizeHexIterator<I> where I: Iterator {}
+impl<I> ExactSizeIterator for ExactSizeHexIterator<I>
+where
+    I: Iterator,
+{
+    #[inline]
+    fn len(&self) -> usize {
+        self.count
+    }
+}

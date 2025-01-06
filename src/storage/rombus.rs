@@ -1,6 +1,6 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, ops::Deref};
 
-use crate::Hex;
+use crate::{shapes::Rombus, Hex};
 
 use super::HexStore;
 
@@ -36,10 +36,14 @@ pub struct RombusMap<T> {
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
-struct RombusMetadata {
-    origin: Hex,
-    rows: u32,
-    columns: u32,
+struct RombusMetadata(Rombus);
+
+impl Deref for RombusMetadata {
+    type Target = Rombus;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 impl RombusMetadata {
@@ -76,60 +80,57 @@ impl<T> RombusMap<T> {
     ///
     /// # Arguments
     ///
-    /// * `origin` - The smallest coordinate of the hexagon
-    /// * `rows` - The amount of `y` values per column
-    /// * `columns` - The amount of `x` values per row
+    /// * `rombus` - The rombus parameters
     /// * `values` - Function called for each coordinate to fill the map
     ///
     /// # Example
     ///
     /// ```rust
-    /// # use hexx::{*, storage::RombusMap};
+    /// # use hexx::{*, storage::RombusMap, shapes::Rombus};
     ///
-    /// let map = RombusMap::new(Hex::ZERO, 5, 10, |coord| coord.length());
+    /// let rombus = Rombus {
+    ///   origin: Hex::ZERO,
+    ///   rows: 5,
+    ///   columns: 10
+    /// };
+    /// let map = RombusMap::new(rombus, |coord| coord.length());
     /// assert_eq!(map[hex(1, 0)], 1);
     /// ```
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
-    pub fn new(origin: Hex, rows: u32, columns: u32, mut values: impl FnMut(Hex) -> T) -> Self {
-        let mut inner = Vec::with_capacity((rows * columns) as usize);
-        for y in 0..rows {
-            for x in 0..columns {
-                let p = origin.const_add(Hex::new(x as i32, y as i32));
-                inner.push(values(p));
-            }
-        }
+    pub fn new(rombus: Rombus, values: impl FnMut(Hex) -> T) -> Self {
+        let inner = rombus.coords().map(values).collect();
         Self {
             inner,
-            meta: RombusMetadata {
-                origin,
-                rows,
-                columns,
-            },
+            meta: RombusMetadata(rombus),
         }
     }
 
     #[must_use]
+    #[inline]
     /// Map storage length, equals to `rows * columns`
     pub fn len(&self) -> usize {
         self.inner.len()
     }
 
     #[must_use]
+    #[inline]
     /// Returns `true` if `rows` or `columns` is zero
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
     }
 
     #[must_use]
+    #[inline]
     /// Amount of rows
-    pub const fn rows(&self) -> u32 {
+    pub fn rows(&self) -> u32 {
         self.meta.rows
     }
 
     #[must_use]
+    #[inline]
     /// Amount of columns
-    pub const fn columns(&self) -> u32 {
+    pub fn columns(&self) -> u32 {
         self.meta.columns
     }
 }
@@ -207,7 +208,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::shapes::rombus;
     use std::collections::HashMap;
 
     use super::*;
@@ -217,18 +217,21 @@ mod tests {
         for origin in Hex::ZERO.range(20) {
             for rows in 0_u32..25 {
                 for columns in 0_u32..25 {
-                    let expected: HashMap<Hex, usize> = rombus(origin, rows, columns)
-                        .enumerate()
-                        .map(|(i, h)| (h, i))
-                        .collect();
+                    let rombus = Rombus {
+                        origin,
+                        rows,
+                        columns,
+                    };
+                    let expected: HashMap<Hex, usize> =
+                        rombus.coords().enumerate().map(|(i, h)| (h, i)).collect();
 
-                    let map = RombusMap::new(origin, rows, columns, |h| expected[&h]);
+                    let map = RombusMap::new(rombus, |h| expected[&h]);
 
                     assert_eq!(map.len(), (rows * columns) as usize);
                     for (k, v) in &expected {
                         assert_eq!(*v, map[k]);
                     }
-                    for k in rombus(origin, rows + 1, columns + 1) {
+                    for k in crate::shapes::rombus(origin - Hex::NEG_ONE, rows + 2, columns + 2) {
                         assert_eq!(expected.get(&k), map.get(k));
                     }
                 }
@@ -241,12 +244,15 @@ mod tests {
         for origin in Hex::ZERO.range(20) {
             for rows in 0_u32..25 {
                 for columns in 0_u32..25 {
-                    let expected: HashMap<Hex, usize> = rombus(origin, rows, columns)
-                        .enumerate()
-                        .map(|(i, h)| (h, i))
-                        .collect();
+                    let rombus = Rombus {
+                        origin,
+                        rows,
+                        columns,
+                    };
+                    let expected: HashMap<Hex, usize> =
+                        rombus.coords().enumerate().map(|(i, h)| (h, i)).collect();
 
-                    let map = RombusMap::new(origin, rows, columns, |h| expected[&h]);
+                    let map = RombusMap::new(rombus, |h| expected[&h]);
 
                     let iter: HashMap<Hex, usize> = map.iter().map(|(k, v)| (k, *v)).collect();
                     assert_eq!(expected, iter);
