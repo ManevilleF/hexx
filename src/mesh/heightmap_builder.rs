@@ -1,8 +1,7 @@
 use super::{face::Quad, FaceOptions, InsetOptions, MeshInfo};
 use crate::{storage::HexStore, EdgeDirection, HexLayout, PlaneMeshBuilder, UVOptions};
 use glam::{Quat, Vec3};
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 type CapOptionsFn = dyn Fn(Hex) -> Option<FaceOptions>;
 type SideOptionsFn = dyn Fn(Hex, Hex) -> Option<FaceOptions>;

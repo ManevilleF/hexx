@@ -18,7 +18,7 @@
 * Added `HexLayout::with_rect_size` to construct hexagons matching sprite dimensions (#194)
 * Added `hex_edge_corners` utility method (#170)
 
-### Mesh generation (#170)
+### Mesh generation (#170, #198)
 
 * (**BREAKING**)`ColumnMeshBuilder` can now disable some side quads
 * (**BREAKING**) `ColumnMeshBuilder` and `PlaneMeshBuilder` now use a centralized
