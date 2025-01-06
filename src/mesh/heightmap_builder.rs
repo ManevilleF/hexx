@@ -64,10 +64,10 @@ pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     pub rotation: Option<Quat>,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
-    /// Optional function pointer to specify custom [`FaceOption`] for some
+    /// Optional function pointer to specify custom [`FaceOptions`] for some
     /// top faces
     pub custom_caps_options: Option<Arc<CapOptionsFn>>,
-    /// Optional function pointer to specify custom [`FaceOption`] for some
+    /// Optional function pointer to specify custom [`FaceOptions`] for some
     /// side quads.
     pub custom_sides_options: Option<Arc<SideOptionsFn>>,
 }
