@@ -77,11 +77,11 @@ pub struct ExactSizeHexIterator<I> {
     pub count: usize,
 }
 
-impl<I> Iterator for ExactSizeHexIterator<I>
+impl<I, T> Iterator for ExactSizeHexIterator<I>
 where
-    I: Iterator<Item = Hex>,
+    I: Iterator<Item = T>,
 {
-    type Item = Hex;
+    type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.count = self.count.saturating_sub(1);
@@ -93,4 +93,4 @@ where
     }
 }
 
-impl<I> ExactSizeIterator for ExactSizeHexIterator<I> where I: Iterator<Item = Hex> {}
+impl<I> ExactSizeIterator for ExactSizeHexIterator<I> where I: Iterator {}

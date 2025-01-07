@@ -28,6 +28,20 @@
 * Renamed `Quad::from_bottom` to `Quad::new`
 * Added a new `HeightMapMeshBuilder` with its associated `heightmap_builder` example
 
+### Storage
+
+* Fixed `HexagonalMap` access returning values for indices out of bounds.
+* (**BREAKING**) Moved common methods of storage structs to a `HexStore` trait.
+* `std::collections::HashMap<Hex, T>` implements `HexStore`
+* All `HexStore` types now have the following methods:
+  * `values()` which iterates on the stored values
+  * `values_mut()` which iterates mutably on the stored values
+  * (**BREAKING**) `iter()` which iterates on the key value pairs
+  * (**BREAKING**) `iter_mut()` which iterates on the key value pairs with mutable reference to the value
+* Added the followin `HexagonalMap` methods:
+  * `len()`
+  * `is_empty()`
+
 ## Misc
 
 * (**BREAKING**) `HexOffsetMode` now has only 2 variants `Even` and `Odd`

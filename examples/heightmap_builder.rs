@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use bevy::{
     ecs::system::RunSystemOnce,
     input::mouse::MouseMotion,
-    pbr::wireframe::{Wireframe, WireframePlugin},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
@@ -14,6 +13,7 @@ use bevy_egui::{
 use bevy_inspector_egui::bevy_inspector;
 use hexx::*;
 use rand::{thread_rng, Rng};
+use storage::HexagonalMap;
 
 #[derive(Debug, Resource)]
 struct HexInfo {
@@ -41,7 +41,6 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugins(WireframePlugin)
         .add_plugins(EguiPlugin)
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
@@ -197,7 +196,6 @@ fn setup(
         .spawn((
             Mesh3d(mesh_handle.clone()),
             MeshMaterial3d(material_handle.clone()),
-            Wireframe,
         ))
         .id();
     commands.insert_resource(HexInfo {
@@ -234,7 +232,7 @@ fn gizmos(
 ) {
     let transform = transforms.get(info.mesh_entity).unwrap();
     // Global axis
-    draw.axes(Transform::default(), 100.0);
+    // draw.axes(Transform::default(), 100.0);
     // Local axis
     let mut transform = *transform;
     transform.scale.y += params.max_height / 2.0;
@@ -246,10 +244,9 @@ fn gizmos(
 
 fn generate(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {
     let mut rng = thread_rng();
-    let map = Hex::ZERO
-        .range(params.range)
-        .map(|h| (h, rng.gen_range(0.0..=params.max_height)))
-        .collect();
+    let map = HexagonalMap::new(Hex::ZERO, params.range, |_| {
+        rng.gen_range(0.0..=params.max_height)
+    });
     let mut new_mesh = HeightMapMeshBuilder::new(&info.layout, &map)
         .with_offset(Vec3::NEG_Y * params.max_height / 2.0 * params.scale.y)
         .with_scale(params.scale)
