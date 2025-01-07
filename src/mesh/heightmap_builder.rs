@@ -1,8 +1,9 @@
 use super::{face::Quad, FaceOptions, InsetOptions, MeshInfo};
-use crate::{storage::HexStore, EdgeDirection, HexLayout, PlaneMeshBuilder, UVOptions};
+use crate::{storage::HexStore, EdgeDirection, Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 use glam::{Quat, Vec3};
-use std::{collections::HashMap, sync::Arc};
+use std::{ops::RangeInclusive, sync::Arc};
 
+type MapEdgeHeightFn = dyn Fn(Hex) -> f32;
 type CapOptionsFn = dyn Fn(Hex) -> Option<FaceOptions>;
 type SideOptionsFn = dyn Fn(Hex, Hex) -> Option<FaceOptions>;
 
@@ -42,17 +43,14 @@ type SideOptionsFn = dyn Fn(Hex, Hex) -> Option<FaceOptions>;
 pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     /// The hexagonal layout, used to compute vertex positions
     pub layout: &'l HexLayout,
-    /// The column height on missing neighbor
-    pub base_height: Option<f32>,
+    /// Optional custom range. Otherwise computed from `map` values
+    pub height_range: Option<RangeInclusive<f32>>,
     /// Map between the coordinates and the associated height
     pub map: &'m HeightMap,
     /// Top hexagonal face options. If `None` no top faces will be generated
     pub top_face_options: Option<FaceOptions>,
     /// Side quad face options. If `None` no side quads will be generated
     pub side_options: Option<FaceOptions>,
-    /// Specifies a default height for side quads to be generated at the border
-    /// of the map or if holes are present in `map`.
-    pub default_height: Option<f32>,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
     /// Optional custom scale factor for the mesh vertex positions
@@ -64,6 +62,9 @@ pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     pub rotation: Option<Quat>,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
+    /// Specifies a default height for side quads to be generated at the border
+    /// of the map or if holes are present in `map`.
+    pub border_edge_heights: Option<Arc<MapEdgeHeightFn>>,
     /// Optional function pointer to specify custom [`FaceOptions`] for some
     /// top faces
     pub custom_caps_options: Option<Arc<CapOptionsFn>>,
@@ -89,17 +90,33 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
         Self {
             layout,
             map,
-            base_height: None,
+            height_range: None,
             top_face_options: Some(FaceOptions::new()),
             side_options: Some(FaceOptions::new()),
-            default_height: None,
             offset: None,
             scale: None,
             rotation: None,
             center_aligned: false,
+            border_edge_heights: None,
             custom_caps_options: None,
             custom_sides_options: None,
         }
+    }
+
+    /// Specify a custom height range for the map. This is to be used only
+    /// if you are generating only part of the global hashmap and don't want
+    /// to rely on the automatic min/max calculation based on `map` values.
+    ///
+    /// These values are used to remap UV coordinates of side quads.
+    ///
+    /// # Notes
+    /// * The range will *not* be checked, if out of range heights are found
+    ///   it will have unexpected behaviour on UV calculations
+    /// * The range should cover all possible heights, included `border_edge_heights`
+    #[must_use]
+    pub const fn with_height_range(mut self, range: RangeInclusive<f32>) -> Self {
+        self.height_range = Some(range);
+        self
     }
 
     /// Specify a custom rotation for the whole mesh
@@ -222,12 +239,24 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
         self
     }
 
-    /// Specifies a default height for side quads to be generated at the border
+    /// Specifies a custom height for out of bounds columns in order to generate
+    /// side quads for columns on the border of the map.
+    ///
+    /// This is useful if you have multiple heightmaps which should connect to
+    /// each other seamlessly
+    #[must_use]
+    #[inline]
+    pub fn with_border_edge_heights(mut self, func: impl Fn(Hex) -> f32 + 'static) -> Self {
+        self.border_edge_heights = Some(Arc::new(func));
+        self
+    }
+
+    /// Specifies a default global height for side quads to be generated at the border
     /// of the map or if holes are present in the height map
     #[must_use]
     #[inline]
-    pub const fn with_default_height(mut self, default_height: f32) -> Self {
-        self.default_height = Some(default_height);
+    pub fn with_default_height(mut self, default_height: f32) -> Self {
+        self.border_edge_heights = Some(Arc::new(move |_| default_height));
         self
     }
 
@@ -245,11 +274,13 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
         // We create the final mesh
         let mut mesh = MeshInfo::default();
 
-        let mut min = self.map.values().copied().reduce(f32::min).unwrap_or(0.0);
-        if let Some(default_height) = self.default_height {
-            min = min.min(default_height);
-        }
-        let max = self.map.values().copied().reduce(f32::max).unwrap_or(0.0);
+        let [min, max] = match self.height_range {
+            Some(r) => [*r.start(), *r.end()],
+            None => [
+                self.map.values().copied().reduce(f32::min).unwrap_or(0.0),
+                self.map.values().copied().reduce(f32::max).unwrap_or(0.0),
+            ],
+        };
 
         for (hex, &height) in self.map.iter() {
             if let Some(opts) = self.top_face_options {
@@ -272,29 +303,26 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
             }
             if let Some(side_opts) = self.side_options {
                 let corners = self.layout.hex_edge_corners(hex);
-                let dir_heights = EdgeDirection::ALL_DIRECTIONS
-                    .map(|dir| (dir, self.map.get(hex + dir).copied().or(self.base_height)));
-                for (dir, opt_height) in dir_heights {
+                for dir in EdgeDirection::ALL_DIRECTIONS {
+                    let neighbor = hex + dir;
+                    let opt_height = self.map.get(hex + dir).copied();
                     // Maybe custom options
                     let side_opts = self
                         .custom_sides_options
                         .as_ref()
-                        .and_then(|f| f(hex, hex + dir))
+                        .and_then(|f| f(hex, neighbor))
                         .unwrap_or(side_opts);
 
-                    let points = corners[dir.index() as usize];
-                    let Some(other_height) = opt_height else {
-                        if let Some(default_height) = self.default_height {
-                            let quad =
-                                Quad::new_bounded(points, default_height, height, [min, max]);
-                            mesh.merge_with(quad.apply_options(&side_opts));
-                        }
+                    let [a, b] = corners[dir.index() as usize];
+                    let Some(neighbor_height) = opt_height
+                        .or_else(|| self.border_edge_heights.as_ref().map(|f| f(neighbor)))
+                    else {
                         continue;
                     };
-                    if other_height <= height {
+                    if neighbor_height >= height {
                         continue;
                     }
-                    let quad = Quad::new_bounded(points, other_height, height, [min, max]);
+                    let quad = Quad::new_bounded([a, b], neighbor_height, height, [min, max]);
                     mesh.merge_with(quad.apply_options(&side_opts));
                 }
             }
