@@ -24,6 +24,7 @@ type SideOptionsFn = dyn Fn(Hex, Hex) -> Option<FaceOptions>;
 /// let layout = HexLayout::default();
 /// let mesh = HeightMapMeshBuilder::new(&layout, &map)
 ///     .with_offset(Vec3::new(1.2, 3.45, 6.7))
+///     .with_height_range(0.0..=5.0)
 ///     .without_top_face()
 ///     .build();
 /// ```
@@ -64,7 +65,7 @@ pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     pub center_aligned: bool,
     /// Specifies a default height for side quads to be generated at the border
     /// of the map or if holes are present in `map`.
-    pub border_edge_heights: Option<Arc<MapEdgeHeightFn>>,
+    pub border_heights: Option<Arc<MapEdgeHeightFn>>,
     /// Optional function pointer to specify custom [`FaceOptions`] for some
     /// top faces
     pub custom_caps_options: Option<Arc<CapOptionsFn>>,
@@ -97,7 +98,7 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
             scale: None,
             rotation: None,
             center_aligned: false,
-            border_edge_heights: None,
+            border_heights: None,
             custom_caps_options: None,
             custom_sides_options: None,
         }
@@ -110,9 +111,12 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
     /// These values are used to remap UV coordinates of side quads.
     ///
     /// # Notes
-    /// * The range will *not* be checked, if out of range heights are found
-    ///   it will have unexpected behaviour on UV calculations
-    /// * The range should cover all possible heights, included `border_edge_heights`
+    /// * It is *heavily* recommended to specify a height range to avoid
+    ///   inconsistent UVs
+    /// * The range will *not* be checked, if out of range heights are found it
+    ///   will have unexpected behaviour on UV calculations
+    /// * The range should cover all possible heights, included
+    ///   `border_edge_heights`
     #[must_use]
     pub const fn with_height_range(mut self, range: RangeInclusive<f32>) -> Self {
         self.height_range = Some(range);
@@ -239,24 +243,41 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
         self
     }
 
-    /// Specifies a custom height for out of bounds columns in order to generate
-    /// side quads for columns on the border of the map.
+    /// Specifies a custom height for out of bounds or missing columns in order
+    /// to generate side quads for columns on the border of the map or to fill
+    /// holes in the heightmap
     ///
     /// This is useful if you have multiple heightmaps which should connect to
     /// each other seamlessly
+    ///
+    /// # Note
+    ///
+    /// It is *recommended* to also call [`Self::with_height_range`] in this
+    /// case. As this `default_height` won't be used in UV remapping,
+    /// leading to inconsistent results
     #[must_use]
     #[inline]
-    pub fn with_border_edge_heights(mut self, func: impl Fn(Hex) -> f32 + 'static) -> Self {
-        self.border_edge_heights = Some(Arc::new(func));
+    pub fn with_border_heights(mut self, func: impl Fn(Hex) -> f32 + 'static) -> Self {
+        self.border_heights = Some(Arc::new(func));
         self
     }
 
-    /// Specifies a default global height for side quads to be generated at the border
-    /// of the map or if holes are present in the height map
+    /// Specifies a global "default" height for out of bounds or missing columns
+    /// in order to generate side quads for columns on the border of the map
+    /// or to fill holes in the heightmap
+    ///
+    /// This is useful if you have multiple heightmaps which should connect to
+    /// each other seamlessly
+    ///
+    /// # Note
+    ///
+    /// It is *recommended* to also call [`Self::with_height_range`] in this
+    /// case. As this `default_height` won't be used in UV remapping,
+    /// leading to inconsistent results
     #[must_use]
     #[inline]
     pub fn with_default_height(mut self, default_height: f32) -> Self {
-        self.border_edge_heights = Some(Arc::new(move |_| default_height));
+        self.border_heights = Some(Arc::new(move |_| default_height));
         self
     }
 
@@ -314,8 +335,8 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
                         .unwrap_or(side_opts);
 
                     let [a, b] = corners[dir.index() as usize];
-                    let Some(neighbor_height) = opt_height
-                        .or_else(|| self.border_edge_heights.as_ref().map(|f| f(neighbor)))
+                    let Some(neighbor_height) =
+                        opt_height.or_else(|| self.border_heights.as_ref().map(|f| f(neighbor)))
                     else {
                         continue;
                     };
