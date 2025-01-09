@@ -387,6 +387,15 @@ This example showcases the hexagon 3D height map procedural generation customiza
 This example showcases the hexagon resolution system, allowing to tile coordinates
 in evenly sized chunks
 
+### Dynamic resolutions
+
+![chunks](docs/resolutions.png "Resolutions example")
+
+> `cargo run --example resolutions --feature bevy_reflect`
+
+This example showcases the hexagon resolution system, with multiple configurable
+chunk sizes and dynamic visualization
+
 ### Merged Chunks
 
 ![merged_chunks](docs/merged_columns.png "Merged Chunks example")

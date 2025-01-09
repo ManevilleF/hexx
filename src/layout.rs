@@ -173,8 +173,9 @@ impl HexLayout {
     }
 
     #[must_use]
-    /// Non offsetted hex corners
-    pub(crate) fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
+    /// Retrieves all 6 edge corner pair coordinates of the given hexagonal
+    /// coordinates `hex` without offsetting at the origin
+    pub fn center_aligned_hex_corners(&self) -> [Vec2; 6] {
         VertexDirection::ALL_DIRECTIONS.map(|dir| dir.world_unit_vector(self))
     }
 
