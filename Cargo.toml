@@ -131,6 +131,11 @@ name = "chunks"
 path = "examples/chunks.rs"
 
 [[example]]
+name = "resolutions"
+path = "examples/resolution_grid.rs"
+required-features = ["bevy_reflect"]
+
+[[example]]
 name = "merged_columns"
 path = "examples/merged_columns.rs"
 required-features = ["bevy_reflect"]

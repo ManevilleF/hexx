@@ -146,6 +146,17 @@ impl Deref for HexOrientation {
     }
 }
 
+impl std::ops::Not for HexOrientation {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            Self::Pointy => Self::Flat,
+            Self::Flat => Self::Pointy,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
