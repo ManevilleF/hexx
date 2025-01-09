@@ -49,7 +49,8 @@
   take a new `HexOrientation` parameter (#189)
 * Added `world_unit_vector` methods to `EdgeDirection` and `VertexDirection` (#190)
 * Orientation matrices are now `glam::Mat2` (#191)
-* Added a `resolutions_grid` example
+* Added a `resolutions_grid` example (#199)
+* `HexOrientation` implements `std::ops::Not` (#199)
 
 ## 0.19.1
 
