@@ -194,9 +194,9 @@
 //!
 //! ## Dense map storage
 //!
-//! [`Hex`] implements `Hash`, and most users store hexagonal maps in a `HashMap`.
-//! But for some cases `hexx` provides *dense* [storage collections](crate::storage)
-//! with more performant accessors:
+//! [`Hex`] implements `Hash`, and most users store hexagonal maps in a
+//! `HashMap`. But for some cases `hexx` provides *dense* [storage
+//! collections](crate::storage) with more performant accessors:
 //!
 //! - [`HexagonalMap<T>`](crate::storage::hexagonal::HexagonalMap)
 //! - [`RombusMap<T>`](crate::storage::rombus::RombusMap)
