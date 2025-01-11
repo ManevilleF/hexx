@@ -1,6 +1,11 @@
 use super::{face::Quad, FaceOptions, InsetOptions, MeshInfo};
-use crate::{storage::HexStore, EdgeDirection, HexLayout, PlaneMeshBuilder, UVOptions};
+use crate::{storage::HexStore, EdgeDirection, Hex, HexLayout, PlaneMeshBuilder, UVOptions};
 use glam::{Quat, Vec3};
+use std::{ops::RangeInclusive, sync::Arc};
+
+type MapFringeHeightFn = dyn Fn(Hex) -> f32;
+type CapOptionsFn = dyn Fn(Hex) -> Option<FaceOptions>;
+type SideOptionsFn = dyn Fn(Hex, Hex) -> Option<FaceOptions>;
 
 /// Builder struct to customize hex column heightmap mesh generation.
 ///
@@ -19,14 +24,31 @@ use glam::{Quat, Vec3};
 /// let layout = HexLayout::default();
 /// let mesh = HeightMapMeshBuilder::new(&layout, &map)
 ///     .with_offset(Vec3::new(1.2, 3.45, 6.7))
+///     .with_height_range(0.0..=5.0)
 ///     .without_top_face()
 ///     .build();
 /// ```
 ///
-/// To specify a default height, and enable side quads at the map edges
-/// (No niehgbor found in a direction) use [`Self::with_default_height`]
+/// # Filling holes
 ///
-/// # Note
+/// The builder will iterate through the entire `map`, and check for neighboring
+/// heights to construct the vertical side quads. Meaning that there will always
+/// be some missing neighbors:
+/// * Inside the map if it is *sparse*
+/// * On the "edge" of the map if it is *dense*
+///
+/// By default the builder will simply not generate the quads in those cases,
+/// leading to vertical holes (See the `heightmap_builder` example]).
+/// To fix this you have two options:
+/// * Either define a "default height" ([`Self::with_default_height`]) which the
+///   builder will consider to be the height of all those missing neighbors,
+///   usually `0.0` or the miminim of your `height_range`.
+/// * Provide the real height of those missing neighbors
+///   ([`Self::with_fringe_heights`]) which the builder will use. This is
+///   typically in the case of a large heightmap which is divided in smaller
+///   meshes and you wish for all those meshes to connect seamlessly
+///
+/// # Notes
 ///
 /// Transform operations (Scale, Rotate, Translate) through the methods
 ///
@@ -38,17 +60,14 @@ use glam::{Quat, Vec3};
 pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     /// The hexagonal layout, used to compute vertex positions
     pub layout: &'l HexLayout,
-    /// The column height on missing neighbor
-    pub base_height: Option<f32>,
+    /// Optional custom range. Otherwise computed from `map` values
+    pub height_range: Option<RangeInclusive<f32>>,
     /// Map between the coordinates and the associated height
     pub map: &'m HeightMap,
     /// Top hexagonal face options. If `None` no top faces will be generated
     pub top_face_options: Option<FaceOptions>,
     /// Side quad face options. If `None` no side quads will be generated
     pub side_options: Option<FaceOptions>,
-    /// Specifies a default height for side quads to be generated at the border
-    /// of the map or if holes are present in `map`.
-    pub default_height: Option<f32>,
     /// Optional custom offset for the mesh vertex positions
     pub offset: Option<Vec3>,
     /// Optional custom scale factor for the mesh vertex positions
@@ -60,6 +79,18 @@ pub struct HeightMapMeshBuilder<'l, 'm, HeightMap> {
     pub rotation: Option<Quat>,
     /// If set to `true`, the mesh will ignore [`HexLayout::origin`]
     pub center_aligned: bool,
+    /// Specifies the height for side quads to be generated at the fringe
+    /// of the `map` (Map edge and potential holes in sparse maps).
+    ///
+    /// This function will be called on direct neighbors of map coordinates
+    /// if that neighbor has no associated height in `map`
+    pub fringe_heights: Option<Arc<MapFringeHeightFn>>,
+    /// Optional function pointer to specify custom [`FaceOptions`] for some
+    /// top faces
+    pub custom_caps_options: Option<Arc<CapOptionsFn>>,
+    /// Optional function pointer to specify custom [`FaceOptions`] for some
+    /// side quads.
+    pub custom_sides_options: Option<Arc<SideOptionsFn>>,
 }
 
 impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
@@ -79,15 +110,38 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
         Self {
             layout,
             map,
-            base_height: None,
+            height_range: None,
             top_face_options: Some(FaceOptions::new()),
             side_options: Some(FaceOptions::new()),
-            default_height: None,
             offset: None,
             scale: None,
             rotation: None,
             center_aligned: false,
+            fringe_heights: None,
+            custom_caps_options: None,
+            custom_sides_options: None,
         }
+    }
+
+    /// Specify a custom height range for the map. This is to be used only
+    /// if you are generating only part of the global hashmap and don't want
+    /// to rely on the automatic min/max calculation based on `map` values.
+    ///
+    /// These values are used to remap UV coordinates of side quads.
+    ///
+    /// # Notes
+    /// * It is *heavily* recommended to specify a height range to avoid
+    ///   inconsistent UVs
+    /// * The range will *not* be checked, if out of range heights are found it
+    ///   will have unexpected behaviour on UV calculations
+    /// * The range should cover the full height map. If you intend for this
+    ///   mesh to be part of a larger heightmap (See
+    ///   [`Self::with_fringe_heights`]) then the range should include all
+    ///   possible heights in the full map
+    #[must_use]
+    pub const fn with_height_range(mut self, range: RangeInclusive<f32>) -> Self {
+        self.height_range = Some(range);
+        self
     }
 
     /// Specify a custom rotation for the whole mesh
@@ -123,9 +177,61 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
 
     #[must_use]
     #[inline]
-    /// Specify custom face options for the top cap triangles
+    /// Specify global face options for the top cap triangles
     pub const fn with_cap_options(mut self, options: FaceOptions) -> Self {
         self.top_face_options = Some(options);
+        self
+    }
+
+    #[must_use]
+    #[inline]
+    /// Specify global uv options for the top cap triangles
+    ///
+    /// Notes:
+    /// * This won't have any effect if [`Self::top_face_options`] is disabled
+    ///   by [`Self::without_top_face`]
+    /// * This method will override or be overidden by
+    ///   [`Self::with_cap_options`]
+    pub const fn with_cap_uv_options(mut self, uv_options: UVOptions) -> Self {
+        if let Some(opts) = &mut self.top_face_options {
+            opts.uv = uv_options;
+        }
+        self
+    }
+
+    /// Specify global insetting option for the top cap face
+    ///
+    /// Notes:
+    /// * This won't have any effect if [`Self::top_face_options`] is disabled
+    ///   by [`Self::without_top_face`]
+    /// * This method will override or be overidden by
+    ///   [`Self::with_cap_options`]
+    #[must_use]
+    #[inline]
+    pub const fn with_cap_inset_options(mut self, inset: InsetOptions) -> Self {
+        if let Some(opts) = &mut self.top_face_options {
+            opts.insetting = Some(inset);
+        }
+        self
+    }
+
+    /// Specify custom face options for the top cap faces to override the global
+    /// `top_face_options` parameters.
+    ///
+    /// For each coordinate in the heightmap the function will be called. If it
+    /// returns a `Some(opts)` then `opts` will be used for that face, otherwise
+    /// the global `top_face_options` will be used
+    ///
+    /// Notes:
+    /// * This won't have any effect if [`Self::top_face_options`] is disabled
+    ///   by [`Self::without_top_face`]
+    #[must_use]
+    #[inline]
+    pub fn with_custom_cap_options(
+        mut self,
+        func: impl Fn(Hex) -> Option<FaceOptions> + 'static,
+    ) -> Self {
+        self.custom_caps_options = Some(Arc::new(func));
         self
     }
 
@@ -139,44 +245,74 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
 
     #[must_use]
     #[inline]
-    /// Specify custom face options for the column sides
+    /// Specify global face options for the column sides
     pub const fn with_side_options(mut self, options: FaceOptions) -> Self {
         self.side_options = Some(options);
         self
     }
 
+    /// Specify custom sides options for the side faces to override the global
+    /// `side_options` parameters.
+    ///
+    /// For each neighboring coordinate pair in the heightmap the function will
+    /// be called. If it returns a `Some(opts)` then `opts` will be used for
+    /// that face, otherwise the global `side_option` will be used
+    ///
+    /// Notes:
+    /// * This won't have any effect if [`Self::side_options`] is disabled by
+    ///   [`Self::without_sides`]
+    /// * Each hexagonal pair will be called *twice* but applied only *once*,
+    ///   including coordinates at the fringe of the map (See
+    ///   [`Self::with_fringe_heights`])
     #[must_use]
     #[inline]
-    /// Specify custom uv options for the top cap triangles
-    ///
-    /// Note:
-    /// this won't have any effect if `top_face_options` is disabled
-    pub const fn with_cap_uv_options(mut self, uv_options: UVOptions) -> Self {
-        if let Some(opts) = &mut self.top_face_options {
-            opts.uv = uv_options;
-        }
+    pub fn with_custom_sides_options(
+        mut self,
+        func: impl Fn(Hex, Hex) -> Option<FaceOptions> + 'static,
+    ) -> Self {
+        self.custom_sides_options = Some(Arc::new(func));
         self
     }
 
-    /// Specify inset option for the top cap face
+    /// Specifies a custom height for *out of bounds* or *missing* columns in
+    /// order to generate side quads for columns on the edge of the map or
+    /// to fill holes in the heightmap
     ///
-    /// Note:
-    /// this won't have any effect if `top_face_options` is disabled
+    /// This is useful if you have multiple heightmaps which should connect to
+    /// each other seamlessly
+    ///
+    /// # Notes
+    ///
+    /// * It is *recommended* to also call [`Self::with_height_range`] in this
+    ///   case. As the returned fringe heights won't be used in UV remapping,
+    ///   leading to inconsistent results
+    /// * This method will override or be overidden by
+    ///   [`Self::with_default_height`]
     #[must_use]
     #[inline]
-    pub const fn with_cap_inset_options(mut self, inset: InsetOptions) -> Self {
-        if let Some(opts) = &mut self.top_face_options {
-            opts.insetting = Some(inset);
-        }
+    pub fn with_fringe_heights(mut self, func: impl Fn(Hex) -> f32 + 'static) -> Self {
+        self.fringe_heights = Some(Arc::new(func));
         self
     }
 
-    /// Specifies a default height for side quads to be generated at the border
-    /// of the map or if holes are present in the height map
+    /// Specifies a global "default" height for *out of bounds* or missing
+    /// columns in order to generate side quads for columns at the fringe of
+    /// the map or to fill holes in the heightmap
+    ///
+    /// This is useful if you have multiple heightmaps which should connect to
+    /// each other seamlessly
+    ///
+    /// # Notes
+    ///
+    /// * It is *recommended* to also call [`Self::with_height_range`] in this
+    ///   case. As this `default_height` won't be used in UV remapping, leading
+    ///   to inconsistent results
+    /// * This method will override or be overidden by
+    ///   [`Self::with_fringe_heights`]
     #[must_use]
     #[inline]
-    pub const fn with_default_height(mut self, default_height: f32) -> Self {
-        self.default_height = Some(default_height);
+    pub fn with_default_height(mut self, default_height: f32) -> Self {
+        self.fringe_heights = Some(Arc::new(move |_| default_height));
         self
     }
 
@@ -194,14 +330,23 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
         // We create the final mesh
         let mut mesh = MeshInfo::default();
 
-        let mut min = self.map.values().copied().reduce(f32::min).unwrap_or(0.0);
-        if let Some(default_height) = self.default_height {
-            min = min.min(default_height);
-        }
-        let max = self.map.values().copied().reduce(f32::max).unwrap_or(0.0);
+        let [min, max] = match self.height_range {
+            Some(r) => [*r.start(), *r.end()],
+            None => [
+                self.map.values().copied().reduce(f32::min).unwrap_or(0.0),
+                self.map.values().copied().reduce(f32::max).unwrap_or(0.0),
+            ],
+        };
 
         for (hex, &height) in self.map.iter() {
-            if let Some(opts) = &self.top_face_options {
+            if let Some(opts) = self.top_face_options {
+                // Maybe custom options
+                let opts = self
+                    .custom_caps_options
+                    .as_ref()
+                    .and_then(|f| f(hex))
+                    .unwrap_or(opts);
+
                 let mut plane = PlaneMeshBuilder::new(self.layout)
                     .at(hex)
                     .center_aligned()
@@ -212,25 +357,29 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
                 }
                 mesh.merge_with(plane.build());
             }
-            if let Some(side_opts) = &self.side_options {
+            if let Some(side_opts) = self.side_options {
                 let corners = self.layout.hex_edge_corners(hex);
-                let dir_heights = EdgeDirection::ALL_DIRECTIONS
-                    .map(|dir| (dir, self.map.get(hex + dir).copied().or(self.base_height)));
-                for (dir, opt_height) in dir_heights {
-                    let points = corners[dir.index() as usize];
-                    let Some(other_height) = opt_height else {
-                        if let Some(default_height) = self.default_height {
-                            let quad =
-                                Quad::new_bounded(points, default_height, height, [min, max]);
-                            mesh.merge_with(quad.apply_options(side_opts));
-                        }
+                for dir in EdgeDirection::ALL_DIRECTIONS {
+                    let neighbor = hex + dir;
+                    let opt_height = self.map.get(hex + dir).copied();
+                    // Maybe custom options
+                    let side_opts = self
+                        .custom_sides_options
+                        .as_ref()
+                        .and_then(|f| f(hex, neighbor))
+                        .unwrap_or(side_opts);
+
+                    let [a, b] = corners[dir.index() as usize];
+                    let Some(neighbor_height) =
+                        opt_height.or_else(|| self.fringe_heights.as_ref().map(|f| f(neighbor)))
+                    else {
                         continue;
                     };
-                    if other_height <= height {
+                    if neighbor_height >= height {
                         continue;
                     }
-                    let quad = Quad::new_bounded(points, other_height, height, [min, max]);
-                    mesh.merge_with(quad.apply_options(side_opts));
+                    let quad = Quad::new_bounded([a, b], neighbor_height, height, [min, max]);
+                    mesh.merge_with(quad.apply_options(&side_opts));
                 }
             }
         }

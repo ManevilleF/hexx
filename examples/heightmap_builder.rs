@@ -250,6 +250,7 @@ fn generate(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<A
     let mut new_mesh = HeightMapMeshBuilder::new(&info.layout, &map)
         .with_offset(Vec3::NEG_Y * params.max_height / 2.0 * params.scale.y)
         .with_scale(params.scale)
+        .with_height_range(0.0..=params.max_height)
         .without_top_face()
         .without_sides();
     if let Some(opts) = params.caps_options {

@@ -79,9 +79,10 @@ impl Quad {
         top_height: f32,
         [min_height, max_height]: [f32; 2],
     ) -> Self {
+        let delta = max_height - min_height;
         let mut quad = Self::new(sides, bottom_height, top_height);
-        let bottom_v = (bottom_height - min_height) / (max_height - min_height);
-        let top_v = (top_height - min_height) / (max_height - min_height);
+        let bottom_v = (bottom_height - min_height) / delta;
+        let top_v = (top_height - min_height) / delta;
         quad.uvs[0][1] = bottom_v;
         quad.uvs[1][1] = top_v;
         quad.uvs[2][1] = top_v;
