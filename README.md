@@ -23,8 +23,8 @@
  * Generate hexagon meshes (planes or columns)
 
  I made the choice to use *Axial Coordinates* for performance and utility
- reasons, but the [`Hex`] type has conversion utilities with *cubic*,
- *doubled*, *hexmod* and *offset* coordinates.
+ reasons, but the [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) type has conversion utilities with
+ *cubic*, *doubled*, *hexmod* and *offset* coordinates.
 
  > See the [hexagonal coordinate systems](https://www.redblobgames.com/grids/hexagons/#coordinates)
 
@@ -112,8 +112,8 @@
 
  ## Layout usage
 
- [`HexLayout`] is the bridge between your world/screen/pixel coordinate
- system and the hexagonal coordinates system.
+ [`HexLayout`](https://docs.rs/hexx/latest/hexx/layout/struct.HexLayout.html) is the bridge between your
+ world/screen/pixel coordinate system and the hexagonal coordinates system.
 
 ```rust
  use hexx::*;
@@ -134,9 +134,9 @@
 
  ## Wrapping
 
- [`HexBounds`] defines a bounding hexagon around a center coordinate.
- It can be used for boundary and interesection checks but also for wrapping
- coordinates.
+ [`HexBounds`](https://docs.rs/hexx/latest/hexx/bounds/struct.HexBounds.html) defines a bounding hexagon around a
+ center coordinate. It can be used for boundary and interesection checks but
+ also for wrapping coordinates.
  Coordinate wrapping transform a point outside of the bounds to a point
  inside. This allows for seamless or repeating [wraparound](https://www.redblobgames.com/grids/hexagons/#wraparound)
  maps.
@@ -155,7 +155,7 @@
 
  ## Resolutions and chunks
 
- [`Hex`] support multi-resolution coordinates.
+ [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) support multi-resolution coordinates.
  In practice this means that you may convert a coordinate to a different
  resolution:
 
@@ -207,8 +207,8 @@
 
  ## Dense map storage
 
- [`Hex`] implements `Hash`, and most users store hexagonal maps in a
- `HashMap`. But for some cases `hexx` provides *dense* [storagecollections](https://docs.rs/hexx/latest/hexx/storage/) with more performant accessors:
+ [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) implements `Hash`, and most users store hexagonal
+ maps in a `HashMap`. But for some cases `hexx` provides *dense* [storagecollections](https://docs.rs/hexx/latest/hexx/storage/) with more performant accessors:
 
  - [`HexagonalMap<T>`](https://docs.rs/hexx/latest/hexx/storage/hexagonal/struct.HexagonalMap.html)
  - [`RombusMap<T>`](https://docs.rs/hexx/latest/hexx/storage/rombus/struct.RombusMap.html)
@@ -216,12 +216,16 @@
  ## Procedural meshes
 
  `hexx` provides 3 built-in procedural mesh construction utilies:
- - [`PlaneMeshBuilder`] for hexagonal planes
- - [`ColumnMeshBuilder`] for hexagonal columns
- - [`HeightMapMeshBuilder`] for hexagonal height maps
+ - [`PlaneMeshBuilder`](https://docs.rs/hexx/latest/hexx/mesh/plane_builder/struct.PlaneMeshBuilder.html) for
+   hexagonal planes
+ - [`ColumnMeshBuilder`](https://docs.rs/hexx/latest/hexx/mesh/column_builder/struct.ColumnMeshBuilder.html)  for
+   hexagonal columns
+ - [`HeightMapMeshBuilder`](https://docs.rs/hexx/latest/hexx/mesh/heightmap_builder/struct.HeightMapMeshBuilder.html)
+   for hexagonal height maps
 
  All those builders have a lot of customization options and will output a
- [`MeshInfo`] struct containing vertex positions, normals and uvs
+ [`MeshInfo`](https://docs.rs/hexx/latest/hexx/mesh/struct.MeshInfo.html) struct containing vertex positions,
+ normals and uvs
 
  ### Usage in [Bevy](https://bevyengine.org/)
 
