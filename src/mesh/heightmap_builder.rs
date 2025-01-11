@@ -261,7 +261,9 @@ impl<'l, 'm, HeightMap: HexStore<f32>> HeightMapMeshBuilder<'l, 'm, HeightMap> {
     /// Notes:
     /// * This won't have any effect if [`Self::side_options`] is disabled by
     ///   [`Self::without_sides`]
-    /// * Each hexagonal pair will be called *twice* but applied only *once*.
+    /// * Each hexagonal pair will be called *twice* but applied only *once*,
+    ///   including coordinates at the fringe of the map (See
+    ///   [`Self::with_fringe_heights`])
     #[must_use]
     #[inline]
     pub fn with_custom_sides_options(
