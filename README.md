@@ -64,7 +64,7 @@
 
  ## Features
 
- `hexx` provides the [`Hex`] coordinates with:
+ `hexx` provides the [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) coordinates with:
 
  * Distances
  * Neighbors and directions
@@ -208,7 +208,8 @@
  ## Dense map storage
 
  [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) implements `Hash`, and most users store hexagonal
- maps in a `HashMap`. But for some cases `hexx` provides *dense* [storagecollections](https://docs.rs/hexx/latest/hexx/storage/) with more performant accessors:
+ maps in a `HashMap`. But for some cases `hexx` provides *dense storage*
+  [collections](https://docs.rs/hexx/latest/hexx/storage/) with more performant accessors:
 
  - [`HexagonalMap<T>`](https://docs.rs/hexx/latest/hexx/storage/hexagonal/struct.HexagonalMap.html)
  - [`RombusMap<T>`](https://docs.rs/hexx/latest/hexx/storage/rombus/struct.RombusMap.html)

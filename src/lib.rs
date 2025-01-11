@@ -51,7 +51,7 @@
 //!
 //! ## Features
 //!
-//! `hexx` provides the [`Hex`] coordinates with:
+//! `hexx` provides the [`Hex`](crate::hex::Hex) coordinates with:
 //!
 //! * Distances
 //! * Neighbors and directions
@@ -195,8 +195,8 @@
 //! ## Dense map storage
 //!
 //! [`Hex`](crate::hex::Hex) implements `Hash`, and most users store hexagonal
-//! maps in a `HashMap`. But for some cases `hexx` provides *dense* [storage
-//! collections](crate::storage) with more performant accessors:
+//! maps in a `HashMap`. But for some cases `hexx` provides *dense storage*
+//!  [collections](crate::storage) with more performant accessors:
 //!
 //! - [`HexagonalMap<T>`](crate::storage::hexagonal::HexagonalMap)
 //! - [`RombusMap<T>`](crate::storage::rombus::RombusMap)
