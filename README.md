@@ -7,7 +7,7 @@
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
 [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.19.1/status.svg)](https://deps.rs/crate/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.20.0/status.svg)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
@@ -33,7 +33,7 @@
  Run `cargo add hexx` in your project or add the following line to your
  `Cargo.toml`:
 
- * `hexx = "0.19"`
+ * `hexx = "0.20"`
 
  ### Cargo features
 
@@ -41,26 +41,26 @@
  through the `serde` feature gate. To enable it add the following line to
  your `Cargo.toml`:
 
- * `hexx = { version = "0.19", features = ["serde"] }`
+ * `hexx = { version = "0.20", features = ["serde"] }`
 
  By default `Hex` uses rust classic memory layout, if you want to use `hexx`
  through the FFI or have `Hex` be stored without any memory padding, the
  `packed` feature will make `Hex` `repr(C)`. To enable this behaviour add the
  following line to your `Cargo.toml`:
 
- * `hexx = { version = "0.19", features = ["packed"] }`
+ * `hexx = { version = "0.20", features = ["packed"] }`
 
  `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
  through the `bevy_reflect` feature. To enable it add the following line to
  your `Cargo.toml`:
 
- * `hexx = { version = "0.19", features = ["bevy_reflect"] }`
+ * `hexx = { version = "0.20", features = ["bevy_reflect"] }`
 
  `hexx` supports Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
  using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge. To
  enable it add the following line to your `Cargo.toml`:
 
- * `hexx = { version = "0.19", features = ["grid"] }`
+ * `hexx = { version = "0.20", features = ["grid"] }`
 
  ## Features
 
@@ -205,10 +205,29 @@
  An other usage could be to draw an infinite hex grid, with different
  resolutions displayed, dynamically changing according to user zoom level.
 
- ## Usage in [Bevy](https://bevyengine.org/)
+ ## Dense map storage
 
- If you want to generate 3D hexagonal mesh and use it in
- [bevy](bevyengine.org) you may do it this way:
+ [`Hex`] implements `Hash`, and most users store hexagonal maps in a `HashMap`.
+ But for some cases `hexx` provides *dense* [storage collections](https://docs.rs/hexx/latest/hexx/storage/)
+ with more performant accessors:
+
+ - [`HexagonalMap<T>`](https://docs.rs/hexx/latest/hexx/storage/hexagonal/struct.HexagonalMap.html)
+ - [`RombusMap<T>`](https://docs.rs/hexx/latest/hexx/storage/rombus/struct.RombusMap.html)
+
+ ## Procedural meshes
+
+ `hexx` provides 3 built-in procedural mesh construction utilies:
+ - [`PlaneMeshBuilder`] for hexagonal planes
+ - [`ColumnMeshBuilder`] for hexagonal columns
+ - [`HeightMapMeshBuilder`] for hexagonal height maps
+
+ All those builders have a lot of customization options and will output a
+ [`MeshInfo`] struct containing vertex positions, normals and uvs
+
+ ### Usage in [Bevy](https://bevyengine.org/)
+
+ If you want to integrate the procedural meshes in [bevy](bevyengine.org) you
+ may do it this way:
 
 ```rust
  use bevy::{
@@ -232,9 +251,6 @@
      .with_inserted_indices(Indices::U16(mesh_info.indices))
  }
  ```
-
- The [`MeshInfo`] can be produced from [`PlaneMeshBuilder`],
- [`ColumnMeshBuilder`] or [`HeightMapMeshBuilder`]
 
 <!-- cargo-sync-readme end -->
 
