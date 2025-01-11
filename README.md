@@ -222,7 +222,8 @@
  pub fn hexagonal_mesh(mesh_info: MeshInfo) -> Mesh {
      Mesh::new(
          PrimitiveTopology::TriangleList,
-         // Means you won't edit the mesh afterwards, check bevy docs for more information
+         // Means you won't interact with the mesh on the CPU afterwards
+         // Check bevy docs for more information
          RenderAssetUsages::RENDER_WORLD,
      )
      .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, mesh_info.vertices)
