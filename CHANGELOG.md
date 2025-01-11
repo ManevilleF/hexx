@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.20.0
+
 ### HexLayout
 
 * (**BREAKING**) `HexLayout` Y axis is no longer inverted by default (#187)

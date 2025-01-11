@@ -6,8 +6,8 @@
 //! * [`RombusMap`] is up to ~100x faster than a hash map
 //!
 //! [this article]: https://www.redblobgames.com/grids/hexagons/#map-storage
-mod hexagonal;
-mod rombus;
+pub(crate) mod hexagonal;
+pub(crate) mod rombus;
 
 pub use hexagonal::HexagonalMap;
 pub use rombus::RombusMap;

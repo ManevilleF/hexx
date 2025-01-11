@@ -1,8 +1,8 @@
-mod column_builder;
+pub(crate) mod column_builder;
 /// Utility module for mesh construction
 pub mod face;
-mod heightmap_builder;
-mod plane_builder;
+pub(crate) mod heightmap_builder;
+pub(crate) mod plane_builder;
 #[cfg(test)]
 mod tests;
 mod uv_mapping;
