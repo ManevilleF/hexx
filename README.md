@@ -2,7 +2,7 @@
   <img src="docs/hexx.png?" alt="Hexx">
 </p>
 
-[![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg?style=flat-square)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
+[![CI](https://img.shields.io/github/check-runs/ManevilleF/hexx/main?style=flat-square&label=CI)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](./LICENSE)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success?style=flat-square)](https://github.com/rust-secure-code/safety-dance/)
 [![Crates.io](https://img.shields.io/crates/v/hexx?style=flat-square)](https://crates.io/crates/hexx)
