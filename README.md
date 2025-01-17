@@ -2,13 +2,13 @@
   <img src="docs/hexx.png?" alt="Hexx">
 </p>
 
-[![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
-[![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
-[![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
-[![Downloads](https://img.shields.io/crates/dr/hexx?label=downloads)](https://crates.io/crates/hexx)
-[![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.20.0/status.svg)](https://deps.rs/crate/hexx)
+[![workflow](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml/badge.svg?style=flat-square)](https://github.com/ManevilleF/hexx/actions/workflows/rust.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](./LICENSE)
+[![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success?style=flat-square)](https://github.com/rust-secure-code/safety-dance/)
+[![Crates.io](https://img.shields.io/crates/v/hexx?style=flat-square)](https://crates.io/crates/hexx)
+[![Downloads](https://img.shields.io/crates/d/hexx?style=flat-square)](https://crates.io/crates/hexx)
+[![Docs.rs](https://img.shields.io/docsrs/hexx?style=flat-square)](https://docs.rs/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.20.0/status.svg?style=flat-square)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
