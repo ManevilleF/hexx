@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 [![Crates.io](https://img.shields.io/crates/v/hexx.svg)](https://crates.io/crates/hexx)
+[![Downloads](https://img.shields.io/crates/dr/hexx?label=downloads)](https://crates.io/crates/hexx)
 [![Docs.rs](https://docs.rs/hexx/badge.svg)](https://docs.rs/hexx)
 [![dependency status](https://deps.rs/crate/hexx/0.20.0/status.svg)](https://deps.rs/crate/hexx)
 
@@ -37,30 +38,23 @@
 
  ### Cargo features
 
- `hexx` supports serialization and deserialization of most types using [serde](https://github.com/serde-rs/serde),
- through the `serde` feature gate. To enable it add the following line to
- your `Cargo.toml`:
+ `hexx` provides the following cargo features:
+ * `serde`: Enables [serde](https://github.com/serde-rs/serde) support for
+   most types
+ * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it accross
+   the FII
+ * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
+   for most types. Useful for integration with [Bevy](https://bevyengine.org/)
+ * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
+    using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
+ * `algorithms`: Enables the [algorithms](https://docs.rs/hexx/latest/hexx/algorithms/) module with:
+   * Field of Movement
+   * A Star Pathfinding
+   * Field of view
+ * `mesh`: Enables procedural mesh generation
 
- * `hexx = { version = "0.20", features = ["serde"] }`
-
- By default `Hex` uses rust classic memory layout, if you want to use `hexx`
- through the FFI or have `Hex` be stored without any memory padding, the
- `packed` feature will make `Hex` `repr(C)`. To enable this behaviour add the
- following line to your `Cargo.toml`:
-
- * `hexx = { version = "0.20", features = ["packed"] }`
-
- `hexx` supports [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
- through the `bevy_reflect` feature. To enable it add the following line to
- your `Cargo.toml`:
-
- * `hexx = { version = "0.20", features = ["bevy_reflect"] }`
-
- `hexx` supports Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
- using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge. To
- enable it add the following line to your `Cargo.toml`:
-
- * `hexx = { version = "0.20", features = ["grid"] }`
+ _Some features are enabled by default, it is recommended to enable only
+ what is needed for your usage_
 
  ## Features
 
@@ -215,6 +209,8 @@
  - [`RombusMap<T>`](https://docs.rs/hexx/latest/hexx/storage/rombus/struct.RombusMap.html)
 
  ## Procedural meshes
+
+ > Requires the `mesh` feature
 
  `hexx` provides 3 built-in procedural mesh construction utilies:
  - [`PlaneMeshBuilder`](https://docs.rs/hexx/latest/hexx/mesh/plane_builder/struct.PlaneMeshBuilder.html) for
