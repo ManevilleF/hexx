@@ -41,12 +41,12 @@
  `hexx` provides the following cargo features:
  * `serde`: Enables [serde](https://github.com/serde-rs/serde) support for
    most types
- * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it accross
-   the FII
+ * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it
+   accross the FII
  * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
    for most types. Useful for integration with [Bevy](https://bevyengine.org/)
  * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
-    using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
+   using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
  * `algorithms`: Enables the [algorithms](https://docs.rs/hexx/latest/hexx/algorithms/) module with:
    * Field of Movement
    * A Star Pathfinding
