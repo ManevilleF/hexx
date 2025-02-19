@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Bumped dev-dependencies
+
 ## 0.20.0
 
 ### HexLayout
