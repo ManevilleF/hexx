@@ -70,9 +70,9 @@ version = "0.5"
 features = ["html_reports"]
 
 [dev-dependencies]
-rand = "0.8"
-bevy-inspector-egui = "0.28"
-bevy_egui = "0.31"
+rand = "0.9"
+bevy-inspector-egui = "0.29"
+bevy_egui = "0.32"
 approx = "0.5"
 
 [lints.rust]
