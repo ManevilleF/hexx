@@ -50,7 +50,7 @@ fn setup_grid(
         let color_index = (hex_mod.x - hex_mod.y).rem_euclid(3);
         commands.spawn((
             Mesh2d(mesh_handle.clone()),
-            MeshMaterial2d(materials[color_index as usize].clone_weak()),
+            MeshMaterial2d(materials[color_index as usize].clone()),
             Transform::from_xyz(pos.x, pos.y, 0.0),
         ));
     }
