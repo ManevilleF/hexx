@@ -1,4 +1,5 @@
-use bevy::{prelude::*, utils::HashMap, window::PrimaryWindow};
+use bevy::{prelude::*, window::PrimaryWindow};
+use bevy_platform_support::collections::hash_map::HashMap;
 use glam::uvec2;
 use hexx::{shapes, *};
 
@@ -72,25 +73,26 @@ fn handle_input(
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<HexGrid>,
     mut tiles: Query<&mut Sprite>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else {
-            return;
+            return Ok(());
         };
         if !buttons.just_pressed(MouseButton::Left) {
-            return;
+            return Ok(());
         }
         let Ok(mut sprite) = tiles.get_mut(entity) else {
-            return;
+            return Ok(());
         };
         if let Some(atlas) = sprite.texture_atlas.as_mut() {
             atlas.index = (atlas.index + 1) % (7 * 6);
         }
     }
+    Ok(())
 }

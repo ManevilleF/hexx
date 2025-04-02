@@ -2,9 +2,9 @@ use bevy::{
     color::palettes::css::{GOLD, ORANGE, RED, WHITE},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    utils::HashSet,
     window::PrimaryWindow,
 };
+use bevy_platform_support::collections::hash_set::HashSet;
 use glam::vec2;
 use hexx::*;
 use std::collections::HashMap;
@@ -118,14 +118,14 @@ fn handle_input(
     mut area: ResMut<HexArea>,
     mouse: Res<ButtonInput<MouseButton>>,
     mut cursors: Query<&mut Transform>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     else {
-        return;
+        return Ok(());
     };
     let mut to_add = Vec::new();
     let mut to_remove = Vec::new();
@@ -177,6 +177,7 @@ fn handle_input(
             .entity(*entity)
             .insert(MeshMaterial2d(map.default_material.clone_weak()));
     }
+    Ok(())
 }
 
 fn gizmos(mut gizmos: Gizmos, area: Res<HexArea>, map: Res<Map>) {

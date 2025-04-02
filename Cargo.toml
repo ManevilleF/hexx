@@ -39,19 +39,21 @@ features = ["derive"]
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.15"
+version = "0.16.0-rc"
 default-features = false
 features = ["glam"]
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.15"
+version = "0.16.0-rc"
 features = [
     "bevy_asset",
     "bevy_core_pipeline",
     "bevy_gizmos",
+    "bevy_log",
     "bevy_pbr",
+    "bevy_picking",
     "bevy_render",
     "bevy_sprite",
     "bevy_text",
@@ -70,9 +72,10 @@ version = "0.5"
 features = ["html_reports"]
 
 [dev-dependencies]
+bevy_platform_support = "0.16.0-rc"
 rand = "0.9"
-bevy-inspector-egui = "0.29"
-bevy_egui = "0.32"
+bevy-inspector-egui = { git = "https://github.com/slyedoc/bevy-inspector-egui", branch = "bevy_0.16" }
+bevy_egui = { git = "https://github.com/slyedoc/bevy_egui", branch = "bevy_0.16" }
 approx = "0.5"
 
 [lints.rust]

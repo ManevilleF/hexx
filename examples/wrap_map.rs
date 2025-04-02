@@ -3,9 +3,9 @@ use std::ops::Deref;
 use bevy::{
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    utils::HashMap,
     window::PrimaryWindow,
 };
+use bevy_platform_support::collections::hash_map::HashMap;
 use hexx::*;
 
 /// World size of the hexagons (outer radius)
@@ -83,16 +83,16 @@ fn handle_input(
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<HexGrid>,
     mut current_hex: Local<Hex>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         if hex_pos == *current_hex {
-            return;
+            return Ok(());
         }
         let wrapped = grid.bounds.wrap(hex_pos);
         commands
@@ -103,6 +103,7 @@ fn handle_input(
             .insert(MeshMaterial2d(grid.selected_mat.clone()));
         *current_hex = wrapped;
     }
+    Ok(())
 }
 
 /// Compute a bevy mesh from the layout

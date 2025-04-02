@@ -1,9 +1,9 @@
 use bevy::{
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    utils::HashMap,
     window::PrimaryWindow,
 };
+use bevy_platform_support::collections::hash_map::HashMap;
 use hexx::*;
 
 /// World size of the hexagons (outer radius)
@@ -78,9 +78,9 @@ fn handle_input(
     windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<HexGrid>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
@@ -94,6 +94,7 @@ fn handle_input(
                 .insert(Transform::from_xyz(pos.x, pos.y, 0.0));
         }
     }
+    Ok(())
 }
 
 /// Compute a bevy mesh from the layout

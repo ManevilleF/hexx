@@ -102,7 +102,7 @@ pub fn setup(mut commands: Commands, mut mats: ResMut<Assets<ColorMaterial>>) {
 fn show_ui(world: &mut World) {
     let mut regenerate = false;
 
-    let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+    let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
         return;
     };
     let mut egui_context = egui_context.clone();
@@ -160,7 +160,7 @@ fn generate(
     shape: Res<Shape>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    commands.entity(map.entity).despawn_descendants();
+    commands.entity(map.entity).despawn_related::<Children>();
     let mesh = meshes.add(hexagonal_plane(&map.layout));
     for coord in shape.coords() {
         let pos = map.layout.hex_to_world_pos(coord);
@@ -169,9 +169,8 @@ fn generate(
                 Mesh2d(mesh.clone()),
                 MeshMaterial2d(map.mat.clone_weak()),
                 Transform::from_xyz(pos.x, pos.y, 0.0),
-            ))
-            .with_children(|b| {
-                b.spawn((
+                ChildOf { parent: map.entity },
+                children![(
                     Text2d(format!("{},{}", coord.x, coord.y)),
                     TextColor(Color::BLACK),
                     TextFont {
@@ -179,9 +178,8 @@ fn generate(
                         ..default()
                     },
                     Transform::from_xyz(0.0, 0.0, 10.0),
-                ));
-            })
-            .set_parent(map.entity);
+                )],
+            ));
     }
 }
 

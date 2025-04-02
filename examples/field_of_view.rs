@@ -2,9 +2,9 @@ use bevy::{
     color::palettes::css::{AQUA, BLACK, WHITE},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    utils::{HashMap, HashSet},
     window::PrimaryWindow,
 };
+use bevy_platform_support::collections::{hash_map::HashMap, hash_set::HashSet};
 use hexx::{algorithms::range_fov, *};
 
 /// World size of the hexagons (outer radius)
@@ -55,7 +55,7 @@ fn setup_grid(
     let default_mat = materials.add(Color::Srgba(WHITE));
     let blocked_mat = materials.add(Color::Srgba(BLACK));
     let visible_mat = materials.add(Color::Srgba(AQUA));
-    let mut blocked_coords = HashSet::new();
+    let mut blocked_coords = HashSet::default();
     let entities = Hex::ZERO
         .spiral_range(0..=MAP_RADIUS)
         .enumerate()
@@ -96,16 +96,16 @@ fn handle_input(
     cameras: Query<(&Camera, &GlobalTransform)>,
     mut current: Local<Hex>,
     mut grid: ResMut<HexGrid>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else {
-            return;
+            return Ok(());
         };
         if buttons.just_pressed(MouseButton::Left) {
             if grid.blocked_coords.contains(&hex_pos) {
@@ -120,10 +120,10 @@ fn handle_input(
                     .entity(entity)
                     .insert(MeshMaterial2d(grid.blocked_mat.clone_weak()));
             }
-            return;
+            return Ok(());
         }
         if hex_pos == *current {
-            return;
+            return Ok(());
         }
         *current = hex_pos;
         for entity in &grid.visible_entities {
@@ -145,6 +145,7 @@ fn handle_input(
         }
         grid.visible_entities = entities;
     }
+    Ok(())
 }
 
 /// Compute a bevy mesh from the layout
