@@ -164,22 +164,21 @@ fn generate(
     let mesh = meshes.add(hexagonal_plane(&map.layout));
     for coord in shape.coords() {
         let pos = map.layout.hex_to_world_pos(coord);
-        commands
-            .spawn((
-                Mesh2d(mesh.clone()),
-                MeshMaterial2d(map.mat.clone_weak()),
-                Transform::from_xyz(pos.x, pos.y, 0.0),
-                ChildOf { parent: map.entity },
-                children![(
-                    Text2d(format!("{},{}", coord.x, coord.y)),
-                    TextColor(Color::BLACK),
-                    TextFont {
-                        font_size: 7.0,
-                        ..default()
-                    },
-                    Transform::from_xyz(0.0, 0.0, 10.0),
-                )],
-            ));
+        commands.spawn((
+            Mesh2d(mesh.clone()),
+            MeshMaterial2d(map.mat.clone_weak()),
+            Transform::from_xyz(pos.x, pos.y, 0.0),
+            ChildOf { parent: map.entity },
+            children![(
+                Text2d(format!("{},{}", coord.x, coord.y)),
+                TextColor(Color::BLACK),
+                TextFont {
+                    font_size: 7.0,
+                    ..default()
+                },
+                Transform::from_xyz(0.0, 0.0, 10.0),
+            )],
+        ));
     }
 }
 
