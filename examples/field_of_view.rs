@@ -1,6 +1,6 @@
-use bevy::platform_support::collections::{hash_map::HashMap, hash_set::HashSet};
 use bevy::{
     color::palettes::css::{AQUA, BLACK, WHITE},
+    platform_support::collections::{hash_map::HashMap, hash_set::HashSet},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
