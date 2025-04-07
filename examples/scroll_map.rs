@@ -1,9 +1,9 @@
+use bevy::platform_support::collections::hash_map::HashMap;
 use bevy::{
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
 };
-use bevy::platform_support::collections::hash_map::HashMap;
 use hexx::*;
 
 /// World size of the hexagons (outer radius)

@@ -1,10 +1,10 @@
+use bevy::platform_support::collections::hash_set::HashSet;
 use bevy::{
     color::palettes::css::{GRAY, LIME, WHITE, YELLOW},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
 };
-use bevy::platform_support::collections::hash_set::HashSet;
 use hexx::{
     algorithms::field_of_movement,
     storage::{HexStore, HexagonalMap},
