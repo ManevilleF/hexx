@@ -4,7 +4,7 @@ use bevy::{
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
 };
-use bevy_platform_support::collections::{hash_map::HashMap, hash_set::HashSet};
+use bevy::platform_support::collections::{hash_map::HashMap, hash_set::HashSet};
 use hexx::{algorithms::a_star, *};
 
 /// World size of the hexagons (outer radius)

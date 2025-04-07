@@ -72,7 +72,6 @@ version = "0.5"
 features = ["html_reports"]
 
 [dev-dependencies]
-bevy_platform_support = "0.16.0-rc"
 rand = "0.9"
 bevy-inspector-egui = { git = "https://github.com/slyedoc/bevy-inspector-egui", branch = "bevy_0.16" }
 bevy_egui = { git = "https://github.com/slyedoc/bevy_egui", branch = "bevy_0.16" }
