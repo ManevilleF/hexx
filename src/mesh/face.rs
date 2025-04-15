@@ -31,7 +31,7 @@ pub type Hexagon = Face<6, 4>;
 impl Tri {
     /// Flips the vertex indices order, effectively making the triangle face
     /// the other way
-    pub fn flip(&mut self) {
+    pub const fn flip(&mut self) {
         let [a, b, c] = self.0;
         self.0 = [c, b, a];
     }
