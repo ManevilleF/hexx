@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 * Bumped dev-dependencies
+* Appease clippy for rust 1.86 (#214)
+* Fixed `HexBounds::from_iter` computation (#213, #214)
 
 ## 0.20.0
 
