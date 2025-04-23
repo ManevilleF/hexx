@@ -52,6 +52,18 @@ fn hex_length() {
     assert_eq!(Hex::new(i32::MIN + 1, 0).ulength(), u32::MAX / 2);
 }
 
+#[inline]
+const fn old_hex_length(hex: Hex) -> i32 {
+    (hex.x.abs() + hex.y.abs() + hex.z().abs()) / 2
+}
+
+#[test]
+fn old_vs_new_length() {
+    for hex in Hex::ZERO.range(30) {
+        assert_eq!(hex.length(), old_hex_length(hex));
+    }
+}
+
 #[test]
 #[allow(clippy::cast_possible_truncation)]
 #[allow(clippy::cast_possible_wrap)]

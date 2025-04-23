@@ -62,7 +62,7 @@ impl HexBounds {
     #[must_use]
     pub fn from_min_max(min: Hex, max: Hex) -> Self {
         let center = (min + max) / 2;
-        let radius = center.unsigned_distance_to(max) / 2;
+        let radius = center.unsigned_distance_to(max);
         Self { center, radius }
     }
 
@@ -143,16 +143,23 @@ impl HexBounds {
 
 impl FromIterator<Hex> for HexBounds {
     fn from_iter<T: IntoIterator<Item = Hex>>(iter: T) -> Self {
+        let coords: Vec<_> = iter.into_iter().collect();
         let mut min = Hex::new(i32::MAX, i32::MAX);
         let mut max = Hex::new(i32::MIN, i32::MIN);
+        let mut radius = 0;
 
-        for hex in iter {
+        for hex in &coords {
             min.x = min.x.min(hex.x);
             max.x = max.x.max(hex.x);
             min.y = min.y.min(hex.y);
             max.y = max.y.max(hex.y);
         }
-        Self::from_min_max(min, max)
+        let center = (min + max) / 2;
+        for hex in coords {
+            radius = radius.max(hex.unsigned_distance_to(center));
+        }
+
+        Self::new(center, radius)
     }
 }
 
@@ -164,6 +171,26 @@ mod tests {
     fn in_bounds_work() {
         let bounds = HexBounds::new(Hex::new(-4, 23), 34);
         for h in bounds.all_coords() {
+            assert!(bounds.is_in_bounds(h));
+        }
+    }
+
+    #[test]
+    fn range_works() {
+        let coords: Vec<_> = Hex::ZERO.range(10).collect();
+        let bounds = HexBounds::from_iter(coords.clone());
+        assert_eq!(bounds.center, Hex::ZERO);
+        assert_eq!(bounds.radius, 10);
+        for h in coords {
+            assert!(bounds.is_in_bounds(h));
+        }
+    }
+
+    #[test]
+    fn rombus_works() {
+        let coords: Vec<_> = crate::shapes::rombus(Hex::ZERO, 10, 10).collect();
+        let bounds = HexBounds::from_iter(coords.clone());
+        for h in coords {
             assert!(bounds.is_in_bounds(h));
         }
     }

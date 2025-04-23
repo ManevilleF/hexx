@@ -100,10 +100,10 @@ fn setup_grid(
     let desert_mat = materials.add(Color::Srgba(YELLOW));
     let wall_mat = materials.add(Color::Srgba(GRAY));
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let entities = HexagonalMap::new(Hex::ZERO, MAP_RADIUS, |coord| {
-        let cost = rng.gen_range(0..=3);
+        let cost = rng.random_range(0..=3);
         let pos = layout.hex_to_world_pos(coord);
         let material = match cost {
             0 => plains_mat.clone(),
