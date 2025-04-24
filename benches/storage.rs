@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use hexx::{
     shapes::rombus,
-    storage::{HexStore, HexagonalMap, RombusMap},
+    storage::{HexStore, HexagonalMap, HexModMap, RombusMap},
     *,
 };
 use std::{collections::HashMap, time::Duration};
@@ -21,6 +21,8 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
             .map(|hex| (hex, get_value(hex)))
             .collect();
         let hex_map = HexagonalMap::new(Hex::ZERO, dist, get_value);
+        let hex_mod_map = HexModMap::new(Hex::ZERO, dist, get_value);
+        
         group.bench_with_input(BenchmarkId::new("HashMap_get", dist), &dist, |b, dist| {
             b.iter(|| {
                 for c in black_box(Hex::ZERO).range(*dist) {
@@ -39,6 +41,17 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
                 })
             },
         );
+        group.bench_with_input(
+            BenchmarkId::new("HexModMap_get", dist),
+            &dist,
+            |b, dist| {
+                b.iter(|| {
+                    for c in black_box(Hex::ZERO).range(*dist) {
+                        hex_mod_map.get(c).unwrap();
+                    }
+                })
+            },
+        );
         group.bench_with_input(BenchmarkId::new("HashMap_iter", dist), &dist, |b, _| {
             b.iter(|| hash_map.iter().collect::<Vec<_>>())
         });
@@ -46,6 +59,11 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
             BenchmarkId::new("HexagonalMap_iter", dist),
             &dist,
             |b, _| b.iter(|| hex_map.iter().collect::<Vec<_>>()),
+        );
+        group.bench_with_input(
+            BenchmarkId::new("HexModMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| hex_mod_map.iter().collect::<Vec<_>>()),
         );
     }
     group.finish();
