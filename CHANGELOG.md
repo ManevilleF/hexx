@@ -5,6 +5,7 @@
 * Bumped dev-dependencies
 * Bumped `bevy` dev-dependency to 0.16
 * Updated examples to use `bevy` 0.16
+* Added `bevy_platform` feature to enable `bevy_platform` dependencies
 
 ## 0.20.0
 
