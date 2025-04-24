@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use bevy::{
-    platform::collections::hash_map::HashMap,
+    platform::collections::HashMap,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
