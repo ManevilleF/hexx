@@ -1,6 +1,6 @@
 use bevy::{
     color::palettes::css::{GRAY, LIME, WHITE, YELLOW},
-    platform::collections::hash_set::HashSet,
+    platform::collections::HashSet,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,

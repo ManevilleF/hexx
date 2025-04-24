@@ -53,7 +53,10 @@ storage_impl!(RombusMap<T>);
 /// - [`HexagonalMap<T>`](HexagonalMap)
 /// - [`RombusMap<T>`](RombusMap)
 /// - [`HashMap<Hex, T>`](std::collections::HashMap)
-/// - [`HashMap<Hex, T>`](bevy_platform::collections::HashMap) with the `bevy_platform` feature enabled
+#[cfg_attr(
+    feature = "bevy_platform",
+    doc = "- [`HashMap<Hex, T>`](bevy_platform::collections::HashMap)"
+)]
 pub trait HexStore<T> {
     /// Returns a reference the stored value associated with `idx`.
     /// Returns `None` if `idx` is out of bounds
@@ -130,7 +133,9 @@ impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<cra
 }
 
 #[cfg(feature = "bevy_platform")]
-impl<T, S: std::hash::BuildHasher> HexStore<T> for bevy_platform::collections::HashMap<crate::Hex, T, S> {
+impl<T, S: std::hash::BuildHasher> HexStore<T>
+    for bevy_platform::collections::HashMap<crate::Hex, T, S>
+{
     fn get(&self, hex: crate::Hex) -> Option<&T> {
         self.get(&hex)
     }
