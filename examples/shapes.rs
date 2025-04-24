@@ -168,7 +168,7 @@ fn generate(
             Mesh2d(mesh.clone()),
             MeshMaterial2d(map.mat.clone_weak()),
             Transform::from_xyz(pos.x, pos.y, 0.0),
-            ChildOf { parent: map.entity },
+            ChildOf(map.entity),
             children![(
                 Text2d(format!("{},{}", coord.x, coord.y)),
                 TextColor(Color::BLACK),
