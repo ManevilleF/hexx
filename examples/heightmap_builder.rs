@@ -12,7 +12,7 @@ use bevy_egui::{
 };
 use bevy_inspector_egui::bevy_inspector;
 use hexx::*;
-use rand::{thread_rng, Rng};
+use rand::{rng, Rng};
 use storage::HexagonalMap;
 
 #[derive(Debug, Resource)]
@@ -88,7 +88,7 @@ fn face_opts(ui: &mut Ui, options: &mut Option<FaceOptions>, world: &mut World) 
 fn show_ui(world: &mut World) {
     let mut regenerate = false;
     world.resource_scope(|world, mut params: Mut<BuilderParams>| {
-        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
             return;
         };
         let mut egui_context = egui_context.clone();
@@ -127,7 +127,7 @@ fn show_ui(world: &mut World) {
         });
     });
     world.resource_scope(|world, mut materials: Mut<Assets<StandardMaterial>>| {
-        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
             return;
         };
         let mut egui_context = egui_context.clone();
@@ -243,7 +243,7 @@ fn gizmos(
 }
 
 fn generate(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let map = HexagonalMap::new(Hex::ZERO, params.range, |_| {
         rng.gen_range(0.0..=params.max_height)
     });

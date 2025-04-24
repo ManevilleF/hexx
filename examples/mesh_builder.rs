@@ -66,7 +66,7 @@ pub fn main() {
 
 fn show_ui(world: &mut World) {
     world.resource_scope(|world, mut params: Mut<BuilderParams>| {
-        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
             return;
         };
         let mut egui_context = egui_context.clone();
@@ -188,7 +188,7 @@ fn show_ui(world: &mut World) {
         });
     });
     world.resource_scope(|world, mut materials: Mut<Assets<StandardMaterial>>| {
-        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
             return;
         };
         let mut egui_context = egui_context.clone();
