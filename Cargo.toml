@@ -28,6 +28,8 @@ packed = []
 serde = ["dep:serde", "glam/serde"]
 # Adds Bevy Reflection support
 bevy_reflect = ["dep:bevy_reflect"]
+# Adds Bevy Platform support
+bevy_platform = ["dep:bevy_platform"]
 
 [dependencies]
 glam = "0.29"
@@ -42,6 +44,10 @@ optional = true
 version = "0.16.0-rc"
 default-features = false
 features = ["glam"]
+optional = true
+
+[dependencies.bevy_platform]
+version = "0.16.0-rc"
 optional = true
 
 # For lib.rs doctests and examples

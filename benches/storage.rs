@@ -4,7 +4,12 @@ use hexx::{
     storage::{HexStore, HexagonalMap, RombusMap},
     *,
 };
-use std::{collections::HashMap, time::Duration};
+use std::time::Duration;
+
+#[cfg(not(feature = "bevy_platform"))]
+use std::collections::HashMap;
+#[cfg(feature = "bevy_platform")]
+use bevy_platform::collections::HashMap;
 
 pub fn hexagonal_map_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hexagonal Storage");

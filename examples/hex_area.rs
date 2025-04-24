@@ -1,13 +1,12 @@
 use bevy::{
     color::palettes::css::{GOLD, ORANGE, RED, WHITE},
-    platform::collections::hash_set::HashSet,
+    platform::collections::{hash_set::HashSet, HashMap},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
 };
 use glam::vec2;
 use hexx::*;
-use std::collections::HashMap;
 
 /// World size of the hexagons (outer radius)
 const HEX_SIZE: f32 = 15.0;
