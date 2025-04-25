@@ -40,7 +40,9 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugins(EguiPlugin)
+        .add_plugins(EguiPlugin {
+            enable_multipass_for_primary_context: false,
+        })
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, (show_ui, animate, gizmos))
@@ -244,7 +246,7 @@ fn gizmos(
 fn generate(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {
     let mut rng = rng();
     let map = HexagonalMap::new(Hex::ZERO, params.range, |_| {
-        rng.gen_range(0.0..=params.max_height)
+        rng.random_range(0.0..=params.max_height)
     });
     let mut new_mesh = HeightMapMeshBuilder::new(&info.layout, &map)
         .with_offset(Vec3::NEG_Y * params.max_height / 2.0 * params.scale.y)

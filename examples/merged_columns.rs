@@ -5,9 +5,10 @@ use bevy::{
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
+use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::{quick::ResourceInspectorPlugin, InspectorOptions};
 use hexx::*;
-use rand::{thread_rng, Rng};
+use rand::{rng, Rng};
 
 /// Chunk colors
 const COLORS: [Color; 3] = [Color::Srgba(BLUE), Color::Srgba(WHITE), Color::Srgba(RED)];
@@ -22,6 +23,9 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
+        .add_plugins(EguiPlugin {
+            enable_multipass_for_primary_context: false,
+        })
         .add_plugins(ResourceInspectorPlugin::<MapSettings>::default())
         .add_systems(Startup, setup_camera)
         .add_systems(Update, setup_grid)
@@ -63,7 +67,7 @@ fn setup_grid(
     }
     println!("Generating map");
     if map.0 != Entity::PLACEHOLDER {
-        commands.entity(map.0).despawn_recursive();
+        commands.entity(map.0).despawn();
     }
     let layout = HexLayout {
         scale: settings.hex_size,
@@ -80,7 +84,7 @@ fn setup_grid(
             Visibility::default(),
         ))
         .id();
-    let mut rng = thread_rng();
+    let mut rng = rng();
     // For each chunk
     for chunk in Hex::ZERO.range(settings.map_radius) {
         // We retrieve its center chil
@@ -95,7 +99,7 @@ fn setup_grid(
         let mesh = children.fold(MeshInfo::default(), |mut mesh, c| {
             let [min, max] = settings.column_heights;
             let height = if min < max {
-                rng.gen_range(min..=max)
+                rng.random_range(min..=max)
             } else {
                 min
             };
@@ -108,14 +112,13 @@ fn setup_grid(
             mesh
         });
         let mesh = meshes.add(hex_mesh(mesh));
-        commands
-            .spawn((
-                Name::new(format!("Chunk {} {}", chunk.x, chunk.y)),
-                Mesh3d(mesh),
-                MeshMaterial3d(materials[color_index].clone()),
-                Transform::from_xyz(pos.x, 0.0, pos.y),
-            ))
-            .set_parent(map_entity);
+        commands.spawn((
+            Name::new(format!("Chunk {} {}", chunk.x, chunk.y)),
+            Mesh3d(mesh),
+            MeshMaterial3d(materials[color_index].clone()),
+            Transform::from_xyz(pos.x, 0.0, pos.y),
+            ChildOf(map_entity),
+        ));
     }
     map.0 = map_entity;
 }
