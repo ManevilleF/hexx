@@ -1,7 +1,7 @@
 use crate::Hex;
-use std::collections::BinaryHeap;
 #[cfg(feature = "bevy_platform")]
 use bevy_platform::collections::HashMap;
+use std::collections::BinaryHeap;
 #[cfg(not(feature = "bevy_platform"))]
 use std::collections::HashMap;
 
