@@ -56,8 +56,10 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugins(WireframePlugin)
-        .add_plugins(EguiPlugin)
+        .add_plugins(WireframePlugin::default())
+        .add_plugins(EguiPlugin {
+            enable_multipass_for_primary_context: false,
+        })
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, (show_ui, animate, update_mesh, gizmos))
