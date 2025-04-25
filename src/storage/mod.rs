@@ -132,7 +132,7 @@ impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<cra
     }
 }
 
-//#[cfg(feature = "bevy_platform")]
+#[cfg(feature = "bevy_platform")]
 impl<T, S: core::hash::BuildHasher> HexStore<T>
     for bevy_platform::collections::HashMap<crate::Hex, T, S>
 {

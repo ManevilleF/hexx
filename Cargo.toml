@@ -47,12 +47,12 @@ features = ["glam"]
 optional = true
 
 [dependencies.bevy_platform]
-version = "0.16.0"
+version = "0.16"
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.16.0-rc"
+version = "0.16"
 features = [
     "bevy_asset",
     "bevy_core_pipeline",
