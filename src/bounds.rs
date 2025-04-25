@@ -143,16 +143,103 @@ impl HexBounds {
 
 impl FromIterator<Hex> for HexBounds {
     fn from_iter<T: IntoIterator<Item = Hex>>(iter: T) -> Self {
-        let mut min = Hex::new(i32::MAX, i32::MAX);
-        let mut max = Hex::new(i32::MIN, i32::MIN);
+        let mut minx = i32::MAX;
+        let mut miny = i32::MAX;
+        let mut minz = i32::MAX;
+        let mut maxx = i32::MIN;
+        let mut maxy = i32::MIN;
+        let mut maxz = i32::MIN;
 
-        for hex in iter {
-            min.x = min.x.min(hex.x);
-            max.x = max.x.max(hex.x);
-            min.y = min.y.min(hex.y);
-            max.y = max.y.max(hex.y);
+        let count = iter
+            .into_iter()
+            .map(|hex| {
+                minx = minx.min(hex.x);
+                miny = miny.min(hex.y);
+                minz = minz.min(hex.z());
+                maxx = maxx.max(hex.x);
+                maxy = maxy.max(hex.y);
+                maxz = maxz.max(hex.z());
+            })
+            .count();
+
+        // This algorithm will malfunction if the iterator is empty or has only one element
+        if count == 0 {
+            // Exit early
+            return Self::from_radius(0);
+        } else if count == 1 {
+            // If the iterator only contains one element, we can just return it
+            let center = Hex::new(minx, miny);
+            return Self::new(center, 0);
         }
-        Self::from_min_max(min, max)
+
+        // Calculate the minimum size of the hexagon that can contain all the hexes
+        let xsize = maxx - minx;
+        let ysize = maxy - miny;
+        let zsize = maxz - minz;
+
+        let trisize1 = maxx + maxy + maxz;
+        let trisize2 = -minx - miny - minz;
+
+        let axissize = xsize.max(ysize).max(zsize);
+        let trisize = trisize1.max(trisize2);
+
+        // Convert the sizes to radii
+        let axisradius = (axissize + 1) / 2;
+        let triradius = (trisize + 2) / 3;
+
+        // This is the minimum radius
+        let radius = axisradius.max(triradius);
+
+        // Now we need to calculate the center of the hexagon
+
+        // The center must exist between these extremes.
+        let cminx = maxx - radius;
+        let cminy = maxy - radius;
+        let cminz = maxz - radius;
+        let cmaxx = minx + radius;
+        let cmaxy = miny + radius;
+        // We don't actually need to calculate cmaxz
+
+        // How much wiggle room we have on these two axes
+        let xrange = cmaxx - cminx;
+        let yrange = cmaxy - cminy;
+
+        // Position the center of the hexagon
+        let mut x = cminx;
+        let mut y = cminy;
+        let z = cminz;
+
+        // This sum needs to be 0, but it could be negative
+        // This is *never* positive.
+        let mut sum = x + y + z;
+
+        // Can sum be fixed entirely by moving on the x axis?
+        if -sum > xrange {
+            // No, we need to move on the y axis too
+            // Move on the x axis first
+            sum += xrange;
+            x += xrange;
+
+            // Can we fix the sum by moving on the y axis?
+            if -sum > yrange {
+                // No, we need to move on the z axis too
+                y += yrange;
+                // z is guaranteed to be able to fix the sum.
+                // We don't need to calculate it here.
+            } else {
+                // Yes, we can fix the sum by moving on the y axis
+                // Move on the y axis
+                y -= sum;
+            }
+        } else {
+            // Yes, we can fix the sum by moving on the x axis
+            // Move on the x axis
+            x -= sum;
+        }
+
+        let center = Hex::new(x, y);
+        let radius = radius as u32;
+        HexBounds { center, radius }
     }
 }
 
@@ -205,6 +292,91 @@ mod tests {
             let fails: Vec<_> = coords.filter(|c| c.x < 0 || c.y < 0).collect();
             println!("{fails:#?}");
             assert!(fails.is_empty());
+        }
+    }
+
+    #[test]
+    fn bounds_hexagon() {
+        for radius in 0..8 {
+            let bounds = HexBounds::new(Hex::ZERO, radius);
+            let coords = bounds.all_coords();
+            let reconstructed = HexBounds::from_iter(coords);
+            assert_eq!(bounds, reconstructed);
+        }
+
+        for radius in 0..8 {
+            let bounds = HexBounds::new(Hex::new(15, -19), radius);
+            let coords = bounds.all_coords();
+            let reconstructed = HexBounds::from_iter(coords);
+            assert_eq!(bounds, reconstructed);
+        }
+    }
+
+    #[test]
+    fn bounds_rhombus() {
+        for size in 1..10 {
+            for rotation in 0..3 {
+                let coords = (0..size * size)
+                    .map(|i| Hex::new(i / size, i % size).rotate_cw(rotation))
+                    .collect::<Vec<_>>();
+                let reconstructed = HexBounds::from_iter(coords.iter().copied());
+                for h in coords {
+                    assert!(reconstructed.is_in_bounds(h));
+                }
+                assert_eq!(reconstructed.radius, size as u32 - 1);
+            }
+        }
+    }
+
+    #[test]
+    fn bounds_line() {
+        for direction in 0..6 {
+            for size in 1..10 {
+                let coords = Hex::new(0, 0)
+                    .line_to(Hex::new(size, 0))
+                    .map(|h| h.rotate_cw(direction))
+                    .collect::<Vec<_>>();
+                let reconstructed = HexBounds::from_iter(coords.iter().copied());
+                for h in coords {
+                    assert!(reconstructed.is_in_bounds(h));
+                }
+                assert_eq!(reconstructed.radius, (size as u32 + 1) / 2);
+            }
+        }
+    }
+
+    #[test]
+    fn bounds_edge_cases() {
+        let mut coords = vec![];
+        let reconstructed = HexBounds::from_iter(coords.iter().copied());
+        // Doesn't matter where it's placed.
+        assert_eq!(reconstructed.radius, 0);
+
+        coords.push(Hex::new(0, 0));
+        let reconstructed = HexBounds::from_iter(coords.iter().copied());
+        assert_eq!(reconstructed, HexBounds::from_radius(0));
+    }
+
+    #[test]
+    fn bounds_wedge() {
+        for size in 1..10 {
+            let coords = Hex::new(0, 0)
+                .full_wedge(size, crate::VertexDirection(1))
+                .collect::<Vec<_>>();
+            let reconstructed = HexBounds::from_iter(coords.iter().copied());
+            for h in coords {
+                assert!(reconstructed.is_in_bounds(h));
+            }
+            assert_eq!(reconstructed.radius, 2 * (size + 1) / 3);
+
+            let coords = Hex::new(0, 0)
+                .full_wedge(size, crate::VertexDirection(2))
+                .collect::<Vec<_>>();
+            let reconstructed = HexBounds::from_iter(coords.iter().copied());
+            for h in coords {
+                assert!(reconstructed.is_in_bounds(h));
+            }
+            assert_eq!(reconstructed.radius, 2 * (size + 1) / 3);
         }
     }
 }
