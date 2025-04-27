@@ -143,29 +143,27 @@ impl HexBounds {
 
 impl FromIterator<Hex> for HexBounds {
     fn from_iter<T: IntoIterator<Item = Hex>>(iter: T) -> Self {
-        let mut minx = i32::MAX;
-        let mut miny = i32::MAX;
-        let mut minz = i32::MAX;
-        let mut maxx = i32::MIN;
-        let mut maxy = i32::MIN;
-        let mut maxz = i32::MIN;
+        let mut iter = iter.into_iter();
 
-        let count = iter
-            .into_iter()
-            .map(|hex| {
-                minx = minx.min(hex.x);
-                miny = miny.min(hex.y);
-                minz = minz.min(hex.z());
-                maxx = maxx.max(hex.x);
-                maxy = maxy.max(hex.y);
-                maxz = maxz.max(hex.z());
-            })
-            .count();
-
-        // This algorithm will malfunction if the iterator is empty or has only one element
-        if count == 0 {
+        let Some(first) = iter.next() else {
             // Exit early
             return Self::from_radius(0);
+        };
+
+        let mut minx = first.x;
+        let mut miny = first.y;
+        let mut minz = first.z();
+        let mut maxx = first.x;
+        let mut maxy = first.y;
+        let mut maxz = first.z();
+
+        for hex in iter {
+            minx = minx.min(hex.x);
+            miny = miny.min(hex.y);
+            minz = minz.min(hex.z());
+            maxx = maxx.max(hex.x);
+            maxy = maxy.max(hex.y);
+            maxz = maxz.max(hex.z());
         }
 
         // Calculate the minimum size of the hexagon that can contain all the hexes
