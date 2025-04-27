@@ -206,6 +206,7 @@
   [collections](https://docs.rs/hexx/latest/hexx/storage/) with more performant accessors:
 
  - [`HexagonalMap<T>`](https://docs.rs/hexx/latest/hexx/storage/hexagonal/struct.HexagonalMap.html)
+ - [`HexModMap<T>`](https://docs.rs/hexx/latest/hexx/storage/hexmod/struct.HexModMap.html)
  - [`RombusMap<T>`](https://docs.rs/hexx/latest/hexx/storage/rombus/struct.RombusMap.html)
 
  ## Procedural meshes
