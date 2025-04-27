@@ -56,8 +56,10 @@ pub fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugins(WireframePlugin)
-        .add_plugins(EguiPlugin)
+        .add_plugins(WireframePlugin::default())
+        .add_plugins(EguiPlugin {
+            enable_multipass_for_primary_context: false,
+        })
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, (show_ui, animate, update_mesh, gizmos))
@@ -66,7 +68,7 @@ pub fn main() {
 
 fn show_ui(world: &mut World) {
     world.resource_scope(|world, mut params: Mut<BuilderParams>| {
-        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
             return;
         };
         let mut egui_context = egui_context.clone();
@@ -188,7 +190,7 @@ fn show_ui(world: &mut World) {
         });
     });
     world.resource_scope(|world, mut materials: Mut<Assets<StandardMaterial>>| {
-        let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+        let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
             return;
         };
         let mut egui_context = egui_context.clone();

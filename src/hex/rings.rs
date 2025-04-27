@@ -34,7 +34,7 @@ impl Hex {
                     .into_iter()
                     .flat_map(|dir| (0..range).map(move |_| dir)),
             );
-        };
+        }
         let count = Self::ring_count(range);
         let point = self + start_dir * range as i32;
         let iter = (0..count).scan(point, move |point, i| {

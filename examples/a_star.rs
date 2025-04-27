@@ -1,9 +1,8 @@
 use bevy::{
     color::palettes::css::{AQUA, BLACK, WHITE},
-    log,
+    platform::collections::{hash_map::HashMap, hash_set::HashSet},
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    utils::{HashMap, HashSet},
     window::PrimaryWindow,
 };
 use hexx::{algorithms::a_star, *};
@@ -97,16 +96,16 @@ fn handle_input(
     cameras: Query<(&Camera, &GlobalTransform)>,
     mut current: Local<Hex>,
     mut grid: ResMut<HexGrid>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
     {
         let hex_pos = grid.layout.world_pos_to_hex(pos);
         let Some(entity) = grid.entities.get(&hex_pos).copied() else {
-            return;
+            return Ok(());
         };
         if buttons.just_pressed(MouseButton::Left) {
             if grid.blocked_coords.contains(&hex_pos) {
@@ -121,10 +120,10 @@ fn handle_input(
                     .entity(entity)
                     .insert(MeshMaterial2d(grid.blocked_mat.clone_weak()));
             }
-            return;
+            return Ok(());
         }
         if hex_pos == *current {
-            return;
+            return Ok(());
         }
         *current = hex_pos;
         let path_to_clear: Vec<_> = grid.path_entities.drain().collect();
@@ -136,14 +135,14 @@ fn handle_input(
         let Some(path) = a_star(Hex::ZERO, hex_pos, |_, h| {
             (grid.entities.contains_key(&h) && !grid.blocked_coords.contains(&h)).then_some(1)
         }) else {
-            log::info!("No path found");
-            return;
+            info!("No path found");
+            return Ok(());
         };
         let entities: HashSet<_> = path
             .into_iter()
             .inspect(|h| {
                 if grid.blocked_coords.contains(h) {
-                    log::error!("A star picked a blocked coord: {h:?}");
+                    error!("A star picked a blocked coord: {h:?}");
                 }
             })
             .filter_map(|h| grid.entities.get(&h).copied())
@@ -155,6 +154,7 @@ fn handle_input(
         }
         grid.path_entities = entities;
     }
+    Ok(())
 }
 
 /// Compute a bevy mesh from the layout

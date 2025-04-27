@@ -1,8 +1,8 @@
 use bevy::{
     color::palettes::css::{WHITE, YELLOW},
+    platform::collections::HashMap,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    utils::HashMap,
     window::PrimaryWindow,
 };
 use hexx::{shapes, *};
@@ -91,23 +91,23 @@ fn higlight_hovered(
     mut highlighted: Local<Hex>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     windows: Query<&Window, With<PrimaryWindow>>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     let Some(ray) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world(cam_transform, p).ok())
     else {
-        return;
+        return Ok(());
     };
     let Some(distance) = ray.intersect_plane(Vec3::ZERO, InfinitePlane3d::new(Dir3::Y)) else {
-        return;
+        return Ok(());
     };
     let point = ray.origin + ray.direction * distance;
     let coord = map.layout.world_pos_to_hex(point.xz());
     if coord != *highlighted {
         let Some(entity) = map.entities.get(&coord).copied() else {
-            return;
+            return Ok(());
         };
         commands
             .entity(entity)
@@ -117,6 +117,7 @@ fn higlight_hovered(
             .insert(MeshMaterial3d(map.default_material.clone_weak()));
         *highlighted = coord;
     }
+    Ok(())
 }
 
 /// Compute a bevy mesh from the layout

@@ -1,8 +1,8 @@
 use bevy::{
     color::palettes::css::{GRAY, LIME, WHITE, YELLOW},
+    platform::collections::HashSet,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    utils::HashSet,
     window::PrimaryWindow,
 };
 use hexx::{
@@ -52,9 +52,9 @@ fn handle_input(
     mut tile_transforms: Query<(Entity, &mut Transform)>,
     mut current: Local<Hex>,
     mut grid: ResMut<HexGrid>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
@@ -62,7 +62,7 @@ fn handle_input(
         let hex_pos = grid.layout.world_pos_to_hex(pos);
 
         if hex_pos == *current {
-            return;
+            return Ok(());
         }
         *current = hex_pos;
 
@@ -83,6 +83,7 @@ fn handle_input(
 
         grid.reachable_entities = reachable_entities;
     }
+    Ok(())
 }
 
 fn setup_grid(
@@ -100,10 +101,10 @@ fn setup_grid(
     let desert_mat = materials.add(Color::Srgba(YELLOW));
     let wall_mat = materials.add(Color::Srgba(GRAY));
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let entities = HexagonalMap::new(Hex::ZERO, MAP_RADIUS, |coord| {
-        let cost = rng.gen_range(0..=3);
+        let cost = rng.random_range(0..=3);
         let pos = layout.hex_to_world_pos(coord);
         let material = match cost {
             0 => plains_mat.clone(),

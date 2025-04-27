@@ -84,9 +84,7 @@ fn setup_grid(
                     Mesh2d(mesh_handle.clone()),
                     MeshMaterial2d(default_material.clone_weak()),
                     Transform::from_xyz(pos.x, pos.y, 0.0),
-                ))
-                .with_children(|b| {
-                    b.spawn((
+                    children![(
                         Text2d(format!("{},{}", hex.x, hex.y)),
                         TextColor(Color::BLACK),
                         TextFont {
@@ -94,8 +92,8 @@ fn setup_grid(
                             ..default()
                         },
                         Transform::from_xyz(0.0, 0.0, 10.0),
-                    ));
-                })
+                    )],
+                ))
                 .id();
             (hex, id)
         })
@@ -120,9 +118,9 @@ fn handle_input(
     cameras: Query<(&Camera, &GlobalTransform)>,
     map: Res<Map>,
     mut highlighted_hexes: ResMut<HighlightedHexes>,
-) {
-    let window = windows.single();
-    let (camera, cam_transform) = cameras.single();
+) -> Result {
+    let window = windows.single()?;
+    let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
         .cursor_position()
         .and_then(|p| camera.viewport_to_world_2d(cam_transform, p).ok())
@@ -130,7 +128,7 @@ fn handle_input(
         let coord = map.layout.world_pos_to_hex(pos);
         if let Some(entity) = map.entities.get(&coord).copied() {
             if coord == highlighted_hexes.selected {
-                return;
+                return Ok(());
             }
             // Clear highlighted hexes materials
             for vec in [
@@ -193,6 +191,7 @@ fn handle_input(
             highlighted_hexes.selected = coord;
         }
     }
+    Ok(())
 }
 
 fn gizmos(mut gizmos: Gizmos, higlights: Res<HighlightedHexes>, map: Res<Map>) {

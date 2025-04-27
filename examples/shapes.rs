@@ -24,7 +24,9 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins(EguiPlugin)
+        .add_plugins(EguiPlugin {
+            enable_multipass_for_primary_context: false,
+        })
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, (setup, generate).chain())
         .add_systems(Update, show_ui)
@@ -102,7 +104,7 @@ pub fn setup(mut commands: Commands, mut mats: ResMut<Assets<ColorMaterial>>) {
 fn show_ui(world: &mut World) {
     let mut regenerate = false;
 
-    let Ok(egui_context) = world.query::<&mut EguiContext>().get_single(world) else {
+    let Ok(egui_context) = world.query::<&mut EguiContext>().single(world) else {
         return;
     };
     let mut egui_context = egui_context.clone();
@@ -160,28 +162,25 @@ fn generate(
     shape: Res<Shape>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    commands.entity(map.entity).despawn_descendants();
+    commands.entity(map.entity).despawn_related::<Children>();
     let mesh = meshes.add(hexagonal_plane(&map.layout));
     for coord in shape.coords() {
         let pos = map.layout.hex_to_world_pos(coord);
-        commands
-            .spawn((
-                Mesh2d(mesh.clone()),
-                MeshMaterial2d(map.mat.clone_weak()),
-                Transform::from_xyz(pos.x, pos.y, 0.0),
-            ))
-            .with_children(|b| {
-                b.spawn((
-                    Text2d(format!("{},{}", coord.x, coord.y)),
-                    TextColor(Color::BLACK),
-                    TextFont {
-                        font_size: 7.0,
-                        ..default()
-                    },
-                    Transform::from_xyz(0.0, 0.0, 10.0),
-                ));
-            })
-            .set_parent(map.entity);
+        commands.spawn((
+            Mesh2d(mesh.clone()),
+            MeshMaterial2d(map.mat.clone_weak()),
+            Transform::from_xyz(pos.x, pos.y, 0.0),
+            ChildOf(map.entity),
+            children![(
+                Text2d(format!("{},{}", coord.x, coord.y)),
+                TextColor(Color::BLACK),
+                TextFont {
+                    font_size: 7.0,
+                    ..default()
+                },
+                Transform::from_xyz(0.0, 0.0, 10.0),
+            )],
+        ));
     }
 }
 
