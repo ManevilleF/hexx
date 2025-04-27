@@ -47,7 +47,7 @@
  * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
    for `HashMap`
  * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
-   for most types. Useful for integration with [Bevy](https://bevyengine.org/)
+   for most types
  * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
    using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
  * `algorithms`: Enables the [algorithms](https://docs.rs/hexx/latest/hexx/algorithms/) module with:
