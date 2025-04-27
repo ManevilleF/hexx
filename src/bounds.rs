@@ -166,10 +166,6 @@ impl FromIterator<Hex> for HexBounds {
         if count == 0 {
             // Exit early
             return Self::from_radius(0);
-        } else if count == 1 {
-            // If the iterator only contains one element, we can just return it
-            let center = Hex::new(minx, miny);
-            return Self::new(center, 0);
         }
 
         // Calculate the minimum size of the hexagon that can contain all the hexes
