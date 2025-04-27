@@ -146,92 +146,111 @@ impl FromIterator<Hex> for HexBounds {
         let mut iter = iter.into_iter();
 
         let Some(first) = iter.next() else {
-            // Exit early
+            // Exit early with a zero radius bounds at the origin
             return Self::from_radius(0);
         };
 
-        let mut minx = first.x;
-        let mut miny = first.y;
-        let mut minz = first.z();
-        let mut maxx = first.x;
-        let mut maxy = first.y;
-        let mut maxz = first.z();
+        // This algorithm is broken into two parts:
+        // 1. Calculate the minimum size of the hexagon that can contain all the hexes
+        // 2. Position the center of the hexagon
+
+        // Step 1: Calculate the size of the hexagon that can contain all the hexes
+        // We need to find the min and max for each axis
+
+        // We can use the first hex as a starting point
+        let mut max = first.as_ivec3();
+        let mut min = max.clone();
 
         for hex in iter {
-            minx = minx.min(hex.x);
-            miny = miny.min(hex.y);
-            minz = minz.min(hex.z());
-            maxx = maxx.max(hex.x);
-            maxy = maxy.max(hex.y);
-            maxz = maxz.max(hex.z());
+            let hex = hex.as_ivec3();
+            max = max.max(hex);
+            min = min.min(hex);
         }
 
-        // Calculate the minimum size of the hexagon that can contain all the hexes
-        let xsize = maxx - minx;
-        let ysize = maxy - miny;
-        let zsize = maxz - minz;
+        // There are 5 ways the size of the hexagon can be bounded:
+        // We need to calculate all of them and take the largest one.
 
-        let trisize1 = maxx + maxy + maxz;
-        let trisize2 = -minx - miny - minz;
+        // 3 of them are calculated from opposite edges of the hexagon,
+        // calculated here by taking the diference between the min and max.
+        // We only need to convert the largest one to a radius,
+        // so we'll find the max element right away.
+        let duo_size = (max - min).max_element();
 
-        let axissize = xsize.max(ysize).max(zsize);
-        let trisize = trisize1.max(trisize2);
+        // The other 2 are from triplets of edges.
+        // They account for shapes that are more triangular.
+        // Again, we only need to convert the largest one to a radius,
+        // so we'll find the maximum of the two right away.
+        let trio_size = max.element_sum().max(-min.element_sum());
 
         // Convert the sizes to radii
-        let axisradius = (axissize + 1) / 2;
-        let triradius = (trisize + 2) / 3;
+
+        // These steps are like integer division,
+        // but we need to always round up
+        // instead of truncating.
+        let duo_radius = (duo_size + 1) / 2;
+        let trio_radius = (trio_size + 2) / 3;
 
         // This is the minimum radius
-        let radius = axisradius.max(triradius);
+        let radius = duo_radius.max(trio_radius);
 
-        // Now we need to calculate the center of the hexagon
+        // This has completed the first step of the algorithm.
+        // Now we need to do the second step:
+        // Position the center of the hexagon
 
         // The center must exist between these extremes.
-        let cminx = maxx - radius;
-        let cminy = maxy - radius;
-        let cminz = maxz - radius;
-        let cmaxx = minx + radius;
-        let cmaxy = miny + radius;
-        // We don't actually need to calculate cmaxz
+        let center_min = max - radius;
+        let center_max = min + radius;
 
-        // How much wiggle room we have on these two axes
-        let xrange = cmaxx - cminx;
-        let yrange = cmaxy - cminy;
+        // How much wiggle room do we have on these axes
+        let range = center_max - center_min;
 
-        // Position the center of the hexagon
-        let mut x = cminx;
-        let mut y = cminy;
-        let z = cminz;
+        // Start with the center at the minimum
+        let mut center = center_min.clone();
 
         // This sum needs to be 0, but it could be negative
         // This is *never* positive.
-        let mut sum = x + y + z;
+        let mut sum = center.element_sum();
+
+        // This part of the algorithm considers each axis one step at a time.
+        // We ask the question:
+        // "Can we fix the sum by moving on just this axis?"
+        // If the answer is no, we move as close as we can on this axis,
+        // and move on to the next axis.
+        // If the answer is yes, we move on this axis and stop.
+        //
+        // We can actually skip the last axis (z),
+        // because we know that `center_max.element_sum() >= 0`
+        // and that if the algorithm ran all the way to needing the z axis,
+        // we would end up at `center_max` anyway.
 
         // Can sum be fixed entirely by moving on the x axis?
-        if -sum > xrange {
+        if -sum > range.x {
             // No, we need to move on the y axis too
             // Move on the x axis first
-            sum += xrange;
-            x += xrange;
+            sum += range.x;
+            center.x += range.x;
 
             // Can we fix the sum by moving on the y axis?
-            if -sum > yrange {
+            if -sum > range.y {
                 // No, we need to move on the z axis too
-                y += yrange;
+                center.y += range.y;
                 // z is guaranteed to be able to fix the sum.
                 // We don't need to calculate it here.
             } else {
                 // Yes, we can fix the sum by moving on the y axis
                 // Move on the y axis
-                y -= sum;
+                center.y -= sum;
             }
         } else {
             // Yes, we can fix the sum by moving on the x axis
             // Move on the x axis
-            x -= sum;
+            center.x -= sum;
         }
 
-        let center = Hex::new(x, y);
+        // Step 2 is now complete.
+
+        // Convert the `IVec3` back to a `Hex`
+        let center = Hex::new(center.x, center.y);
         let radius = radius as u32;
         HexBounds { center, radius }
     }
