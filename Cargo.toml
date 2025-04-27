@@ -26,6 +26,8 @@ grid = []
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
+# Adds support for the Bevy game engine
+bevy = ["bevy_reflect", "bevy_platform"]
 # Adds Bevy Reflection support
 bevy_reflect = ["dep:bevy_reflect"]
 # Adds Bevy Platform support
@@ -186,6 +188,7 @@ harness = false
 [[bench]]
 name = "storage"
 harness = false
+required-features = ["bevy_platform"]
 
 [profile.dev]
 opt-level = 1

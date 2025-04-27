@@ -52,7 +52,10 @@ storage_impl!(RombusMap<T>);
 /// Implemented for
 /// - [`HexagonalMap<T>`](HexagonalMap)
 /// - [`RombusMap<T>`](RombusMap)
-/// - [`HashMap<Hex, T>`](std::collections::HashMap)
+#[cfg_attr(
+    not(feature = "bevy_platform"),
+    doc = "- [`HashMap<Hex, T>`](std::collections::HashMap)"
+)]
 #[cfg_attr(
     feature = "bevy_platform",
     doc = "- [`HashMap<Hex, T>`](bevy_platform::collections::HashMap)"
