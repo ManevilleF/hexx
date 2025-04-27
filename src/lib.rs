@@ -192,6 +192,7 @@
 //!  [collections](crate::storage) with more performant accessors:
 //!
 //! - [`HexagonalMap<T>`](crate::storage::hexagonal::HexagonalMap)
+//! - [`HexModMap<T>`](crate::storage::hexmod::HexModMap)
 //! - [`RombusMap<T>`](crate::storage::rombus::RombusMap)
 //!
 //! ## Procedural meshes
