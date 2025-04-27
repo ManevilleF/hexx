@@ -43,6 +43,9 @@
    most types
  * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it
    accross the FII
+ * `bevy`: Enables [Bevy](https://bevyengine.org/) support
+ * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
+   for `HashMap`
  * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
    for most types. Useful for integration with [Bevy](https://bevyengine.org/)
  * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
