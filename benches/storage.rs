@@ -15,12 +15,13 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
 
     let get_value = |h: Hex| h.length();
 
-    for dist in [10, 50, 100, 300] {
+    for dist in [10, 100, 300] {
         let hash_map: HashMap<_, _> = Hex::ZERO
             .range(dist)
             .map(|hex| (hex, get_value(hex)))
             .collect();
         let hex_map = HexagonalMap::new(Hex::ZERO, dist, get_value);
+        let hexmod_map = HexModMap::new(Hex::ZERO, dist, get_value);
         group.bench_with_input(BenchmarkId::new("HashMap_get", dist), &dist, |b, dist| {
             b.iter(|| {
                 for c in black_box(Hex::ZERO).range(*dist) {
@@ -39,40 +40,6 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
                 })
             },
         );
-        group.bench_with_input(BenchmarkId::new("HashMap_iter", dist), &dist, |b, _| {
-            b.iter(|| hash_map.iter().collect::<Vec<_>>())
-        });
-        group.bench_with_input(
-            BenchmarkId::new("HexagonalMap_iter", dist),
-            &dist,
-            |b, _| b.iter(|| hex_map.iter().collect::<Vec<_>>()),
-        );
-    }
-    group.finish();
-}
-
-pub fn hexmod_map_benchmark(c: &mut Criterion) {
-    let mut group = c.benchmark_group("HexMod Storage");
-    group
-        .significance_level(0.1)
-        .measurement_time(Duration::from_secs(8))
-        .sample_size(100);
-
-    let get_value = |h: Hex| h.length();
-
-    for dist in [10, 100, 300] {
-        let hash_map: HashMap<_, _> = Hex::ZERO
-            .range(dist)
-            .map(|hex| (hex, get_value(hex)))
-            .collect();
-        let hexmod_map = HexModMap::new(Hex::ZERO, dist, get_value);
-        group.bench_with_input(BenchmarkId::new("HashMap_get", dist), &dist, |b, dist| {
-            b.iter(|| {
-                for c in black_box(Hex::ZERO).range(*dist) {
-                    hash_map.get(&c).unwrap();
-                }
-            })
-        });
         group.bench_with_input(BenchmarkId::new("HexModMap_get", dist), &dist, |b, dist| {
             b.iter(|| {
                 for c in black_box(Hex::ZERO).range(*dist) {
@@ -83,6 +50,11 @@ pub fn hexmod_map_benchmark(c: &mut Criterion) {
         group.bench_with_input(BenchmarkId::new("HashMap_iter", dist), &dist, |b, _| {
             b.iter(|| hash_map.iter().collect::<Vec<_>>())
         });
+        group.bench_with_input(
+            BenchmarkId::new("HexagonalMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| hex_map.iter().collect::<Vec<_>>()),
+        );
         group.bench_with_input(BenchmarkId::new("HexModMap_iter", dist), &dist, |b, _| {
             b.iter(|| hexmod_map.iter().collect::<Vec<_>>())
         });
@@ -125,10 +97,5 @@ pub fn rombus_map_benchmark(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(
-    benches,
-    hexagonal_map_benchmark,
-    rombus_map_benchmark,
-    hexmod_map_benchmark
-);
+criterion_group!(benches, hexagonal_map_benchmark, rombus_map_benchmark,);
 criterion_main!(benches);

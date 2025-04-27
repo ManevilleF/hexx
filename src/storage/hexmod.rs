@@ -8,8 +8,6 @@ use super::HexStore;
 /// [`HexModMap`] is made for _hexagonal_ large _dense_ maps, utilizing [hexmod]
 /// coordinates to map [`Hex`] coordinate to a positive 1D array.
 ///
-/// This provides faster iteration performance compared to [`HexagonalMap`].
-///
 /// It can be used only if:
 /// - The map is an hexagon shape
 /// - The map is _dense_
@@ -20,7 +18,7 @@ use super::HexStore;
 /// ## Performance agains [`HashMap`]
 ///
 /// This struct is uses less memory and the larger the map, the faster `get`
-/// operations are agains a hashmap, approximately 20x to 200x faster
+/// operations are agains a hashmap, approximately 10x to 20x faster
 ///
 /// But for iterating this storage is *less* performant than a hashmap
 /// approximately 3x slower
@@ -228,7 +226,7 @@ mod tests {
                 let map = HexModMap::new(center, radius, |h| expected[&h]);
 
                 for (k, v) in &expected {
-                    assert_eq!(*v, *map.get(*k).unwrap());
+                    assert_eq!(*v, map[k]);
                 }
                 for k in center.range(radius + 1) {
                     assert_eq!(expected.get(&k), map.get(k));
