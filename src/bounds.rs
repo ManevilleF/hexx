@@ -159,7 +159,7 @@ impl FromIterator<Hex> for HexBounds {
 
         // We can use the first hex as a starting point
         let mut max = first.as_ivec3();
-        let mut min = max.clone();
+        let mut min = max;
 
         for hex in iter {
             let hex = hex.as_ivec3();
@@ -205,7 +205,7 @@ impl FromIterator<Hex> for HexBounds {
         let range = center_max - center_min;
 
         // Start with the center at the minimum
-        let mut center = center_min.clone();
+        let mut center = center_min;
 
         // This sum needs to be 0, but it could be negative
         // This is *never* positive.
@@ -251,8 +251,9 @@ impl FromIterator<Hex> for HexBounds {
 
         // Convert the `IVec3` back to a `Hex`
         let center = Hex::new(center.x, center.y);
+        #[allow(clippy::cast_sign_loss)]
         let radius = radius as u32;
-        HexBounds { center, radius }
+        Self { center, radius }
     }
 }
 
@@ -313,14 +314,14 @@ mod tests {
         for radius in 0..8 {
             let bounds = HexBounds::new(Hex::ZERO, radius);
             let coords = bounds.all_coords();
-            let reconstructed = HexBounds::from_iter(coords);
+            let reconstructed: HexBounds = coords.collect();
             assert_eq!(bounds, reconstructed);
         }
 
         for radius in 0..8 {
             let bounds = HexBounds::new(Hex::new(15, -19), radius);
             let coords = bounds.all_coords();
-            let reconstructed = HexBounds::from_iter(coords);
+            let reconstructed: HexBounds = coords.collect();
             assert_eq!(bounds, reconstructed);
         }
     }
@@ -332,11 +333,13 @@ mod tests {
                 let coords = (0..size * size)
                     .map(|i| Hex::new(i / size, i % size).rotate_cw(rotation))
                     .collect::<Vec<_>>();
-                let reconstructed = HexBounds::from_iter(coords.iter().copied());
+                let reconstructed: HexBounds = coords.iter().copied().collect();
                 for h in coords {
                     assert!(reconstructed.is_in_bounds(h));
                 }
-                assert_eq!(reconstructed.radius, size as u32 - 1);
+                #[allow(clippy::cast_sign_loss)]
+                let radius = size as u32 - 1;
+                assert_eq!(reconstructed.radius, radius);
             }
         }
     }
@@ -349,11 +352,13 @@ mod tests {
                     .line_to(Hex::new(size, 0))
                     .map(|h| h.rotate_cw(direction))
                     .collect::<Vec<_>>();
-                let reconstructed = HexBounds::from_iter(coords.iter().copied());
+                let reconstructed: HexBounds = coords.iter().copied().collect();
                 for h in coords {
                     assert!(reconstructed.is_in_bounds(h));
                 }
-                assert_eq!(reconstructed.radius, (size as u32 + 1) / 2);
+                #[allow(clippy::cast_sign_loss)]
+                let radius = (size as u32 + 1) / 2;
+                assert_eq!(reconstructed.radius, radius);
             }
         }
     }
@@ -361,12 +366,12 @@ mod tests {
     #[test]
     fn bounds_edge_cases() {
         let mut coords = vec![];
-        let reconstructed = HexBounds::from_iter(coords.iter().copied());
+        let reconstructed: HexBounds = coords.iter().copied().collect();
         // Doesn't matter where it's placed.
         assert_eq!(reconstructed.radius, 0);
 
         coords.push(Hex::new(0, 0));
-        let reconstructed = HexBounds::from_iter(coords.iter().copied());
+        let reconstructed: HexBounds = coords.iter().copied().collect();
         assert_eq!(reconstructed, HexBounds::from_radius(0));
     }
 
@@ -376,7 +381,7 @@ mod tests {
             let coords = Hex::new(0, 0)
                 .full_wedge(size, crate::VertexDirection(1))
                 .collect::<Vec<_>>();
-            let reconstructed = HexBounds::from_iter(coords.iter().copied());
+            let reconstructed: HexBounds = coords.iter().copied().collect();
             for h in coords {
                 assert!(reconstructed.is_in_bounds(h));
             }
@@ -385,7 +390,7 @@ mod tests {
             let coords = Hex::new(0, 0)
                 .full_wedge(size, crate::VertexDirection(2))
                 .collect::<Vec<_>>();
-            let reconstructed = HexBounds::from_iter(coords.iter().copied());
+            let reconstructed: HexBounds = coords.iter().copied().collect();
             for h in coords {
                 assert!(reconstructed.is_in_bounds(h));
             }
