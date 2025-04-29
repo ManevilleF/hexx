@@ -5,6 +5,7 @@
 * Bumped dev-dependencies
 * Bumped `bevy` dev-dependency to 0.16 (#211)
 * Updated examples to use `bevy` 0.16 (#211)
+* Fixed `HexBounds::from_iter` and `HexBounds::from_min_max` calculation (#217)
 
 ## 0.20.0
 

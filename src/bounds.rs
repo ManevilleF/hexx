@@ -62,7 +62,7 @@ impl HexBounds {
     #[must_use]
     pub fn from_min_max(min: Hex, max: Hex) -> Self {
         let center = (min + max) / 2;
-        let radius = center.unsigned_distance_to(max) / 2;
+        let radius = center.unsigned_distance_to(max);
         Self { center, radius }
     }
 
@@ -327,6 +327,17 @@ mod tests {
     }
 
     #[test]
+    fn range_works() {
+        let coords: Vec<_> = Hex::ZERO.range(10).collect();
+        let bounds = HexBounds::from_iter(coords.clone());
+        assert_eq!(bounds.center, Hex::ZERO);
+        assert_eq!(bounds.radius, 10);
+        for h in coords {
+            assert!(bounds.is_in_bounds(h));
+        }
+    }
+
+    #[test]
     fn bounds_rhombus() {
         for size in 1..10 {
             for rotation in 0..3 {
@@ -337,7 +348,6 @@ mod tests {
                 for h in coords {
                     assert!(reconstructed.is_in_bounds(h));
                 }
-                #[allow(clippy::cast_sign_loss)]
                 let radius = size as u32 - 1;
                 assert_eq!(reconstructed.radius, radius);
             }
@@ -356,8 +366,7 @@ mod tests {
                 for h in coords {
                     assert!(reconstructed.is_in_bounds(h));
                 }
-                #[allow(clippy::cast_sign_loss)]
-                let radius = (size as u32 + 1) / 2;
+                let radius = (size as u32).div_ceil(2);
                 assert_eq!(reconstructed.radius, radius);
             }
         }
