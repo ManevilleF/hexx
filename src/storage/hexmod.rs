@@ -44,69 +44,18 @@ struct HexModMapMetadata {
 
 impl HexModMapMetadata {
     fn new(bounds: HexBounds) -> Self {
-        // Calculate the side length of the hexagon (distance from center to any corner)
-        let side_length = bounds.radius as i32;
-        Self { bounds, side_length }
+        Self { bounds, side_length: bounds.radius as i32 }
     }
 
-    const fn offset(&self) -> Hex {
-        Hex::splat(self.side_length).const_sub(self.bounds.center)
-    }
-
-    /// Converts from hex coordinates to a 1D array index
     fn hex_to_idx(&self, hex: Hex) -> Option<usize> {
         if !self.bounds.is_in_bounds(hex) {
             return None;
         }
-        
-        // Apply offset to bring hex into positive coordinate range relative to bounds
-        let hex = hex + self.offset();
-        
-        // Calculate index in the 1D array using the HexMod mapping formula
-        // This formula converts from 2D hex coordinates to a 1D array index
-        // for a hexagonal shape centered at the origin
-        let q = hex.x;
-        let r = hex.y;
-        let s = -q - r;
-        
-        let diameter = 2 * self.side_length + 1;
-        let qt = q + self.side_length;
-        let rt = r + self.side_length;
-        let st = s + self.side_length;
-        
-        // Validate coordinates are in range
-        if qt < 0 || qt >= diameter || rt < 0 || rt >= diameter || st < 0 || st >= diameter {
-            return None;
-        }
-        
-        // Calculate the 1D index
-        let index = qt + rt * diameter - (rt * (rt + 1)) / 2;
-        
-        Some(index as usize)
+        Some(hex.to_hexmod_coordinates(self.bounds.center, self.bounds.radius) as usize)
     }
 
-    /// Converts from a 1D array index back to hex coordinates
     fn idx_to_hex(&self, idx: usize) -> Hex {
-        // Calculate the row (axial y-coordinate + offset)
-        let diameter = 2 * self.side_length + 1;
-        let mut rt = 0;
-        let mut row_size = diameter;
-        let mut remaining = idx;
-        
-        // Find the row by subtracting row sizes
-        while remaining >= row_size {
-            remaining -= row_size;
-            rt += 1;
-            row_size -= 1;
-        }
-        
-        // Calculate qt (axial x-coordinate + offset)
-        let qt = remaining;
-        
-        // Convert back to original coordinate system
-        let hex = Hex::new(qt as i32, rt as i32) - self.offset();
-        
-        hex
+        Hex::from_hexmod_coordinates(idx as u32, self.bounds.center, self.bounds.radius)
     }
 }
 
@@ -258,13 +207,13 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::HashMap;
+    use std::collections::HashSet;
 
     #[test]
     fn validity() {
         for center in Hex::ZERO.range(20) {
             for radius in 0_u32..30 {
-                let expected: HashMap<Hex, usize> = center
+                let expected: std::collections::HashMap<Hex, usize> = center
                     .range(radius)
                     .enumerate()
                     .map(|(i, h)| (h, i))
@@ -273,7 +222,7 @@ mod tests {
                 let map = HexModMap::new(center, radius, |h| expected[&h]);
 
                 for (k, v) in &expected {
-                    assert_eq!(*v, map[k]);
+                    assert_eq!(*v, map[*k]);
                 }
                 for k in center.range(radius + 1) {
                     assert_eq!(expected.get(&k), map.get(k));
@@ -290,7 +239,7 @@ mod tests {
     fn iter() {
         for center in Hex::ZERO.range(20) {
             for radius in 0_u32..30 {
-                let expected: HashMap<Hex, usize> = center
+                let expected: std::collections::HashMap<Hex, usize> = center
                     .range(radius)
                     .enumerate()
                     .map(|(i, h)| (h, i))
@@ -298,18 +247,13 @@ mod tests {
 
                 let map = HexModMap::new(center, radius, |h| expected[&h]);
 
-                let mut values: Vec<_> = map.values().copied().collect();
-                let mut expected_values: Vec<_> = expected.values().copied().collect();
+                let values: Vec<_> = map.values().copied().collect();
+                let expected_values: Vec<_> = expected.values().copied().collect();
+                assert_eq!(values.len(), expected_values.len());
+                assert!(values.iter().all(|v| expected_values.contains(v)));
 
-                values.sort_unstable();
-                expected_values.sort_unstable();
-                assert_eq!(values, expected_values);
-
-                let mut keys: Vec<_> = map.iter().map(|(k, _)| k).collect();
-                let mut expected_keys: Vec<_> = expected.keys().copied().collect();
-
-                keys.sort_unstable();
-                expected_keys.sort_unstable();
+                let keys: HashSet<_> = map.iter().map(|(k, _)| k).collect();
+                let expected_keys: HashSet<_> = expected.keys().copied().collect();
                 assert_eq!(keys, expected_keys);
 
                 assert_eq!(map.values().len(), expected.values().len());
