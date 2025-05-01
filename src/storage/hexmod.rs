@@ -51,11 +51,11 @@ impl HexModMapMetadata {
         if !self.bounds.is_in_bounds(hex) {
             return None;
         }
-        Some(hex.to_hexmod_coordinates(self.bounds.center, self.bounds.radius) as usize)
+        Some(hex.to_hexmod_coordinates(self.bounds.radius) as usize)
     }
 
     fn idx_to_hex(&self, idx: usize) -> Hex {
-        Hex::from_hexmod_coordinates(idx as u32, self.bounds.center, self.bounds.radius)
+        Hex::from_hexmod_coordinates(idx as u32, self.bounds.radius)
     }
 }
 
