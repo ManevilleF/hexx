@@ -208,6 +208,9 @@ where
 #[cfg(test)]
 mod tests {
     use crate::shapes::rombus;
+    #[cfg(feature = "bevy_platform")]
+    use bevy_platform::collections::HashMap;
+    #[cfg(not(feature = "bevy_platform"))]
     use std::collections::HashMap;
 
     use super::*;

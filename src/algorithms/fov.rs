@@ -1,4 +1,7 @@
 use crate::{EdgeDirection, Hex};
+#[cfg(feature = "bevy_platform")]
+use bevy_platform::collections::HashSet;
+#[cfg(not(feature = "bevy_platform"))]
 use std::collections::HashSet;
 
 /// Computes a field of view around `coord` in a given `range`

@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-
 use bevy::{
     ecs::system::RunSystemOnce,
     input::mouse::MouseMotion,
+    platform::collections::HashMap,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
