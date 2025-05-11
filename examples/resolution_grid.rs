@@ -1,7 +1,6 @@
-use std::collections::HashSet;
-
 use bevy::{
     color::palettes::css::{AQUA, ORANGE, VIOLET},
+    platform::collections::HashSet,
     prelude::*,
 };
 use bevy_egui::EguiPlugin;

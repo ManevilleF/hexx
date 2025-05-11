@@ -1,7 +1,6 @@
-use std::collections::HashMap;
-
 use bevy::{
     color::palettes::css::{AQUA, LIMEGREEN, ORANGE, RED, VIOLET, WHITE, YELLOW},
+    platform::collections::HashMap,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
     window::PrimaryWindow,
