@@ -6,6 +6,9 @@
 * Bumped `bevy` dev-dependency to 0.16 (#211)
 * Updated examples to use `bevy` 0.16 (#211)
 * Added [`HexModMap`] storage map, using 1D array internal storage (#218, #215)
+* Added `bevy_platform` feature to enable `bevy_platform` dependencies (#216)
+* Added `bevy` feature to enable both `bevy_platform` and `bevy_reflect` (#216)
+* Fixed `HexBounds::from_iter` and `HexBounds::from_min_max` calculation (#217)
 
 ## 0.20.0
 

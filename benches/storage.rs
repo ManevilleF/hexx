@@ -4,7 +4,7 @@ use hexx::{
     storage::{HexModMap, HexStore, HexagonalMap, RombusMap},
     *,
 };
-use std::{collections::HashMap, time::Duration};
+use std::time::Duration;
 
 pub fn hexagonal_map_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hexagonal Storage");
@@ -16,19 +16,38 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
     let get_value = |h: Hex| h.length();
 
     for dist in [10, 100, 300] {
-        let hash_map: HashMap<_, _> = Hex::ZERO
+        let std_hash_map: std::collections::HashMap<_, _> = Hex::ZERO
+            .range(dist)
+            .map(|hex| (hex, get_value(hex)))
+            .collect();
+        let bevy_hash_map: bevy_platform::collections::HashMap<_, _> = Hex::ZERO
             .range(dist)
             .map(|hex| (hex, get_value(hex)))
             .collect();
         let hex_map = HexagonalMap::new(Hex::ZERO, dist, get_value);
         let hexmod_map = HexModMap::new(Hex::ZERO, dist, get_value);
-        group.bench_with_input(BenchmarkId::new("HashMap_get", dist), &dist, |b, dist| {
-            b.iter(|| {
-                for c in black_box(Hex::ZERO).range(*dist) {
-                    hash_map.get(&c).unwrap();
-                }
-            })
-        });
+        group.bench_with_input(
+            BenchmarkId::new("std::HashMap_get", dist),
+            &dist,
+            |b, dist| {
+                b.iter(|| {
+                    for c in black_box(Hex::ZERO).range(*dist) {
+                        std_hash_map.get(&c).unwrap();
+                    }
+                })
+            },
+        );
+        group.bench_with_input(
+            BenchmarkId::new("bevy_platform::HashMap_get", dist),
+            &dist,
+            |b, dist| {
+                b.iter(|| {
+                    for c in black_box(Hex::ZERO).range(*dist) {
+                        bevy_hash_map.get(&c).unwrap();
+                    }
+                })
+            },
+        );
         group.bench_with_input(
             BenchmarkId::new("HexagonalMap_get", dist),
             &dist,
@@ -47,9 +66,16 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
                 }
             })
         });
-        group.bench_with_input(BenchmarkId::new("HashMap_iter", dist), &dist, |b, _| {
-            b.iter(|| hash_map.iter().collect::<Vec<_>>())
-        });
+        group.bench_with_input(
+            BenchmarkId::new("std::HashMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| std_hash_map.iter().collect::<Vec<_>>()),
+        );
+        group.bench_with_input(
+            BenchmarkId::new("bevy_platform::HashMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| bevy_hash_map.iter().collect::<Vec<_>>()),
+        );
         group.bench_with_input(
             BenchmarkId::new("HexagonalMap_iter", dist),
             &dist,
@@ -69,17 +95,36 @@ pub fn rombus_map_benchmark(c: &mut Criterion) {
     let get_value = |h: Hex| h.length();
 
     for dist in [10, 100, 500] {
-        let hash_map: HashMap<_, _> = rombus(Hex::ZERO, dist, dist)
+        let std_hash_map: std::collections::HashMap<_, _> = rombus(Hex::ZERO, dist, dist)
             .map(|hex| (hex, get_value(hex)))
             .collect();
+        let bevy_hash_map: bevy_platform::collections::HashMap<_, _> =
+            rombus(Hex::ZERO, dist, dist)
+                .map(|hex| (hex, get_value(hex)))
+                .collect();
         let rombus_map = RombusMap::new(Hex::ZERO, dist, dist, get_value);
-        group.bench_with_input(BenchmarkId::new("HashMap_get", dist), &dist, |b, dist| {
-            b.iter(|| {
-                for c in rombus(black_box(Hex::ZERO), *dist, *dist) {
-                    hash_map.get(&c).unwrap();
-                }
-            })
-        });
+        group.bench_with_input(
+            BenchmarkId::new("std::HashMap_get", dist),
+            &dist,
+            |b, dist| {
+                b.iter(|| {
+                    for c in rombus(black_box(Hex::ZERO), *dist, *dist) {
+                        std_hash_map.get(&c).unwrap();
+                    }
+                })
+            },
+        );
+        group.bench_with_input(
+            BenchmarkId::new("bevy_platform::HashMap_get", dist),
+            &dist,
+            |b, dist| {
+                b.iter(|| {
+                    for c in rombus(black_box(Hex::ZERO), *dist, *dist) {
+                        bevy_hash_map.get(&c).unwrap();
+                    }
+                })
+            },
+        );
         group.bench_with_input(BenchmarkId::new("RombusMap_get", dist), &dist, |b, dist| {
             b.iter(|| {
                 for c in rombus(black_box(Hex::ZERO), *dist, *dist) {
@@ -87,9 +132,16 @@ pub fn rombus_map_benchmark(c: &mut Criterion) {
                 }
             })
         });
-        group.bench_with_input(BenchmarkId::new("HashMap_iter", dist), &dist, |b, _| {
-            b.iter(|| hash_map.iter().collect::<Vec<_>>())
-        });
+        group.bench_with_input(
+            BenchmarkId::new("std::HashMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| std_hash_map.iter().collect::<Vec<_>>()),
+        );
+        group.bench_with_input(
+            BenchmarkId::new("bevy_platform::HashMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| bevy_hash_map.iter().collect::<Vec<_>>()),
+        );
         group.bench_with_input(BenchmarkId::new("RombusMap_iter", dist), &dist, |b, _| {
             b.iter(|| rombus_map.iter().collect::<Vec<_>>())
         });
@@ -97,5 +149,5 @@ pub fn rombus_map_benchmark(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, hexagonal_map_benchmark, rombus_map_benchmark,);
+criterion_group!(benches, hexagonal_map_benchmark, rombus_map_benchmark);
 criterion_main!(benches);

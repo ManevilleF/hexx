@@ -55,7 +55,14 @@ storage_impl!(HexModMap<T>);
 /// Implemented for
 /// - [`HexagonalMap<T>`](HexagonalMap)
 /// - [`RombusMap<T>`](RombusMap)
-/// - [`HashMap<Hex, T>`](std::collections::HashMap)
+#[cfg_attr(
+    not(feature = "bevy_platform"),
+    doc = "- [`HashMap<Hex, T>`](std::collections::HashMap)"
+)]
+#[cfg_attr(
+    feature = "bevy_platform",
+    doc = "- [`HashMap<Hex, T>`](bevy_platform::collections::HashMap)"
+)]
 pub trait HexStore<T> {
     /// Returns a reference the stored value associated with `idx`.
     /// Returns `None` if `idx` is out of bounds
@@ -94,6 +101,47 @@ pub trait HexStore<T> {
 }
 
 impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<crate::Hex, T, S> {
+    fn get(&self, hex: crate::Hex) -> Option<&T> {
+        self.get(&hex)
+    }
+
+    fn get_mut(&mut self, hex: crate::Hex) -> Option<&mut T> {
+        self.get_mut(&hex)
+    }
+
+    fn values<'s>(&'s self) -> impl ExactSizeIterator<Item = &'s T>
+    where
+        T: 's,
+    {
+        self.values()
+    }
+
+    fn values_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = &'s mut T>
+    where
+        T: 's,
+    {
+        self.values_mut()
+    }
+
+    fn iter<'s>(&'s self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s T)>
+    where
+        T: 's,
+    {
+        self.iter().map(|(k, v)| (*k, v))
+    }
+
+    fn iter_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s mut T)>
+    where
+        T: 's,
+    {
+        self.iter_mut().map(|(k, v)| (*k, v))
+    }
+}
+
+#[cfg(feature = "bevy_platform")]
+impl<T, S: core::hash::BuildHasher> HexStore<T>
+    for bevy_platform::collections::HashMap<crate::Hex, T, S>
+{
     fn get(&self, hex: crate::Hex) -> Option<&T> {
         self.get(&hex)
     }

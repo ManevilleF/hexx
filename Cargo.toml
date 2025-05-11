@@ -26,8 +26,12 @@ grid = []
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
+# Adds support for the Bevy game engine
+bevy = ["bevy_reflect", "bevy_platform"]
 # Adds Bevy Reflection support
 bevy_reflect = ["dep:bevy_reflect"]
+# Adds Bevy Platform support
+bevy_platform = ["dep:bevy_platform"]
 
 [dependencies]
 glam = "0.29"
@@ -42,6 +46,10 @@ optional = true
 version = "0.16"
 default-features = false
 features = ["glam"]
+optional = true
+
+[dependencies.bevy_platform]
+version = "0.16"
 optional = true
 
 # For lib.rs doctests and examples
@@ -85,38 +93,47 @@ unexpected_cfgs = { level = "warn", check-cfg = [
 [[example]]
 name = "hex_grid"
 path = "examples/hex_grid.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "hex_area"
 path = "examples/hex_area.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "scroll_map"
 path = "examples/scroll_map.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "wrap_map"
 path = "examples/wrap_map.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "a_star"
 path = "examples/a_star.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "field_of_view"
 path = "examples/field_of_view.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "field_of_movement"
 path = "examples/field_of_movement.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "3d_columns"
 path = "examples/3d_columns.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "3d_picking"
 path = "examples/3d_picking.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "mesh_builder"
@@ -135,7 +152,7 @@ path = "examples/chunks.rs"
 [[example]]
 name = "resolutions"
 path = "examples/resolution_grid.rs"
-required-features = ["bevy_reflect"]
+required-features = ["bevy_platform", "bevy_reflect"]
 
 [[example]]
 name = "merged_columns"
@@ -145,6 +162,7 @@ required-features = ["bevy_reflect"]
 [[example]]
 name = "sprite_sheet"
 path = "examples/sprite_sheet.rs"
+required-features = ["bevy_platform"]
 
 [[example]]
 name = "shapes"
@@ -170,6 +188,7 @@ harness = false
 [[bench]]
 name = "storage"
 harness = false
+required-features = ["bevy_platform"]
 
 [profile.dev]
 opt-level = 1
