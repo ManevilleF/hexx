@@ -9,6 +9,7 @@
 * Added `bevy_platform` feature to enable `bevy_platform` dependencies (#216)
 * Added `bevy` feature to enable both `bevy_platform` and `bevy_reflect` (#216)
 * Fixed `HexBounds::from_iter` and `HexBounds::from_min_max` calculation (#217)
+* Rust 1.87 clippy fixes (#220)
 
 ## 0.20.0
 

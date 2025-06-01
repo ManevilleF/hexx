@@ -119,7 +119,7 @@ impl<T> HexModMap<T> {
 
     #[must_use]
     /// Returns `true` if `len` is zero
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.inner.is_empty()
     }
 }
