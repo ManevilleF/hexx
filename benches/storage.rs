@@ -11,7 +11,7 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
     group
         .significance_level(0.1)
         .measurement_time(Duration::from_secs(8))
-        .sample_size(100);
+        .sample_size(500);
 
     let get_value = |h: Hex| h.length();
 
@@ -90,7 +90,7 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
 
 pub fn rombus_map_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Rombus Storage");
-    group.significance_level(0.1).sample_size(100);
+    group.significance_level(0.1).sample_size(500);
 
     let get_value = |h: Hex| h.length();
 

@@ -111,13 +111,13 @@ impl<T> RombusMap<T> {
 
     #[must_use]
     /// Map storage length, equals to `rows * columns`
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         self.inner.len()
     }
 
     #[must_use]
     /// Returns `true` if `rows` or `columns` is zero
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.inner.is_empty()
     }
 

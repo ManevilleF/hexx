@@ -63,10 +63,10 @@ impl Hex {
     ) -> [i32; 2] {
         match (mode, orientation) {
             (OffsetHexMode::Even, HexOrientation::Flat) => {
-                [self.x, self.y + (self.x + (self.x & 1)) / 2]
+                [self.x, self.y + i32::midpoint(self.x, self.x & 1)]
             }
             (OffsetHexMode::Even, HexOrientation::Pointy) => {
-                [self.x + (self.y + (self.y & 1)) / 2, self.y]
+                [self.x + i32::midpoint(self.y, self.y & 1), self.y]
             }
             (OffsetHexMode::Odd, HexOrientation::Flat) => {
                 [self.x, self.y + (self.x - (self.x & 1)) / 2]
@@ -140,13 +140,13 @@ impl Hex {
     ) -> Self {
         match (mode, orientation) {
             (OffsetHexMode::Even, HexOrientation::Flat) => {
-                Self::new(col, row - (col + (col & 1)) / 2)
+                Self::new(col, row - i32::midpoint(col, col & 1))
             }
             (OffsetHexMode::Odd, HexOrientation::Flat) => {
                 Self::new(col, row - (col - (col & 1)) / 2)
             }
             (OffsetHexMode::Even, HexOrientation::Pointy) => {
-                Self::new(col - (row + (row & 1)) / 2, row)
+                Self::new(col - i32::midpoint(row, row & 1), row)
             }
             (OffsetHexMode::Odd, HexOrientation::Pointy) => {
                 Self::new(col - (row - (row & 1)) / 2, row)
