@@ -3,7 +3,7 @@ use hexx::*;
 
 pub fn wedge_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hex Wedge");
-    group.significance_level(0.1).sample_size(100);
+    group.significance_level(0.1).sample_size(1000);
     let dist = 500;
 
     group.bench_with_input(BenchmarkId::new("Wedge", dist), &dist, |b, dist| {
