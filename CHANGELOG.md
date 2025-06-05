@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.21.0
+
 * Bumped dev-dependencies
 * Bumped `bevy` dev-dependency to 0.16 (#211)
 * Updated examples to use `bevy` 0.16 (#211)
