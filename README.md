@@ -8,7 +8,7 @@
 [![Crates.io](https://img.shields.io/crates/v/hexx?style=flat-square)](https://crates.io/crates/hexx)
 [![Downloads](https://img.shields.io/crates/d/hexx?style=flat-square)](https://crates.io/crates/hexx)
 [![Docs.rs](https://img.shields.io/docsrs/hexx?style=flat-square)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.20.0/status.svg?style=flat-square)](https://deps.rs/crate/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.21.0/status.svg?style=flat-square)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
@@ -34,7 +34,7 @@
  Run `cargo add hexx` in your project or add the following line to your
  `Cargo.toml`:
 
- * `hexx = "0.20"`
+ * `hexx = "0.21"`
 
  ### Cargo features
 
