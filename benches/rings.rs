@@ -3,7 +3,7 @@ use hexx::*;
 
 pub fn rings_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hex Rings");
-    group.significance_level(0.1).sample_size(1000);
+    group.significance_level(0.1).sample_size(500);
     let dist: u32 = 1000;
 
     group.bench_with_input(BenchmarkId::new("Range", dist), &dist, |b, dist| {

@@ -2,6 +2,7 @@ use glam::{BVec2, Vec2};
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+// #[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 /// Struct containing options for UV mapping.
 ///
@@ -15,7 +16,7 @@ use glam::{BVec2, Vec2};
 ///     .with_offset(vec2(1.0, 0.5))
 ///     .flip_u()
 ///     .with_scale_factor(vec2(1.0, 2.0));
-/// ```    
+/// ```
 ///
 /// # Order of operations
 ///
@@ -45,6 +46,7 @@ pub struct UVOptions {
 /// 2D rect, with remapping utilities
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+// #[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Rect {
     /// minimum coordinate
