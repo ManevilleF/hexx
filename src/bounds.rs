@@ -1,4 +1,4 @@
-use crate::Hex;
+use crate::{EdgeDirection, Hex};
 
 /// Hexagonal bounds utils, represented as a center and radius.
 /// This type can be defined manually or from a [`Hex`] iterator.
@@ -138,6 +138,13 @@ impl HexBounds {
     #[must_use]
     pub fn wrap(&self, coord: Hex) -> Hex {
         self.wrap_local(coord) + self.center
+    }
+
+    /// Returns the 6 corners of the hex bounds in [`EdgeDirection`] order
+    #[must_use]
+    #[allow(clippy::cast_possible_wrap)]
+    pub fn corners(&self) -> [Hex; 6] {
+        EdgeDirection::ALL_DIRECTIONS.map(|dir| self.center.const_add(dir * self.radius as i32))
     }
 }
 
@@ -316,12 +323,18 @@ mod tests {
             let coords = bounds.all_coords();
             let reconstructed: HexBounds = coords.collect();
             assert_eq!(bounds, reconstructed);
+            let corners = bounds.corners();
+            let reconstructed: HexBounds = corners.into_iter().collect();
+            assert_eq!(bounds, reconstructed);
         }
 
         for radius in 0..8 {
             let bounds = HexBounds::new(Hex::new(15, -19), radius);
             let coords = bounds.all_coords();
             let reconstructed: HexBounds = coords.collect();
+            assert_eq!(bounds, reconstructed);
+            let corners = bounds.corners();
+            let reconstructed: HexBounds = corners.into_iter().collect();
             assert_eq!(bounds, reconstructed);
         }
     }
