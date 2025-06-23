@@ -6,6 +6,7 @@ use crate::{Hex, hex::ExactSizeHexIterator};
 /// Equivalent to [`parallelogram`]
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Parallelogram {
     /// Start coordinate
@@ -49,6 +50,7 @@ pub fn parallelogram(min: Hex, max: Hex) -> impl ExactSizeIterator<Item = Hex> {
 /// Equivalent to [`triangle`]
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Triangle {
     /// Triangle size
@@ -89,6 +91,7 @@ pub fn triangle(size: u32) -> impl ExactSizeIterator<Item = Hex> {
 /// Equivalent to [`hexagon`]
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Hexagon {
     /// Center coordinate
@@ -126,6 +129,7 @@ pub fn hexagon(center: Hex, radius: u32) -> impl ExactSizeIterator<Item = Hex> {
 /// Equivalent to [`rombus`]
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Rombus {
     /// rombus lowest coordinate
@@ -174,6 +178,7 @@ pub fn rombus(point: Hex, rows: u32, columns: u32) -> impl ExactSizeIterator<Ite
 /// [Pointy]: crate::HexOrientation::Pointy
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct PointyRectangle {
     /// Lowest `x` coordinate
@@ -233,6 +238,7 @@ pub fn pointy_rectangle(
 /// [Flat]: crate::HexOrientation::Flat
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct FlatRectangle {
     /// Lowest `x` coordinate

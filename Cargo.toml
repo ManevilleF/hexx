@@ -26,6 +26,8 @@ grid = []
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
+# facet compatibility
+facet = ["dep:facet"]
 # Adds support for the Bevy game engine
 bevy = ["bevy_reflect", "bevy_platform"]
 # Adds Bevy Reflection support
@@ -40,6 +42,11 @@ glam = "0.30"
 version = "1"
 default-features = false
 features = ["derive"]
+optional = true
+
+[dependencies.facet]
+version = "0.27"
+default-features = false
 optional = true
 
 [dependencies.bevy_reflect]

@@ -7,11 +7,15 @@ type VertexIdx = u16;
 
 /// Structure storing three vertex indices
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Tri(pub [VertexIdx; 3]);
 
 /// Representation of a primitive face, with a fixed amount of vertices and
 /// triangles
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Face<const VERTS: usize, const TRIS: usize> {
     /// Vertex positions
     pub positions: [Vec3; VERTS],
