@@ -601,7 +601,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes the distance from `self` to `rhs` in hexagonal space as a
+    /// Computes the manhattan distance from `self` to `rhs` in hexagonal space as a
     /// signed integer
     ///
     /// See [`Self::unsigned_distance_to`] for the unsigned version
