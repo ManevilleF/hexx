@@ -6,9 +6,9 @@ use bevy::{
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
 use bevy_egui::EguiPlugin;
-use bevy_inspector_egui::{quick::ResourceInspectorPlugin, InspectorOptions};
+use bevy_inspector_egui::{InspectorOptions, quick::ResourceInspectorPlugin};
 use hexx::*;
-use rand::{rng, Rng};
+use rand::{Rng, rng};
 
 /// Chunk colors
 const COLORS: [Color; 3] = [Color::Srgba(BLUE), Color::Srgba(WHITE), Color::Srgba(RED)];

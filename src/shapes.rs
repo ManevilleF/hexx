@@ -1,4 +1,4 @@
-use crate::{hex::ExactSizeHexIterator, Hex};
+use crate::{Hex, hex::ExactSizeHexIterator};
 
 /// Parallelogram shape parameters.
 ///

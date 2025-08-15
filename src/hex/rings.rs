@@ -1,4 +1,4 @@
-use super::{iter::ExactSizeHexIterator, EdgeDirection, Hex, VertexDirection};
+use super::{EdgeDirection, Hex, VertexDirection, iter::ExactSizeHexIterator};
 
 impl Hex {
     #[must_use]
@@ -538,10 +538,6 @@ impl Hex {
     #[must_use]
     /// Counts how many coordinates there are in a ring at the given `range`
     pub const fn ring_count(range: u32) -> usize {
-        if range == 0 {
-            1
-        } else {
-            6 * range as usize
-        }
+        if range == 0 { 1 } else { 6 * range as usize }
     }
 }

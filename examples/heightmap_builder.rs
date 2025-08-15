@@ -6,12 +6,12 @@ use bevy::{
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
 use bevy_egui::{
-    egui::{self, Ui},
     EguiContext, EguiPlugin,
+    egui::{self, Ui},
 };
 use bevy_inspector_egui::bevy_inspector;
 use hexx::*;
-use rand::{rng, Rng};
+use rand::{Rng, rng};
 use storage::HexagonalMap;
 
 #[derive(Debug, Resource)]

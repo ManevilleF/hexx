@@ -1,4 +1,4 @@
-use crate::{hex::ExactSizeHexIterator, Hex, HexBounds};
+use crate::{Hex, HexBounds, hex::ExactSizeHexIterator};
 use std::fmt;
 
 use super::HexStore;
