@@ -82,7 +82,7 @@ pub struct RectMetadata {
     /// the hex layout of the map
     hex_layout: HexLayout,
     /// the offset mode of the map
-    /// 
+    ///
     /// affect which way does the map zic zac.
     offset_mode: OffsetHexMode,
     /// the half size of the map
@@ -267,8 +267,8 @@ impl RectMetadata {
     /// - => `rc` 2D view of `Vec`
     /// - => `idx` `Vec` index
     fn ij_to_idx(&self, ij: IVec2) -> usize {
-        let rc = ij + self.half_size;
-        (rc[0] + rc[1] * (2 * self.half_size[0])) as usize
+        let rc = (ij + self.half_size).as_uvec2();
+        (rc[0] + rc[1] * (2 * self.half_size.as_uvec2()[0])) as usize
     }
 
     /// infallable
@@ -325,7 +325,7 @@ impl RectMetadata {
     /// total size of the map
     #[must_use]
     pub fn len(&self) -> usize {
-        self.half_size.element_product() as usize * 4
+        (self.half_size.as_uvec2().element_product() * 4) as usize
     }
 
     /// whether of not the map layout is empty
@@ -376,7 +376,7 @@ impl<T> RectMap<T> {
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
     pub fn new(meta: RectMetadata, mut values: impl FnMut(Hex) -> T) -> Self {
-        let size = meta.half_size.element_product() as usize * 4;
+        let size = (meta.half_size.as_uvec2().element_product() * 4) as usize;
         let mut inner = Vec::with_capacity(size);
         for h in meta.iter_hex() {
             inner.push(values(h));
