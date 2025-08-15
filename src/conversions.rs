@@ -20,6 +20,7 @@ pub enum DoubledHexMode {
 /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub enum OffsetHexMode {
     /// Depending on the orientation:
     ///

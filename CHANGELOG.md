@@ -4,6 +4,24 @@
 
 * Rust 2024 edition (#225)
 * Added `HexBounds::corners` method (#223)
+* Added feature `bevy_ecs` (`dep:bevy_ecs`)
+  - which allow data types to derive `Component` and `Resource`.
+
+### `RectMap<T>`
+* Added `src/storage/rect.rs`
+  - `RectMap`, rectangular layout hex map
+    - internally use offset coordinate to map indice to 1D vec index
+    - implement `HexStore`
+  - `RectMetadata`, meta for `RectMap`, also act as builder pattern
+  - `WrapStrategy`, the wrapping strategy 
+    - `Clamp`, clamp to `min..max`, use for latitude
+    - `Cycle`, cycle the index, use for longitude
+  - tested for
+    - index conversion
+    - containment, and 
+    - wrapping indexing.
+* Added `examples/rect_map.rs` to demostrate `RectMap` usage
+
 
 ## 0.21.0
 
