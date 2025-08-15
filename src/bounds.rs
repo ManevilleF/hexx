@@ -98,7 +98,7 @@ impl HexBounds {
     #[doc(alias = "all_items")]
     #[must_use]
     /// Returns an iterator with all the coordinates in bounds
-    pub fn all_coords(&self) -> impl ExactSizeIterator<Item = Hex> {
+    pub fn all_coords(self) -> impl ExactSizeIterator<Item = Hex> {
         self.center.range(self.radius)
     }
 

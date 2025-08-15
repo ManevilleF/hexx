@@ -8,7 +8,7 @@ use bevy::{
         render_asset::RenderAssetUsages,
     },
 };
-use bevy_egui::{egui, EguiContext, EguiPlugin};
+use bevy_egui::{EguiContext, EguiPlugin, egui};
 use bevy_inspector_egui::bevy_inspector;
 use hexx::{shapes, *};
 

@@ -5,8 +5,8 @@ use bevy::{
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
 use bevy_egui::{
-    egui::{self, Ui},
     EguiContext, EguiPlugin,
+    egui::{self, Ui},
 };
 use bevy_inspector_egui::bevy_inspector;
 use hexx::*;

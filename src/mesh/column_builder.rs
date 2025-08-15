@@ -1,6 +1,6 @@
 use glam::{Quat, Vec3};
 
-use super::{face::Quad, MeshInfo, BASE_FACING};
+use super::{BASE_FACING, MeshInfo, face::Quad};
 use crate::{
     EdgeDirection, FaceOptions, Hex, HexLayout, InsetOptions, PlaneMeshBuilder, UVOptions,
 };

@@ -1,4 +1,4 @@
-use crate::{HexLayout, InsetScaleMode, MeshInfo, UVOptions, BASE_FACING};
+use crate::{BASE_FACING, HexLayout, InsetScaleMode, MeshInfo, UVOptions};
 use glam::{Vec2, Vec3};
 
 use super::FaceOptions;

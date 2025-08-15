@@ -4,7 +4,7 @@ use bevy::{
     prelude::*,
 };
 use bevy_egui::EguiPlugin;
-use bevy_inspector_egui::{quick::ResourceInspectorPlugin, InspectorOptions};
+use bevy_inspector_egui::{InspectorOptions, quick::ResourceInspectorPlugin};
 use hexx::*;
 
 pub fn main() {
