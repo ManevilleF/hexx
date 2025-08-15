@@ -1,4 +1,4 @@
-use crate::{orientation::SQRT_3, EdgeDirection, Hex, HexOrientation, VertexDirection};
+use crate::{EdgeDirection, Hex, HexOrientation, VertexDirection, orientation::SQRT_3};
 use glam::Vec2;
 
 /// Hexagonal layout. This type is the bridge between your *world*/*pixel*

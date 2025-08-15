@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Rust 2024 edition (#225)
+
 ## 0.21.0
 
 * Bumped dev-dependencies

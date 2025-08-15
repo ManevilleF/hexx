@@ -1,9 +1,9 @@
 use crate::{
+    EdgeDirection, Hex, HexLayout, HexOrientation,
     angles::{
         DIRECTION_ANGLE_DEGREES, DIRECTION_ANGLE_OFFSET_DEGREES, DIRECTION_ANGLE_OFFSET_RAD,
         DIRECTION_ANGLE_RAD,
     },
-    EdgeDirection, Hex, HexLayout, HexOrientation,
 };
 use glam::Vec2;
 use std::{f32::consts::TAU, fmt::Debug};

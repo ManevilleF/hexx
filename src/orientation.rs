@@ -1,4 +1,4 @@
-use glam::{vec2, Mat2, Vec2};
+use glam::{Mat2, Vec2, vec2};
 use std::ops::Deref;
 
 pub(crate) const SQRT_3: f32 = 1.732_050_8;

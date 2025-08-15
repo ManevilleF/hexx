@@ -1,5 +1,5 @@
-use super::{face::Quad, FaceOptions, InsetOptions, MeshInfo};
-use crate::{storage::HexStore, EdgeDirection, Hex, HexLayout, PlaneMeshBuilder, UVOptions};
+use super::{FaceOptions, InsetOptions, MeshInfo, face::Quad};
+use crate::{EdgeDirection, Hex, HexLayout, PlaneMeshBuilder, UVOptions, storage::HexStore};
 use glam::{Quat, Vec3};
 use std::{ops::RangeInclusive, sync::Arc};
 
