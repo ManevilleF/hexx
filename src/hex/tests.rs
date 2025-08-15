@@ -235,6 +235,21 @@ fn distance_to() {
 }
 
 #[test]
+fn euclidean_distance_to() {
+    for (i, ring) in Hex::ZERO.rings(0..10).enumerate().skip(1) {
+        let mut equal_dists = 0;
+        for coord in ring {
+            let dist = coord.euclidean_distance_to(Hex::ZERO);
+            assert!(dist <= i as f32);
+            if dist == i as f32 {
+                equal_dists += 1;
+            }
+        }
+        assert_eq!(equal_dists, 6);
+    }
+}
+
+#[test]
 fn rotation() {
     let neighbors = Hex::ZERO.all_neighbors();
     for elems in neighbors.windows(2) {

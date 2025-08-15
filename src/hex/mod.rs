@@ -619,6 +619,28 @@ impl Hex {
         self.const_sub(rhs).ulength()
     }
 
+    /// Computes euclidean distance from `self` to `rhs` as a floating point
+    /// number in the Cartesian coordinate system.
+    /// Euclidean distance can vary for coordinates in the same range, and
+    /// can be used for operations outside of the hexagonal space, like
+    /// checking if coordinates are in a circular range instead of an
+    /// hexagonal range
+    ///
+    /// Note: For most cases you should use an [`crate::HexLayout`]
+    ///
+    /// > Source:
+    /// > Xiangguo Li's 2013 [Paper]. ([DOI]) gives a formula for Euclidean distance
+    ///
+    /// [Paper]: https://scholar.google.com/scholar?q=Storage+and+addressing+scheme+for+practical+hexagonal+image+processing
+    /// [DOI]: https://doi.org/10.1117/1.JEI.22.1.010502
+    #[must_use]
+    #[allow(clippy::cast_precision_loss)]
+    pub fn euclidean_distance_to(self, rhs: Self) -> f32 {
+        let dx = (rhs.x - self.x) as f32;
+        let dy = (rhs.y - self.y) as f32;
+        dx.mul_add(dy, dx.mul_add(dx, dy * dy)).sqrt()
+    }
+
     #[inline]
     #[must_use]
     /// Retrieves the hexagonal neighbor coordinates matching the given
@@ -993,6 +1015,31 @@ impl Hex {
             }),
             count: Self::range_count(range) as usize,
         }
+    }
+
+    /// Retrieves all [`Hex`] around `self` in a given circular `range`.
+    ///
+    /// > See also [`Hex::range`] for hexagonal ranges
+    ///
+    /// Note that this implementation is very naive and inefficient.
+    /// Use sparingly
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::*;
+    /// let coord = hex(12, 34);
+    /// assert_eq!(coord.circular_range(0.0).count(), 1);
+    /// assert_eq!(coord.circular_range(1.0).count(), 7);
+    /// ```
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    pub fn circular_range(self, range: f32) -> impl Iterator<Item = Self> {
+        let radius = range.ceil() as u32;
+        // TODO: Improve this computation to have the smallest hexagon
+        // which fits the circle
+        let hex_range = radius + radius / 2;
+        self.range(hex_range)
+            .filter(move |h| self.euclidean_distance_to(*h) <= range)
     }
 
     #[allow(clippy::cast_possible_wrap)]

@@ -1,5 +1,8 @@
 use bevy::{
-    color::palettes::css::{AQUA, LIMEGREEN, ORANGE, RED, VIOLET, WHITE, YELLOW},
+    color::palettes::{
+        css::{AQUA, LIMEGREEN, ORANGE, RED, VIOLET, WHITE, YELLOW},
+        tailwind::GRAY_300,
+    },
     platform::collections::HashMap,
     prelude::*,
     render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
@@ -8,7 +11,7 @@ use bevy::{
 use hexx::{shapes, *};
 
 /// World size of the hexagons (outer radius)
-const HEX_SIZE: f32 = 13.0;
+const HEX_SIZE: f32 = 12.0;
 
 pub fn main() {
     App::new()
@@ -36,6 +39,7 @@ struct HighlightedHexes {
     pub rectiline: Vec<Hex>,
     pub half_ring: Vec<Hex>,
     pub rotated: Vec<Hex>,
+    pub circle: Vec<Hex>,
 }
 
 #[derive(Debug, Resource)]
@@ -48,6 +52,7 @@ struct Map {
     dir_wedge_material: Handle<ColorMaterial>,
     line_material: Handle<ColorMaterial>,
     half_ring_material: Handle<ColorMaterial>,
+    circle_material: Handle<ColorMaterial>,
     default_material: Handle<ColorMaterial>,
 }
 
@@ -70,12 +75,13 @@ fn setup_grid(
     let dir_wedge_material = materials.add(Color::Srgba(VIOLET));
     let line_material = materials.add(Color::Srgba(ORANGE));
     let half_ring_material = materials.add(Color::Srgba(LIMEGREEN));
+    let circle_material = materials.add(Color::Srgba(GRAY_300));
     let default_material = materials.add(Color::Srgba(WHITE));
     // mesh
     let mesh = hexagonal_plane(&layout);
     let mesh_handle = meshes.add(mesh);
 
-    let entities = shapes::flat_rectangle([-26, 26, -23, 23])
+    let entities = shapes::flat_rectangle([-28, 28, -23, 23])
         .map(|hex| {
             let pos = layout.hex_to_world_pos(hex);
             let id = commands
@@ -87,7 +93,7 @@ fn setup_grid(
                         Text2d(format!("{},{}", hex.x, hex.y)),
                         TextColor(Color::BLACK),
                         TextFont {
-                            font_size: 7.0,
+                            font_size: 6.0,
                             ..default()
                         },
                         Transform::from_xyz(0.0, 0.0, 10.0),
@@ -106,6 +112,7 @@ fn setup_grid(
         line_material,
         half_ring_material,
         wedge_material,
+        circle_material,
         dir_wedge_material,
     });
 }
@@ -137,6 +144,7 @@ fn handle_input(
                 &highlighted_hexes.dir_wedge,
                 &highlighted_hexes.half_ring,
                 &highlighted_hexes.rotated,
+                &highlighted_hexes.circle,
             ] {
                 for entity in vec.iter().filter_map(|h| map.entities.get(h)) {
                     commands
@@ -164,7 +172,10 @@ fn handle_input(
             highlighted_hexes.rotated = (1..6).map(|i| coord.rotate_cw(i)).collect();
             // Draw an dual wedge
             highlighted_hexes.dir_wedge = Hex::ZERO.corner_wedge_to(coord / 2).collect();
+            // Draw a circle
+            highlighted_hexes.circle = Hex::ZERO.circular_range(coord.length() as f32).collect();
             for (vec, mat) in [
+                (&highlighted_hexes.circle, &map.circle_material),
                 (&highlighted_hexes.wedge, &map.wedge_material),
                 (&highlighted_hexes.dir_wedge, &map.dir_wedge_material),
                 (&highlighted_hexes.ring, &map.ring_material),
