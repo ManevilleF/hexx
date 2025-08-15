@@ -629,7 +629,8 @@ impl Hex {
     /// Note: For most cases you should use an [`crate::HexLayout`]
     ///
     /// > Source:
-    /// > Xiangguo Li's 2013 [Paper]. ([DOI]) gives a formula for Euclidean distance
+    /// > Xiangguo Li's 2013 [Paper]. ([DOI]) gives a formula for Euclidean
+    /// > distance
     ///
     /// [Paper]: https://scholar.google.com/scholar?q=Storage+and+addressing+scheme+for+practical+hexagonal+image+processing
     /// [DOI]: https://doi.org/10.1117/1.JEI.22.1.010502
@@ -1037,7 +1038,7 @@ impl Hex {
         let radius = range.ceil() as u32;
         // TODO: Improve this computation to have the smallest hexagon
         // which fits the circle
-        let hex_range = radius + radius / 2;
+        let hex_range = radius + (range / 6.0).floor() as u32;
         self.range(hex_range)
             .filter(move |h| self.euclidean_distance_to(*h) <= range)
     }
