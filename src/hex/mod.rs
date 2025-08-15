@@ -601,8 +601,8 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    /// Computes the manhattan distance from `self` to `rhs` in hexagonal space as a
-    /// signed integer
+    /// Computes the manhattan distance from `self` to `rhs` in hexagonal space
+    /// as a signed integer
     ///
     /// See [`Self::unsigned_distance_to`] for the unsigned version
     pub const fn distance_to(self, rhs: Self) -> i32 {

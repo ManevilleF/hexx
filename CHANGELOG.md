@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 * Rust 2024 edition (#225)
+* Added `HexBounds::corners` method (#223)
 
 ## 0.21.0
 
