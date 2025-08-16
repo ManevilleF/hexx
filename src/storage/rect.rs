@@ -16,12 +16,15 @@ use crate::{Hex, HexLayout, OffsetHexMode, storage::HexStore};
 /// - The map is _dense_
 /// - No coordinate will be added or removed from the map
 ///
-/// If your use case doesn't match all of the above, use a [`std::collections::HashMap`] instead
+/// If your use case doesn't match all of the above, use a
+/// [`std::collections::HashMap`] instead
 ///
 /// # Example
 /// ```rust
-/// use hexx::storage::{HexStore, RectMap, RectMetadata, WrapStrategy};
-/// use hexx::*;
+/// use hexx::{
+///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+///     *,
+/// };
 ///
 /// let layout = HexLayout::pointy()
 ///     .with_hex_size(30.0)
@@ -56,17 +59,18 @@ pub struct RectMap<T> {
 ///
 /// # Example
 /// ```rust
-/// use hexx::{Hex, HexLayout, OffsetHexMode};
-/// use hexx::storage::{RectMap, HexStore, RectMetadata, WrapStrategy};
-/// use hexx::IVec2;
+/// use hexx::{
+///     Hex, HexLayout, IVec2, OffsetHexMode,
+///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+/// };
 ///
 /// let rect_hex_map = RectMetadata::default()
 ///     .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
-///     .with_half_size(IVec2::new(8,12))
+///     .with_half_size(IVec2::new(8, 12))
 ///     .with_offset_mode(OffsetHexMode::Odd)
 ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
 ///     .build_default::<i32>();
-/// let hex = Hex::new(0,0);
+/// let hex = Hex::new(0, 0);
 ///
 /// assert_eq!(rect_hex_map.get(hex), Some(&0_i32));
 /// assert_eq!(rect_hex_map.wrapped_get(hex), &0_i32);
@@ -91,7 +95,8 @@ pub struct RectMetadata {
     wrap_strategies: [WrapStrategy; 2],
 }
 
-/// Wrapping Strategy for when try to [`RectMap::wrapped_get`] and [`RectMap::wrapped_get_mut`]
+/// Wrapping Strategy for when try to [`RectMap::wrapped_get`] and
+/// [`RectMap::wrapped_get_mut`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
@@ -148,8 +153,10 @@ impl RectMetadata {
     /// builder patter, build map with function to eval value
     /// # Example
     /// ```rust
-    /// use hexx::storage::{HexStore, RectMap, RectMetadata, WrapStrategy};
-    /// use hexx::*;
+    /// use hexx::{
+    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    ///     *,
+    /// };
     ///
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)
@@ -168,8 +175,10 @@ impl RectMetadata {
     /// builder patter, build map with default values
     /// # Example
     /// ```rust
-    /// use hexx::storage::{HexStore, RectMap, RectMetadata, WrapStrategy};
-    /// use hexx::*;
+    /// use hexx::{
+    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    ///     *,
+    /// };
     ///
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)
@@ -213,7 +222,7 @@ impl RectMetadata {
     ///
     /// infallible
     ///
-    /// - `idx` `Vec` index  
+    /// - `idx` `Vec` index
     /// - => `rc` 2D view of `Vec`
     /// - => `ij` offset coordinate
     /// - => `hex`
@@ -359,8 +368,10 @@ impl<T> RectMap<T> {
     ///
     /// # Example
     /// ```
-    /// use hexx::storage::{HexStore, RectMap, RectMetadata, WrapStrategy};
-    /// use hexx::*;
+    /// use hexx::{
+    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    ///     *,
+    /// };
     ///
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)
@@ -391,8 +402,10 @@ impl<T> RectMap<T> {
     ///
     /// # Example
     /// ```
-    /// use hexx::storage::{HexStore, RectMap, RectMetadata, WrapStrategy};
-    /// use hexx::*;
+    /// use hexx::{
+    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    ///     *,
+    /// };
     ///
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)

@@ -1,11 +1,11 @@
-use bevy::color::palettes::css::*;
-use bevy::math::VectorSpace;
-use bevy::platform::collections::HashMap;
-use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
+use bevy::{
+    color::palettes::css::*, platform::collections::HashMap, prelude::*, window::PrimaryWindow,
+};
 
-use hexx::storage::{HexStore, RectMap, RectMetadata, WrapStrategy};
-use hexx::*;
+use hexx::{
+    storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    *,
+};
 
 pub fn main() {
     App::new()
@@ -29,17 +29,14 @@ pub fn main() {
         .init_resource::<CursorHex>()
         .add_event::<RespawnMap>()
         .add_systems(Startup, setup)
-        .add_systems(
-            Update,
-            (handle_input, respawn_map, cursor_draw, cursor_mat).chain(),
-        )
+        .add_systems(Update, (handle_input, respawn_map, cursor_draw).chain())
         .run();
 }
 
 #[derive(Resource)]
 pub struct DefaultMaterial(pub MeshMaterial2d<ColorMaterial>);
 #[derive(Resource)]
-pub struct SelectedMaterial(pub MeshMaterial2d<ColorMaterial>);
+pub struct CursorMaterial(pub MeshMaterial2d<ColorMaterial>);
 
 #[derive(Resource, Default)]
 pub struct CursorHex(pub Option<Hex>);
@@ -59,8 +56,8 @@ fn setup(
     commands.spawn(Camera2d);
     let default_mat = MeshMaterial2d(materials.add(ColorMaterial::from_color(GRAY)));
     commands.insert_resource(DefaultMaterial(default_mat));
-    let select_mat = MeshMaterial2d(materials.add(ColorMaterial::from_color(GREEN)));
-    commands.insert_resource(SelectedMaterial(select_mat));
+    let cursor_mat = MeshMaterial2d(materials.add(ColorMaterial::from_color(GREEN)));
+    commands.insert_resource(CursorMaterial(cursor_mat));
     commands.spawn((
         Text::new(""),
         Node {
@@ -126,7 +123,7 @@ fn respawn_map(
         30_f32.to_radians()
     };
 
-    let map = meta.clone().build(|hex| {
+    let map: RectMap<Entity> = meta.clone().build(|hex| {
         let mut pos = meta.hex_to_world_pos(hex).xyy();
         pos[2] = 0.0;
 
@@ -144,22 +141,8 @@ fn respawn_map(
             .id()
     });
 
+    // Insert RectMap<Entity> as an resource
     commands.insert_resource(map);
-}
-
-fn cursor_mat(
-    mut query: Query<(&mut MeshMaterial2d<ColorMaterial>, &Hex)>,
-    default_mat: Res<DefaultMaterial>,
-    select_mat: Res<SelectedMaterial>,
-    mut cursor_hex: Res<CursorHex>,
-) {
-    for (mut mat, h) in query.iter_mut() {
-        if cursor_hex.0 == Some(*h) {
-            *mat = select_mat.0.clone();
-        } else {
-            *mat = default_mat.0.clone();
-        }
-    }
 }
 
 fn handle_input(
@@ -239,16 +222,23 @@ fn handle_input(
     }
 }
 
-/// Input interaction
 fn cursor_draw(
     mut commands: Commands,
     mut gizmos: Gizmos,
     windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform)>,
-    mut cursor_hex: ResMut<CursorHex>,
     map: Res<RectMap<Entity>>,
+    default_mat: Res<DefaultMaterial>,
+    cursor_mat: Res<CursorMaterial>,
+    mut query: Query<&mut MeshMaterial2d<ColorMaterial>>,
+    mut last: Local<Option<Hex>>,
 ) -> Result {
-    *cursor_hex = CursorHex(None);
+    if let Some(hex) = *last {
+        if let Ok(mut mat) = query.get_mut(map[hex]) {
+            *mat = default_mat.0.clone();
+        }
+    };
+
     let window = windows.single()?;
     let (camera, cam_transform) = cameras.single()?;
     if let Some(pos) = window
@@ -269,7 +259,10 @@ fn cursor_draw(
         );
 
         let wrapped_hex = map.wrap_hex(hex);
-        *cursor_hex = CursorHex(Some(wrapped_hex));
+        *last = Some(wrapped_hex);
+        if let Ok(mut mat) = query.get_mut(map[wrapped_hex]) {
+            *mat = cursor_mat.0.clone();
+        }
     }
     Ok(())
 }
