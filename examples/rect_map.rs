@@ -15,13 +15,12 @@ pub fn main() {
             ..default()
         }))
         .insert_resource(
-            RectMetadata::default()
+            RectMetadata::new(IVec2 { x: 8, y: 4 })
                 .with_hex_layout(
                     HexLayout::pointy()
                         .with_hex_size(30.0)
                         .with_origin(Vec2::ZERO),
                 )
-                .with_half_size(IVec2 { x: 8, y: 4 })
                 .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]),
         )
         .init_resource::<CursorHex>()
@@ -101,6 +100,10 @@ fn respawn_map(
             "Press <9> to change latitude wrapping strategy: {:?}",
             wrap_strategies[1]
         ),
+        format!(
+            "Press <0> to change the offset mode: {:?}",
+            meta.offset_mode()
+        ),
     ]
     .join("\n");
 
@@ -150,6 +153,7 @@ fn handle_input(
     let mut hex_size = 0.5 * meta.rect_size().max_element();
     let mut half_size: IVec2 = meta.half_size();
     let mut wrap_strategies: [WrapStrategy; 2] = meta.wrap_strategies();
+    let mut offset_mode = meta.offset_mode();
 
     if key.just_pressed(KeyCode::Digit1) {
         if orientation == HexOrientation::Flat {
@@ -199,6 +203,14 @@ fn handle_input(
         }
         changed = true;
     }
+    if key.just_pressed(KeyCode::Digit0) {
+        if offset_mode == OffsetHexMode::Odd {
+            offset_mode = OffsetHexMode::Even;
+        } else {
+            offset_mode = OffsetHexMode::Odd
+        }
+        changed = true;
+    }
 
     if changed {
         let layout = if orientation == HexOrientation::Flat {
@@ -208,10 +220,10 @@ fn handle_input(
         }
         .with_hex_size(hex_size);
 
-        *meta = RectMetadata::default()
+        *meta = RectMetadata::new(half_size)
             .with_hex_layout(layout)
-            .with_half_size(half_size)
-            .with_wrap_strategies(wrap_strategies);
+            .with_wrap_strategies(wrap_strategies)
+            .with_offset_mode(offset_mode);
 
         wtr.write(RespawnMap);
     }
@@ -227,9 +239,10 @@ fn cursor_draw(
     mut last: Local<Option<Hex>>,
 ) -> Result {
     if let Some(hex) = *last
+        && map.contains_hex(hex)
         && let Ok(mut mat) = query.get_mut(map[hex])
     {
-        *mat = default_mat.0[1].clone();
+        *mat = default_mat.0[0].clone();
     };
 
     let window = windows.single()?;
@@ -254,7 +267,7 @@ fn cursor_draw(
         let wrapped_hex = map.wrap_hex(hex);
         *last = Some(wrapped_hex);
         if let Ok(mut mat) = query.get_mut(map[wrapped_hex]) {
-            *mat = default_mat.0[0].clone();
+            *mat = default_mat.0[1].clone();
         }
     }
     Ok(())

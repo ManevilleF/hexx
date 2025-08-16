@@ -29,9 +29,8 @@ use crate::{Hex, HexLayout, OffsetHexMode, storage::HexStore};
 /// let layout = HexLayout::pointy()
 ///     .with_hex_size(30.0)
 ///     .with_origin(Vec2::ZERO);
-/// let rect_map = RectMetadata::default()
+/// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
 ///     .with_hex_layout(layout)
-///     .with_half_size(IVec2 { x: 8, y: 4 })
 ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
 ///     .build_default::<i32>();
 ///
@@ -64,9 +63,8 @@ pub struct RectMap<T> {
 ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
 /// };
 ///
-/// let rect_hex_map = RectMetadata::default()
+/// let rect_hex_map = RectMetadata::new(IVec2::new(8, 12))
 ///     .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
-///     .with_half_size(IVec2::new(8, 12))
 ///     .with_offset_mode(OffsetHexMode::Odd)
 ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
 ///     .build_default::<i32>();
@@ -87,7 +85,7 @@ pub struct RectMetadata {
     hex_layout: HexLayout,
     /// the offset mode of the map
     ///
-    /// affect which way does the map zic zac.
+    /// affect which way does the map zic zac along point axis
     offset_mode: OffsetHexMode,
     /// the half size of the map
     half_size: IVec2,
@@ -111,21 +109,20 @@ pub enum WrapStrategy {
     Cycle,
 }
 
-impl Default for RectMetadata {
-    fn default() -> Self {
-        Self {
-            hex_layout: HexLayout::pointy(),
-            offset_mode: OffsetHexMode::Odd,
-            half_size: IVec2::new(32, 16),
-            wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
-        }
-    }
-}
-
 impl RectMetadata {
     // ================================
     // Builder Pattern
     // ================================
+    /// create a new meta with half size
+    #[must_use]
+    pub fn new(half_size: IVec2) -> Self {
+        Self {
+            half_size: half_size.abs(),
+            hex_layout: HexLayout::pointy(),
+            offset_mode: OffsetHexMode::Odd,
+            wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
+        }
+    }
     /// builder patter, set hex layout
     #[must_use]
     pub const fn with_hex_layout(mut self, hex_layout: HexLayout) -> Self {
@@ -139,6 +136,8 @@ impl RectMetadata {
         self
     }
     /// builder patter, set offset mode
+    ///
+    /// affect which way does the map zic zac along point axis
     #[must_use]
     pub const fn with_offset_mode(mut self, offset_mode: OffsetHexMode) -> Self {
         self.offset_mode = offset_mode;
@@ -150,6 +149,7 @@ impl RectMetadata {
         self.wrap_strategies = wrap_strategies;
         self
     }
+
     /// builder patter, build map with function to eval value
     /// # Example
     /// ```rust
@@ -161,9 +161,8 @@ impl RectMetadata {
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)
     ///     .with_origin(Vec2::ZERO);
-    /// let rect_map = RectMetadata::default()
+    /// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
     ///     .with_hex_layout(layout)
-    ///     .with_half_size(IVec2 { x: 8, y: 4 })
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
     ///     .build(|hex| hex.x + hex.y);
     ///
@@ -172,6 +171,7 @@ impl RectMetadata {
     pub fn build<T>(self, values: impl FnMut(Hex) -> T) -> RectMap<T> {
         RectMap::new(self, values)
     }
+
     /// builder patter, build map with default values
     /// # Example
     /// ```rust
@@ -183,9 +183,8 @@ impl RectMetadata {
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)
     ///     .with_origin(Vec2::ZERO);
-    /// let rect_map = RectMetadata::default()
+    /// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
     ///     .with_hex_layout(layout)
-    ///     .with_half_size(IVec2 { x: 8, y: 4 })
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
     ///     .build_default::<i32>();
     ///
@@ -229,7 +228,7 @@ impl RectMetadata {
     #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
     fn idx_to_hex(&self, idx: usize) -> Hex {
         let idx = idx as i32;
-        let rc = IVec2::new(idx % (2 * self.half_size[0]), idx / (2 * self.half_size[0]));
+        let rc = IVec2::new(idx % (2 * self.half_size.x), idx / (2 * self.half_size.x));
         let ij = rc - self.half_size;
         self.ij_to_hex(ij)
     }
@@ -277,31 +276,31 @@ impl RectMetadata {
     /// - => `idx` `Vec` index
     fn ij_to_idx(&self, ij: IVec2) -> usize {
         let rc = (ij + self.half_size).as_uvec2();
-        (rc[0] + rc[1] * (2 * self.half_size.as_uvec2()[0])) as usize
+        (rc.x + rc.y * (2 * self.half_size.as_uvec2().x)) as usize
     }
 
     /// infallable
     fn wrap_ij(&self, mut ij: IVec2) -> IVec2 {
         if self.wrap_strategies[0] == WrapStrategy::Cycle {
-            while ij[0] < -self.half_size[0] {
-                ij[0] += self.half_size[0] * 2;
+            while ij.x < -self.half_size.x {
+                ij.x += self.half_size.x * 2;
             }
-            while ij[0] >= self.half_size[0] {
-                ij[0] -= self.half_size[0] * 2;
+            while ij.x >= self.half_size.x {
+                ij.x -= self.half_size.x * 2;
             }
         } else {
-            ij[0] = ij[0].clamp(-self.half_size[0], self.half_size[0] - 1);
+            ij.x = ij.x.clamp(-self.half_size.x, self.half_size.x - 1);
         }
 
         if self.wrap_strategies[1] == WrapStrategy::Cycle {
-            while ij[1] < -self.half_size[1] {
-                ij[1] += self.half_size[1] * 2;
+            while ij.y < -self.half_size.y {
+                ij.y += self.half_size.y * 2;
             }
-            while ij[1] >= self.half_size[1] {
-                ij[1] -= self.half_size[1] * 2;
+            while ij.y >= self.half_size.y {
+                ij.y -= self.half_size.y * 2;
             }
         } else {
-            ij[1] = ij[1].clamp(-self.half_size[1], self.half_size[1] - 1);
+            ij.y = ij.y.clamp(-self.half_size.y, self.half_size.y - 1);
         }
 
         ij
@@ -376,9 +375,8 @@ impl<T> RectMap<T> {
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)
     ///     .with_origin(Vec2::ZERO);
-    /// let meta = RectMetadata::default()
+    /// let meta = RectMetadata::new(IVec2 { x: 8, y: 4 })
     ///     .with_hex_layout(layout)
-    ///     .with_half_size(IVec2 { x: 8, y: 4 })
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]);
     /// let rect_map = RectMap::new(meta, |hex| hex.x + hex.y);
     ///
@@ -410,9 +408,8 @@ impl<T> RectMap<T> {
     /// let layout = HexLayout::pointy()
     ///     .with_hex_size(30.0)
     ///     .with_origin(Vec2::ZERO);
-    /// let meta = RectMetadata::default()
+    /// let meta = RectMetadata::new(IVec2 { x: 8, y: 4 })
     ///     .with_hex_layout(layout)
-    ///     .with_half_size(IVec2 { x: 8, y: 4 })
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]);
     /// let rect_map = RectMap::default_values(meta);
     ///
@@ -451,12 +448,6 @@ impl<T> std::ops::Deref for RectMap<T> {
     type Target = RectMetadata;
     fn deref(&self) -> &Self::Target {
         &self.meta
-    }
-}
-
-impl<T: Default> Default for RectMap<T> {
-    fn default() -> Self {
-        RectMetadata::default().build_default()
     }
 }
 
@@ -541,9 +532,8 @@ mod test {
     #[test]
     fn idx_hex_test() {
         for dim in HALF_SIZES {
-            let rect_hex_map = RectMetadata::default()
+            let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
                 .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
-                .with_half_size(IVec2::from_array(*dim))
                 .with_offset_mode(OffsetHexMode::Odd)
                 .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
                 .build_default::<i32>();
@@ -561,10 +551,9 @@ mod test {
     #[test]
     fn contains_test() {
         for dim in HALF_SIZES {
-            let rect_hex_map = RectMetadata::default()
+            let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
                 .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
                 .with_offset_mode(OffsetHexMode::Odd)
-                .with_half_size(IVec2::from_array(*dim))
                 .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
                 .build_default::<i32>();
 
@@ -588,10 +577,9 @@ mod test {
     fn wrap_test() {
         for dim in HALF_SIZES {
             for wrap_strategies in WRAP_STRATEGIES {
-                let rect_hex_map = RectMetadata::default()
+                let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
                     .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
                     .with_offset_mode(OffsetHexMode::Odd)
-                    .with_half_size(IVec2::from_array(*dim))
                     .with_wrap_strategies(*wrap_strategies)
                     .build_default::<i32>();
 
