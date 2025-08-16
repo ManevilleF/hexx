@@ -219,7 +219,7 @@ impl<'l> ColumnMeshBuilder<'l> {
 
     #[must_use]
     #[inline]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     /// Specify custom options for each of the side quad triangles.
     ///
     /// For a global setting prefer [`Self::with_sides_options`]
@@ -264,8 +264,7 @@ impl<'l> ColumnMeshBuilder<'l> {
     }
 
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
-    #[allow(clippy::many_single_char_names)]
+    #[expect(clippy::cast_precision_loss)]
     /// Comsumes the builder to return the computed mesh data
     pub fn build(self) -> MeshInfo {
         // We store the offset to match the `self.pos`
