@@ -6,6 +6,9 @@
 * Added `Hex::circular_range` (#226)
 * Rust 2024 edition (#225)
 * Added `HexBounds::corners` method (#223)
+* Added feature `bevy_ecs` (`dep:bevy_ecs`)  (#227)
+* Added `RectMap` storage for rectangular dense hex maps (#227)
+
 
 ## 0.21.0
 
