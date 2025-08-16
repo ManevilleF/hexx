@@ -6,6 +6,7 @@
 * Added `Hex::circular_range` (#226)
 * Rust 2024 edition (#225)
 * Added `HexBounds::corners` method (#223)
+* Additional clippy lints (#228)
 
 ## 0.21.0
 
