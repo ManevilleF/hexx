@@ -1,9 +1,7 @@
-use bevy::{
-    color::palettes::css::*, platform::collections::HashMap, prelude::*, window::PrimaryWindow,
-};
+use bevy::{color::palettes::css::*, prelude::*, window::PrimaryWindow};
 
 use hexx::{
-    storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    storage::{RectMap, RectMetadata, WrapStrategy},
     *,
 };
 
@@ -34,9 +32,7 @@ pub fn main() {
 }
 
 #[derive(Resource)]
-pub struct DefaultMaterial(pub MeshMaterial2d<ColorMaterial>);
-#[derive(Resource)]
-pub struct CursorMaterial(pub MeshMaterial2d<ColorMaterial>);
+pub struct DefaultMaterial(pub [MeshMaterial2d<ColorMaterial>; 2]);
 
 #[derive(Resource, Default)]
 pub struct CursorHex(pub Option<Hex>);
@@ -55,9 +51,8 @@ fn setup(
 ) {
     commands.spawn(Camera2d);
     let default_mat = MeshMaterial2d(materials.add(ColorMaterial::from_color(GRAY)));
-    commands.insert_resource(DefaultMaterial(default_mat));
     let cursor_mat = MeshMaterial2d(materials.add(ColorMaterial::from_color(GREEN)));
-    commands.insert_resource(CursorMaterial(cursor_mat));
+    commands.insert_resource(DefaultMaterial([default_mat, cursor_mat]));
     commands.spawn((
         Text::new(""),
         Node {
@@ -69,15 +64,15 @@ fn setup(
         TextInstruction,
     ));
 
-    wtr.send(RespawnMap);
+    wtr.write(RespawnMap);
 }
 
 fn respawn_map(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut meta: Res<RectMetadata>,
+    meta: Res<RectMetadata>,
     default_mat: Res<DefaultMaterial>,
-    mut query: Query<Entity, With<Hex>>,
+    query: Query<Entity, With<Hex>>,
     mut rdr: EventReader<RespawnMap>,
     mut text: Query<&mut Text, With<TextInstruction>>,
 ) {
@@ -135,7 +130,7 @@ fn respawn_map(
                     rotation: Quat::from_rotation_z(angle),
                     ..Default::default()
                 },
-                default_mat.0.clone(),
+                default_mat.0[0].clone(),
                 default_mesh.clone(),
             ))
             .id()
@@ -218,25 +213,23 @@ fn handle_input(
             .with_half_size(half_size)
             .with_wrap_strategies(wrap_strategies);
 
-        wtr.send(RespawnMap);
+        wtr.write(RespawnMap);
     }
 }
 
 fn cursor_draw(
-    mut commands: Commands,
     mut gizmos: Gizmos,
     windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     map: Res<RectMap<Entity>>,
     default_mat: Res<DefaultMaterial>,
-    cursor_mat: Res<CursorMaterial>,
     mut query: Query<&mut MeshMaterial2d<ColorMaterial>>,
     mut last: Local<Option<Hex>>,
 ) -> Result {
-    if let Some(hex) = *last {
-        if let Ok(mut mat) = query.get_mut(map[hex]) {
-            *mat = default_mat.0.clone();
-        }
+    if let Some(hex) = *last
+        && let Ok(mut mat) = query.get_mut(map[hex])
+    {
+        *mat = default_mat.0[1].clone();
     };
 
     let window = windows.single()?;
@@ -261,7 +254,7 @@ fn cursor_draw(
         let wrapped_hex = map.wrap_hex(hex);
         *last = Some(wrapped_hex);
         if let Ok(mut mat) = query.get_mut(map[wrapped_hex]) {
-            *mat = cursor_mat.0.clone();
+            *mat = default_mat.0[0].clone();
         }
     }
     Ok(())
