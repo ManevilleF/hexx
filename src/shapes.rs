@@ -33,7 +33,7 @@ impl Parallelogram {
 
 /// Generates a parallelogram layout from `min` to `max`
 #[must_use]
-#[allow(clippy::cast_sign_loss)]
+#[expect(clippy::cast_sign_loss)]
 pub fn parallelogram(min: Hex, max: Hex) -> impl ExactSizeIterator<Item = Hex> {
     let dist = (max.x.saturating_sub(min.x) + 1) * (max.y.saturating_sub(min.y) + 1);
     ExactSizeHexIterator {
@@ -73,7 +73,7 @@ impl Triangle {
 /// # Note
 ///
 /// To offset the map, apply the offset to each `Item` of the returned iterator
-#[allow(clippy::cast_possible_wrap)]
+#[expect(clippy::cast_possible_wrap)]
 #[must_use]
 pub fn triangle(size: u32) -> impl ExactSizeIterator<Item = Hex> {
     ExactSizeHexIterator {
@@ -156,7 +156,7 @@ impl Rombus {
 
 /// Generates a Rombus from `point` of `rows` in y and `columns` in `x`
 #[must_use]
-#[allow(clippy::cast_possible_wrap)]
+#[expect(clippy::cast_possible_wrap)]
 pub fn rombus(point: Hex, rows: u32, columns: u32) -> impl ExactSizeIterator<Item = Hex> {
     ExactSizeHexIterator {
         iter: (0..rows).flat_map(move |y| {
@@ -211,7 +211,7 @@ impl PointyRectangle {
 /// The generations goes `left` to `right` and `top` to `bottom`, therefore
 /// `right` must be greater than `left` and `bottom` must be greater than `top`.
 #[must_use]
-#[allow(clippy::cast_sign_loss)]
+#[expect(clippy::cast_sign_loss)]
 pub fn pointy_rectangle(
     [left, right, top, bottom]: [i32; 4],
 ) -> impl ExactSizeIterator<Item = Hex> {
@@ -270,7 +270,7 @@ impl FlatRectangle {
 /// The generations goes `left` to `right` and `top` to `bottom`, therefore
 /// `right` must be greater than `left` and `bottom` must be greater than `top`.
 #[must_use]
-#[allow(clippy::cast_sign_loss)]
+#[expect(clippy::cast_sign_loss)]
 pub fn flat_rectangle([left, right, top, bottom]: [i32; 4]) -> impl ExactSizeIterator<Item = Hex> {
     let count = (right.saturating_sub(left) + 1) * (bottom.saturating_sub(top) + 1);
     ExactSizeHexIterator {

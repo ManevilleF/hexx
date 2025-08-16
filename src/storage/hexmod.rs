@@ -59,7 +59,7 @@ impl HexModMapMetadata {
 
     /// Converts from a 1D array index back to hex coordinates
     #[inline]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     const fn idx_to_hex(&self, idx: usize) -> Hex {
         self.bounds
             .center
@@ -86,7 +86,7 @@ impl<T> HexModMap<T> {
     /// assert_eq!(map[hex(1, 0)], 1);
     /// ```
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn new(center: Hex, radius: u32, mut values: impl FnMut(Hex) -> T) -> Self {
         let bounds = HexBounds::new(center, radius);
         let meta = HexModMapMetadata::new(bounds);

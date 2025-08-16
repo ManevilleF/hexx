@@ -65,8 +65,8 @@ fn old_vs_new_length() {
 }
 
 #[test]
-#[allow(clippy::cast_possible_truncation)]
-#[allow(clippy::cast_possible_wrap)]
+#[expect(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_wrap)]
 fn hex_avg_center() {
     let points = [
         Hex::ONE,
@@ -127,7 +127,7 @@ fn hex_division() {
 }
 
 #[test]
-#[allow(clippy::cast_precision_loss)]
+#[expect(clippy::cast_precision_loss)]
 fn int_division() {
     assert_eq!(Hex::new(2, 2) / 2, Hex::ONE);
     assert_eq!(Hex::new(10, 30) / 2, Hex::new(5, 15));
@@ -474,7 +474,7 @@ fn ring() {
 }
 
 #[test]
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 fn cached_rings() {
     let point = Hex::ZERO;
     let cache = point.cached_rings::<10>();
@@ -542,7 +542,7 @@ fn ring_edge() {
 }
 
 #[test]
-#[allow(clippy::cast_possible_truncation)]
+#[expect(clippy::cast_possible_truncation)]
 fn wedge() {
     let point = Hex::new(98, -123);
     for dir in VertexDirection::ALL_DIRECTIONS {

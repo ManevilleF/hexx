@@ -82,7 +82,7 @@ impl Hex {
     /// [hexmod]: https://observablehq.com/@sanderevers/hexmod-representation
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     pub const fn to_hexmod_coordinates(self, range: u32) -> u32 {
         let area = Self::range_count(range) as i32;
         let shift = Self::shift(range) as i32;
@@ -100,7 +100,7 @@ impl Hex {
     /// [hexmod]: https://observablehq.com/@sanderevers/hexmod-representation
     /// [axial]: https://www.redblobgames.com/grids/hexagons/#coordinates-axial
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     pub const fn from_hexmod_coordinates(coord: u32, range: u32) -> Self {
         let shift = Self::shift(range) as i32;
         let range = range as i32;

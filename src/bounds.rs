@@ -73,7 +73,7 @@ impl HexBounds {
     /// disallowing negative coordinates
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     pub const fn positive_radius(radius: u32) -> Self {
         let center = Hex::splat(radius as i32);
         Self { center, radius }
@@ -142,7 +142,7 @@ impl HexBounds {
 
     /// Returns the 6 corners of the hex bounds in [`EdgeDirection`] order
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     pub fn corners(&self) -> [Hex; 6] {
         EdgeDirection::ALL_DIRECTIONS.map(|dir| self.center.const_add(dir * self.radius as i32))
     }
@@ -258,7 +258,7 @@ impl FromIterator<Hex> for HexBounds {
 
         // Convert the `IVec3` back to a `Hex`
         let center = Hex::new(center.x, center.y);
-        #[allow(clippy::cast_sign_loss)]
+        #[expect(clippy::cast_sign_loss)]
         let radius = radius as u32;
         Self { center, radius }
     }

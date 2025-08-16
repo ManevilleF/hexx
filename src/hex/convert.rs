@@ -94,7 +94,7 @@ impl Hex {
     /// ```
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_sign_loss)]
     #[doc(alias = "pack")]
     pub const fn as_u64(self) -> u64 {
         let high = (self.x as u32 as u64) << 32;

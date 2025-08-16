@@ -2,7 +2,7 @@ use super::{EdgeDirection, Hex, VertexDirection, iter::ExactSizeHexIterator};
 
 impl Hex {
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     /// Retrieves one [`Hex`] ring around `self` in a given `range`.
     /// The returned coordinates start from `start_dir` and loop counter
     /// clockwise around `self` unless `clockwise` is set to `true`.
@@ -133,7 +133,7 @@ impl Hex {
 
     /// Computes an `origin` as `self + start_dir * dist`
     /// and computes a line between `origin` and `origin + len * end_dir`
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     fn __ring_edge(
         self,
         dist: u32,
@@ -347,7 +347,7 @@ impl Hex {
         self.corner_wedge(0..=range, self.way_to(rhs).unwrap())
     }
 
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     #[must_use]
     /// Retrieves all successive [`Hex`] ring edges around `self` in a given
     /// `RANGE` and `direction` as an array of edges.
@@ -390,7 +390,7 @@ impl Hex {
         })
     }
 
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     #[must_use]
     /// Retrieves all successive [`Hex`] ring edges around `self` in a given
     /// `RANGE` and `direction` as an array of edges.
@@ -429,7 +429,7 @@ impl Hex {
         std::array::from_fn(|r| self.ring_edge(r as u32, direction).collect())
     }
 
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     #[must_use]
     /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
     /// as an array of rings.
@@ -465,7 +465,7 @@ impl Hex {
         std::array::from_fn(|r| self.ring(r as u32).collect())
     }
 
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     #[must_use]
     /// Retrieves all successive [`Hex`] rings around `self` in a given `RANGE`
     /// as an array of rings.

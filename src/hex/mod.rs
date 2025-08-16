@@ -303,7 +303,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     /// Converts `self` to an [`f32`] array as `[x, y]`
     pub const fn to_array_f32(self) -> [f32; 2] {
         [self.x as f32, self.y as f32]
@@ -329,7 +329,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     /// Converts `self` to cubic [`f32`] coordinates array as `[x, y, z]`
     pub const fn to_cubic_array_f32(self) -> [f32; 3] {
         [self.x as f32, self.y as f32, self.z() as f32]
@@ -388,7 +388,7 @@ impl Hex {
         }
     }
 
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     #[must_use]
     #[inline]
     /// Converts `self` to a [`Vec2`].
@@ -448,7 +448,7 @@ impl Hex {
 
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     /// Rounds floating point coordinates to [`Hex`].
     /// This method is used for operations like multiplications and divisions
     /// with floating point numbers.
@@ -635,7 +635,7 @@ impl Hex {
     /// [Paper]: https://scholar.google.com/scholar?q=Storage+and+addressing+scheme+for+practical+hexagonal+image+processing
     /// [DOI]: https://doi.org/10.1117/1.JEI.22.1.010502
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn euclidean_distance_to(self, rhs: Self) -> f32 {
         let dx = (rhs.x - self.x) as f32;
         let dy = (rhs.y - self.y) as f32;
@@ -901,7 +901,7 @@ impl Hex {
         Self::new(self.y, self.x)
     }
 
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     #[must_use]
     /// Computes all coordinates in a line from `self` to `other`.
     ///
@@ -926,7 +926,7 @@ impl Hex {
         }
     }
 
-    #[allow(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_sign_loss)]
     #[must_use]
     /// Computes all coordinate in a two segment rectiline path from `self` to
     /// `other`
@@ -991,7 +991,7 @@ impl Hex {
         start.lerp(end, s).into()
     }
 
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range`.
     /// The number of returned coordinates is equal to `Hex::range_count(range)`
@@ -1033,7 +1033,7 @@ impl Hex {
     /// assert_eq!(coord.circular_range(0.0).count(), 1);
     /// assert_eq!(coord.circular_range(1.0).count(), 7);
     /// ```
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     pub fn circular_range(self, range: f32) -> impl Iterator<Item = Self> {
         let radius = range.ceil() as u32;
         // TODO: Improve this computation to have the smallest hexagon
@@ -1043,7 +1043,6 @@ impl Hex {
             .filter(move |h| self.euclidean_distance_to(*h) <= range)
     }
 
-    #[allow(clippy::cast_possible_wrap)]
     #[doc(alias = "excluding_range")]
     #[must_use]
     /// Retrieves all [`Hex`] around `self` in a given `range` except `self`.
@@ -1097,7 +1096,7 @@ impl Hex {
     ///
     /// [source]: https://observablehq.com/@sanderevers/hexagon-tiling-of-an-hexagonal-grid
     #[must_use]
-    #[allow(
+    #[expect(
         clippy::cast_possible_wrap,
         clippy::cast_precision_loss,
         clippy::cast_possible_truncation
@@ -1151,7 +1150,7 @@ impl Hex {
     ///
     /// [source]: https://observablehq.com/@sanderevers/hexagon-tiling-of-an-hexagonal-grid
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     #[doc(alias = "upscale")]
     pub const fn to_higher_res(self, radius: u32) -> Self {
         let range = radius as i32;
