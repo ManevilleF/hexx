@@ -117,7 +117,7 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
     /// Computes the centroid of the face positions
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn centroid(&self) -> Vec3 {
         self.positions.iter().sum::<Vec3>() / VERTS as f32
     }
@@ -125,7 +125,7 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
     /// Computes the centroid of the face uvs
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn uv_centroid(&self) -> Vec2 {
         self.uvs.iter().sum::<Vec2>() / VERTS as f32
     }
@@ -148,7 +148,7 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
     /// * `mode` - the insetting behaviour mode
     /// * `keep_inner_face` - If set to true the insetted face will be kept,
     ///   otherwise it will be removed
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     #[must_use]
     pub fn inset(self, mode: InsetScaleMode, scale: f32, keep_inner_face: bool) -> MeshInfo {
         // We compute the inset mesh, identical to the original face
@@ -219,7 +219,6 @@ impl<const VERTS: usize, const TRIS: usize> Face<VERTS, TRIS> {
 }
 
 impl<const VERTS: usize, const TRIS: usize> From<Face<VERTS, TRIS>> for MeshInfo {
-    #[allow(clippy::many_single_char_names)]
     fn from(face: Face<VERTS, TRIS>) -> Self {
         Self {
             vertices: face.positions.to_vec(),

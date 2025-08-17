@@ -146,7 +146,6 @@ impl HexLayout {
         Hex::round(p)
     }
 
-    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation)]
     #[must_use]
     /// Computes world/pixel coordinates `pos` into fractional hexagonal
     /// coordinates

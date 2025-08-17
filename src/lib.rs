@@ -246,10 +246,21 @@
     clippy::nursery,
     clippy::pedantic,
     clippy::cargo,
-    clippy::unwrap_used,
     missing_docs,
     nonstandard_style,
-    future_incompatible
+    future_incompatible,
+    // clippy::restriction
+    clippy::unwrap_used,
+    clippy::lossy_float_literal,
+    clippy::return_and_then,
+    clippy::same_name_method,
+    clippy::str_to_string,
+    clippy::try_err,
+    clippy::undocumented_unsafe_blocks,
+    clippy::use_debug,
+    clippy::unseparated_literal_suffix,
+    clippy::large_include_file,
+    clippy::allow_attributes
 )]
 #![allow(clippy::module_name_repetitions, clippy::multiple_crate_versions)]
 // For lib.rs docs only

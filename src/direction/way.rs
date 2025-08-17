@@ -48,7 +48,6 @@ impl<T: PartialEq> PartialEq<T> for DirectionWay<T> {
 impl<T> DirectionWay<T> {
     #[inline]
     #[must_use]
-    #[allow(clippy::missing_const_for_fn)]
     /// Resolves the current way and returns the `Single` direction or the first
     /// of the two in `Tie`.
     pub fn unwrap(self) -> T {

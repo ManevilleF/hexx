@@ -333,7 +333,7 @@ impl EdgeDirection {
         a.angle_degrees_to(b)
     }
 
-    #[allow(clippy::cast_lossless)]
+    #[expect(clippy::cast_lossless)]
     #[must_use]
     #[inline]
     /// Computes the angle between `self` and `rhs` in radians.
@@ -342,7 +342,7 @@ impl EdgeDirection {
         steps * DIRECTION_ANGLE_RAD
     }
 
-    #[allow(clippy::cast_lossless)]
+    #[expect(clippy::cast_lossless)]
     #[must_use]
     #[inline]
     /// Computes the angle between `self` and `rhs` in degrees.
@@ -454,7 +454,7 @@ impl EdgeDirection {
     }
 
     #[must_use]
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     /// Returns the direction from the given `angle` in degrees
     ///
     /// # Example
@@ -487,7 +487,7 @@ impl EdgeDirection {
     }
 
     #[must_use]
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     /// Returns the direction from the given `angle` in radians
     ///
     /// # Example

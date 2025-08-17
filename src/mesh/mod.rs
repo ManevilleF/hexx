@@ -155,7 +155,7 @@ impl MeshInfo {
     /// Computes the centroid of the mesh vertices
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn centroid(&self) -> Vec3 {
         let len = self.vertices.len() as f32;
         self.vertices.iter().sum::<Vec3>() / len
@@ -164,7 +164,7 @@ impl MeshInfo {
     /// Computes the centroid of the mesh uvs
     #[inline]
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(clippy::cast_precision_loss)]
     pub fn uv_centroid(&self) -> Vec2 {
         let len = self.uvs.len() as f32;
         self.uvs.iter().sum::<Vec2>() / len
