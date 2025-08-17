@@ -87,7 +87,6 @@ pub struct RectMetadata {
     /// the offset coordinate for the start element of the flat vec
     ///
     /// it represent the minimum offset coordinate element-wise among whole map
-    ///
     start: IVec2,
     /// dimension of the map
     dim: UVec2,
