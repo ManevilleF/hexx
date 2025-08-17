@@ -27,11 +27,13 @@ packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
 # Adds support for the Bevy game engine
-bevy = ["bevy_reflect", "bevy_platform"]
+bevy = ["bevy_reflect", "bevy_platform", "bevy_ecs"]
 # Adds Bevy Reflection support
 bevy_reflect = ["dep:bevy_reflect"]
 # Adds Bevy Platform support
 bevy_platform = ["dep:bevy_platform"]
+# Adds Bevy ECS support
+bevy_ecs = ["dep:bevy_ecs"]
 
 [dependencies]
 glam = "0.29"
@@ -52,6 +54,10 @@ optional = true
 version = "0.16"
 optional = true
 
+[dependencies.bevy_ecs]
+version = "0.16"
+optional = true
+
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
 version = "0.16"
@@ -67,6 +73,7 @@ features = [
     "bevy_text",
     "bevy_window",
     "bevy_winit",
+    "bevy_ui",
     "default_font",
     "multi_threaded",
     "png",
@@ -134,6 +141,11 @@ required-features = ["bevy_platform"]
 name = "3d_picking"
 path = "examples/3d_picking.rs"
 required-features = ["bevy_platform"]
+
+[[example]]
+name = "rect_map"
+path = "examples/rect_map.rs"
+required-features = ["bevy_platform", "bevy_ecs"]
 
 [[example]]
 name = "mesh_builder"
