@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use glam::{IVec2, Vec2Swizzles};
 
-use crate::{Hex, HexLayout, OffsetHexMode, storage::HexStore};
+use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
 
 /// [`Vec`] Based storage for rectangular maps.
 ///
@@ -82,7 +82,7 @@ pub struct RectMap<T> {
 )]
 pub struct RectMetadata {
     /// the hex layout of the map
-    hex_layout: HexLayout,
+    orientation: HexOrientation,
     /// the offset mode of the map
     ///
     /// affect which way does the map zic zac along point axis
@@ -90,6 +90,8 @@ pub struct RectMetadata {
     /// the half size of the map
     half_size: IVec2,
     /// the wrapping strategy for indexing
+    ///
+    /// this only affect result of [`RectMap::wrapped_get`] and [`RectMap::wrapped_get_mut`]
     wrap_strategies: [WrapStrategy; 2],
 }
 
@@ -118,15 +120,15 @@ impl RectMetadata {
     pub fn new(half_size: IVec2) -> Self {
         Self {
             half_size: half_size.abs(),
-            hex_layout: HexLayout::pointy(),
+            orientation: HexOrientation::Pointy,
             offset_mode: OffsetHexMode::Odd,
             wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
         }
     }
     /// builder patter, set hex layout
     #[must_use]
-    pub const fn with_hex_layout(mut self, hex_layout: HexLayout) -> Self {
-        self.hex_layout = hex_layout;
+    pub const fn with_orientation(mut self, orientation: HexOrientation) -> Self {
+        self.orientation = orientation;
         self
     }
     /// builder patter, set half size
@@ -144,6 +146,8 @@ impl RectMetadata {
         self
     }
     /// builder patter, set wrapping strategy
+    ///
+    /// this only affect result of [`RectMap::wrapped_get`] and [`RectMap::wrapped_get_mut`]
     #[must_use]
     pub const fn with_wrap_strategies(mut self, wrap_strategies: [WrapStrategy; 2]) -> Self {
         self.wrap_strategies = wrap_strategies;
@@ -234,11 +238,7 @@ impl RectMetadata {
     }
 
     fn ij_to_hex(&self, ij: IVec2) -> Hex {
-        Hex::from_offset_coordinates(
-            ij.xy().to_array(),
-            self.offset_mode,
-            self.hex_layout.orientation,
-        )
+        Hex::from_offset_coordinates(ij.xy().to_array(), self.offset_mode, self.orientation)
     }
 
     // ================================
@@ -264,7 +264,7 @@ impl RectMetadata {
     /// infallable
     fn hex_to_ij(&self, hex: Hex) -> IVec2 {
         let v: IVec2 = hex
-            .to_offset_coordinates(self.offset_mode, self.hex_layout.orientation)
+            .to_offset_coordinates(self.offset_mode, self.orientation)
             .into();
         v.xy()
     }
@@ -345,13 +345,6 @@ impl RectMetadata {
     /// iterator over the hexagonal coordinates in the map.
     pub fn iter_hex(&self) -> impl Iterator<Item = Hex> + use<'_> {
         (0..self.len()).map(|idx| self.idx_to_hex(idx))
-    }
-}
-
-impl std::ops::Deref for RectMetadata {
-    type Target = HexLayout;
-    fn deref(&self) -> &Self::Target {
-        &self.hex_layout
     }
 }
 
@@ -533,7 +526,7 @@ mod test {
     fn idx_hex_test() {
         for dim in HALF_SIZES {
             let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
-                .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
+                .with_orientation(HexOrientation::Pointy)
                 .with_offset_mode(OffsetHexMode::Odd)
                 .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
                 .build_default::<i32>();
@@ -552,7 +545,7 @@ mod test {
     fn contains_test() {
         for dim in HALF_SIZES {
             let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
-                .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
+                .with_orientation(HexOrientation::Pointy)
                 .with_offset_mode(OffsetHexMode::Odd)
                 .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
                 .build_default::<i32>();
@@ -578,7 +571,7 @@ mod test {
         for dim in HALF_SIZES {
             for wrap_strategies in WRAP_STRATEGIES {
                 let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
-                    .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
+                    .with_orientation(HexOrientation::Pointy)
                     .with_offset_mode(OffsetHexMode::Odd)
                     .with_wrap_strategies(*wrap_strategies)
                     .build_default::<i32>();

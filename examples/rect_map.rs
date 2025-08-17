@@ -16,7 +16,7 @@ pub fn main() {
         }))
         .insert_resource(
             RectMetadata::new(IVec2 { x: 8, y: 4 })
-                .with_hex_layout(
+                .with_hex_orientation(
                     HexLayout::pointy()
                         .with_hex_size(30.0)
                         .with_origin(Vec2::ZERO),
@@ -221,7 +221,7 @@ fn handle_input(
         .with_hex_size(hex_size);
 
         *meta = RectMetadata::new(half_size)
-            .with_hex_layout(layout)
+            .with_hex_orientation(layout)
             .with_wrap_strategies(wrap_strategies)
             .with_offset_mode(offset_mode);
 
