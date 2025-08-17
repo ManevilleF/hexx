@@ -317,7 +317,7 @@ impl RectMetadata {
     /// - => `rc` 2D view of `Vec`
     /// - => `ij` offset coordinate
     /// - => `hex`
-    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_truncation)]
     fn idx_to_hex(&self, idx: usize) -> Hex {
         let idx = idx as u32;
         let rc = UVec2::new(idx % self.dim.x, idx / self.dim.x);
@@ -466,7 +466,6 @@ impl<T> RectMap<T> {
     /// assert_eq!(rect_map.get(Hex::new(0, 0)), Some(&0));
     /// ```
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
     pub fn new(meta: RectMetadata, mut values: impl FnMut(Hex) -> T) -> Self {
         let size = (meta.dim.element_product() * 4) as usize;
         let mut inner = Vec::with_capacity(size);
