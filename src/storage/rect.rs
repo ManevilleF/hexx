@@ -26,11 +26,8 @@ use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
 ///     *,
 /// };
 ///
-/// let layout = HexLayout::pointy()
-///     .with_hex_size(30.0)
-///     .with_origin(Vec2::ZERO);
 /// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
-///     .with_hex_layout(layout)
+///     .with_orientation(HexOrientation::Pointy)
 ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
 ///     .build_default::<i32>();
 ///
@@ -59,12 +56,12 @@ pub struct RectMap<T> {
 /// # Example
 /// ```rust
 /// use hexx::{
-///     Hex, HexLayout, IVec2, OffsetHexMode,
 ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+///     *,
 /// };
 ///
 /// let rect_hex_map = RectMetadata::new(IVec2::new(8, 12))
-///     .with_hex_layout(HexLayout::pointy().with_hex_size(1.0))
+///     .with_orientation(HexOrientation::Pointy)
 ///     .with_offset_mode(OffsetHexMode::Odd)
 ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
 ///     .build_default::<i32>();
@@ -91,7 +88,8 @@ pub struct RectMetadata {
     half_size: IVec2,
     /// the wrapping strategy for indexing
     ///
-    /// this only affect result of [`RectMap::wrapped_get`] and [`RectMap::wrapped_get_mut`]
+    /// this only affect result of [`RectMap::wrapped_get`] and
+    /// [`RectMap::wrapped_get_mut`]
     wrap_strategies: [WrapStrategy; 2],
 }
 
@@ -147,7 +145,8 @@ impl RectMetadata {
     }
     /// builder patter, set wrapping strategy
     ///
-    /// this only affect result of [`RectMap::wrapped_get`] and [`RectMap::wrapped_get_mut`]
+    /// this only affect result of [`RectMap::wrapped_get`] and
+    /// [`RectMap::wrapped_get_mut`]
     #[must_use]
     pub const fn with_wrap_strategies(mut self, wrap_strategies: [WrapStrategy; 2]) -> Self {
         self.wrap_strategies = wrap_strategies;
@@ -162,11 +161,8 @@ impl RectMetadata {
     ///     *,
     /// };
     ///
-    /// let layout = HexLayout::pointy()
-    ///     .with_hex_size(30.0)
-    ///     .with_origin(Vec2::ZERO);
     /// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
-    ///     .with_hex_layout(layout)
+    ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
     ///     .build(|hex| hex.x + hex.y);
     ///
@@ -184,11 +180,8 @@ impl RectMetadata {
     ///     *,
     /// };
     ///
-    /// let layout = HexLayout::pointy()
-    ///     .with_hex_size(30.0)
-    ///     .with_origin(Vec2::ZERO);
     /// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
-    ///     .with_hex_layout(layout)
+    ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
     ///     .build_default::<i32>();
     ///
@@ -202,6 +195,11 @@ impl RectMetadata {
     // ================================
     // Access
     // ================================
+    /// get the hex orientation of the map
+    #[must_use]
+    pub const fn orientation(&self) -> HexOrientation {
+        self.orientation
+    }
     /// get the offset mode of the map
     #[must_use]
     pub const fn offset_mode(&self) -> OffsetHexMode {
@@ -365,11 +363,8 @@ impl<T> RectMap<T> {
     ///     *,
     /// };
     ///
-    /// let layout = HexLayout::pointy()
-    ///     .with_hex_size(30.0)
-    ///     .with_origin(Vec2::ZERO);
     /// let meta = RectMetadata::new(IVec2 { x: 8, y: 4 })
-    ///     .with_hex_layout(layout)
+    ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]);
     /// let rect_map = RectMap::new(meta, |hex| hex.x + hex.y);
     ///
@@ -398,11 +393,8 @@ impl<T> RectMap<T> {
     ///     *,
     /// };
     ///
-    /// let layout = HexLayout::pointy()
-    ///     .with_hex_size(30.0)
-    ///     .with_origin(Vec2::ZERO);
     /// let meta = RectMetadata::new(IVec2 { x: 8, y: 4 })
-    ///     .with_hex_layout(layout)
+    ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]);
     /// let rect_map = RectMap::default_values(meta);
     ///
