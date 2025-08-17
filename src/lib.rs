@@ -283,7 +283,7 @@ pub use conversions::*;
 #[doc(inline)]
 pub use direction::*;
 #[doc(hidden)]
-pub use glam::{IVec2, IVec3, Quat, Vec2, Vec3};
+pub use glam::{IVec2, IVec3, Quat, UVec2, Vec2, Vec3};
 #[doc(inline)]
 #[cfg(feature = "grid")]
 pub use hex::{GridEdge, GridVertex};

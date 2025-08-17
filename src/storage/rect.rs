@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use glam::{IVec2, Vec2Swizzles};
+use glam::{IVec2, UVec2, Vec2Swizzles};
 
 use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
 
@@ -26,7 +26,7 @@ use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
 ///     *,
 /// };
 ///
-/// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
+/// let rect_map = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
 ///     .with_orientation(HexOrientation::Pointy)
 ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
 ///     .build_default::<i32>();
@@ -60,7 +60,7 @@ pub struct RectMap<T> {
 ///     *,
 /// };
 ///
-/// let rect_hex_map = RectMetadata::new(IVec2::new(8, 12))
+/// let rect_hex_map = RectMetadata::from_half_size(UVec2::new(8, 12))
 ///     .with_orientation(HexOrientation::Pointy)
 ///     .with_offset_mode(OffsetHexMode::Odd)
 ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
@@ -84,8 +84,13 @@ pub struct RectMetadata {
     ///
     /// affect which way does the map zic zac along point axis
     offset_mode: OffsetHexMode,
-    /// the half size of the map
-    half_size: IVec2,
+    /// the offset coordinate for the start element of the flat vec
+    ///
+    /// it represent the minimum offset coordinate element-wise among whole map
+    ///
+    start: IVec2,
+    /// dimension of the map
+    dim: UVec2,
     /// the wrapping strategy for indexing
     ///
     /// this only affect result of [`RectMap::wrapped_get`] and
@@ -113,15 +118,107 @@ impl RectMetadata {
     // ================================
     // Builder Pattern
     // ================================
-    /// create a new meta with half size
+    /// create a new [`RectMetadata`] with half size
+    ///
+    /// # Param
+    /// * `half_size`: the half span of the map
+    ///
+    /// the resulting map will have:
+    /// - columns: `-half_size[0]..(half_size[0] - 1)`, and
+    /// - rows: `-half_size[1]..(half_size[1] - 1)`, and
     #[must_use]
-    pub fn new(half_size: IVec2) -> Self {
+    pub fn from_half_size(half_size: UVec2) -> Self {
         Self {
-            half_size: half_size.abs(),
+            start: -half_size.as_ivec2(),
+            dim: 2 * half_size,
             orientation: HexOrientation::Pointy,
             offset_mode: OffsetHexMode::Odd,
             wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
         }
+    }
+    /// create a new [`RectMetadata`] with start and end
+    ///
+    /// # Param
+    /// * `start`: the element wise minimum offset coordinate in the map
+    /// * `end`: the element wise maximum offset coordinate in the map
+    ///
+    /// the resulting map will have:
+    /// - columns: `start[0]..max(start[0], end[0])`
+    /// - rows: `start[1]..max(start[1], end[1])`
+    #[must_use]
+    pub fn from_start_end(start: IVec2, end: IVec2) -> Self {
+        Self {
+            start,
+            dim: (end.max(start) - start).as_uvec2(),
+            orientation: HexOrientation::Pointy,
+            offset_mode: OffsetHexMode::Odd,
+            wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
+        }
+    }
+    /// create a new [`RectMetadata`] with start and dimension
+    ///
+    /// # Param
+    /// * `start`: the element wise minimum offset coordinate in the map
+    /// * `dim`: the dimension of the map
+    ///
+    /// the resulting map will have:
+    /// - columns: `start[0]..(start[0] + dim[0])`
+    /// - rows: `start[1]..(start[1] + dim[1])`
+    #[must_use]
+    pub const fn from_start_dim(start: IVec2, dim: UVec2) -> Self {
+        Self {
+            start,
+            dim,
+            orientation: HexOrientation::Pointy,
+            offset_mode: OffsetHexMode::Odd,
+            wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
+        }
+    }
+    /// builder patter, set half size
+    ///
+    /// # Param
+    /// * `half_size`: the half span of the map
+    ///
+    /// the resulting map will have:
+    /// - columns: `-half_size[0]..(half_size[0] - 1)`, and
+    /// - rows: `-half_size[1]..(half_size[1] - 1)`, and
+    #[must_use]
+    pub fn with_half_size(mut self, half_size: IVec2) -> Self {
+        // self.half_size = half_size.abs();
+        self.start = -half_size.abs();
+        self.dim = (2 * half_size.abs()).as_uvec2();
+        self
+    }
+    /// builder patter, set start and end
+    ///
+    /// # Param
+    /// * `start`: the element wise minimum offset coordinate in the map
+    /// * `end`: the element wise maximum offset coordinate in the map
+    ///
+    /// the resulting map will have:
+    /// - columns: `start[0]..max(start[0], end[0])`
+    /// - rows: `start[1]..max(start[1], end[1])`
+    #[must_use]
+    pub fn with_start_end(mut self, start: IVec2, end: IVec2) -> Self {
+        // self.half_size = half_size.abs();
+        self.start = start;
+        self.dim = (end.max(start) - start).as_uvec2();
+        self
+    }
+    /// builder pattern, set start and dimension
+    ///
+    /// # Param
+    /// * `start`: the element wise minimum offset coordinate in the map
+    /// * `dim`: the dimension of the map
+    ///
+    /// the resulting map will have:
+    /// - columns: `start[0]..(start[0] + dim[0])`
+    /// - rows: `start[1]..(start[1] + dim[1])`
+    #[must_use]
+    pub const fn with_start_dim(mut self, start: IVec2, dim: UVec2) -> Self {
+        self.start = start;
+        self.dim = dim;
+        self
     }
     /// builder patter, set hex layout
     #[must_use]
@@ -129,13 +226,7 @@ impl RectMetadata {
         self.orientation = orientation;
         self
     }
-    /// builder patter, set half size
-    #[must_use]
-    pub fn with_half_size(mut self, half_size: IVec2) -> Self {
-        self.half_size = half_size.abs();
-        self
-    }
-    /// builder patter, set offset mode
+    /// builder pattern, set offset mode
     ///
     /// affect which way does the map zic zac along point axis
     #[must_use]
@@ -161,7 +252,7 @@ impl RectMetadata {
     ///     *,
     /// };
     ///
-    /// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
+    /// let rect_map = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
     ///     .build(|hex| hex.x + hex.y);
@@ -180,7 +271,7 @@ impl RectMetadata {
     ///     *,
     /// };
     ///
-    /// let rect_map = RectMetadata::new(IVec2 { x: 8, y: 4 })
+    /// let rect_map = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
     ///     .build_default::<i32>();
@@ -205,10 +296,10 @@ impl RectMetadata {
     pub const fn offset_mode(&self) -> OffsetHexMode {
         self.offset_mode
     }
-    /// get the half size of the map
+    /// get the dimension of the map
     #[must_use]
-    pub const fn half_size(&self) -> IVec2 {
-        self.half_size
+    pub const fn dim(&self) -> UVec2 {
+        self.dim
     }
     /// get the wrap strategies of the map
     #[must_use]
@@ -229,9 +320,11 @@ impl RectMetadata {
     /// - => `hex`
     #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
     fn idx_to_hex(&self, idx: usize) -> Hex {
-        let idx = idx as i32;
-        let rc = IVec2::new(idx % (2 * self.half_size.x), idx / (2 * self.half_size.x));
-        let ij = rc - self.half_size;
+        let idx = idx as u32;
+        let rc = UVec2::new(idx % self.dim.x, idx / self.dim.x);
+        // let rc = IVec2::new(idx % (2 * self.half_size.x), idx / (2 *
+        // self.half_size.x)); let ij = rc - self.half_size;
+        let ij = rc.as_ivec2() + self.start;
         self.ij_to_hex(ij)
     }
 
@@ -273,32 +366,34 @@ impl RectMetadata {
     /// - => `rc` 2D view of `Vec`
     /// - => `idx` `Vec` index
     fn ij_to_idx(&self, ij: IVec2) -> usize {
-        let rc = (ij + self.half_size).as_uvec2();
-        (rc.x + rc.y * (2 * self.half_size.as_uvec2().x)) as usize
+        let rc = (ij - self.start).as_uvec2();
+        (rc.x + rc.y * self.dim.x) as usize
     }
 
     /// infallable
     fn wrap_ij(&self, mut ij: IVec2) -> IVec2 {
+        let dim = self.dim.as_ivec2();
+        let end = self.start + dim;
         if self.wrap_strategies[0] == WrapStrategy::Cycle {
-            while ij.x < -self.half_size.x {
-                ij.x += self.half_size.x * 2;
+            while ij.x < -self.start.x {
+                ij.x += dim.x;
             }
-            while ij.x >= self.half_size.x {
-                ij.x -= self.half_size.x * 2;
+            while ij.x >= end.x {
+                ij.x -= dim.x;
             }
         } else {
-            ij.x = ij.x.clamp(-self.half_size.x, self.half_size.x - 1);
+            ij.x = ij.x.clamp(self.start.x, end.x - 1);
         }
 
         if self.wrap_strategies[1] == WrapStrategy::Cycle {
-            while ij.y < -self.half_size.y {
-                ij.y += self.half_size.y * 2;
+            while ij.y < self.start.y {
+                ij.y += dim.y;
             }
-            while ij.y >= self.half_size.y {
-                ij.y -= self.half_size.y * 2;
+            while ij.y >= end.y {
+                ij.y -= dim.y;
             }
         } else {
-            ij.y = ij.y.clamp(-self.half_size.y, self.half_size.y - 1);
+            ij.y = ij.y.clamp(self.start.y, end.y - 1);
         }
 
         ij
@@ -322,7 +417,8 @@ impl RectMetadata {
     }
     /// internally
     fn contains_ij(&self, ij: IVec2) -> bool {
-        ij == ij.clamp(-self.half_size, self.half_size.wrapping_sub([1, 1].into()))
+        ij == ij.clamp(self.start, self.start + self.dim.as_ivec2() - IVec2::ONE)
+            && !self.is_empty()
     }
 
     // ================================
@@ -331,7 +427,7 @@ impl RectMetadata {
     /// total size of the map
     #[must_use]
     pub fn len(&self) -> usize {
-        (self.half_size.as_uvec2().element_product() * 4) as usize
+        self.dim.element_product() as usize
     }
 
     /// whether of not the map layout is empty
@@ -363,7 +459,7 @@ impl<T> RectMap<T> {
     ///     *,
     /// };
     ///
-    /// let meta = RectMetadata::new(IVec2 { x: 8, y: 4 })
+    /// let meta = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]);
     /// let rect_map = RectMap::new(meta, |hex| hex.x + hex.y);
@@ -373,7 +469,7 @@ impl<T> RectMap<T> {
     #[must_use]
     #[allow(clippy::cast_possible_wrap)]
     pub fn new(meta: RectMetadata, mut values: impl FnMut(Hex) -> T) -> Self {
-        let size = (meta.half_size.as_uvec2().element_product() * 4) as usize;
+        let size = (meta.dim.element_product() * 4) as usize;
         let mut inner = Vec::with_capacity(size);
         for h in meta.iter_hex() {
             inner.push(values(h));
@@ -393,7 +489,7 @@ impl<T> RectMap<T> {
     ///     *,
     /// };
     ///
-    /// let meta = RectMetadata::new(IVec2 { x: 8, y: 4 })
+    /// let meta = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]);
     /// let rect_map = RectMap::default_values(meta);
@@ -488,11 +584,11 @@ impl<T: Debug> Debug for RectMap<T> {
 }
 
 #[cfg(test)]
-mod test {
+mod half_size_test {
     use super::*;
 
     // Test dimensions for creating RectHexMap instances.
-    const HALF_SIZES: &[[i32; 2]] = &[
+    const HALF_SIZES: &[[u32; 2]] = &[
         [0, 0],
         [0, 1],
         [1, 1],
@@ -503,7 +599,6 @@ mod test {
         [64, 128],
         [127, 201],
         [256, 512],
-        [-40, 3],
     ];
 
     const WRAP_STRATEGIES: &[[WrapStrategy; 2]] = &[
@@ -517,16 +612,16 @@ mod test {
     #[test]
     fn idx_hex_test() {
         for dim in HALF_SIZES {
-            let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
+            let rect_map = RectMetadata::from_half_size(UVec2::from_array(*dim))
                 .with_orientation(HexOrientation::Pointy)
                 .with_offset_mode(OffsetHexMode::Odd)
                 .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
                 .build_default::<i32>();
 
-            for idx in 0..rect_hex_map.len() {
-                let hex = rect_hex_map.idx_to_hex(idx);
-                assert!(rect_hex_map.contains_hex(hex));
-                let _idx = rect_hex_map.hex_to_idx(hex);
+            for idx in 0..rect_map.len() {
+                let hex = rect_map.idx_to_hex(idx);
+                assert!(rect_map.contains_hex(hex));
+                let _idx = rect_map.hex_to_idx(hex);
                 assert_eq!(Some(idx), _idx);
             }
         }
@@ -536,20 +631,19 @@ mod test {
     #[test]
     fn contains_test() {
         for dim in HALF_SIZES {
-            let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
+            let rect_map = RectMetadata::from_half_size(UVec2::from_array(*dim))
                 .with_orientation(HexOrientation::Pointy)
                 .with_offset_mode(OffsetHexMode::Odd)
                 .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
                 .build_default::<i32>();
 
+            let dim = [dim[0] as i32, dim[1] as i32];
+
             for a in -2..2 {
                 for b in -2..2 {
                     for i in (2 * a * dim[0])..((2 * a + 1) * dim[0]) {
                         for j in (2 * b * dim[1])..((2 * b + 1) * dim[1]) {
-                            assert_eq!(
-                                a == 0 && b == 0,
-                                rect_hex_map.contains_ij(IVec2::new(i, j))
-                            );
+                            assert_eq!(a == 0 && b == 0, rect_map.contains_ij(IVec2::new(i, j)));
                         }
                     }
                 }
@@ -562,11 +656,13 @@ mod test {
     fn wrap_test() {
         for dim in HALF_SIZES {
             for wrap_strategies in WRAP_STRATEGIES {
-                let rect_hex_map = RectMetadata::new(IVec2::from_array(*dim))
+                let rect_map = RectMetadata::from_half_size(UVec2::from_array(*dim))
                     .with_orientation(HexOrientation::Pointy)
                     .with_offset_mode(OffsetHexMode::Odd)
                     .with_wrap_strategies(*wrap_strategies)
                     .build_default::<i32>();
+
+                let dim = [dim[0] as i32, dim[1] as i32];
 
                 for a in -2..2 {
                     for b in -2..2 {
@@ -591,8 +687,223 @@ mod test {
                                 let ij_a = IVec2::new(ia, ja);
                                 let ij_b = IVec2::new(ib, jb);
 
-                                let wij_a = rect_hex_map.wrap_ij(ij_a);
-                                let wij_b = rect_hex_map.wrap_ij(ij_b);
+                                let wij_a = rect_map.wrap_ij(ij_a);
+                                let wij_b = rect_map.wrap_ij(ij_b);
+
+                                assert_eq!(wij_a, wij_b);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod start_end_test {
+    // ================================
+    // Start End Test
+    // ================================
+    use super::*;
+
+    const START_END: &[([i32; 2], [i32; 2])] = &[
+        ([0, 0], [0, 0]),
+        ([0, 0], [1, 1]),
+        ([-1, -1], [1, 1]),
+        ([-10, -10], [10, 10]),
+        ([-10, -10], [15, 15]),
+        ([0, 0], [15, 15]),
+        ([0, 0], [-30, -30]),
+        ([-17, -13], [31, 41]),
+        ([-64, -64], [64, 64]),
+    ];
+
+    const WRAP_STRATEGIES: &[[WrapStrategy; 2]] = &[
+        [WrapStrategy::Clamp, WrapStrategy::Clamp],
+        [WrapStrategy::Clamp, WrapStrategy::Cycle],
+        [WrapStrategy::Cycle, WrapStrategy::Clamp],
+        [WrapStrategy::Cycle, WrapStrategy::Cycle],
+    ];
+
+    /// Tests the conversion between index and hexagonal coordinates.
+    #[test]
+    fn idx_hex_test() {
+        for (start, end) in START_END {
+            let rect_map =
+                RectMetadata::from_start_end((*start).into(), (*end).into()).build_default::<i32>();
+
+            for idx in 0..rect_map.len() {
+                let hex = rect_map.idx_to_hex(idx);
+                assert!(rect_map.contains_hex(hex));
+                let ij = rect_map.hex_to_ij(hex);
+                assert!(rect_map.contains_ij(ij));
+                assert_eq!(Some(idx), rect_map.hex_to_idx(hex));
+            }
+        }
+    }
+
+    #[test]
+    fn contains_test() {
+        for (start, end) in START_END {
+            let rect_map =
+                RectMetadata::from_start_end((*start).into(), (*end).into()).build_default::<i32>();
+
+            for i in (start[0] - 10)..(end[0] + 10) {
+                for j in (start[1] - 10)..(end[1] + 10) {
+                    let contain = (i >= start[0] && i < end[0]) && (j >= start[1] && j < end[1]);
+
+                    println!(
+                        "{:?} || {:?} - {:?} | {}, {} | {}",
+                        rect_map.dim, start, end, i, j, contain
+                    );
+
+                    assert_eq!(rect_map.contains_ij([i, j].into()), contain);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn wrap_test() {
+        for (start, end) in START_END {
+            for wrap_strategies in WRAP_STRATEGIES {
+                let rect_map = RectMetadata::from_start_end((*start).into(), (*end).into())
+                    .with_wrap_strategies(*wrap_strategies)
+                    .build_default::<i32>();
+
+                let dim = [(end[0] - start[0]).max(0), (end[1] - start[1]).max(0)];
+
+                for a in -2..2 {
+                    for b in -2..2 {
+                        let i_iter_a = (2 * a * dim[0] - dim[0])..((2 * a) * dim[0] + dim[0]);
+                        let i_iter_b: Box<dyn Iterator<Item = i32>> =
+                            if wrap_strategies[0] == WrapStrategy::Cycle {
+                                Box::new(-dim[0]..dim[0])
+                            } else {
+                                Box::new(i_iter_a.clone().map(|i| i.clamp(-dim[0], dim[0] - 1)))
+                            };
+
+                        for (ia, ib) in i_iter_a.zip(i_iter_b) {
+                            let j_iter_a = (2 * b * dim[1] - dim[1])..((2 * b) * dim[1] + dim[1]);
+                            let j_iter_b: Box<dyn Iterator<Item = i32>> =
+                                if wrap_strategies[1] == WrapStrategy::Cycle {
+                                    Box::new(-dim[1]..dim[1])
+                                } else {
+                                    Box::new(j_iter_a.clone().map(|j| j.clamp(-dim[1], dim[1] - 1)))
+                                };
+
+                            for (ja, jb) in j_iter_a.zip(j_iter_b) {
+                                let ij_a = IVec2::new(ia, ja);
+                                let ij_b = IVec2::new(ib, jb);
+
+                                let wij_a = rect_map.wrap_ij(ij_a);
+                                let wij_b = rect_map.wrap_ij(ij_b);
+
+                                assert_eq!(wij_a, wij_b);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod start_dim_test {
+    // ================================
+    // Start End Test
+    // ================================
+    use super::*;
+
+    const START_END: &[([i32; 2], [u32; 2])] = &[
+        ([0, 0], [0, 0]),
+        ([0, 0], [1, 1]),
+        ([-1, -1], [1, 1]),
+        ([-10, -10], [10, 10]),
+        ([-10, -10], [15, 15]),
+        ([0, 0], [15, 15]),
+        ([0, 0], [30, 30]),
+        ([-17, -13], [31, 41]),
+        ([-64, -64], [64, 64]),
+    ];
+
+    const WRAP_STRATEGIES: &[[WrapStrategy; 2]] = &[
+        [WrapStrategy::Clamp, WrapStrategy::Clamp],
+        [WrapStrategy::Clamp, WrapStrategy::Cycle],
+        [WrapStrategy::Cycle, WrapStrategy::Clamp],
+        [WrapStrategy::Cycle, WrapStrategy::Cycle],
+    ];
+
+    /// Tests the conversion between index and hexagonal coordinates.
+    #[test]
+    fn idx_hex_test() {
+        for (start, dim) in START_END {
+            let rect_map =
+                RectMetadata::from_start_dim((*start).into(), (*dim).into()).build_default::<i32>();
+
+            for idx in 0..rect_map.len() {
+                let hex = rect_map.idx_to_hex(idx);
+                assert!(rect_map.contains_hex(hex));
+                let ij = rect_map.hex_to_ij(hex);
+                assert!(rect_map.contains_ij(ij));
+                assert_eq!(Some(idx), rect_map.hex_to_idx(hex));
+            }
+        }
+    }
+
+    #[test]
+    fn contains_test() {
+        for (start, dim) in START_END {
+            let rect_map =
+                RectMetadata::from_start_dim((*start).into(), (*dim).into()).build_default::<i32>();
+
+            for i in (start[0] - 10)..(start[0] + dim[0] as i32 + 10) {
+                for j in (start[1] - 10)..(start[1] + dim[1] as i32 + 10) {
+                    let contain = (i >= start[0] && i < start[0] + dim[0] as i32)
+                        && (j >= start[1] && j < start[1] + dim[1] as i32);
+                    assert_eq!(rect_map.contains_ij([i, j].into()), contain);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn wrap_test() {
+        for (start, dim) in START_END {
+            for wrap_strategies in WRAP_STRATEGIES {
+                let rect_map = RectMetadata::from_start_dim((*start).into(), (*dim).into())
+                    .with_wrap_strategies(*wrap_strategies)
+                    .build_default::<i32>();
+
+                let dim = [dim[0] as i32, dim[1] as i32];
+
+                for a in -2..2 {
+                    for b in -2..2 {
+                        let i_iter_a = (2 * a * dim[0] - dim[0])..((2 * a) * dim[0] + dim[0]);
+                        let i_iter_b: Box<dyn Iterator<Item = i32>> =
+                            if wrap_strategies[0] == WrapStrategy::Cycle {
+                                Box::new(-dim[0]..dim[0])
+                            } else {
+                                Box::new(i_iter_a.clone().map(|i| i.clamp(-dim[0], dim[0] - 1)))
+                            };
+
+                        for (ia, ib) in i_iter_a.zip(i_iter_b) {
+                            let j_iter_a = (2 * b * dim[1] - dim[1])..((2 * b) * dim[1] + dim[1]);
+                            let j_iter_b: Box<dyn Iterator<Item = i32>> =
+                                if wrap_strategies[1] == WrapStrategy::Cycle {
+                                    Box::new(-dim[1]..dim[1])
+                                } else {
+                                    Box::new(j_iter_a.clone().map(|j| j.clamp(-dim[1], dim[1] - 1)))
+                                };
+
+                            for (ja, jb) in j_iter_a.zip(j_iter_b) {
+                                let ij_a = IVec2::new(ia, ja);
+                                let ij_b = IVec2::new(ib, jb);
+
+                                let wij_a = rect_map.wrap_ij(ij_a);
+                                let wij_b = rect_map.wrap_ij(ij_b);
 
                                 assert_eq!(wij_a, wij_b);
                             }

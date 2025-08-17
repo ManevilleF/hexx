@@ -32,8 +32,21 @@ pub fn main() {
 
 #[derive(Resource)]
 pub struct RectMapConfig {
-    pub meta: RectMetadata,
-    pub layout: HexLayout,
+    orientation: HexOrientation,
+    hex_size: f32,
+    wrap_strategies: [WrapStrategy; 2],
+    offset_mode: OffsetHexMode,
+    half_size: UVec2,
+    start: IVec2,
+    end: IVec2,
+    dim: UVec2,
+    mode: RectCreateMode,
+}
+
+pub enum RectCreateMode {
+    HalfSize,
+    StartEnd,
+    StartDim,
 }
 
 #[derive(Resource)]
@@ -70,12 +83,23 @@ fn setup(
         TextInstruction,
     ));
 
+    // commands.insert_resource(RectMapConfig {
+    //     meta: RectMetadata::from_half_size(UVec2::new(8, 4))
+    //         .with_offset_mode(OffsetHexMode::Odd)
+    //         .with_orientation(HexOrientation::Pointy)
+    //         .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]),
+    //     layout: HexLayout::pointy().with_hex_size(30.0),
+    // });
     commands.insert_resource(RectMapConfig {
-        meta: RectMetadata::new(IVec2::new(8, 4))
-            .with_offset_mode(OffsetHexMode::Odd)
-            .with_orientation(HexOrientation::Pointy)
-            .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp]),
-        layout: HexLayout::pointy().with_hex_size(30.0),
+        orientation: HexOrientation::Pointy,
+        hex_size: 30.0,
+        wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
+        offset_mode: OffsetHexMode::Odd,
+        half_size: UVec2 { x: 8, y: 4 },
+        start: IVec2 { x: -8, y: -4 },
+        end: IVec2 { x: 8, y: 4 },
+        dim: UVec2 { x: 16, y: 8 },
+        mode: RectCreateMode::HalfSize,
     });
 
     wtr.write(RespawnMap);
@@ -98,49 +122,64 @@ fn respawn_map(
         commands.entity(i).despawn();
     }
 
-    let hex_size = 0.5 * config.layout.rect_size().max_element();
-    let wrap_strategies = config.meta.wrap_strategies();
+    let mut instructions = vec![
+        format!("Press <1> to change orientation: {:?}", config.orientation),
+        format!("Press <2,3> to change hex size: {:?}", config.hex_size),
+        format!(
+            "Press <4,5> to change longitude wrapping strategy: {:?}, {:?}",
+            config.wrap_strategies[0], config.wrap_strategies[1]
+        ),
+        format!(
+            "Press <6> to change the offset mode: {:?}",
+            config.offset_mode
+        ),
+        format!(""),
+        format!("Press <Tab> to change rect map creation mode"),
+    ];
 
-    let instructions = vec![
-        format!("hex size : {}", hex_size),
-        format!("half size: {:?}", config.meta.half_size()),
-        format!(
-            "Press <1> to change orientation: {:?}",
-            config.meta.orientation()
-        ),
-        format!("Press <2> to increase hex size"),
-        format!("Press <3> to decrease hex size"),
-        format!("Press <4> to increase column count"),
-        format!("Press <5> to decrease column count"),
-        format!("Press <6> to increase row count"),
-        format!("Press <7> to decrease column count"),
-        format!(
-            "Press <8> to change longitude wrapping strategy: {:?}",
-            wrap_strategies[0]
-        ),
-        format!(
-            "Press <9> to change latitude wrapping strategy: {:?}",
-            wrap_strategies[1]
-        ),
-        format!(
-            "Press <0> to change the offset mode: {:?}",
-            config.meta.offset_mode()
-        ),
-    ]
-    .join("\n");
+    match config.mode {
+        RectCreateMode::HalfSize => instructions.append(&mut vec![
+            format!("half size: {:?}", config.half_size),
+            format!("Press <w,a,s,d>> to change half size"),
+        ]),
+
+        RectCreateMode::StartEnd => instructions.append(&mut vec![
+            format!("start, end: {:?}, {:?}", config.start, config.end),
+            format!("Press <w,a,s,d> to change start"),
+            format!("Press <arrows> to change end"),
+        ]),
+        RectCreateMode::StartDim => instructions.append(&mut vec![
+            format!("start, dim: {:?}, {:?}", config.start, config.dim),
+            format!("Press <w,a,s,d> to change start"),
+            format!("Press <arrows> to change dimension"),
+        ]),
+    }
+
+    let instructions = instructions.join("\n");
 
     *text.single_mut().unwrap() = Text::new(instructions);
 
-    let default_mesh = Mesh2d(meshes.add(RegularPolygon::new(0.9 * hex_size, 6)));
+    let default_mesh = Mesh2d(meshes.add(RegularPolygon::new(0.9 * config.hex_size, 6)));
 
-    let angle = if config.meta.orientation() == HexOrientation::Pointy {
+    let angle = if config.orientation == HexOrientation::Pointy {
         0.0
     } else {
         30_f32.to_radians()
     };
 
-    let map: RectMap<Entity> = config.meta.clone().build(|hex| {
-        let mut pos = config.layout.hex_to_world_pos(hex).xyy();
+    let meta = match config.mode {
+        RectCreateMode::HalfSize => RectMetadata::from_half_size(config.half_size),
+        RectCreateMode::StartEnd => RectMetadata::from_start_end(config.start, config.end),
+        RectCreateMode::StartDim => RectMetadata::from_start_dim(config.start, config.dim),
+    }
+    .with_orientation(config.orientation)
+    .with_wrap_strategies(config.wrap_strategies)
+    .with_offset_mode(config.offset_mode);
+
+    let layout = HexLayout::new(config.orientation).with_hex_size(config.hex_size);
+
+    let map: RectMap<Entity> = meta.clone().build(|hex| {
+        let mut pos = layout.hex_to_world_pos(hex).xyy();
         pos[2] = 0.0;
 
         commands
@@ -166,78 +205,121 @@ fn handle_input(
     mut config: ResMut<RectMapConfig>,
     mut wtr: EventWriter<RespawnMap>,
 ) {
-    let mut changed = false;
-    let mut orientation = config.meta.orientation();
-    let mut hex_size = 0.5 * config.layout.rect_size().max_element();
-    let mut half_size: IVec2 = config.meta.half_size();
-    let mut wrap_strategies: [WrapStrategy; 2] = config.meta.wrap_strategies();
-    let mut offset_mode = config.meta.offset_mode();
+    if key.just_pressed(KeyCode::Tab) {
+        config.mode = match config.mode {
+            RectCreateMode::HalfSize => RectCreateMode::StartEnd,
+            RectCreateMode::StartEnd => RectCreateMode::StartDim,
+            RectCreateMode::StartDim => RectCreateMode::HalfSize,
+        };
+    }
 
     if key.just_pressed(KeyCode::Digit1) {
-        if orientation == HexOrientation::Flat {
-            orientation = HexOrientation::Pointy
+        if config.orientation == HexOrientation::Flat {
+            config.orientation = HexOrientation::Pointy
         } else {
-            orientation = HexOrientation::Flat
+            config.orientation = HexOrientation::Flat
         }
-        changed = true;
     }
     if key.just_pressed(KeyCode::Digit2) {
-        hex_size = (hex_size + 1.0).clamp(15.0, 45.0);
-        changed = true;
+        config.hex_size = (config.hex_size + 1.0).clamp(15.0, 45.0);
     }
     if key.just_pressed(KeyCode::Digit3) {
-        hex_size = (hex_size - 1.0).clamp(15.0, 45.0);
-        changed = true;
+        config.hex_size = (config.hex_size - 1.0).clamp(15.0, 45.0);
     }
     if key.just_pressed(KeyCode::Digit4) {
-        half_size[0] = (half_size[0] + 1).clamp(4, 16);
-        changed = true;
+        if config.wrap_strategies[0] == WrapStrategy::Clamp {
+            config.wrap_strategies[0] = WrapStrategy::Cycle;
+        } else {
+            config.wrap_strategies[0] = WrapStrategy::Clamp;
+        }
     }
     if key.just_pressed(KeyCode::Digit5) {
-        half_size[0] = (half_size[0] - 1).clamp(4, 16);
-        changed = true;
+        if config.wrap_strategies[1] == WrapStrategy::Clamp {
+            config.wrap_strategies[1] = WrapStrategy::Cycle;
+        } else {
+            config.wrap_strategies[1] = WrapStrategy::Clamp;
+        }
     }
     if key.just_pressed(KeyCode::Digit6) {
-        half_size[1] = (half_size[1] + 1).clamp(2, 8);
-        changed = true;
-    }
-    if key.just_pressed(KeyCode::Digit7) {
-        half_size[1] = (half_size[1] - 1).clamp(2, 8);
-        changed = true;
-    }
-    if key.just_pressed(KeyCode::Digit8) {
-        if wrap_strategies[0] == WrapStrategy::Clamp {
-            wrap_strategies[0] = WrapStrategy::Cycle;
+        if config.offset_mode == OffsetHexMode::Odd {
+            config.offset_mode = OffsetHexMode::Even;
         } else {
-            wrap_strategies[0] = WrapStrategy::Clamp;
+            config.offset_mode = OffsetHexMode::Odd
         }
-        changed = true;
-    }
-    if key.just_pressed(KeyCode::Digit9) {
-        if wrap_strategies[1] == WrapStrategy::Clamp {
-            wrap_strategies[1] = WrapStrategy::Cycle;
-        } else {
-            wrap_strategies[1] = WrapStrategy::Clamp;
-        }
-        changed = true;
-    }
-    if key.just_pressed(KeyCode::Digit0) {
-        if offset_mode == OffsetHexMode::Odd {
-            offset_mode = OffsetHexMode::Even;
-        } else {
-            offset_mode = OffsetHexMode::Odd
-        }
-        changed = true;
     }
 
-    if changed {
-        config.meta = RectMetadata::new(half_size)
-            .with_orientation(orientation)
-            .with_wrap_strategies(wrap_strategies)
-            .with_offset_mode(offset_mode);
+    match config.mode {
+        RectCreateMode::HalfSize => {
+            if key.just_pressed(KeyCode::KeyD) {
+                config.half_size[0] = (config.half_size[0] + 1).clamp(2, 16);
+            }
+            if key.just_pressed(KeyCode::KeyA) {
+                config.half_size[0] = (config.half_size[0] - 1).clamp(2, 16);
+            }
+            if key.just_pressed(KeyCode::KeyW) {
+                config.half_size[1] = (config.half_size[1] + 1).clamp(1, 8);
+            }
+            if key.just_pressed(KeyCode::KeyS) {
+                config.half_size[1] = (config.half_size[1] - 1).clamp(1, 8);
+            }
+        }
+        RectCreateMode::StartEnd => {
+            if key.just_pressed(KeyCode::KeyD) {
+                config.start[0] = (config.start[0] + 1).clamp(-8, 0);
+            }
+            if key.just_pressed(KeyCode::KeyA) {
+                config.start[0] = (config.start[0] - 1).clamp(-8, 0);
+            }
+            if key.just_pressed(KeyCode::KeyW) {
+                config.start[1] = (config.start[1] + 1).clamp(-8, 0);
+            }
+            if key.just_pressed(KeyCode::KeyS) {
+                config.start[1] = (config.start[1] - 1).clamp(-8, 0);
+            }
+            //
+            if key.just_pressed(KeyCode::ArrowRight) {
+                config.end[0] = (config.end[0] + 1).clamp(0, 8);
+            }
+            if key.just_pressed(KeyCode::ArrowLeft) {
+                config.end[0] = (config.end[0] - 1).clamp(0, 8);
+            }
+            if key.just_pressed(KeyCode::ArrowUp) {
+                config.end[1] = (config.end[1] + 1).clamp(0, 4);
+            }
+            if key.just_pressed(KeyCode::ArrowDown) {
+                config.end[1] = (config.end[1] - 1).clamp(0, 4);
+            }
+        }
+        RectCreateMode::StartDim => {
+            if key.just_pressed(KeyCode::KeyD) {
+                config.start[0] = (config.start[0] + 1).clamp(-8, 0);
+            }
+            if key.just_pressed(KeyCode::KeyA) {
+                config.start[0] = (config.start[0] - 1).clamp(-8, 0);
+            }
+            if key.just_pressed(KeyCode::KeyW) {
+                config.start[1] = (config.start[1] + 1).clamp(-8, 0);
+            }
+            if key.just_pressed(KeyCode::KeyS) {
+                config.start[1] = (config.start[1] - 1).clamp(-8, 0);
+            }
+            //
+            if key.just_pressed(KeyCode::ArrowRight) {
+                config.dim[0] = (config.dim[0] + 1).clamp(1, 24);
+            }
+            if key.just_pressed(KeyCode::ArrowLeft) {
+                config.dim[0] = (config.dim[0] - 1).clamp(1, 24);
+            }
+            if key.just_pressed(KeyCode::ArrowUp) {
+                config.dim[1] = (config.dim[1] + 1).clamp(1, 16);
+            }
+            if key.just_pressed(KeyCode::ArrowDown) {
+                config.dim[1] = (config.dim[1] - 1).clamp(1, 16);
+            }
+        }
+    }
 
-        config.layout = HexLayout::new(orientation).with_hex_size(hex_size);
-
+    if key.get_just_pressed().count() != 0 {
         wtr.write(RespawnMap);
     }
 }
@@ -263,13 +345,15 @@ fn update_material(
     // draw small red circle in cursor position
     gizmos.circle_2d(Isometry2d::from_translation(pos), 5.0, RED);
 
-    let hex = config.layout.world_pos_to_hex(pos);
-    let pos = config.layout.hex_to_world_pos(hex);
+    let layout = HexLayout::new(config.orientation).with_hex_size(config.hex_size);
+
+    let hex = layout.world_pos_to_hex(pos);
+    let pos = layout.hex_to_world_pos(hex);
 
     // draw large red circle in snapped to current hex's center.
     gizmos.circle_2d(
         Isometry2d::from_translation(pos),
-        0.9 * 0.5 * config.layout.rect_size().max_element(),
+        0.9 * config.hex_size,
         RED,
     );
 
