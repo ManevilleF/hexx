@@ -56,7 +56,7 @@ impl RombusMetadata {
         Some((y * self.columns + x) as usize)
     }
 
-    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
     fn idx_to_hex(&self, idx: usize) -> Hex {
         let idx = idx as u32;
         debug_assert!(
@@ -90,7 +90,7 @@ impl<T> RombusMap<T> {
     /// assert_eq!(map[hex(1, 0)], 1);
     /// ```
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     pub fn new(origin: Hex, rows: u32, columns: u32, mut values: impl FnMut(Hex) -> T) -> Self {
         let mut inner = Vec::with_capacity((rows * columns) as usize);
         for y in 0..rows {

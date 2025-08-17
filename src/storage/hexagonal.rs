@@ -41,7 +41,7 @@ struct HexagonalMapMetadata {
 }
 
 impl HexagonalMapMetadata {
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     const fn offset(&self) -> Hex {
         Hex::splat(self.bounds.radius as i32).const_sub(self.bounds.center)
     }
@@ -59,7 +59,7 @@ impl HexagonalMapMetadata {
         ])
     }
 
-    #[allow(clippy::cast_possible_wrap, clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_wrap, clippy::cast_possible_truncation)]
     fn idx_to_hex(&self, [y, x]: [usize; 2]) -> Hex {
         let x = (x as u32).saturating_add(self.bounds.radius.saturating_sub(y as u32)) as i32;
         let y = y as i32;
@@ -87,7 +87,7 @@ impl<T> HexagonalMap<T> {
     /// assert_eq!(map[hex(1, 0)], 1);
     /// ```
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap)]
     pub fn new(center: Hex, radius: u32, mut values: impl FnMut(Hex) -> T) -> Self {
         let bounds = HexBounds::new(center, radius);
         let range = radius as i32;
@@ -132,12 +132,12 @@ impl<T> HexagonalMap<T> {
 impl<T> HexStore<T> for HexagonalMap<T> {
     fn get(&self, hex: crate::Hex) -> Option<&T> {
         let [y, x] = self.meta.hex_to_idx(hex)?;
-        self.inner.get(y).and_then(|v| v.get(x))
+        self.inner.get(y)?.get(x)
     }
 
     fn get_mut(&mut self, hex: crate::Hex) -> Option<&mut T> {
         let [y, x] = self.meta.hex_to_idx(hex)?;
-        self.inner.get_mut(y).and_then(|v| v.get_mut(x))
+        self.inner.get_mut(y)?.get_mut(x)
     }
 
     fn values<'s>(&'s self) -> impl ExactSizeIterator<Item = &'s T>
