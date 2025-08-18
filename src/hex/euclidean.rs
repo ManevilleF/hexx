@@ -1,8 +1,8 @@
 use super::Hex;
 
 impl Hex {
-    /// Computes squared euclidean distance from `self` to `origin` as an integer
-    /// number in the Cartesian coordinate system.
+    /// Computes squared euclidean distance from `self` to `origin` as an
+    /// integer number in the Cartesian coordinate system.
     /// Euclidean distance can vary for coordinates in the same range, and
     /// can be used for operations outside of the hexagonal space, like
     /// checking if coordinates are in a circular range instead of an
@@ -53,7 +53,7 @@ impl Hex {
     ///
     /// Also check:
     /// - [`Hex::euclidean_distance_to`]
-    /// - [`Hex::circulare_range`]
+    /// - [`Hex::circular_range`]
     ///
     /// > Source:
     /// > Xiangguo Li's 2013 [Paper]. ([DOI]) gives a formula for Euclidean
@@ -77,7 +77,7 @@ impl Hex {
     ///
     /// Also check:
     /// - [`Hex::squared_euclidean_distance_to`]
-    /// - [`Hex::circulare_range`]
+    /// - [`Hex::circular_range`]
     ///
     /// > Source:
     /// > Xiangguo Li's 2013 [Paper]. ([DOI]) gives a formula for Euclidean
