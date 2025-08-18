@@ -28,6 +28,10 @@ use super::HexStore;
 /// [`HashMap`]: std::collections::HashMap
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+#[cfg_attr(
+    feature = "bevy_ecs",
+    derive(bevy_ecs::resource::Resource, bevy_ecs::component::Component)
+)]
 pub struct HexagonalMap<T> {
     inner: Vec<Vec<T>>,
     meta: HexagonalMapMetadata,

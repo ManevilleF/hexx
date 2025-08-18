@@ -81,8 +81,6 @@ pub struct RectMetadata {
     /// the hex layout of the map
     orientation: HexOrientation,
     /// the offset mode of the map
-    ///
-    /// affect which way does the map zic zac along point axis
     offset_mode: OffsetHexMode,
     /// the offset coordinate for the start element of the flat vec
     ///
@@ -226,8 +224,6 @@ impl RectMetadata {
         self
     }
     /// builder pattern, set offset mode
-    ///
-    /// affect which way does the map zic zac along point axis
     #[must_use]
     pub const fn with_offset_mode(mut self, offset_mode: OffsetHexMode) -> Self {
         self.offset_mode = offset_mode;
