@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 
-* Added `Hex::euclidean_distance_to` (#226)
+* Added euclidean norm methods:
+  - `Hex::euclidean_distance_to` (#226)
+  - `Hex::squared_euclidean_distance_to` (#229)
+  - `Hex::squared_euclidean_length` (#229)
+  - `Hex::euclidean_length` (#229)
 * Added `Hex::circular_range` (#226)
 * Rust 2024 edition (#225)
 * Added `HexBounds::corners` method (#223)

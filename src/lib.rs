@@ -66,6 +66,7 @@
 //!     * Doubled coordinates
 //!     * Hexmod coordinates
 //! * Multiple hex resolution
+//! * Euclidean norm
 //!
 //! ## Basic usage
 //!
