@@ -471,6 +471,12 @@ impl<T> RectMap<T> {
         Self { inner, meta }
     }
 
+    /// get the [`RectMetadata`] of the map.
+    #[must_use]
+    pub const fn meta(&self) -> &RectMetadata {
+        &self.meta
+    }
+
     /// Creates and fills a rectangular shaped map
     ///
     /// # Arguments
@@ -522,7 +528,7 @@ impl<T> RectMap<T> {
 impl<T> std::ops::Deref for RectMap<T> {
     type Target = RectMetadata;
     fn deref(&self) -> &Self::Target {
-        &self.meta
+        self.meta()
     }
 }
 
