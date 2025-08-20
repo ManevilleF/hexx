@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use glam::{IVec2, UVec2, Vec2Swizzles};
+use glam::{IVec2, UVec2};
 
 use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
 
@@ -313,18 +313,20 @@ impl RectMetadata {
     /// - => `rc` 2D view of `Vec`
     /// - => `ij` offset coordinate
     /// - => `hex`
-    #[expect(clippy::cast_possible_truncation)]
     fn idx_to_hex(&self, idx: usize) -> Hex {
-        let idx = idx as u32;
-        let rc = UVec2::new(idx % self.dim.x, idx / self.dim.x);
-        // let rc = IVec2::new(idx % (2 * self.half_size.x), idx / (2 *
-        // self.half_size.x)); let ij = rc - self.half_size;
-        let ij = rc.as_ivec2() + self.start;
+        let ij = self.idx_to_ij(idx);
         self.ij_to_hex(ij)
     }
 
-    fn ij_to_hex(&self, ij: IVec2) -> Hex {
-        Hex::from_offset_coordinates(ij.xy().to_array(), self.offset_mode, self.orientation)
+    #[expect(clippy::cast_possible_truncation)]
+    fn idx_to_ij(&self, idx: usize) -> IVec2 {
+        let idx = idx as u32;
+        let rc = UVec2::new(idx % self.dim.x, idx / self.dim.x);
+        rc.as_ivec2() + self.start
+    }
+
+    const fn ij_to_hex(&self, ij: IVec2) -> Hex {
+        Hex::from_offset_coordinates(ij.to_array(), self.offset_mode, self.orientation)
     }
 
     // ================================
@@ -332,8 +334,8 @@ impl RectMetadata {
     // ================================
     /// `None` if outside map
     fn hex_to_idx(&self, hex: Hex) -> Option<usize> {
-        let ij = self.hex_to_ij(hex);
-        if self.contains_ij(ij) {
+        let ij = self.hex_to_offset(hex);
+        if self.contains_offset(ij) {
             Some(self.ij_to_idx(ij))
         } else {
             None
@@ -342,17 +344,17 @@ impl RectMetadata {
 
     /// Wrap if `hex` lie outside of layout
     fn wrapped_hex_to_idx(&self, hex: Hex) -> usize {
-        let ij = self.hex_to_ij(hex);
-        let ij = self.wrap_ij(ij);
+        let ij = self.hex_to_offset(hex);
+        let ij = self.wrap_offset(ij);
         self.ij_to_idx(ij)
     }
 
-    /// infallable
-    fn hex_to_ij(&self, hex: Hex) -> IVec2 {
-        let v: IVec2 = hex
-            .to_offset_coordinates(self.offset_mode, self.orientation)
-            .into();
-        v.xy()
+    /// Calculate offset coordinate from hex for map's orientation and offset
+    /// mode
+    #[must_use]
+    pub fn hex_to_offset(&self, hex: Hex) -> IVec2 {
+        hex.to_offset_coordinates(self.offset_mode, self.orientation)
+            .into()
     }
 
     /// fallable input, internal
@@ -365,40 +367,43 @@ impl RectMetadata {
         (rc.x + rc.y * self.dim.x) as usize
     }
 
-    /// infallable
-    fn wrap_ij(&self, mut ij: IVec2) -> IVec2 {
+    /// Wrap a offset coordinate to ensure it fall inside the map
+    #[must_use]
+    pub fn wrap_offset(&self, offset: impl Into<IVec2>) -> IVec2 {
         let dim = self.dim.as_ivec2();
         let end = self.start + dim;
+        let mut offset = offset.into();
+
         if self.wrap_strategies[0] == WrapStrategy::Cycle {
-            while ij.x < -self.start.x {
-                ij.x += dim.x;
+            while offset.x < self.start.x {
+                offset.x += dim.x;
             }
-            while ij.x >= end.x {
-                ij.x -= dim.x;
+            while offset.x >= end.x {
+                offset.x -= dim.x;
             }
         } else {
-            ij.x = ij.x.clamp(self.start.x, end.x - 1);
+            offset.x = offset.x.clamp(self.start.x, end.x - 1);
         }
 
         if self.wrap_strategies[1] == WrapStrategy::Cycle {
-            while ij.y < self.start.y {
-                ij.y += dim.y;
+            while offset.y < self.start.y {
+                offset.y += dim.y;
             }
-            while ij.y >= end.y {
-                ij.y -= dim.y;
+            while offset.y >= end.y {
+                offset.y -= dim.y;
             }
         } else {
-            ij.y = ij.y.clamp(self.start.y, end.y - 1);
+            offset.y = offset.y.clamp(self.start.y, end.y - 1);
         }
 
-        ij
+        offset
     }
 
     /// Wrap a Hex to ensure it fall inside the map
     #[must_use]
     pub fn wrap_hex(&self, hex: Hex) -> Hex {
-        let ij = self.hex_to_ij(hex);
-        let ij = self.wrap_ij(ij);
+        let ij = self.hex_to_offset(hex);
+        let ij = self.wrap_offset(ij);
         self.ij_to_hex(ij)
     }
 
@@ -408,11 +413,14 @@ impl RectMetadata {
     /// whether the map contains certain `Hex`
     #[must_use]
     pub fn contains_hex(&self, hex: Hex) -> bool {
-        self.contains_ij(self.hex_to_ij(hex))
+        self.contains_offset(self.hex_to_offset(hex))
     }
-    /// internally
-    fn contains_ij(&self, ij: IVec2) -> bool {
-        ij == ij.clamp(self.start, self.start + self.dim.as_ivec2() - IVec2::ONE)
+    /// whether the map contains certain offset coordinate
+    #[must_use]
+    pub fn contains_offset(&self, offset_coord: impl Into<IVec2>) -> bool {
+        let offset_coord = offset_coord.into();
+        offset_coord
+            == offset_coord.clamp(self.start, self.start + self.dim.as_ivec2() - IVec2::ONE)
             && !self.is_empty()
     }
 
@@ -434,6 +442,10 @@ impl RectMetadata {
     /// iterator over the hexagonal coordinates in the map.
     pub fn iter_hex(&self) -> impl Iterator<Item = Hex> + use<'_> {
         (0..self.len()).map(|idx| self.idx_to_hex(idx))
+    }
+    /// iterator over the offset coordinates in the map.
+    pub fn iter_offset(&self) -> impl Iterator<Item = IVec2> + use<'_> {
+        (0..self.len()).map(|idx| self.idx_to_ij(idx))
     }
 }
 
@@ -504,23 +516,64 @@ impl<T> RectMap<T> {
         Self::new(meta, |_| Default::default())
     }
 
+    /// Returns a reference the stored value associated with offset coordinate.
+    /// Returns `None` if `offset_coord` is out of bounds
+    #[must_use]
+    pub fn get_by_offset(&self, offset_coord: impl Into<IVec2>) -> Option<&T> {
+        let offset_coord = offset_coord.into();
+        if self.contains_offset(offset_coord) {
+            let idx = self.ij_to_idx(offset_coord);
+            Some(&self.inner[idx])
+        } else {
+            None
+        }
+    }
+    /// Returns a mutable reference the stored value associated with offset
+    /// coordinate. Returns `None` if `offset_coord` is out of bounds
+    #[must_use]
+    pub fn get_mut_by_offset(&mut self, offset_coord: impl Into<IVec2>) -> Option<&mut T> {
+        let offset_coord = offset_coord.into();
+        if self.contains_offset(offset_coord) {
+            let idx = self.ij_to_idx(offset_coord);
+            Some(&mut self.inner[idx])
+        } else {
+            None
+        }
+    }
+
     // ================================
     // Wrapped Index
     // ================================
-    /// Wrap if `hex` lie outside of layout
-    /// - Clamp for latitude/vertical coordinate
-    /// - Wrap for longitude/horizontal coordinate
+    /// Returns a reference the stored value associated with hexagonal
+    /// coordinate Wrap if `hex` lie outside of layout
     #[must_use]
     pub fn wrapped_get(&self, hex: Hex) -> &T {
-        let idx = self.meta.wrapped_hex_to_idx(hex);
+        let idx = self.wrapped_hex_to_idx(hex);
         &self.inner[idx]
     }
 
-    /// Wrap if `hex` lie outside of layout
-    /// - Clamp for latitude/vertical coordinate
-    /// - Wrap for longitude/horizontal coordinate
+    /// Returns a mutable reference the stored value associated with hexagonal
+    /// coordinate Wrap if `hex` lie outside of layout
+    #[must_use]
     pub fn wrapped_get_mut(&mut self, hex: Hex) -> &mut T {
-        let idx = self.meta.wrapped_hex_to_idx(hex);
+        let idx = self.wrapped_hex_to_idx(hex);
+        &mut self.inner[idx]
+    }
+
+    /// Returns a reference the stored value associated with offset coordinate
+    /// Wrap if `hex` lie outside of layout
+    #[must_use]
+    pub fn wrapped_get_by_offset(&self, offset_coord: impl Into<IVec2>) -> &T {
+        let wrapped = self.wrap_offset(offset_coord);
+        let idx = self.ij_to_idx(wrapped);
+        &self.inner[idx]
+    }
+    /// Returns a mutable reference the stored value associated with offset
+    /// coordinate Wrap if `hex` lie outside of layout
+    #[must_use]
+    pub fn wrapped_get_mut_by_offset(&mut self, offset_coord: impl Into<IVec2>) -> &mut T {
+        let wrapped = self.wrap_offset(offset_coord);
+        let idx = self.ij_to_idx(wrapped);
         &mut self.inner[idx]
     }
 }
@@ -643,7 +696,10 @@ mod half_size_test {
                 for b in -2..2 {
                     for i in (2 * a * dim[0])..((2 * a + 1) * dim[0]) {
                         for j in (2 * b * dim[1])..((2 * b + 1) * dim[1]) {
-                            assert_eq!(a == 0 && b == 0, rect_map.contains_ij(IVec2::new(i, j)));
+                            assert_eq!(
+                                a == 0 && b == 0,
+                                rect_map.contains_offset(IVec2::new(i, j))
+                            );
                         }
                     }
                 }
@@ -687,8 +743,8 @@ mod half_size_test {
                                 let ij_a = IVec2::new(ia, ja);
                                 let ij_b = IVec2::new(ib, jb);
 
-                                let wij_a = rect_map.wrap_ij(ij_a);
-                                let wij_b = rect_map.wrap_ij(ij_b);
+                                let wij_a = rect_map.wrap_offset(ij_a);
+                                let wij_b = rect_map.wrap_offset(ij_b);
 
                                 assert_eq!(wij_a, wij_b);
                             }
@@ -736,8 +792,8 @@ mod start_end_test {
             for idx in 0..rect_map.len() {
                 let hex = rect_map.idx_to_hex(idx);
                 assert!(rect_map.contains_hex(hex));
-                let ij = rect_map.hex_to_ij(hex);
-                assert!(rect_map.contains_ij(ij));
+                let ij = rect_map.hex_to_offset(hex);
+                assert!(rect_map.contains_offset(ij));
                 assert_eq!(Some(idx), rect_map.hex_to_idx(hex));
             }
         }
@@ -758,7 +814,7 @@ mod start_end_test {
                         rect_map.dim, start, end, i, j, contain
                     );
 
-                    assert_eq!(rect_map.contains_ij([i, j].into()), contain);
+                    assert_eq!(rect_map.contains_offset([i, j]), contain);
                 }
             }
         }
@@ -797,8 +853,8 @@ mod start_end_test {
                                 let ij_a = IVec2::new(ia, ja);
                                 let ij_b = IVec2::new(ib, jb);
 
-                                let wij_a = rect_map.wrap_ij(ij_a);
-                                let wij_b = rect_map.wrap_ij(ij_b);
+                                let wij_a = rect_map.wrap_offset(ij_a);
+                                let wij_b = rect_map.wrap_offset(ij_b);
 
                                 assert_eq!(wij_a, wij_b);
                             }
@@ -846,8 +902,8 @@ mod start_dim_test {
             for idx in 0..rect_map.len() {
                 let hex = rect_map.idx_to_hex(idx);
                 assert!(rect_map.contains_hex(hex));
-                let ij = rect_map.hex_to_ij(hex);
-                assert!(rect_map.contains_ij(ij));
+                let ij = rect_map.hex_to_offset(hex);
+                assert!(rect_map.contains_offset(ij));
                 assert_eq!(Some(idx), rect_map.hex_to_idx(hex));
             }
         }
@@ -863,7 +919,7 @@ mod start_dim_test {
                 for j in (start[1] - 10)..(start[1] + dim[1] as i32 + 10) {
                     let contain = (i >= start[0] && i < start[0] + dim[0] as i32)
                         && (j >= start[1] && j < start[1] + dim[1] as i32);
-                    assert_eq!(rect_map.contains_ij([i, j].into()), contain);
+                    assert_eq!(rect_map.contains_offset([i, j]), contain);
                 }
             }
         }
@@ -902,8 +958,8 @@ mod start_dim_test {
                                 let ij_a = IVec2::new(ia, ja);
                                 let ij_b = IVec2::new(ib, jb);
 
-                                let wij_a = rect_map.wrap_ij(ij_a);
-                                let wij_b = rect_map.wrap_ij(ij_b);
+                                let wij_a = rect_map.wrap_offset(ij_a);
+                                let wij_b = rect_map.wrap_offset(ij_b);
 
                                 assert_eq!(wij_a, wij_b);
                             }
