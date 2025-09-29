@@ -13,9 +13,7 @@ pub fn main() {
         .register_type::<MapSettings>()
         .init_resource::<MapSettings>()
         .add_plugins(DefaultPlugins)
-        .add_plugins(EguiPlugin {
-            enable_multipass_for_primary_context: false,
-        })
+        .add_plugins(EguiPlugin::default())
         .add_plugins(ResourceInspectorPlugin::<MapSettings>::default())
         .add_systems(Startup, setup_camera)
         .add_systems(Update, setup_grid)

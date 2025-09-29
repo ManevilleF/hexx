@@ -5,7 +5,8 @@ use bevy::{
     },
     platform::collections::HashMap,
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
+    asset::RenderAssetUsages, mesh::Indices, 
     window::PrimaryWindow,
 };
 use hexx::{shapes, *};
@@ -18,7 +19,7 @@ pub fn main() {
         .init_resource::<HighlightedHexes>()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: (1_000.0, 1_000.0).into(),
+                resolution: (1_000, 1_000).into(),
                 ..default()
             }),
             ..default()
@@ -87,7 +88,7 @@ fn setup_grid(
             let id = commands
                 .spawn((
                     Mesh2d(mesh_handle.clone()),
-                    MeshMaterial2d(default_material.clone_weak()),
+                    MeshMaterial2d(default_material.clone()),
                     Transform::from_xyz(pos.x, pos.y, 0.0),
                     children![(
                         Text2d(format!("{},{}", hex.x, hex.y)),
@@ -149,15 +150,15 @@ fn handle_input(
                 for entity in vec.iter().filter_map(|h| map.entities.get(h)) {
                     commands
                         .entity(*entity)
-                        .insert(MeshMaterial2d(map.default_material.clone_weak()));
+                        .insert(MeshMaterial2d(map.default_material.clone()));
                 }
             }
             commands
                 .entity(map.entities[&highlighted_hexes.selected])
-                .insert(MeshMaterial2d(map.default_material.clone_weak()));
+                .insert(MeshMaterial2d(map.default_material.clone()));
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(MeshMaterial2d(map.default_material.clone_weak()));
+                .insert(MeshMaterial2d(map.default_material.clone()));
             // Draw a line
             highlighted_hexes.line = Hex::ZERO.line_to(coord).collect();
             // Draw a rectiline path
@@ -185,7 +186,7 @@ fn handle_input(
             ] {
                 for h in vec {
                     if let Some(e) = map.entities.get(h) {
-                        commands.entity(*e).insert(MeshMaterial2d(mat.clone_weak()));
+                        commands.entity(*e).insert(MeshMaterial2d(mat.clone()));
                     }
                 }
             }
@@ -193,11 +194,11 @@ fn handle_input(
             highlighted_hexes.halfway = coord / 2;
             commands
                 .entity(map.entities[&highlighted_hexes.halfway])
-                .insert(MeshMaterial2d(map.selected_material.clone_weak()));
+                .insert(MeshMaterial2d(map.selected_material.clone()));
             // Make the selected tile red
             commands
                 .entity(entity)
-                .insert(MeshMaterial2d(map.selected_material.clone_weak()));
+                .insert(MeshMaterial2d(map.selected_material.clone()));
             highlighted_hexes.selected = coord;
         }
     }

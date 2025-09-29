@@ -2,7 +2,9 @@ use bevy::{
     color::palettes::css::{WHITE, YELLOW},
     platform::collections::HashMap,
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
+    asset::RenderAssetUsages, 
+    mesh::Indices, 
     time::common_conditions::on_timer,
 };
 use hexx::{shapes, *};
@@ -77,7 +79,7 @@ fn setup_grid(
             let id = commands
                 .spawn((
                     Mesh3d(mesh_handle.clone()),
-                    MeshMaterial3d(default_material.clone_weak()),
+                    MeshMaterial3d(default_material.clone()),
                     Transform::from_xyz(pos.x, hex.length() as f32 / 2.0, pos.y),
                 ))
                 .id();
@@ -104,7 +106,7 @@ fn animate_rings(
     {
         commands
             .entity(*entity)
-            .insert(MeshMaterial3d(map.default_material.clone_weak()));
+            .insert(MeshMaterial3d(map.default_material.clone()));
     }
     highlighted_hexes.ring += 1;
     if highlighted_hexes.ring > MAP_RADIUS {
@@ -116,7 +118,7 @@ fn animate_rings(
         if let Some(e) = map.entities.get(h) {
             commands
                 .entity(*e)
-                .insert(MeshMaterial3d(map.highlighted_material.clone_weak()));
+                .insert(MeshMaterial3d(map.highlighted_material.clone()));
         }
     }
 }

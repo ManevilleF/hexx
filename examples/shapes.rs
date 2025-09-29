@@ -1,12 +1,7 @@
 use std::ops::DerefMut;
 
 use bevy::{
-    ecs::system::RunSystemOnce,
-    prelude::*,
-    render::{
-        mesh::{Indices, PrimitiveTopology},
-        render_asset::RenderAssetUsages,
-    },
+    asset::RenderAssetUsages, ecs::system::RunSystemOnce, mesh::{Indices, PrimitiveTopology}, prelude::*
 };
 use bevy_egui::{EguiContext, EguiPlugin, egui};
 use bevy_inspector_egui::bevy_inspector;
@@ -19,14 +14,12 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: (1_000.0, 1_000.0).into(),
+                resolution: (1_000, 1_000).into(),
                 ..default()
             }),
             ..default()
         }))
-        .add_plugins(EguiPlugin {
-            enable_multipass_for_primary_context: false,
-        })
+        .add_plugins(EguiPlugin::default())
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, (setup, generate).chain())
         .add_systems(Update, show_ui)
@@ -168,7 +161,7 @@ fn generate(
         let pos = map.layout.hex_to_world_pos(coord);
         commands.spawn((
             Mesh2d(mesh.clone()),
-            MeshMaterial2d(map.mat.clone_weak()),
+            MeshMaterial2d(map.mat.clone()),
             Transform::from_xyz(pos.x, pos.y, 0.0),
             ChildOf(map.entity),
             children![(
