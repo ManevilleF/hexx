@@ -1,9 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{GOLD, ORANGE, RED, WHITE},
+    mesh::Indices,
     platform::collections::{HashMap, HashSet},
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, mesh::Indices, 
     window::PrimaryWindow,
 };
 use glam::vec2;

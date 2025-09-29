@@ -224,7 +224,7 @@
 //! use bevy::{
 //!     prelude::Mesh,
 //!     render::render_resource::PrimitiveTopology,
-//!     asset::RenderAssetUsages, 
+//!     asset::RenderAssetUsages,
 //!     mesh::Indices,
 //! };
 //! use hexx::MeshInfo;

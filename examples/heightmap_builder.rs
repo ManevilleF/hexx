@@ -1,10 +1,6 @@
 use bevy::{
-    ecs::system::RunSystemOnce,
-    input::mouse::MouseMotion,
-    platform::collections::HashMap,
-    prelude::*,
-    render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, mesh::Indices, 
+    asset::RenderAssetUsages, ecs::system::RunSystemOnce, input::mouse::MouseMotion, mesh::Indices,
+    platform::collections::HashMap, prelude::*, render::render_resource::PrimitiveTopology,
 };
 use bevy_egui::{
     EguiContext, EguiPlugin,

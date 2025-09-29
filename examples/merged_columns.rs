@@ -1,10 +1,11 @@
 use std::ops::Range;
 
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{BLUE, RED, WHITE},
+    mesh::Indices,
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, mesh::Indices, 
 };
 use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::{InspectorOptions, quick::ResourceInspectorPlugin};

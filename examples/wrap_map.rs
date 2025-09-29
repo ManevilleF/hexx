@@ -1,7 +1,8 @@
 use std::ops::Deref;
 
 use bevy::{
-    asset::RenderAssetUsages, mesh::Indices, platform::collections::HashMap, prelude::*, render::render_resource::PrimitiveTopology, window::PrimaryWindow
+    asset::RenderAssetUsages, mesh::Indices, platform::collections::HashMap, prelude::*,
+    render::render_resource::PrimitiveTopology, window::PrimaryWindow,
 };
 use hexx::*;
 

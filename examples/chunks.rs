@@ -1,8 +1,9 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{BLUE, RED, WHITE},
+    mesh::Indices,
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, mesh::Indices, 
 };
 use hexx::{shapes, *};
 

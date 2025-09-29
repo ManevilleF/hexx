@@ -1,9 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{AQUA, BLACK, WHITE},
+    mesh::Indices,
     platform::collections::{HashMap, HashSet},
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, mesh::Indices, 
     window::PrimaryWindow,
 };
 use hexx::{algorithms::range_fov, *};

@@ -1,12 +1,13 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::{
         css::{AQUA, LIMEGREEN, ORANGE, RED, VIOLET, WHITE, YELLOW},
         tailwind::GRAY_300,
     },
+    mesh::Indices,
     platform::collections::HashMap,
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, mesh::Indices, 
     window::PrimaryWindow,
 };
 use hexx::{shapes, *};

@@ -1,7 +1,10 @@
 use std::ops::DerefMut;
 
 use bevy::{
-    asset::RenderAssetUsages, ecs::system::RunSystemOnce, mesh::{Indices, PrimitiveTopology}, prelude::*
+    asset::RenderAssetUsages,
+    ecs::system::RunSystemOnce,
+    mesh::{Indices, PrimitiveTopology},
+    prelude::*,
 };
 use bevy_egui::{EguiContext, EguiPlugin, egui};
 use bevy_inspector_egui::bevy_inspector;

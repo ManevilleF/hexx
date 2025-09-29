@@ -1,9 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     input::mouse::MouseMotion,
+    mesh::Indices,
     pbr::wireframe::{Wireframe, WireframePlugin},
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, mesh::Indices, 
 };
 use bevy_egui::{
     EguiContext, EguiPlugin,

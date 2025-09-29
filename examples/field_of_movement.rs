@@ -1,10 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{GRAY, LIME, WHITE, YELLOW},
+    mesh::Indices,
     platform::collections::HashSet,
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, 
-    mesh::Indices, 
     window::PrimaryWindow,
 };
 use hexx::{

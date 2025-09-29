@@ -1,10 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{WHITE, YELLOW},
+    mesh::Indices,
     platform::collections::HashMap,
     prelude::*,
     render::render_resource::PrimitiveTopology,
-    asset::RenderAssetUsages, 
-    mesh::Indices, 
     window::PrimaryWindow,
 };
 use hexx::{shapes, *};
