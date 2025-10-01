@@ -236,10 +236,8 @@
 
 ```rust
  use bevy::{
-     prelude::Mesh,
-     render::{
-         mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology,
-     },
+     asset::RenderAssetUsages, mesh::Indices, prelude::Mesh,
+     render::render_resource::PrimitiveTopology,
  };
  use hexx::MeshInfo;
 
