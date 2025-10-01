@@ -222,10 +222,8 @@
 //!
 //!```rust
 //! use bevy::{
-//!     prelude::Mesh,
+//!     asset::RenderAssetUsages, mesh::Indices, prelude::Mesh,
 //!     render::render_resource::PrimitiveTopology,
-//!     asset::RenderAssetUsages,
-//!     mesh::Indices,
 //! };
 //! use hexx::MeshInfo;
 //!
