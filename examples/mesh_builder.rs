@@ -1,8 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     input::mouse::MouseMotion,
+    mesh::Indices,
     pbr::wireframe::{Wireframe, WireframePlugin},
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
 };
 use bevy_egui::{
     EguiContext, EguiPlugin,
@@ -57,9 +59,7 @@ pub fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugins(WireframePlugin::default())
-        .add_plugins(EguiPlugin {
-            enable_multipass_for_primary_context: false,
-        })
+        .add_plugins(EguiPlugin::default())
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, (show_ui, animate, update_mesh, gizmos))
@@ -273,7 +273,7 @@ fn setup(
 fn animate(
     info: Res<HexInfo>,
     mut transforms: Query<&mut Transform>,
-    mut motion_evr: EventReader<MouseMotion>,
+    mut motion_evr: MessageReader<MouseMotion>,
     buttons: Res<ButtonInput<MouseButton>>,
     time: Res<Time>,
 ) {

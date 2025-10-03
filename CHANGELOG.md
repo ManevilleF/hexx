@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* Removed `Reflect` derive from `PlaneMeshBuilder` and `ColumnMeshBuilder` as it does not support reflecting reference members
+* Bumped `glam` to 0.30
+* Bumped `bevy` dev-dependency to 0.17
+* Updated examples to use `bevy` 0.17
 * Added euclidean norm methods:
   - `Hex::euclidean_distance_to` (#226)
   - `Hex::squared_euclidean_distance_to` (#229)
