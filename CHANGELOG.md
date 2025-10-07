@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.22.0
+
 * Removed `Reflect` derive from `PlaneMeshBuilder` and `ColumnMeshBuilder` as it does not support reflecting reference members
 * Bumped `glam` to 0.30
 * Bumped `bevy` dev-dependency to 0.17
