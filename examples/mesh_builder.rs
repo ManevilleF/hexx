@@ -7,8 +7,9 @@ use bevy::{
     render::render_resource::PrimitiveTopology,
 };
 use bevy_egui::{
-    EguiContext, EguiPlugin,
+    EguiContext, EguiPlugin, EguiPrimaryContextPass,
     egui::{self, Ui},
+    input::egui_wants_any_pointer_input,
 };
 use bevy_inspector_egui::bevy_inspector;
 use hexx::*;
@@ -62,7 +63,15 @@ pub fn main() {
         .add_plugins(EguiPlugin::default())
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Update, (show_ui, animate, update_mesh, gizmos))
+        .add_systems(EguiPrimaryContextPass, show_ui)
+        .add_systems(
+            Update,
+            (
+                animate.run_if(not(egui_wants_any_pointer_input)),
+                update_mesh,
+                gizmos,
+            ),
+        )
         .run();
 }
 
