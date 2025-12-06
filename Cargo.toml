@@ -45,7 +45,7 @@ features = ["derive"]
 optional = true
 
 [dependencies.facet]
-version = "0.27"
+version = "0.31"
 default-features = false
 optional = true
 
@@ -84,13 +84,13 @@ features = [
 default-features = false
 
 [dev-dependencies.criterion]
-version = "0.5"
+version = "0.8"
 features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.9"
-bevy-inspector-egui = "0.34"
-bevy_egui = "0.37"
+bevy-inspector-egui = "0.35"
+bevy_egui = "0.38"
 approx = "0.5"
 
 [lints.rust]

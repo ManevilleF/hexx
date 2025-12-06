@@ -10,6 +10,7 @@ type VertexIdx = u16;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+#[repr(transparent)]
 pub struct Tri(pub [VertexIdx; 3]);
 
 /// Representation of a primitive face, with a fixed amount of vertices and

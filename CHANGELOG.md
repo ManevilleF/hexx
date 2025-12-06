@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+* Partial `facet` support (#222)
+* Bump `bevy_egui` and `bevy_inspector_egui` dev-dependencies (#222)
+
 ## 0.22.0
 
 * Removed `Reflect` derive from `PlaneMeshBuilder` and `ColumnMeshBuilder` as it does not support reflecting reference members

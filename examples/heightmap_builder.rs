@@ -128,7 +128,7 @@ fn show_ui(world: &mut World) {
         };
         let mut egui_context = egui_context.clone();
         let ctx = egui_context.get_mut();
-        let rect = ctx.screen_rect().with_min_x(250.0);
+        let rect = ctx.content_rect().with_min_x(250.0);
         egui::Window::new("Visuals")
             .constrain_to(rect)
             .show(ctx, |ui| {
