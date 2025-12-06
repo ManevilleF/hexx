@@ -62,6 +62,7 @@ use std::{
 #[derive(Copy, Clone, Default, Eq, PartialEq)]
 #[cfg_attr(not(target_arch = "spirv"), derive(Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "packed", repr(C))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 pub struct Hex {
@@ -624,7 +625,7 @@ impl Hex {
         self.const_sub(rhs).ulength()
     }
 
-    #[inline]
+    #[inline(always)]
     #[must_use]
     /// Retrieves the hexagonal neighbor coordinates matching the given
     /// `direction`
@@ -632,7 +633,7 @@ impl Hex {
         direction.into_hex()
     }
 
-    #[inline]
+    #[inline(always)]
     #[must_use]
     /// Retrieves the diagonal neighbor coordinates matching the given
     /// `direction`
@@ -859,7 +860,7 @@ impl Hex {
         self.const_sub(center).rotate_cw(m).const_add(center)
     }
 
-    #[inline]
+    #[inline(always)]
     #[must_use]
     #[doc(alias = "reflect_q")]
     /// Computes the reflection of `self` accross the `x` axis
@@ -867,7 +868,7 @@ impl Hex {
         Self::new(self.x, self.z())
     }
 
-    #[inline]
+    #[inline(always)]
     #[must_use]
     #[doc(alias = "reflect_r")]
     /// Computes the reflection of `self` accross the `y` axis
@@ -875,7 +876,7 @@ impl Hex {
         Self::new(self.z(), self.y)
     }
 
-    #[inline]
+    #[inline(always)]
     #[must_use]
     #[doc(alias = "reflect_s")]
     /// Computes the reflection of `self` accross the `z` axis
@@ -1144,7 +1145,7 @@ impl Hex {
         self.const_sub(center)
     }
 
-    #[inline]
+    #[inline(always)]
     #[must_use]
     /// Counts how many coordinates there are in the given `range`
     ///
@@ -1162,13 +1163,14 @@ impl Hex {
     /// Shift constant used for [hexmod] operations
     ///
     /// [hexmod]: https://observablehq.com/@sanderevers/hexmod-representation
-    #[inline]
+    #[inline(always)]
     #[must_use]
     pub(crate) const fn shift(range: u32) -> u32 {
         3 * range + 2
     }
 
     #[must_use]
+    #[inline(always)]
     /// Wraps `self` in an hex range around the origin ([`Hex::ZERO`]).
     /// this allows for seamless *wraparound* hexagonal maps.
     /// See this [article] for more information.

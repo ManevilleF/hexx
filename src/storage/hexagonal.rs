@@ -35,6 +35,7 @@ pub struct HexagonalMap<T> {
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 struct HexagonalMapMetadata {
     bounds: HexBounds,
