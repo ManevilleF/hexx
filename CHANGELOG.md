@@ -5,6 +5,7 @@
 * Partial `facet` support (#222)
 * Bump `bevy_egui` and `bevy_inspector_egui` dev-dependencies (#222)
 * Fix `mesh_builder` and `heightmap_builder` examples (#233)
+* Added `bevy_ecs` feature (#233, #227)
 
 ## 0.22.0
 

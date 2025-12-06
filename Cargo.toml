@@ -29,11 +29,13 @@ serde = ["dep:serde", "glam/serde"]
 # facet compatibility
 facet = ["dep:facet"]
 # Adds support for the Bevy game engine
-bevy = ["bevy_reflect", "bevy_platform"]
+bevy = ["bevy_reflect", "bevy_platform", "bevy_ecs"]
 # Adds Bevy Reflection support
 bevy_reflect = ["dep:bevy_reflect"]
 # Adds Bevy Platform support
 bevy_platform = ["dep:bevy_platform"]
+# Adds Bevy ECS support
+bevy_ecs = ["dep:bevy_ecs"]
 
 [dependencies]
 glam = "0.30"
@@ -56,6 +58,10 @@ features = ["glam"]
 optional = true
 
 [dependencies.bevy_platform]
+version = "0.17"
+optional = true
+
+[dependencies.bevy_ecs]
 version = "0.17"
 optional = true
 
@@ -109,7 +115,7 @@ features = [
     # "smaa_luts",
     # "sysinfo_plugin",
     "tonemapping_luts",
-    "vorbis",
+    # "vorbis",
     # "webgl2",
     "x11",
     # "wayland",

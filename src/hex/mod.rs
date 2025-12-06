@@ -65,6 +65,7 @@ use std::{
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "packed", repr(C))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy_ecs", derive(bevy_ecs::component::Component))]
 pub struct Hex {
     /// `x` axial coordinate (sometimes called `q` or `i`)
     pub x: i32,
