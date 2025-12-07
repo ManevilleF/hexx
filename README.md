@@ -8,7 +8,7 @@
 [![Crates.io](https://img.shields.io/crates/v/hexx?style=flat-square)](https://crates.io/crates/hexx)
 [![Downloads](https://img.shields.io/crates/d/hexx?style=flat-square)](https://crates.io/crates/hexx)
 [![Docs.rs](https://img.shields.io/docsrs/hexx?style=flat-square)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.22.0/status.svg?style=flat-square)](https://deps.rs/crate/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.23.0/status.svg?style=flat-square)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
@@ -34,7 +34,7 @@
  Run `cargo add hexx` in your project or add the following line to your
  `Cargo.toml`:
 
- * `hexx = "0.21"`
+ * `hexx = "0.23"`
 
  ### Cargo features
 
@@ -43,11 +43,6 @@
    most types
  * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it
    accross the FII
- * `bevy`: Enables [Bevy](https://bevyengine.org/) support
- * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
-   for `HashMap`
- * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
-   for most types
  * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
    using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
  * `algorithms`: Enables the [algorithms](https://docs.rs/hexx/latest/hexx/algorithms/) module with:
@@ -55,6 +50,13 @@
    * A Star Pathfinding
    * Field of view
  * `mesh`: Enables procedural mesh generation
+ * `bevy`: Enables [Bevy](https://bevyengine.org/) support including:
+ * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
+   for `HashMap`
+ * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
+   for most types
+ * `bevy_ecs`: Enables `Component` and `Resource` derives for common hexx
+   types
 
  _Some features are enabled by default, it is recommended to enable only
  what is needed for your usage_

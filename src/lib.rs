@@ -20,7 +20,7 @@
 //! Run `cargo add hexx` in your project or add the following line to your
 //! `Cargo.toml`:
 //!
-//! * `hexx = "0.21"`
+//! * `hexx = "0.23"`
 //!
 //! ### Cargo features
 //!
@@ -29,11 +29,6 @@
 //!   most types
 //! * `packed`: Makes [`Hex`](crate::hex::Hex) `repr(C)`, useful to use it
 //!   accross the FII
-//! * `bevy`: Enables [Bevy](https://bevyengine.org/) support
-//! * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
-//!   for `HashMap`
-//! * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
-//!   for most types
 //! * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
 //!   using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
 //! * `algorithms`: Enables the [algorithms](crate::algorithms) module with:
@@ -41,6 +36,13 @@
 //!   * A Star Pathfinding
 //!   * Field of view
 //! * `mesh`: Enables procedural mesh generation
+//! * `bevy`: Enables [Bevy](https://bevyengine.org/) support including:
+//! * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
+//!   for `HashMap`
+//! * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
+//!   for most types
+//! * `bevy_ecs`: Enables `Component` and `Resource` derives for common hexx
+//!   types
 //!
 //! _Some features are enabled by default, it is recommended to enable only
 //! what is needed for your usage_
