@@ -23,31 +23,19 @@ pub fn creation_benchmark(c: &mut Criterion) {
     group.bench_with_input(
         BenchmarkId::new("HexagonalMap", hex_radius),
         &hex_radius,
-        |b, &r| {
-            b.iter(|| {
-                HexagonalMap::new(Hex::ZERO, r, get_value)
-            })
-        },
+        |b, &r| b.iter(|| HexagonalMap::new(Hex::ZERO, r, get_value)),
     );
 
     group.bench_with_input(
         BenchmarkId::new("HexModMap", hex_radius),
         &hex_radius,
-        |b, &r| {
-            b.iter(|| {
-                HexModMap::new(Hex::ZERO, r, get_value)
-            })
-        },
+        |b, &r| b.iter(|| HexModMap::new(Hex::ZERO, r, get_value)),
     );
 
     group.bench_with_input(
         BenchmarkId::new("RombusMap", rombus_size),
         &rombus_size,
-        |b, &s| {
-            b.iter(|| {
-                RombusMap::new(Hex::ZERO, s, s, get_value)
-            })
-        },
+        |b, &s| b.iter(|| RombusMap::new(Hex::ZERO, s, s, get_value)),
     );
 
     group.finish();
@@ -55,4 +43,3 @@ pub fn creation_benchmark(c: &mut Criterion) {
 
 criterion_group!(benches, creation_benchmark);
 criterion_main!(benches);
-

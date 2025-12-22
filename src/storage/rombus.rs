@@ -1,5 +1,5 @@
-use std::fmt::Debug;
 use rayon::prelude::*;
+use std::fmt::Debug;
 
 use crate::Hex;
 
@@ -97,7 +97,12 @@ impl<T> RombusMap<T> {
     /// ```
     #[must_use]
     #[expect(clippy::cast_possible_wrap)]
-    pub fn new(origin: Hex, rows: u32, columns: u32, values: impl Fn(Hex) -> T + Send + Sync) -> Self
+    pub fn new(
+        origin: Hex,
+        rows: u32,
+        columns: u32,
+        values: impl Fn(Hex) -> T + Send + Sync,
+    ) -> Self
     where
         T: Send,
     {

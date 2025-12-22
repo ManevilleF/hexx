@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* (**BREAKING**) `HexagonalMap::new`, `HexModMap::new` and `RombusMap::new` now use `rayon` for parallel iteration, requiring `T` to be `Send` and the value generator to be `Send + Sync`
+
 ## 0.23.0
 
 * Partial `facet` support (#222)
