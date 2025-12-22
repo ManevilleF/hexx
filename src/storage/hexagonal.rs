@@ -1,4 +1,5 @@
 use crate::{Hex, HexBounds, hex::ExactSizeHexIterator};
+use rayon::prelude::*;
 use std::fmt;
 
 use super::HexStore;
@@ -93,10 +94,14 @@ impl<T> HexagonalMap<T> {
     /// ```
     #[must_use]
     #[expect(clippy::cast_possible_wrap)]
-    pub fn new(center: Hex, radius: u32, mut values: impl FnMut(Hex) -> T) -> Self {
+    pub fn new(center: Hex, radius: u32, values: impl Fn(Hex) -> T + Send + Sync) -> Self
+    where
+        T: Send,
+    {
         let bounds = HexBounds::new(center, radius);
         let range = radius as i32;
         let inner = (-range..=range)
+            .into_par_iter()
             .map(|y| {
                 let x_min = i32::max(-range, -y - range);
                 let x_max = i32::min(range, range - y);

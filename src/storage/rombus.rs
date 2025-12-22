@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use rayon::prelude::*;
 
 use crate::Hex;
 
@@ -96,14 +97,20 @@ impl<T> RombusMap<T> {
     /// ```
     #[must_use]
     #[expect(clippy::cast_possible_wrap)]
-    pub fn new(origin: Hex, rows: u32, columns: u32, mut values: impl FnMut(Hex) -> T) -> Self {
-        let mut inner = Vec::with_capacity((rows * columns) as usize);
-        for y in 0..rows {
-            for x in 0..columns {
-                let p = origin.const_add(Hex::new(x as i32, y as i32));
-                inner.push(values(p));
-            }
-        }
+    pub fn new(origin: Hex, rows: u32, columns: u32, values: impl Fn(Hex) -> T + Send + Sync) -> Self
+    where
+        T: Send,
+    {
+        let inner: Vec<_> = (0..rows)
+            .into_par_iter()
+            .flat_map(|y| {
+                let values = &values;
+                (0..columns).into_par_iter().map(move |x| {
+                    let p = origin.const_add(Hex::new(x as i32, y as i32));
+                    values(p)
+                })
+            })
+            .collect();
         Self {
             inner,
             meta: RombusMetadata {

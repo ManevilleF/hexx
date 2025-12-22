@@ -39,6 +39,7 @@ bevy_ecs = ["dep:bevy_ecs"]
 
 [dependencies]
 glam = "0.30"
+rayon = "1.11.0"
 
 [dependencies.serde]
 version = "1"
@@ -238,6 +239,10 @@ harness = false
 name = "storage"
 harness = false
 required-features = ["bevy_platform"]
+
+[[bench]]
+name = "creation"
+harness = false
 
 [profile.dev]
 opt-level = 1
