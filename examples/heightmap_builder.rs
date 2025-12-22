@@ -244,9 +244,8 @@ fn gizmos(
 }
 
 fn generate(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMut<Assets<Mesh>>) {
-    let mut rng = rng();
     let map = HexagonalMap::new(Hex::ZERO, params.range, |_| {
-        rng.random_range(0.0..=params.max_height)
+        rng().random_range(0.0..=params.max_height)
     });
     let mut new_mesh = HeightMapMeshBuilder::new(&info.layout, &map)
         .with_offset(Vec3::NEG_Y * params.max_height / 2.0 * params.scale.y)

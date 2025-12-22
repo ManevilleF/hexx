@@ -103,32 +103,33 @@ fn setup_grid(
     let desert_mat = materials.add(Color::Srgba(YELLOW));
     let wall_mat = materials.add(Color::Srgba(GRAY));
 
-    let mut rng = rand::rng();
-
-    let entities = HexagonalMap::new(Hex::ZERO, MAP_RADIUS, |coord| {
+    let mut entities = HexagonalMap::new(Hex::ZERO, MAP_RADIUS, |_| {
+        let mut rng = rand::rng();
         let cost = rng.random_range(0..=3);
-        let pos = layout.hex_to_world_pos(coord);
-        let material = match cost {
-            0 => plains_mat.clone(),
-            1 => forest_mat.clone(),
-            2 => desert_mat.clone(),
-            3 => wall_mat.clone(),
-            _ => unreachable!(),
-        };
         let cost = if (0..3).contains(&cost) {
             Some(cost)
         } else {
             None
         };
-        let entity = commands
+        (cost, Entity::PLACEHOLDER)
+    });
+    for (coord, (cost, entity)) in entities.iter_mut() {
+        let pos = layout.hex_to_world_pos(coord);
+        let material = match cost {
+            Some(0) => plains_mat.clone(),
+            Some(1) => forest_mat.clone(),
+            Some(2) => desert_mat.clone(),
+            Some(_) => wall_mat.clone(),
+            None => wall_mat.clone(),
+        };
+        *entity = commands
             .spawn((
                 Mesh2d(mesh.clone()),
                 MeshMaterial2d(material),
                 Transform::from_xyz(pos.x, pos.y, 0.0),
             ))
             .id();
-        (cost, entity)
-    });
+    }
     commands.insert_resource(HexGrid {
         entities,
         reachable_entities: Default::default(),
