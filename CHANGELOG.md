@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Fix `shapes` example (#235 #236)
+
 ## 0.23.0
 
 * Partial `facet` support (#222)
