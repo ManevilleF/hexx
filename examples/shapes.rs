@@ -6,7 +6,7 @@ use bevy::{
     mesh::{Indices, PrimitiveTopology},
     prelude::*,
 };
-use bevy_egui::{EguiContext, EguiPlugin, egui};
+use bevy_egui::{EguiContext, EguiPlugin, EguiPrimaryContextPass, egui};
 use bevy_inspector_egui::bevy_inspector;
 use hexx::{shapes, *};
 
@@ -25,7 +25,7 @@ fn main() {
         .add_plugins(EguiPlugin::default())
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, (setup, generate).chain())
-        .add_systems(Update, show_ui)
+        .add_systems(EguiPrimaryContextPass, show_ui)
         .run();
 }
 
