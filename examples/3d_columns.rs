@@ -21,7 +21,7 @@ const TIME_STEP: Duration = Duration::from_millis(100);
 
 pub fn main() {
     App::new()
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             brightness: 200.0,
             ..default()
         })
