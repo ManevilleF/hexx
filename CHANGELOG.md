@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-* Bevu 0.18 support (#238)
+* Bevy 0.18 support (#238)
 * Fix `shapes` example (#235 #236)
 
 ## 0.23.0
