@@ -20,7 +20,7 @@ pub fn main() {
         .register_type::<MapSettings>()
         .register_type::<Range<f32>>()
         .init_resource::<MapSettings>()
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             brightness: 500.,
             ..default()
         })

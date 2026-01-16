@@ -52,22 +52,22 @@ default-features = false
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.17"
+version = "0.18"
 default-features = false
 features = ["glam"]
 optional = true
 
 [dependencies.bevy_platform]
-version = "0.17"
+version = "0.18"
 optional = true
 
 [dependencies.bevy_ecs]
-version = "0.17"
+version = "0.18"
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.17"
+version = "0.18"
 features = [
     "std",
     # "async_executor",
@@ -82,6 +82,7 @@ features = [
     # "bevy_anti_alias",
     # "bevy_gilrs",
     "bevy_gizmos",
+    "bevy_gizmos_render",
     # "bevy_gltf",
     # "bevy_input_focus",
     "bevy_log",
@@ -130,8 +131,8 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.9"
-bevy-inspector-egui = "0.35"
-bevy_egui = "0.38"
+bevy-inspector-egui = "0.36"
+bevy_egui = "0.39"
 approx = "0.5"
 
 [lints.rust]

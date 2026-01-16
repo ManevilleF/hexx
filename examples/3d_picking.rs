@@ -19,7 +19,7 @@ const MAP_RADIUS: u32 = 20;
 
 pub fn main() {
     App::new()
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             brightness: lux::OFFICE,
             ..default()
         })

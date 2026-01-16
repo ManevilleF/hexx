@@ -54,7 +54,7 @@ struct BuilderParams {
 pub fn main() {
     App::new()
         .init_resource::<BuilderParams>()
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             brightness: 500.0,
             ..default()
         })
@@ -209,7 +209,7 @@ fn show_ui(world: &mut World) {
             .constrain_to(rect)
             .show(ctx, |ui| {
                 ui.collapsing("Ambient Light", |ui| {
-                    bevy_inspector::ui_for_resource::<AmbientLight>(world, ui);
+                    bevy_inspector::ui_for_resource::<GlobalAmbientLight>(world, ui);
                 });
                 let info = world.resource::<HexInfo>();
                 let mat = materials.get_mut(&info.material_handle).unwrap();
