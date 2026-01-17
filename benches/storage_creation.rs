@@ -1,4 +1,3 @@
-#![allow(missing_docs, clippy::all)]
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use hexx::{
     storage::{HexModMap, HexagonalMap, RombusMap},

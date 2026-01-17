@@ -15,7 +15,7 @@ resolver = "3"
 all-features = true
 
 [features]
-default = ["algorithms", "mesh", "grid", "rayon"]
+default = ["algorithms", "mesh", "grid"]
 # HL algoritms
 algorithms = []
 # 3d Mesh features
@@ -251,38 +251,8 @@ required-features = ["rayon"]
 opt-level = 1
 
 [lints.rust]
-missing_docs = "warn"
 nonstandard_style = "warn"
 future_incompatible = "warn"
 unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(target_arch, values("spirv"))',
 ] }
-
-[lints.clippy]
-# Enforced Groups
-style = { level = "warn", priority = -1 }
-perf = { level = "warn", priority = -1 }
-suspicious = { level = "warn", priority = -1 }
-correctness = { level = "warn", priority = -1 }
-complexity = { level = "warn", priority = -1 }
-nursery = { level = "warn", priority = -1 }
-pedantic = { level = "warn", priority = -1 }
-
-# Cherry Picks
-## restriction
-# indexing_slicing = "warn"
-rc_mutex = "warn"
-unwrap_used = "warn"
-decimal_literal_representation = "warn"
-dbg_macro = "warn"
-print_stdout = "warn"
-lossy_float_literal = "warn"
-return_and_then = "warn"
-same_name_method = "warn"
-str_to_string = "warn"
-try_err = "warn"
-undocumented_unsafe_blocks = "warn"
-use_debug = "warn"
-unseparated_literal_suffix = "warn"
-large_include_file = "warn"
-allow_attributes = "warn"

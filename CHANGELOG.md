@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+* `rayon` support for Map storages (#234, #239):
+  * `HexagonalMap::new_parallel`
+  * `HexModMap::new_parallel`
+  * `RombusMap::new_parallel`
+* Improvements on benchmarks (#239)
 * Bevy 0.18 support (#238)
 * Fix `shapes` example (#235 #236)
 
