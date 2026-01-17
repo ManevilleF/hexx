@@ -1,16 +1,18 @@
-use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
+#![allow(missing_docs, clippy::all)]
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use hexx::{
     shapes::rombus,
     storage::{HexModMap, HexStore, HexagonalMap, RombusMap},
     *,
 };
-use std::time::Duration;
+use std::hint::black_box;
 
 pub fn hexagonal_map_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hexagonal Storage");
     group
-        .significance_level(0.1)
-        .measurement_time(Duration::from_secs(8))
+        .warm_up_time(std::time::Duration::from_secs(3))
+        .measurement_time(std::time::Duration::from_secs(10))
+        .noise_threshold(0.02)
         .sample_size(500);
 
     let get_value = |h: Hex| h.length();
@@ -34,7 +36,7 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
                     for c in black_box(Hex::ZERO).range(*dist) {
                         std_hash_map.get(&c).unwrap();
                     }
-                })
+                });
             },
         );
         group.bench_with_input(
@@ -45,7 +47,7 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
                     for c in black_box(Hex::ZERO).range(*dist) {
                         bevy_hash_map.get(&c).unwrap();
                     }
-                })
+                });
             },
         );
         group.bench_with_input(
@@ -56,7 +58,7 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
                     for c in black_box(Hex::ZERO).range(*dist) {
                         hex_map.get(c).unwrap();
                     }
-                })
+                });
             },
         );
         group.bench_with_input(BenchmarkId::new("HexModMap_get", dist), &dist, |b, dist| {
@@ -64,7 +66,7 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
                 for c in black_box(Hex::ZERO).range(*dist) {
                     hexmod_map.get(c).unwrap();
                 }
-            })
+            });
         });
         group.bench_with_input(
             BenchmarkId::new("std::HashMap_iter", dist),
@@ -90,7 +92,11 @@ pub fn hexagonal_map_benchmark(c: &mut Criterion) {
 
 pub fn rombus_map_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Rombus Storage");
-    group.significance_level(0.1).sample_size(500);
+    group
+        .warm_up_time(std::time::Duration::from_secs(3))
+        .measurement_time(std::time::Duration::from_secs(10))
+        .noise_threshold(0.02)
+        .sample_size(500);
 
     let get_value = |h: Hex| h.length();
 

@@ -236,6 +236,7 @@ impl VertexDirection {
     /// Converts the direction to a hex coordinate
     #[must_use]
     #[inline]
+    #[expect(clippy::indexing_slicing)]
     pub const fn into_hex(self) -> Hex {
         Hex::DIAGONAL_COORDS[self.0 as usize]
     }

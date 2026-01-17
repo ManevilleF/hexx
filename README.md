@@ -41,6 +41,10 @@
  `hexx` provides the following cargo features:
  * `serde`: Enables [serde](https://github.com/serde-rs/serde) support for
    most types
+ * `facet`: Enables [facet](https://github.com/facet-rs/facet) support for
+   most types
+ * `rayon`: Enables [rayon](https://github.com/rayon-rs/rayon) support for
+   parallel processing
  * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it
    accross the FII
  * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
@@ -51,12 +55,12 @@
    * Field of view
  * `mesh`: Enables procedural mesh generation
  * `bevy`: Enables [Bevy](https://bevyengine.org/) support including:
- * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
-   for `HashMap`
- * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
-   for most types
- * `bevy_ecs`: Enables `Component` and `Resource` derives for common hexx
-   types
+   * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
+     for `HashMap`
+   * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
+     for most types
+   * `bevy_ecs`: Enables `Component` and `Resource` derives for common hexx
+     types
 
  _Some features are enabled by default, it is recommended to enable only
  what is needed for your usage_

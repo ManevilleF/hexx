@@ -1,8 +1,8 @@
-use std::fmt::Debug;
-
-use crate::Hex;
-
 use super::HexStore;
+use crate::Hex;
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+use std::fmt::Debug;
 
 /// [`Vec`] Based storage for rombus maps.
 ///
@@ -104,6 +104,52 @@ impl<T> RombusMap<T> {
                 inner.push(values(p));
             }
         }
+        Self {
+            inner,
+            meta: RombusMetadata {
+                origin,
+                rows,
+                columns,
+            },
+        }
+    }
+
+    /// Creates and fills a rombus shaped ma using parallel processing with
+    /// `rayon`
+    ///
+    /// # Arguments
+    ///
+    /// * `origin` - The smallest coordinate of the hexagon
+    /// * `rows` - The amount of `y` values per column
+    /// * `columns` - The amount of `x` values per row
+    /// * `values` - Function called for each coordinate to fill the map
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::{*, storage::RombusMap};
+    ///
+    /// let map = RombusMap::new(Hex::ZERO, 5, 10, |coord| coord.length());
+    /// assert_eq!(map[hex(1, 0)], 1);
+    /// ```
+    #[must_use]
+    #[cfg(feature = "rayon")]
+    #[expect(clippy::cast_possible_wrap)]
+    pub fn new_parallel<F>(origin: Hex, rows: u32, columns: u32, values: F) -> Self
+    where
+        F: Fn(Hex) -> T + Send + Sync,
+        T: Send,
+    {
+        let inner: Vec<_> = (0..rows)
+            .into_par_iter()
+            .flat_map(|y| {
+                let values = &values;
+                (0..columns).into_par_iter().map(move |x| {
+                    let p = origin.const_add(Hex::new(x as i32, y as i32));
+                    values(p)
+                })
+            })
+            .collect();
         Self {
             inner,
             meta: RombusMetadata {
