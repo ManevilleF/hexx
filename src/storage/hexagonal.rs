@@ -95,11 +95,11 @@ impl<T> HexagonalMap<T> {
     /// ```
     #[must_use]
     #[expect(clippy::cast_possible_wrap)]
-    pub fn new(center: Hex, radius: u32, values: impl Fn(Hex) -> T) -> Self {
+    pub fn new(center: Hex, radius: u32, mut values: impl FnMut(Hex) -> T) -> Self {
         let bounds = HexBounds::new(center, radius);
         let range = radius as i32;
         let inner = (-range..=range)
-            .map(|y| Self::_compute_inner_row(y, center, range, &values))
+            .map(|y| Self::_compute_inner_row(y, center, range, &mut values))
             .collect();
         Self {
             inner,
@@ -145,7 +145,12 @@ impl<T> HexagonalMap<T> {
         }
     }
 
-    fn _compute_inner_row(row: i32, center: Hex, range: i32, values: impl Fn(Hex) -> T) -> Vec<T> {
+    fn _compute_inner_row(
+        row: i32,
+        center: Hex,
+        range: i32,
+        mut values: impl FnMut(Hex) -> T,
+    ) -> Vec<T> {
         let x_min = i32::max(-range, -row - range);
         let x_max = i32::min(range, range - row);
         (x_min..=x_max)

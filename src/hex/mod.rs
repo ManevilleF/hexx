@@ -349,7 +349,6 @@ impl Hex {
     /// Panics if `slice` is less than 2 elements long.
     #[inline]
     #[must_use]
-    #[expect(clippy::indexing_slicing)]
     pub const fn from_slice(slice: &[i32]) -> Self {
         Self::new(slice[0], slice[1])
     }
@@ -360,7 +359,6 @@ impl Hex {
     ///
     /// Panics if `slice` is less than 2 elements long.
     #[inline]
-    #[expect(clippy::indexing_slicing)]
     pub fn write_to_slice(self, slice: &mut [i32]) {
         slice[0] = self.x;
         slice[1] = self.y;

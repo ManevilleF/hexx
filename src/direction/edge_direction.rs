@@ -223,7 +223,6 @@ impl EdgeDirection {
     /// Converts the direction to a normalized hex coordinate
     #[must_use]
     #[inline]
-    #[expect(clippy::indexing_slicing)]
     pub const fn into_hex(self) -> Hex {
         Hex::NEIGHBORS_COORDS[self.0 as usize]
     }
