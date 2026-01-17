@@ -28,6 +28,8 @@ packed = []
 serde = ["dep:serde", "glam/serde"]
 # facet compatibility
 facet = ["dep:facet"]
+# rayon support
+rayon = ["dep:rayon"]
 # Adds support for the Bevy game engine
 bevy = ["bevy_reflect", "bevy_platform", "bevy_ecs"]
 # Adds Bevy Reflection support
@@ -39,6 +41,10 @@ bevy_ecs = ["dep:bevy_ecs"]
 
 [dependencies]
 glam = "0.30"
+
+[dependencies.rayon]
+version = "1.11"
+optional = true
 
 [dependencies.serde]
 version = "1"
@@ -135,10 +141,6 @@ bevy-inspector-egui = "0.36"
 bevy_egui = "0.39"
 approx = "0.5"
 
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = [
-    'cfg(target_arch, values("spirv"))',
-] }
 
 [[example]]
 name = "hex_grid"
@@ -240,5 +242,17 @@ name = "storage"
 harness = false
 required-features = ["bevy_platform"]
 
+[[bench]]
+name = "storage_creation"
+harness = false
+required-features = ["rayon"]
+
 [profile.dev]
 opt-level = 1
+
+[lints.rust]
+nonstandard_style = "warn"
+future_incompatible = "warn"
+unexpected_cfgs = { level = "warn", check-cfg = [
+    'cfg(target_arch, values("spirv"))',
+] }

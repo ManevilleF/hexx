@@ -96,6 +96,15 @@ impl HexBounds {
         Hex::range_count(self.radius) as usize
     }
 
+    #[must_use]
+    #[inline]
+    #[doc(alias = "coords_count")]
+    #[doc(alias = "len32")]
+    /// Returns the number of hexagons in bounds
+    pub const fn hex_count32(&self) -> u32 {
+        Hex::range_count(self.radius)
+    }
+
     #[doc(alias = "all_items")]
     #[must_use]
     /// Returns an iterator with all the coordinates in bounds
