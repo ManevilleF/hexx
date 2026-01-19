@@ -9,13 +9,13 @@ pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: (1_000.0, 1_000.0).into(),
+                resolution: (1_000, 1_000).into(),
                 ..default()
             }),
             ..default()
         }))
         .init_resource::<CursorPos>()
-        .add_event::<RespawnMap>()
+        .add_message::<RespawnMap>()
         .add_systems(Startup, setup)
         .add_systems(
             Update,
@@ -58,14 +58,14 @@ pub struct CursorPos(pub Option<Vec2>);
 #[derive(Component)]
 pub struct TextInstruction;
 
-#[derive(Event)]
+#[derive(Message)]
 pub struct RespawnMap;
 
 /// setup
 fn setup(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut wtr: EventWriter<RespawnMap>,
+    mut wtr: MessageWriter<RespawnMap>,
 ) {
     commands.spawn(Camera2d);
     commands.insert_resource(DefaultMaterial([
@@ -112,7 +112,7 @@ fn respawn_map(
     default_mat: Res<DefaultMaterial>,
     query: Query<Entity, With<Hex>>,
     mut text: Query<&mut Text, With<TextInstruction>>,
-    mut rdr: EventReader<RespawnMap>,
+    mut rdr: MessageReader<RespawnMap>,
 ) {
     if rdr.read().count() == 0 {
         return;
@@ -203,7 +203,7 @@ fn respawn_map(
 fn handle_input(
     key: Res<ButtonInput<KeyCode>>,
     mut config: ResMut<RectMapConfig>,
-    mut wtr: EventWriter<RespawnMap>,
+    mut wtr: MessageWriter<RespawnMap>,
 ) {
     if key.just_pressed(KeyCode::Tab) {
         config.mode = match config.mode {
