@@ -1,4 +1,6 @@
 use crate::{Hex, HexBounds, hex::ExactSizeHexIterator};
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
 use std::fmt;
 
 use super::HexStore;
@@ -38,6 +40,7 @@ pub struct HexModMap<T> {
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 struct HexModMapMetadata {
     bounds: HexBounds,
@@ -90,17 +93,58 @@ impl<T> HexModMap<T> {
     /// assert_eq!(map[hex(1, 0)], 1);
     /// ```
     #[must_use]
-    #[expect(clippy::cast_possible_truncation)]
     pub fn new(center: Hex, radius: u32, mut values: impl FnMut(Hex) -> T) -> Self {
         let bounds = HexBounds::new(center, radius);
         let meta = HexModMapMetadata::new(bounds);
 
-        let hex_count = bounds.hex_count();
+        let hex_count = bounds.hex_count32();
 
         // Iterate over all valid hexes in the hexagonal region and fill the map
         let inner: Vec<_> = (0..hex_count)
             .map(|coord| {
-                let hex = center + Hex::from_hexmod_coordinates(coord as u32, bounds.radius);
+                let hex = center + Hex::from_hexmod_coordinates(coord, bounds.radius);
+                values(hex)
+            })
+            .collect();
+
+        Self { inner, meta }
+    }
+
+    /// Creates and fills a hexagon shaped map using parallel processing with
+    /// `rayon`
+    ///
+    /// # Arguments
+    ///
+    /// * `center` - The center coordinate of the hexagon
+    /// * `radius` - The radius of the map, around `center`
+    /// * `values` - Function called for each coordinate in the `radius` to fill
+    ///   the map
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::{*, storage::HexModMap};
+    ///
+    /// let map = HexModMap::new(Hex::ZERO, 10, |coord| coord.length());
+    /// assert_eq!(map[hex(1, 0)], 1);
+    /// ```
+    #[must_use]
+    #[cfg(feature = "rayon")]
+    pub fn new_parallel<F>(center: Hex, radius: u32, values: F) -> Self
+    where
+        F: Fn(Hex) -> T + Send + Sync,
+        T: Send,
+    {
+        let bounds = HexBounds::new(center, radius);
+        let meta = HexModMapMetadata::new(bounds);
+
+        let hex_count = bounds.hex_count32();
+
+        // Iterate over all valid hexes in the hexagonal region and fill the map
+        let inner: Vec<_> = (0..hex_count)
+            .into_par_iter()
+            .map(|coord| {
+                let hex = center + Hex::from_hexmod_coordinates(coord, bounds.radius);
                 values(hex)
             })
             .collect();

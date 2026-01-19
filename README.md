@@ -8,7 +8,7 @@
 [![Crates.io](https://img.shields.io/crates/v/hexx?style=flat-square)](https://crates.io/crates/hexx)
 [![Downloads](https://img.shields.io/crates/d/hexx?style=flat-square)](https://crates.io/crates/hexx)
 [![Docs.rs](https://img.shields.io/docsrs/hexx?style=flat-square)](https://docs.rs/hexx)
-[![dependency status](https://deps.rs/crate/hexx/0.21.0/status.svg?style=flat-square)](https://deps.rs/crate/hexx)
+[![dependency status](https://deps.rs/crate/hexx/0.23.0/status.svg?style=flat-square)](https://deps.rs/crate/hexx)
 
 <!-- cargo-sync-readme start -->
 
@@ -34,20 +34,19 @@
  Run `cargo add hexx` in your project or add the following line to your
  `Cargo.toml`:
 
- * `hexx = "0.21"`
+ * `hexx = "0.23"`
 
  ### Cargo features
 
  `hexx` provides the following cargo features:
  * `serde`: Enables [serde](https://github.com/serde-rs/serde) support for
    most types
+ * `facet`: Enables [facet](https://github.com/facet-rs/facet) support for
+   most types
+ * `rayon`: Enables [rayon](https://github.com/rayon-rs/rayon) support for
+   parallel processing
  * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it
    accross the FII
- * `bevy`: Enables [Bevy](https://bevyengine.org/) support
- * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
-   for `HashMap`
- * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
-   for most types
  * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
    using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
  * `algorithms`: Enables the [algorithms](https://docs.rs/hexx/latest/hexx/algorithms/) module with:
@@ -55,6 +54,13 @@
    * A Star Pathfinding
    * Field of view
  * `mesh`: Enables procedural mesh generation
+ * `bevy`: Enables [Bevy](https://bevyengine.org/) support including:
+   * `bevy_platform`: Enables [Bevy Platform](https://docs.rs/bevy_platform/latest/bevy_platform)
+     for `HashMap`
+   * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
+     for most types
+   * `bevy_ecs`: Enables `Component` and `Resource` derives for common hexx
+     types
 
  _Some features are enabled by default, it is recommended to enable only
  what is needed for your usage_
@@ -236,10 +242,8 @@
 
 ```rust
  use bevy::{
-     prelude::Mesh,
-     render::{
-         mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology,
-     },
+     asset::RenderAssetUsages, mesh::Indices, prelude::Mesh,
+     render::render_resource::PrimitiveTopology,
  };
  use hexx::MeshInfo;
 
@@ -311,7 +315,7 @@ impl PartialOrd for OrdByYX {
 
 ![hex_grid](docs/hex_grid.png "hex grid example")
 
-> `cargo run --example hex_grid`
+> `cargo run --example hex_grid --features bevy`
 
 This example showcases hex ranges, rings, wedges, rotation, and lines
 
@@ -319,7 +323,7 @@ This example showcases hex ranges, rings, wedges, rotation, and lines
 
 ![hex_grid](docs/hex_area.png "hex area example")
 
-> `cargo run --example hex_area`
+> `cargo run --example hex_area --features bevy`
 
 This example showcases how to generate hexagonal areas using grid utilities and gizmos
 and how to use two layouts on the same grid.
@@ -328,7 +332,7 @@ and how to use two layouts on the same grid.
 
 ![scroll_map](docs/scroll_map.gif "scroll map example")
 
-> `cargo run --example scroll_map`
+> `cargo run --example scroll_map --features bevy`
 
 This example showcases the `HexMap` struct for scrolling maps
 
@@ -336,7 +340,7 @@ This example showcases the `HexMap` struct for scrolling maps
 
 ![wrap_map](docs/wrap_map.gif "wrap map example")
 
-> `cargo run --example wrap_map`
+> `cargo run --example wrap_map --features bevy`
 
 This example showcases the `HexMap` struct for looping/wrapping map
 
@@ -344,7 +348,7 @@ This example showcases the `HexMap` struct for looping/wrapping map
 
 ![a_star](docs/a_star.png "A star example")
 
-> `cargo run --example a_star`
+> `cargo run --example a_star --features bevy`
 
 This example showcases the A star algorithm, with an interactive pathfinding
 between the origin and your cursor. Clicking on tile toggles their availability
@@ -353,7 +357,7 @@ between the origin and your cursor. Clicking on tile toggles their availability
 
 ![fov](docs/fov.png "Field of View example")
 
-> `cargo run --example field_of_view`
+> `cargo run --example field_of_view --features bevy`
 
 This example showcases the FOV algorithm, with an interactive range fov around
 your cursor.
@@ -363,7 +367,7 @@ Clicking on tile toggles their visibility.
 
 ![fov](docs/field_of_movement.gif "Field of movement example")
 
-> `cargo run --example field_of_movement`
+> `cargo run --example field_of_movement --features bevy`
 
 This example showcases the field of movement algorithm, interactively displaying
 the accessible range of movement around the cursor.
@@ -372,7 +376,7 @@ the accessible range of movement around the cursor.
 
 ![columns](docs/3d_columns.png "3d columns example")
 
-> `cargo run --example 3d_columns`
+> `cargo run --example 3d_columns --features bevy`
 
 This example showcases the 3d hexagon columns procedural generation
 
@@ -380,7 +384,7 @@ This example showcases the 3d hexagon columns procedural generation
 
 ![picking](docs/3d_picking.png "3d picking example")
 
-> `cargo run --example 3d_picking`
+> `cargo run --example 3d_picking --features bevy`
 
 This example showcases how to use the camera ray to detect hovered 3d columns
 
@@ -388,7 +392,7 @@ This example showcases how to use the camera ray to detect hovered 3d columns
 
 ![mesh](docs/mesh_builder.png "Mesh builder example")
 
-> `cargo run --example mesh_builder --features bevy_reflect`
+> `cargo run --example mesh_builder --features bevy`
 
 This example showcases the hexagon columns procedural generation customization options
 
@@ -396,7 +400,7 @@ This example showcases the hexagon columns procedural generation customization o
 
 ![mesh](docs/heightmap_builder.png "Height Map Mesh builder example")
 
-> `cargo run --example heightmap_builder --features bevy_reflect`
+> `cargo run --example heightmap_builder --features bevy`
 
 This example showcases the hexagon 3D height map procedural generation customization options
 
@@ -404,7 +408,7 @@ This example showcases the hexagon 3D height map procedural generation customiza
 
 ![chunks](docs/chunks.png "Chunks example")
 
-> `cargo run --example chunks`
+> `cargo run --example chunks --features bevy`
 
 This example showcases the hexagon resolution system, allowing to tile coordinates
 in evenly sized chunks
@@ -413,7 +417,7 @@ in evenly sized chunks
 
 ![chunks](docs/resolutions.png "Resolutions example")
 
-> `cargo run --example resolutions --feature bevy_reflect`
+> `cargo run --example resolutions --features bevy`
 
 This example showcases the hexagon resolution system, with multiple configurable
 chunk sizes and dynamic visualization
@@ -422,7 +426,7 @@ chunk sizes and dynamic visualization
 
 ![merged_chunks](docs/merged_columns.png "Merged Chunks example")
 
-> `cargo run --example merged_columns --features bevy_reflect`
+> `cargo run --example merged_columns --features bevy`
 
 This example showcases how to build a simple hex chunk system with each chunk
 being a single mesh
@@ -431,7 +435,7 @@ being a single mesh
 
 ![sprite_sheet](docs/sprite_sheet.png "Sprite Sheet example")
 
-> `cargo run --example sprite_sheet`
+> `cargo run --example sprite_sheet --features bevy`
 
 This example showcases how to use hexx with 2D sprite sheet.
 
@@ -439,6 +443,6 @@ This example showcases how to use hexx with 2D sprite sheet.
 
 ![shapes](docs/shapes.png "Shapes example")
 
-> `cargo run --example shapes --features bevy_reflect`
+> `cargo run --example shapes --features bevy`
 
 This example showcases how to use hexx shapes module

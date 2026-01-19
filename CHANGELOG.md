@@ -2,6 +2,27 @@
 
 ## [Unreleased]
 
+* `rayon` support for Map storages (#234, #239):
+  * `HexagonalMap::new_parallel`
+  * `HexModMap::new_parallel`
+  * `RombusMap::new_parallel`
+* Improvements on benchmarks (#239)
+* Bevy 0.18 support (#238)
+* Fix `shapes` example (#235 #236)
+
+## 0.23.0
+
+* Partial `facet` support (#222)
+* Bump `bevy_egui` and `bevy_inspector_egui` dev-dependencies (#222)
+* Fix `mesh_builder` and `heightmap_builder` examples (#233)
+* Added `bevy_ecs` feature (#233, #227)
+
+## 0.22.0
+
+* Removed `Reflect` derive from `PlaneMeshBuilder` and `ColumnMeshBuilder` as it does not support reflecting reference members
+* Bumped `glam` to 0.30
+* Bumped `bevy` dev-dependency to 0.17
+* Updated examples to use `bevy` 0.17
 * Added euclidean norm methods:
   - `Hex::euclidean_distance_to` (#226)
   - `Hex::squared_euclidean_distance_to` (#229)

@@ -6,7 +6,9 @@ use crate::{Hex, HexOrientation};
 /// [doubled]: https://www.redblobgames.com/grids/hexagons/#coordinates-doubled
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+#[repr(u8)]
 pub enum DoubledHexMode {
     /// Doubles column values
     #[default]
@@ -21,7 +23,9 @@ pub enum DoubledHexMode {
 /// [offset]: https://www.redblobgames.com/grids/hexagons/#coordinates-offset
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
+#[repr(u8)]
 pub enum OffsetHexMode {
     /// Depending on the orientation:
     ///

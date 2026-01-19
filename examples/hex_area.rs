@@ -1,8 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{GOLD, ORANGE, RED, WHITE},
+    mesh::Indices,
     platform::collections::{HashMap, HashSet},
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
     window::PrimaryWindow,
 };
 use glam::vec2;
@@ -16,7 +18,7 @@ pub fn main() {
         .init_resource::<HexArea>()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: (1_920.0, 1_080.0).into(),
+                resolution: (1_920, 1_080).into(),
                 ..default()
             }),
             ..default()
@@ -84,7 +86,7 @@ fn setup_grid(
                 let id = commands
                     .spawn((
                         Mesh2d(mesh_handle.clone()),
-                        MeshMaterial2d(default_material.clone_weak()),
+                        MeshMaterial2d(default_material.clone()),
                         Transform::from_xyz(pos.x, pos.y, 0.0),
                     ))
                     .id();
@@ -159,22 +161,22 @@ fn handle_input(
         let entity = map.flat_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.area_material.clone_weak()));
+            .insert(MeshMaterial2d(map.area_material.clone()));
         let entity = map.pointy_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.area_material.clone_weak()));
+            .insert(MeshMaterial2d(map.area_material.clone()));
     }
     for coord in to_remove {
         area.area.remove(&coord);
         let entity = map.flat_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.default_material.clone_weak()));
+            .insert(MeshMaterial2d(map.default_material.clone()));
         let entity = map.pointy_entities.get(&coord).unwrap();
         commands
             .entity(*entity)
-            .insert(MeshMaterial2d(map.default_material.clone_weak()));
+            .insert(MeshMaterial2d(map.default_material.clone()));
     }
     Ok(())
 }

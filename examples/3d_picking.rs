@@ -1,8 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{WHITE, YELLOW},
+    mesh::Indices,
     platform::collections::HashMap,
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
     window::PrimaryWindow,
 };
 use hexx::{shapes, *};
@@ -17,7 +19,7 @@ const MAP_RADIUS: u32 = 20;
 
 pub fn main() {
     App::new()
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             brightness: lux::OFFICE,
             ..default()
         })
@@ -70,7 +72,7 @@ fn setup_grid(
             let id = commands
                 .spawn((
                     Mesh3d(mesh_handle.clone()),
-                    MeshMaterial3d(default_material.clone_weak()),
+                    MeshMaterial3d(default_material.clone()),
                     Transform::from_xyz(pos.x, -COLUMN_HEIGHT, pos.y),
                 ))
                 .id();
@@ -111,10 +113,10 @@ fn higlight_hovered(
         };
         commands
             .entity(entity)
-            .insert(MeshMaterial3d(map.highlighted_material.clone_weak()));
+            .insert(MeshMaterial3d(map.highlighted_material.clone()));
         commands
             .entity(map.entities[&*highlighted])
-            .insert(MeshMaterial3d(map.default_material.clone_weak()));
+            .insert(MeshMaterial3d(map.default_material.clone()));
         *highlighted = coord;
     }
     Ok(())

@@ -1,10 +1,8 @@
 use std::ops::Deref;
 
 use bevy::{
-    platform::collections::HashMap,
-    prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
-    window::PrimaryWindow,
+    asset::RenderAssetUsages, mesh::Indices, platform::collections::HashMap, prelude::*,
+    render::render_resource::PrimitiveTopology, window::PrimaryWindow,
 };
 use hexx::*;
 
@@ -16,7 +14,7 @@ pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: (1_000.0, 1_000.0).into(),
+                resolution: (1_000, 1_000).into(),
                 ..default()
             }),
             ..default()
@@ -60,7 +58,7 @@ fn setup_grid(
             let entity = commands
                 .spawn((
                     Mesh2d(mesh.clone()),
-                    MeshMaterial2d(default_mat.clone_weak()),
+                    MeshMaterial2d(default_mat.clone()),
                     Transform::from_xyz(pos.x, pos.y, 0.0),
                 ))
                 .id();

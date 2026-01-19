@@ -1,9 +1,14 @@
-use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use hexx::*;
+use std::hint::black_box;
 
 pub fn rings_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hex Rings");
-    group.significance_level(0.1).sample_size(1000);
+    group
+        .sample_size(500)
+        .warm_up_time(std::time::Duration::from_secs(3))
+        .measurement_time(std::time::Duration::from_secs(15))
+        .noise_threshold(0.02);
     let dist: u32 = 1000;
 
     group.bench_with_input(BenchmarkId::new("Range", dist), &dist, |b, dist| {

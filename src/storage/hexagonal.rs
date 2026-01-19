@@ -1,4 +1,6 @@
 use crate::{Hex, HexBounds, hex::ExactSizeHexIterator};
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
 use std::fmt;
 
 use super::HexStore;
@@ -39,6 +41,7 @@ pub struct HexagonalMap<T> {
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 struct HexagonalMapMetadata {
     bounds: HexBounds,
@@ -96,21 +99,66 @@ impl<T> HexagonalMap<T> {
         let bounds = HexBounds::new(center, radius);
         let range = radius as i32;
         let inner = (-range..=range)
-            .map(|y| {
-                let x_min = i32::max(-range, -y - range);
-                let x_max = i32::min(range, range - y);
-                (x_min..=x_max)
-                    .map(|x| {
-                        let coord = center.const_add(Hex::new(x, y));
-                        values(coord)
-                    })
-                    .collect()
-            })
+            .map(|y| Self::_compute_inner_row(y, center, range, &mut values))
             .collect();
         Self {
             inner,
             meta: HexagonalMapMetadata { bounds },
         }
+    }
+
+    /// Creates and fills a hexagon shaped map using parallel processing with
+    /// `rayon`
+    ///
+    /// # Arguments
+    ///
+    /// * `center` - The center coordinate of the hexagon
+    /// * `radius` - The radius of the map, around `center`
+    /// * `values` - Function called for each coordinate in the `radius` to fill
+    ///   the map
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use hexx::{*, storage::HexagonalMap};
+    ///
+    /// let map = HexagonalMap::new(Hex::ZERO, 10, |coord| coord.length());
+    /// assert_eq!(map[hex(1, 0)], 1);
+    /// ```
+    #[must_use]
+    #[expect(clippy::cast_possible_wrap)]
+    #[cfg(feature = "rayon")]
+    pub fn new_parallel<F>(center: Hex, radius: u32, values: F) -> Self
+    where
+        F: Fn(Hex) -> T + Send + Sync,
+        T: Send,
+    {
+        let bounds = HexBounds::new(center, radius);
+        let range = radius as i32;
+        let inner = (-range..=range)
+            .into_par_iter()
+            .map(|y| Self::_compute_inner_row(y, center, range, &values))
+            .collect();
+        Self {
+            inner,
+            meta: HexagonalMapMetadata { bounds },
+        }
+    }
+
+    fn _compute_inner_row(
+        row: i32,
+        center: Hex,
+        range: i32,
+        mut values: impl FnMut(Hex) -> T,
+    ) -> Vec<T> {
+        let x_min = i32::max(-range, -row - range);
+        let x_max = i32::min(range, range - row);
+        (x_min..=x_max)
+            .map(|x| {
+                let coord = center.const_add(Hex::new(x, row));
+                values(coord)
+            })
+            .collect()
     }
 
     #[inline]

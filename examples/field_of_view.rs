@@ -1,8 +1,10 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{AQUA, BLACK, WHITE},
+    mesh::Indices,
     platform::collections::{HashMap, HashSet},
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
     window::PrimaryWindow,
 };
 use hexx::{algorithms::range_fov, *};
@@ -16,7 +18,7 @@ pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: (1_000.0, 1_000.0).into(),
+                resolution: (1_000, 1_000).into(),
                 ..default()
             }),
             ..default()
@@ -63,9 +65,9 @@ fn setup_grid(
             let pos = layout.hex_to_world_pos(coord);
             let material = if i % 10 == 0 {
                 blocked_coords.insert(coord);
-                blocked_mat.clone_weak()
+                blocked_mat.clone()
             } else {
-                default_mat.clone_weak()
+                default_mat.clone()
             };
             let entity = commands
                 .spawn((
@@ -112,13 +114,13 @@ fn handle_input(
                 grid.blocked_coords.remove(&hex_pos);
                 commands
                     .entity(entity)
-                    .insert(MeshMaterial2d(grid.default_mat.clone_weak()));
+                    .insert(MeshMaterial2d(grid.default_mat.clone()));
             } else {
                 grid.blocked_coords.insert(hex_pos);
                 grid.visible_entities.remove(&entity);
                 commands
                     .entity(entity)
-                    .insert(MeshMaterial2d(grid.blocked_mat.clone_weak()));
+                    .insert(MeshMaterial2d(grid.blocked_mat.clone()));
             }
             return Ok(());
         }
@@ -129,7 +131,7 @@ fn handle_input(
         for entity in &grid.visible_entities {
             commands
                 .entity(*entity)
-                .insert(MeshMaterial2d(grid.default_mat.clone_weak()));
+                .insert(MeshMaterial2d(grid.default_mat.clone()));
         }
         let fov = range_fov(hex_pos, FOV_RADIUS, |h| {
             grid.blocked_coords.contains(&h) || h.ulength() > MAP_RADIUS
@@ -141,7 +143,7 @@ fn handle_input(
         for entity in &entities {
             commands
                 .entity(*entity)
-                .insert(MeshMaterial2d(grid.visible_mat.clone_weak()));
+                .insert(MeshMaterial2d(grid.visible_mat.clone()));
         }
         grid.visible_entities = entities;
     }

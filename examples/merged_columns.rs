@@ -1,9 +1,11 @@
 use std::ops::Range;
 
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{BLUE, RED, WHITE},
+    mesh::Indices,
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
 };
 use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::{InspectorOptions, quick::ResourceInspectorPlugin};
@@ -18,14 +20,12 @@ pub fn main() {
         .register_type::<MapSettings>()
         .register_type::<Range<f32>>()
         .init_resource::<MapSettings>()
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             brightness: 500.,
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugins(EguiPlugin {
-            enable_multipass_for_primary_context: false,
-        })
+        .add_plugins(EguiPlugin::default())
         .add_plugins(ResourceInspectorPlugin::<MapSettings>::default())
         .add_systems(Startup, setup_camera)
         .add_systems(Update, setup_grid)

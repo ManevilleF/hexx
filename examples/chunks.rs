@@ -1,7 +1,9 @@
 use bevy::{
+    asset::RenderAssetUsages,
     color::palettes::css::{BLUE, RED, WHITE},
+    mesh::Indices,
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
 };
 use hexx::{shapes, *};
 
@@ -14,7 +16,7 @@ pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: (1_000.0, 1_000.0).into(),
+                resolution: (1_000, 1_000).into(),
                 ..default()
             }),
             ..default()

@@ -1,6 +1,6 @@
 [package]
 name = "hexx"
-version = "0.21.0"
+version = "0.23.0"
 edition = "2024"
 authors = ["Felix de Maneville <felix.maneville@gmail.com>"]
 description = "Hexagonal utilities"
@@ -26,6 +26,10 @@ grid = []
 packed = []
 # serde compatibility
 serde = ["dep:serde", "glam/serde"]
+# facet compatibility
+facet = ["dep:facet"]
+# rayon support
+rayon = ["dep:rayon"]
 # Adds support for the Bevy game engine
 bevy = ["bevy_reflect", "bevy_platform", "bevy_ecs"]
 # Adds Bevy Reflection support
@@ -36,7 +40,11 @@ bevy_platform = ["dep:bevy_platform"]
 bevy_ecs = ["dep:bevy_ecs"]
 
 [dependencies]
-glam = "0.29"
+glam = "0.30"
+
+[dependencies.rayon]
+version = "1.11"
+optional = true
 
 [dependencies.serde]
 version = "1"
@@ -44,14 +52,23 @@ default-features = false
 features = ["derive"]
 optional = true
 
+[dependencies.facet]
+version = "0.31"
+default-features = false
+optional = true
+
 [dependencies.bevy_reflect]
-version = "0.16"
+version = "0.18"
 default-features = false
 features = ["glam"]
 optional = true
 
 [dependencies.bevy_platform]
-version = "0.16"
+version = "0.18"
+optional = true
+
+[dependencies.bevy_ecs]
+version = "0.18"
 optional = true
 
 [dependencies.bevy_ecs]
@@ -60,42 +77,74 @@ optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.16"
+version = "0.18"
 features = [
+    "std",
+    # "async_executor",
+    # "android-game-activity",
+    # "android_shared_stdcxx",
+    # "animation",
     "bevy_asset",
+    # "bevy_audio",
+    "bevy_color",
     "bevy_core_pipeline",
+    "bevy_post_process",
+    # "bevy_anti_alias",
+    # "bevy_gilrs",
     "bevy_gizmos",
+    "bevy_gizmos_render",
+    # "bevy_gltf",
+    # "bevy_input_focus",
     "bevy_log",
+    # "bevy_mesh_picking_backend",
     "bevy_pbr",
     "bevy_picking",
     "bevy_render",
+    # "bevy_scene",
+    "bevy_image",
+    "bevy_mesh",
+    "bevy_camera",
+    "bevy_light",
+    "bevy_shader",
     "bevy_sprite",
+    # "bevy_sprite_picking_backend",
+    "bevy_sprite_render",
+    "bevy_state",
     "bevy_text",
+    # "bevy_ui",
+    # "bevy_ui_picking_backend",
+    # "bevy_ui_render",
     "bevy_window",
     "bevy_winit",
-    "bevy_ui",
+    # "custom_cursor",
     "default_font",
+    # "hdr",
+    # "ktx2",
     "multi_threaded",
     "png",
+    "reflect_auto_register",
+    # "smaa_luts",
+    # "sysinfo_plugin",
     "tonemapping_luts",
+    # "vorbis",
+    # "webgl2",
     "x11",
+    # "wayland",
+    # "debug",
+    # "zstd_rust",
 ]
 default-features = false
 
 [dev-dependencies.criterion]
-version = "0.5"
+version = "0.8"
 features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.9"
-bevy-inspector-egui = "0.31"
-bevy_egui = "0.34"
+bevy-inspector-egui = "0.36"
+bevy_egui = "0.39"
 approx = "0.5"
 
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = [
-    'cfg(target_arch, values("spirv"))',
-] }
 
 [[example]]
 name = "hex_grid"
@@ -202,5 +251,17 @@ name = "storage"
 harness = false
 required-features = ["bevy_platform"]
 
+[[bench]]
+name = "storage_creation"
+harness = false
+required-features = ["rayon"]
+
 [profile.dev]
 opt-level = 1
+
+[lints.rust]
+nonstandard_style = "warn"
+future_incompatible = "warn"
+unexpected_cfgs = { level = "warn", check-cfg = [
+    'cfg(target_arch, values("spirv"))',
+] }

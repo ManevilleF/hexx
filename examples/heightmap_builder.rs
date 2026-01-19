@@ -1,13 +1,11 @@
 use bevy::{
-    ecs::system::RunSystemOnce,
-    input::mouse::MouseMotion,
-    platform::collections::HashMap,
-    prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    asset::RenderAssetUsages, ecs::system::RunSystemOnce, input::mouse::MouseMotion, mesh::Indices,
+    platform::collections::HashMap, prelude::*, render::render_resource::PrimitiveTopology,
 };
 use bevy_egui::{
-    EguiContext, EguiPlugin,
+    EguiContext, EguiPlugin, EguiPrimaryContextPass,
     egui::{self, Ui},
+    input::egui_wants_any_pointer_input,
 };
 use bevy_inspector_egui::bevy_inspector;
 use hexx::*;
@@ -35,17 +33,19 @@ struct BuilderParams {
 pub fn main() {
     App::new()
         .init_resource::<BuilderParams>()
-        .insert_resource(AmbientLight {
+        .insert_resource(GlobalAmbientLight {
             brightness: 500.0,
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugins(EguiPlugin {
-            enable_multipass_for_primary_context: false,
-        })
+        .add_plugins(EguiPlugin::default())
         .add_plugins(bevy_inspector_egui::DefaultInspectorConfigPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Update, (show_ui, animate, gizmos))
+        .add_systems(EguiPrimaryContextPass, show_ui)
+        .add_systems(
+            Update,
+            (animate.run_if(not(egui_wants_any_pointer_input)), gizmos),
+        )
         .run();
 }
 
@@ -133,12 +133,12 @@ fn show_ui(world: &mut World) {
         };
         let mut egui_context = egui_context.clone();
         let ctx = egui_context.get_mut();
-        let rect = ctx.screen_rect().with_min_x(250.0);
+        let rect = ctx.content_rect().with_min_x(250.0);
         egui::Window::new("Visuals")
             .constrain_to(rect)
             .show(ctx, |ui| {
                 ui.collapsing("Ambient Light", |ui| {
-                    bevy_inspector::ui_for_resource::<AmbientLight>(world, ui);
+                    bevy_inspector::ui_for_resource::<GlobalAmbientLight>(world, ui);
                 });
                 let info = world.resource::<HexInfo>();
                 let mat = materials.get_mut(&info.material_handle).unwrap();
@@ -210,7 +210,7 @@ fn setup(
 fn animate(
     info: Res<HexInfo>,
     mut transforms: Query<&mut Transform>,
-    mut motion_evr: EventReader<MouseMotion>,
+    mut motion_evr: MessageReader<MouseMotion>,
     buttons: Res<ButtonInput<MouseButton>>,
     time: Res<Time>,
 ) {
