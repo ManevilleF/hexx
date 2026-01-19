@@ -71,10 +71,6 @@ optional = true
 version = "0.18"
 optional = true
 
-[dependencies.bevy_ecs]
-version = "0.16"
-optional = true
-
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
 version = "0.18"

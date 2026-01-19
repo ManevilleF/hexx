@@ -700,6 +700,10 @@ mod half_size_test {
                                 a == 0 && b == 0,
                                 rect_map.contains_offset(IVec2::new(i, j))
                             );
+                            assert_eq!(
+                                a == 0 && b == 0,
+                                rect_map.get_by_offset(IVec2::new(i, j)).is_some()
+                            );
                         }
                     }
                 }
@@ -815,6 +819,7 @@ mod start_end_test {
                     );
 
                     assert_eq!(rect_map.contains_offset([i, j]), contain);
+                    assert_eq!(rect_map.get_by_offset([i, j]).is_some(), contain);
                 }
             }
         }
@@ -920,6 +925,7 @@ mod start_dim_test {
                     let contain = (i >= start[0] && i < start[0] + dim[0] as i32)
                         && (j >= start[1] && j < start[1] + dim[1] as i32);
                     assert_eq!(rect_map.contains_offset([i, j]), contain);
+                    assert_eq!(rect_map.get_by_offset([i, j]).is_some(), contain);
                 }
             }
         }
