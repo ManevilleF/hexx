@@ -677,6 +677,7 @@ mod half_size_test {
                 let _idx = rect_map.hex_to_idx(hex);
                 assert_eq!(Some(idx), _idx);
             }
+            assert_eq!(rect_map.iter().count(), rect_map.len());
         }
     }
 
@@ -758,6 +759,19 @@ mod half_size_test {
             }
         }
     }
+
+    /// Tests value construction
+    #[test]
+    fn construction_test() {
+        for dim in HALF_SIZES {
+            let rect_map =
+                RectMetadata::from_half_size(UVec2::from_array(*dim)).build(|h| h.x * 1000 + h.y);
+
+            for (h, v) in rect_map.iter() {
+                assert_eq!(h.x * 1000 + h.y, *v);
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -800,9 +814,11 @@ mod start_end_test {
                 assert!(rect_map.contains_offset(ij));
                 assert_eq!(Some(idx), rect_map.hex_to_idx(hex));
             }
+            assert_eq!(rect_map.iter().count(), rect_map.len());
         }
     }
 
+    /// Tests the containment of ij coordinates within the map.
     #[test]
     fn contains_test() {
         for (start, end) in START_END {
@@ -825,6 +841,7 @@ mod start_end_test {
         }
     }
 
+    /// Tests the wrapping functionality of ij coordinates.
     #[test]
     fn wrap_test() {
         for (start, end) in START_END {
@@ -866,6 +883,19 @@ mod start_end_test {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /// Tests value construction
+    #[test]
+    fn construction_test() {
+        for (start, end) in START_END {
+            let rect_map = RectMetadata::from_start_end((*start).into(), (*end).into())
+                .build(|h| h.x * 1000 + h.y);
+
+            for (h, v) in rect_map.iter() {
+                assert_eq!(h.x * 1000 + h.y, *v);
             }
         }
     }
@@ -911,9 +941,11 @@ mod start_dim_test {
                 assert!(rect_map.contains_offset(ij));
                 assert_eq!(Some(idx), rect_map.hex_to_idx(hex));
             }
+            assert_eq!(rect_map.iter().count(), rect_map.len());
         }
     }
 
+    /// Tests the containment of ij coordinates within the map.
     #[test]
     fn contains_test() {
         for (start, dim) in START_END {
@@ -931,6 +963,7 @@ mod start_dim_test {
         }
     }
 
+    /// Tests the wrapping functionality of ij coordinates.
     #[test]
     fn wrap_test() {
         for (start, dim) in START_END {
@@ -972,6 +1005,19 @@ mod start_dim_test {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /// Tests value construction
+    #[test]
+    fn construction_test() {
+        for (start, dim) in START_END {
+            let rect_map = RectMetadata::from_start_dim((*start).into(), (*dim).into())
+                .build(|h| h.x * 1000 + h.y);
+
+            for (h, v) in rect_map.iter() {
+                assert_eq!(h.x * 1000 + h.y, *v);
             }
         }
     }
