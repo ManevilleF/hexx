@@ -186,7 +186,7 @@ impl RectMetadata {
         self.dim = (2 * half_size.abs()).as_uvec2();
         self
     }
-    /// builder patter, set start and end
+    /// builder pattern, set start and end
     ///
     /// # Param
     /// * `start`: the element wise minimum offset coordinate in the map
