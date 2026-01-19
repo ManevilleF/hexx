@@ -171,7 +171,7 @@ impl RectMetadata {
             wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
         }
     }
-    /// builder patter, set half size
+    /// builder pattern, set half size
     ///
     /// # Param
     /// * `half_size`: the half span of the map
