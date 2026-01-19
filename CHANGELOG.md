@@ -9,6 +9,8 @@
 * Improvements on benchmarks (#239)
 * Bevy 0.18 support (#238)
 * Fix `shapes` example (#235 #236)
+* Added feature `bevy_ecs` (`dep:bevy_ecs`)  (#227)
+* Added `RectMap` storage for rectangular dense hex maps (#227)
 
 ## 0.23.0
 
