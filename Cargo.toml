@@ -227,6 +227,10 @@ path = "examples/shapes.rs"
 required-features = ["bevy_reflect"]
 
 [[bench]]
+name = "conversions"
+harness = false
+
+[[bench]]
 name = "length"
 harness = false
 

@@ -32,7 +32,7 @@
 //! * `rayon`: Enables [rayon](https://github.com/rayon-rs/rayon) support for
 //!   parallel processing
 //! * `packed`: Makes [`Hex`](crate::hex::Hex) `repr(C)`, useful to use it
-//!   accross the FII
+//!   accross the FFI
 //! * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
 //!   using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
 //! * `algorithms`: Enables the [algorithms](crate::algorithms) module with:
