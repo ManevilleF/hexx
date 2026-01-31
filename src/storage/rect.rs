@@ -1,8 +1,8 @@
-use std::fmt::Debug;
-
-use glam::{IVec2, UVec2};
-
 use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
+use glam::{IVec2, UVec2};
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+use std::fmt::Debug;
 
 /// [`Vec`] Based storage for rectangular maps.
 ///
@@ -114,7 +114,8 @@ impl RectMetadata {
     /// - columns: `-half_size[0]..(half_size[0] - 1)`, and
     /// - rows: `-half_size[1]..(half_size[1] - 1)`, and
     #[must_use]
-    pub fn from_half_size(half_size: UVec2) -> Self {
+    pub fn from_half_size(half_size: impl Into<UVec2>) -> Self {
+        let half_size = half_size.into();
         Self {
             start: -half_size.as_ivec2(),
             dim: 2 * half_size,
@@ -246,6 +247,18 @@ impl RectMetadata {
         RectMap::new(self, values)
     }
 
+    /// Build the map with function to eval value using parallel processing with
+    /// `rayon`
+    #[inline]
+    #[cfg(feature = "rayon")]
+    pub fn build_parallel<T, F>(self, values: F) -> RectMap<T>
+    where
+        F: Fn(Hex) -> T + Send + Sync,
+        T: Send,
+    {
+        RectMap::new_parallel(self, values)
+    }
+
     /// Builds map with default values
     /// # Example
     /// ```rust
@@ -263,6 +276,14 @@ impl RectMetadata {
     #[must_use]
     pub fn build_default<T: Default>(self) -> RectMap<T> {
         RectMap::default_values(self)
+    }
+
+    /// Builds map with default values using parallel processing with
+    /// `rayon`
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    pub fn build_default_parralel<T: Default + Send>(self) -> RectMap<T> {
+        RectMap::default_values_parallel(self)
     }
 
     /// get the hex orientation of the map
@@ -323,26 +344,7 @@ impl RectMetadata {
     /// `None` if outside map
     fn hex_to_idx(&self, hex: Hex) -> Option<usize> {
         let ij = self.hex_to_offset(hex);
-        if self.contains_offset(ij) {
-            Some(self.ij_to_idx(ij))
-        } else {
-            None
-        }
-    }
-
-    /// Wrap if `hex` lie outside of layout
-    fn wrapped_hex_to_idx(&self, hex: Hex) -> usize {
-        let ij = self.hex_to_offset(hex);
-        let ij = self.wrap_offset(ij);
-        self.ij_to_idx(ij)
-    }
-
-    /// Calculate offset coordinate from hex for map's orientation and offset
-    /// mode
-    #[must_use]
-    pub fn hex_to_offset(&self, hex: Hex) -> IVec2 {
-        hex.to_offset_coordinates(self.offset_mode, self.orientation)
-            .into()
+        self.contains_offset(ij).then(|| self.ij_to_idx(ij))
     }
 
     /// fallable input, internal
@@ -353,6 +355,21 @@ impl RectMetadata {
     fn ij_to_idx(&self, ij: IVec2) -> usize {
         let rc = (ij - self.start).as_uvec2();
         (rc.x + rc.y * self.dim.x) as usize
+    }
+
+    /// Calculate offset coordinate from hex for map's orientation and offset
+    /// mode
+    #[must_use]
+    pub fn hex_to_offset(&self, hex: Hex) -> IVec2 {
+        hex.to_offset_coordinates(self.offset_mode, self.orientation)
+            .into()
+    }
+
+    /// Wrap if `hex` lie outside of layout
+    fn wrapped_hex_to_idx(&self, hex: Hex) -> usize {
+        let ij = self.hex_to_offset(hex);
+        let ij = self.wrap_offset(ij);
+        self.ij_to_idx(ij)
     }
 
     /// Wrap a offset coordinate to ensure it fall inside the map
@@ -431,13 +448,29 @@ impl RectMetadata {
 
     /// iterator over the hexagonal coordinates in the map.
     #[must_use]
-    pub fn iter_hex(&self) -> impl ExactSizeIterator<Item = Hex> + use<'_> {
+    pub fn iter_hex(&self) -> impl ExactSizeIterator<Item = Hex> {
         (0..self.len()).map(|idx| self.idx_to_hex(idx))
+    }
+    /// Parallel iterator over the hexagonal coordinates in the map.
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    pub fn iter_par_hex(&self) -> impl IndexedParallelIterator<Item = Hex> {
+        (0..self.len())
+            .into_par_iter()
+            .map(|idx| self.idx_to_hex(idx))
     }
     /// iterator over the offset coordinates in the map.
     #[must_use]
-    pub fn iter_offset(&self) -> impl ExactSizeIterator<Item = IVec2> + use<'_> {
+    pub fn iter_offset(&self) -> impl ExactSizeIterator<Item = IVec2> {
         (0..self.len()).map(|idx| self.idx_to_ij(idx))
+    }
+    /// Parallel iterator over the offset coordinates in the map.
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    pub fn iter_par_offset(&self) -> impl IndexedParallelIterator<Item = IVec2> {
+        (0..self.len())
+            .into_par_iter()
+            .map(|idx| self.idx_to_ij(idx))
     }
 }
 
@@ -468,6 +501,23 @@ impl<T> RectMap<T> {
         Self { inner, meta }
     }
 
+    /// Creates and fills a rectangular shaped map using parallel processing with
+    /// `rayon`
+    ///
+    /// # Arguments
+    /// * `meta` - The meta data for the map to create.
+    /// * `values` - Function called for each coordinate to fill the map
+    #[cfg(feature = "rayon")]
+    pub fn new_parallel<F>(meta: RectMetadata, values: F) -> Self
+    where
+        F: Fn(Hex) -> T + Send + Sync,
+        T: Send,
+    {
+        let mut inner = Vec::with_capacity(meta.len());
+        meta.iter_par_hex().map(values).collect_into_vec(&mut inner);
+        Self { inner, meta }
+    }
+
     /// get the [`RectMetadata`] of the map.
     #[must_use]
     #[inline]
@@ -475,7 +525,7 @@ impl<T> RectMap<T> {
         &self.meta
     }
 
-    /// Creates and fills a rectangular shaped map
+    /// Creates and fills a rectangular shaped map using default values
     ///
     /// # Arguments
     /// * `meta` - The meta data for the map to create.
@@ -501,6 +551,22 @@ impl<T> RectMap<T> {
         T: Default,
     {
         Self::new(meta, |_| Default::default())
+    }
+
+    /// Creates and fills a rectangular shaped map using default values and
+    /// parallel processing with `rayon`
+    ///
+    /// # Arguments
+    /// * `meta` - The meta data for the map to create.
+    ///
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    #[inline]
+    pub fn default_values_parallel(meta: RectMetadata) -> Self
+    where
+        T: Default + Send,
+    {
+        Self::new_parallel(meta, |_| Default::default())
     }
 
     /// Returns a reference the stored value associated with offset coordinate.

@@ -1,6 +1,6 @@
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use hexx::{
-    storage::{HexModMap, HexagonalMap, RombusMap},
+    storage::{HexModMap, HexagonalMap, RectMetadata, RombusMap},
     *,
 };
 
@@ -51,6 +51,17 @@ pub fn creation_benchmark(c: &mut Criterion) {
         BenchmarkId::new("RombusMap_Par", rombus_size),
         &rombus_size,
         |b, &s| b.iter(|| RombusMap::new_parallel(Hex::ZERO, s, s, get_value)),
+    );
+
+    group.bench_with_input(
+        BenchmarkId::new("RectMap", rombus_size),
+        &rombus_size,
+        |b, &s| b.iter(|| RectMetadata::from_half_size([s; 2]).build(get_value)),
+    );
+    group.bench_with_input(
+        BenchmarkId::new("RectMap_Par", rombus_size),
+        &rombus_size,
+        |b, &s| b.iter(|| RectMetadata::from_half_size([s; 2]).build_parallel(get_value)),
     );
 
     group.finish();

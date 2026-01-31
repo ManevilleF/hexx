@@ -25,8 +25,15 @@ impl Default for Parallelogram {
 }
 
 impl Parallelogram {
+    /// Creates a parallelogram with `min` and `max` coords
+    #[inline]
+    #[must_use]
+    pub const fn new(min: Hex, max: Hex) -> Self {
+        Self { min, max }
+    }
     /// Generates a [`parallelogram`] with the shape parameters
     #[must_use]
+    #[inline]
     pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
         parallelogram(self.min, self.max)
     }
@@ -64,8 +71,16 @@ impl Default for Triangle {
 }
 
 impl Triangle {
+    /// Creates a triangle of `size`
+    #[inline]
+    #[must_use]
+    pub const fn new(size: u32) -> Self {
+        Self { size }
+    }
+
     /// Generates a [`triangle`] with the shape parameters
     #[must_use]
+    #[inline]
     pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
         triangle(self.size)
     }
@@ -110,7 +125,14 @@ impl Default for Hexagon {
 }
 
 impl Hexagon {
+    /// Creates a hexagon with `center` and `radius`
+    #[inline]
+    #[must_use]
+    pub const fn new(center: Hex, radius: u32) -> Self {
+        Self { center, radius }
+    }
     /// Generates a [`hexagon`] with the shape parameters
+    #[inline]
     #[must_use]
     pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
         hexagon(self.center, self.radius)
@@ -205,6 +227,7 @@ impl Default for PointyRectangle {
 impl PointyRectangle {
     /// Generates a [`pointy_rectangle`] with the shape parameters
     #[must_use]
+    #[inline]
     pub fn coords(self) -> impl ExactSizeIterator<Item = Hex> {
         pointy_rectangle([self.left, self.right, self.top, self.bottom])
     }

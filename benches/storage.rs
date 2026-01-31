@@ -1,7 +1,7 @@
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use hexx::{
     shapes::rombus,
-    storage::{HexModMap, HexStore, HexagonalMap, RombusMap},
+    storage::{HexModMap, HexStore, HexagonalMap, RectMetadata, RombusMap},
     *,
 };
 use std::hint::black_box;
@@ -154,5 +154,69 @@ pub fn rombus_map_benchmark(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, hexagonal_map_benchmark, rombus_map_benchmark);
+pub fn rect_map_benchmark(c: &mut Criterion) {
+    let mut group = c.benchmark_group("RectMap Storage");
+    group
+        .warm_up_time(std::time::Duration::from_secs(3))
+        .measurement_time(std::time::Duration::from_secs(10))
+        .noise_threshold(0.02)
+        .sample_size(500);
+
+    let get_value = |h: Hex| h.length();
+
+    for dist in [10, 100, 500] {
+        let meta = RectMetadata::from_half_size([dist as u32; 2]);
+        let std_hash_map: std::collections::HashMap<_, _> =
+            meta.iter_hex().map(|hex| (hex, get_value(hex))).collect();
+        let bevy_hash_map: bevy_platform::collections::HashMap<_, _> =
+            meta.iter_hex().map(|hex| (hex, get_value(hex))).collect();
+        let rect_map = meta.clone().build(get_value);
+        group.bench_with_input(BenchmarkId::new("std::HashMap_get", dist), &dist, |b, _| {
+            b.iter(|| {
+                for c in meta.iter_hex() {
+                    std_hash_map.get(&c).unwrap();
+                }
+            })
+        });
+        group.bench_with_input(
+            BenchmarkId::new("bevy_platform::HashMap_get", dist),
+            &dist,
+            |b, _| {
+                b.iter(|| {
+                    for c in meta.iter_hex() {
+                        bevy_hash_map.get(&c).unwrap();
+                    }
+                })
+            },
+        );
+        group.bench_with_input(BenchmarkId::new("RectMap_get", dist), &dist, |b, _| {
+            b.iter(|| {
+                for c in meta.iter_hex() {
+                    rect_map.get(c).unwrap();
+                }
+            })
+        });
+        group.bench_with_input(
+            BenchmarkId::new("std::HashMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| std_hash_map.iter().collect::<Vec<_>>()),
+        );
+        group.bench_with_input(
+            BenchmarkId::new("bevy_platform::HashMap_iter", dist),
+            &dist,
+            |b, _| b.iter(|| bevy_hash_map.iter().collect::<Vec<_>>()),
+        );
+        group.bench_with_input(BenchmarkId::new("RectMap_iter", dist), &dist, |b, _| {
+            b.iter(|| rect_map.iter().collect::<Vec<_>>())
+        });
+    }
+    group.finish();
+}
+
+criterion_group!(
+    benches,
+    hexagonal_map_benchmark,
+    rombus_map_benchmark,
+    rect_map_benchmark
+);
 criterion_main!(benches);
