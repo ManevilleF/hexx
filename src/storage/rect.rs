@@ -501,8 +501,8 @@ impl<T> RectMap<T> {
         Self { inner, meta }
     }
 
-    /// Creates and fills a rectangular shaped map using parallel processing with
-    /// `rayon`
+    /// Creates and fills a rectangular shaped map using parallel processing
+    /// with `rayon`
     ///
     /// # Arguments
     /// * `meta` - The meta data for the map to create.
@@ -558,7 +558,6 @@ impl<T> RectMap<T> {
     ///
     /// # Arguments
     /// * `meta` - The meta data for the map to create.
-    ///
     #[cfg(feature = "rayon")]
     #[must_use]
     #[inline]
