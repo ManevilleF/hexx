@@ -107,9 +107,9 @@ features = [
     "bevy_sprite_render",
     "bevy_state",
     "bevy_text",
-    # "bevy_ui",
+    "bevy_ui",
     # "bevy_ui_picking_backend",
-    # "bevy_ui_render",
+    "bevy_ui_render",
     "bevy_window",
     "bevy_winit",
     # "custom_cursor",
@@ -186,6 +186,11 @@ required-features = ["bevy_platform"]
 name = "3d_picking"
 path = "examples/3d_picking.rs"
 required-features = ["bevy_platform"]
+
+[[example]]
+name = "rect_map"
+path = "examples/rect_map.rs"
+required-features = ["bevy_platform", "bevy_ecs"]
 
 [[example]]
 name = "mesh_builder"
