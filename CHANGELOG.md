@@ -2,17 +2,18 @@
 
 ## [Unreleased]
 
-* `rayon` support for Map storages (#234, #239):
+## 0.24.0
+
+* Added `RectMap` storage for rectangular dense hex maps (#227)
+* Bevy 0.18 support (#238)
+* `rayon` support for Map storages (#234, #239, #240):
   * `HexagonalMap::new_parallel`
   * `HexModMap::new_parallel`
   * `RombusMap::new_parallel`
-* Improvements on benchmarks (#239)
-* Bevy 0.18 support (#238)
+  * `RectMap::new_parallel`
 * Fix `shapes` example (#235 #236)
-* Added feature `bevy_ecs` (`dep:bevy_ecs`)  (#227)
-* Added `RectMap` storage for rectangular dense hex maps (#227)
+* Improvements on benchmarks (#239)
 * Hex conversion benchmarks (#240)
-* Added parallel construction for `RectMap` (#240)
 * `RectMap` benchmarks (#240)
 * `bevy_platform` and `bevy_ecs` optional dependencies do not use default features (#240)
 

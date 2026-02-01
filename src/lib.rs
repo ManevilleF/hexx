@@ -20,7 +20,7 @@
 //! Run `cargo add hexx` in your project or add the following line to your
 //! `Cargo.toml`:
 //!
-//! * `hexx = "0.23"`
+//! * `hexx = "0.24"`
 //!
 //! ### Cargo features
 //!
