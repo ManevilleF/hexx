@@ -98,7 +98,6 @@ impl<T> HexModMap<T> {
         let meta = HexModMapMetadata::new(bounds);
 
         let hex_count = bounds.hex_count32();
-
         // Iterate over all valid hexes in the hexagonal region and fill the map
         let inner: Vec<_> = (0..hex_count)
             .map(|coord| {
@@ -139,15 +138,16 @@ impl<T> HexModMap<T> {
         let meta = HexModMapMetadata::new(bounds);
 
         let hex_count = bounds.hex_count32();
+        let mut inner = Vec::with_capacity(bounds.hex_count());
 
         // Iterate over all valid hexes in the hexagonal region and fill the map
-        let inner: Vec<_> = (0..hex_count)
+        (0..hex_count)
             .into_par_iter()
             .map(|coord| {
                 let hex = center + Hex::from_hexmod_coordinates(coord, bounds.radius);
                 values(hex)
             })
-            .collect();
+            .collect_into_vec(&mut inner);
 
         Self { inner, meta }
     }

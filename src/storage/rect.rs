@@ -1,8 +1,8 @@
-use std::fmt::Debug;
-
-use glam::{IVec2, UVec2};
-
 use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
+use glam::{IVec2, UVec2};
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+use std::fmt::Debug;
 
 /// [`Vec`] Based storage for rectangular maps.
 ///
@@ -33,12 +33,6 @@ use crate::{Hex, HexOrientation, OffsetHexMode, storage::HexStore};
 ///
 /// assert_eq!(rect_map.get(Hex::new(0, 0)), Some(&0));
 /// ```
-///
-/// internally handle coordinate transform
-/// - `hex`
-/// - => `ij` offset coordinate
-/// - => `rc` 2D view of `Vec`
-/// - => `idx` `Vec` index
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
 #[cfg_attr(
@@ -55,11 +49,10 @@ pub struct RectMap<T> {
 ///
 /// # Example
 /// ```rust
-/// use hexx::{
-///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
-///     *,
-/// };
-///
+/// # use hexx::{
+/// #    storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+/// #    *,
+/// # };
 /// let rect_hex_map = RectMetadata::from_half_size(UVec2::new(8, 12))
 ///     .with_orientation(HexOrientation::Pointy)
 ///     .with_offset_mode(OffsetHexMode::Odd)
@@ -112,19 +105,17 @@ pub enum WrapStrategy {
 }
 
 impl RectMetadata {
-    // ================================
-    // Builder Pattern
-    // ================================
-    /// create a new [`RectMetadata`] with half size
+    /// Create a new [`RectMetadata`] with half size
     ///
-    /// # Param
-    /// * `half_size`: the half span of the map
+    /// # Arguments
+    /// * `half_size` - the half span of the map
     ///
     /// the resulting map will have:
     /// - columns: `-half_size[0]..(half_size[0] - 1)`, and
     /// - rows: `-half_size[1]..(half_size[1] - 1)`, and
     #[must_use]
-    pub fn from_half_size(half_size: UVec2) -> Self {
+    pub fn from_half_size(half_size: impl Into<UVec2>) -> Self {
+        let half_size = half_size.into();
         Self {
             start: -half_size.as_ivec2(),
             dim: 2 * half_size,
@@ -133,11 +124,11 @@ impl RectMetadata {
             wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
         }
     }
-    /// create a new [`RectMetadata`] with start and end
+    /// Create a new [`RectMetadata`] with start and end
     ///
-    /// # Param
-    /// * `start`: the element wise minimum offset coordinate in the map
-    /// * `end`: the element wise maximum offset coordinate in the map
+    /// # Arguments
+    /// * `start` - the element wise minimum offset coordinate in the map
+    /// * `end` - the element wise maximum offset coordinate in the map
     ///
     /// the resulting map will have:
     /// - columns: `start[0]..max(start[0], end[0])`
@@ -154,9 +145,9 @@ impl RectMetadata {
     }
     /// create a new [`RectMetadata`] with start and dimension
     ///
-    /// # Param
-    /// * `start`: the element wise minimum offset coordinate in the map
-    /// * `dim`: the dimension of the map
+    /// # Arguments
+    /// * `start` - the element wise minimum offset coordinate in the map
+    /// * `dim` - the dimension of the map
     ///
     /// the resulting map will have:
     /// - columns: `start[0]..(start[0] + dim[0])`
@@ -171,42 +162,40 @@ impl RectMetadata {
             wrap_strategies: [WrapStrategy::Cycle, WrapStrategy::Clamp],
         }
     }
-    /// builder pattern, set half size
+    /// Sets map half size
     ///
-    /// # Param
-    /// * `half_size`: the half span of the map
+    /// # Arguments
+    /// * `half_size` - the half span of the map
     ///
     /// the resulting map will have:
     /// - columns: `-half_size[0]..(half_size[0] - 1)`, and
     /// - rows: `-half_size[1]..(half_size[1] - 1)`, and
     #[must_use]
     pub fn with_half_size(mut self, half_size: IVec2) -> Self {
-        // self.half_size = half_size.abs();
         self.start = -half_size.abs();
         self.dim = (2 * half_size.abs()).as_uvec2();
         self
     }
-    /// builder pattern, set start and end
+    /// Sets start and end coordinates
     ///
-    /// # Param
-    /// * `start`: the element wise minimum offset coordinate in the map
-    /// * `end`: the element wise maximum offset coordinate in the map
+    /// # Arguments
+    /// * `start` - the element wise minimum offset coordinate in the map
+    /// * `end` - the element wise maximum offset coordinate in the map
     ///
     /// the resulting map will have:
     /// - columns: `start[0]..max(start[0], end[0])`
     /// - rows: `start[1]..max(start[1], end[1])`
     #[must_use]
     pub fn with_start_end(mut self, start: IVec2, end: IVec2) -> Self {
-        // self.half_size = half_size.abs();
         self.start = start;
         self.dim = (end.max(start) - start).as_uvec2();
         self
     }
-    /// builder pattern, set start and dimension
+    /// Sets the start coordinate and map dimension
     ///
-    /// # Param
-    /// * `start`: the element wise minimum offset coordinate in the map
-    /// * `dim`: the dimension of the map
+    /// # Arguments
+    /// * `start` - the element wise minimum offset coordinate in the map
+    /// * `dim` - the dimension of the map
     ///
     /// the resulting map will have:
     /// - columns: `start[0]..(start[0] + dim[0])`
@@ -217,19 +206,19 @@ impl RectMetadata {
         self.dim = dim;
         self
     }
-    /// builder patter, set hex layout
+    /// Sets Hexagonal orientation
     #[must_use]
     pub const fn with_orientation(mut self, orientation: HexOrientation) -> Self {
         self.orientation = orientation;
         self
     }
-    /// builder pattern, set offset mode
+    /// Setes coordinate offset mode
     #[must_use]
     pub const fn with_offset_mode(mut self, offset_mode: OffsetHexMode) -> Self {
         self.offset_mode = offset_mode;
         self
     }
-    /// builder patter, set wrapping strategy
+    /// Sets the wrapping strategy
     ///
     /// this only affect result of [`RectMap::wrapped_get`] and
     /// [`RectMap::wrapped_get_mut`]
@@ -239,14 +228,13 @@ impl RectMetadata {
         self
     }
 
-    /// builder patter, build map with function to eval value
+    /// Build the map with function to eval value
     /// # Example
     /// ```rust
-    /// use hexx::{
-    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
-    ///     *,
-    /// };
-    ///
+    /// # use hexx::{
+    /// #    storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    /// #    *,
+    /// # };
     /// let rect_map = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
@@ -254,18 +242,30 @@ impl RectMetadata {
     ///
     /// assert_eq!(rect_map.get(Hex::new(0, 0)), Some(&0));
     /// ```
+    #[inline]
     pub fn build<T>(self, values: impl FnMut(Hex) -> T) -> RectMap<T> {
         RectMap::new(self, values)
     }
 
-    /// builder patter, build map with default values
+    /// Build the map with function to eval value using parallel processing with
+    /// `rayon`
+    #[inline]
+    #[cfg(feature = "rayon")]
+    pub fn build_parallel<T, F>(self, values: F) -> RectMap<T>
+    where
+        F: Fn(Hex) -> T + Send + Sync,
+        T: Send,
+    {
+        RectMap::new_parallel(self, values)
+    }
+
+    /// Builds map with default values
     /// # Example
     /// ```rust
-    /// use hexx::{
-    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
-    ///     *,
-    /// };
-    ///
+    /// # use hexx::{
+    /// #    storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    /// #    *,
+    /// # };
     /// let rect_map = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
     ///     .with_wrap_strategies([WrapStrategy::Cycle, WrapStrategy::Clamp])
@@ -278,26 +278,35 @@ impl RectMetadata {
         RectMap::default_values(self)
     }
 
-    // ================================
-    // Access
-    // ================================
+    /// Builds map with default values using parallel processing with
+    /// `rayon`
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    pub fn build_default_parralel<T: Default + Send>(self) -> RectMap<T> {
+        RectMap::default_values_parallel(self)
+    }
+
     /// get the hex orientation of the map
     #[must_use]
+    #[inline]
     pub const fn orientation(&self) -> HexOrientation {
         self.orientation
     }
     /// get the offset mode of the map
     #[must_use]
+    #[inline]
     pub const fn offset_mode(&self) -> OffsetHexMode {
         self.offset_mode
     }
     /// get the dimension of the map
     #[must_use]
+    #[inline]
     pub const fn dim(&self) -> UVec2 {
         self.dim
     }
     /// get the wrap strategies of the map
     #[must_use]
+    #[inline]
     pub const fn wrap_strategies(&self) -> [WrapStrategy; 2] {
         self.wrap_strategies
     }
@@ -335,26 +344,7 @@ impl RectMetadata {
     /// `None` if outside map
     fn hex_to_idx(&self, hex: Hex) -> Option<usize> {
         let ij = self.hex_to_offset(hex);
-        if self.contains_offset(ij) {
-            Some(self.ij_to_idx(ij))
-        } else {
-            None
-        }
-    }
-
-    /// Wrap if `hex` lie outside of layout
-    fn wrapped_hex_to_idx(&self, hex: Hex) -> usize {
-        let ij = self.hex_to_offset(hex);
-        let ij = self.wrap_offset(ij);
-        self.ij_to_idx(ij)
-    }
-
-    /// Calculate offset coordinate from hex for map's orientation and offset
-    /// mode
-    #[must_use]
-    pub fn hex_to_offset(&self, hex: Hex) -> IVec2 {
-        hex.to_offset_coordinates(self.offset_mode, self.orientation)
-            .into()
+        self.contains_offset(ij).then(|| self.ij_to_idx(ij))
     }
 
     /// fallable input, internal
@@ -365,6 +355,21 @@ impl RectMetadata {
     fn ij_to_idx(&self, ij: IVec2) -> usize {
         let rc = (ij - self.start).as_uvec2();
         (rc.x + rc.y * self.dim.x) as usize
+    }
+
+    /// Calculate offset coordinate from hex for map's orientation and offset
+    /// mode
+    #[must_use]
+    pub fn hex_to_offset(&self, hex: Hex) -> IVec2 {
+        hex.to_offset_coordinates(self.offset_mode, self.orientation)
+            .into()
+    }
+
+    /// Wrap if `hex` lie outside of layout
+    fn wrapped_hex_to_idx(&self, hex: Hex) -> usize {
+        let ij = self.hex_to_offset(hex);
+        let ij = self.wrap_offset(ij);
+        self.ij_to_idx(ij)
     }
 
     /// Wrap a offset coordinate to ensure it fall inside the map
@@ -429,42 +434,59 @@ impl RectMetadata {
     // ================================
     /// total size of the map
     #[must_use]
+    #[inline]
     pub fn len(&self) -> usize {
         self.dim.element_product() as usize
     }
 
     /// whether of not the map layout is empty
     #[must_use]
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
     /// iterator over the hexagonal coordinates in the map.
-    pub fn iter_hex(&self) -> impl Iterator<Item = Hex> + use<'_> {
+    #[must_use]
+    pub fn iter_hex(&self) -> impl ExactSizeIterator<Item = Hex> {
         (0..self.len()).map(|idx| self.idx_to_hex(idx))
     }
+    /// Parallel iterator over the hexagonal coordinates in the map.
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    pub fn iter_par_hex(&self) -> impl IndexedParallelIterator<Item = Hex> {
+        (0..self.len())
+            .into_par_iter()
+            .map(|idx| self.idx_to_hex(idx))
+    }
     /// iterator over the offset coordinates in the map.
-    pub fn iter_offset(&self) -> impl Iterator<Item = IVec2> + use<'_> {
+    #[must_use]
+    pub fn iter_offset(&self) -> impl ExactSizeIterator<Item = IVec2> {
         (0..self.len()).map(|idx| self.idx_to_ij(idx))
+    }
+    /// Parallel iterator over the offset coordinates in the map.
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    pub fn iter_par_offset(&self) -> impl IndexedParallelIterator<Item = IVec2> {
+        (0..self.len())
+            .into_par_iter()
+            .map(|idx| self.idx_to_ij(idx))
     }
 }
 
 impl<T> RectMap<T> {
-    // ================================
-    // Creation
-    // ================================
     /// Creates and fills a rectangular shaped map
     ///
     /// # Arguments
-    /// * `meta`: The meta data for the map to create.
+    /// * `meta` - The meta data for the map to create.
     /// * `values` - Function called for each coordinate to fill the map
     ///
     /// # Example
     /// ```
-    /// use hexx::{
-    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
-    ///     *,
-    /// };
+    /// # use hexx::{
+    /// #     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    /// #     *,
+    /// # };
     ///
     /// let meta = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
@@ -474,32 +496,46 @@ impl<T> RectMap<T> {
     /// assert_eq!(rect_map.get(Hex::new(0, 0)), Some(&0));
     /// ```
     #[must_use]
-    pub fn new(meta: RectMetadata, mut values: impl FnMut(Hex) -> T) -> Self {
-        let size = (meta.dim.element_product() * 4) as usize;
-        let mut inner = Vec::with_capacity(size);
-        for h in meta.iter_hex() {
-            inner.push(values(h));
-        }
+    pub fn new(meta: RectMetadata, values: impl FnMut(Hex) -> T) -> Self {
+        let inner = meta.iter_hex().map(values).collect();
+        Self { inner, meta }
+    }
+
+    /// Creates and fills a rectangular shaped map using parallel processing
+    /// with `rayon`
+    ///
+    /// # Arguments
+    /// * `meta` - The meta data for the map to create.
+    /// * `values` - Function called for each coordinate to fill the map
+    #[cfg(feature = "rayon")]
+    pub fn new_parallel<F>(meta: RectMetadata, values: F) -> Self
+    where
+        F: Fn(Hex) -> T + Send + Sync,
+        T: Send,
+    {
+        let mut inner = Vec::with_capacity(meta.len());
+        meta.iter_par_hex().map(values).collect_into_vec(&mut inner);
         Self { inner, meta }
     }
 
     /// get the [`RectMetadata`] of the map.
     #[must_use]
+    #[inline]
     pub const fn meta(&self) -> &RectMetadata {
         &self.meta
     }
 
-    /// Creates and fills a rectangular shaped map
+    /// Creates and fills a rectangular shaped map using default values
     ///
     /// # Arguments
-    /// * `meta`: The meta data for the map to create.
+    /// * `meta` - The meta data for the map to create.
     ///
     /// # Example
     /// ```
-    /// use hexx::{
-    ///     storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
-    ///     *,
-    /// };
+    /// # use hexx::{
+    /// #    storage::{HexStore, RectMap, RectMetadata, WrapStrategy},
+    /// #    *,
+    /// # };
     ///
     /// let meta = RectMetadata::from_half_size(UVec2 { x: 8, y: 4 })
     ///     .with_orientation(HexOrientation::Pointy)
@@ -509,11 +545,27 @@ impl<T> RectMap<T> {
     /// assert_eq!(rect_map.get(Hex::new(0, 0)), Some(&0));
     /// ```
     #[must_use]
+    #[inline]
     pub fn default_values(meta: RectMetadata) -> Self
     where
         T: Default,
     {
         Self::new(meta, |_| Default::default())
+    }
+
+    /// Creates and fills a rectangular shaped map using default values and
+    /// parallel processing with `rayon`
+    ///
+    /// # Arguments
+    /// * `meta` - The meta data for the map to create.
+    #[cfg(feature = "rayon")]
+    #[must_use]
+    #[inline]
+    pub fn default_values_parallel(meta: RectMetadata) -> Self
+    where
+        T: Default + Send,
+    {
+        Self::new_parallel(meta, |_| Default::default())
     }
 
     /// Returns a reference the stored value associated with offset coordinate.
@@ -580,6 +632,7 @@ impl<T> RectMap<T> {
 
 impl<T> std::ops::Deref for RectMap<T> {
     type Target = RectMetadata;
+    #[inline]
     fn deref(&self) -> &Self::Target {
         self.meta()
     }
@@ -594,18 +647,21 @@ impl<T> HexStore<T> for RectMap<T> {
         let idx = self.meta.hex_to_idx(hex)?;
         self.inner.get_mut(idx)
     }
+    #[inline]
     fn values<'s>(&'s self) -> impl ExactSizeIterator<Item = &'s T>
     where
         T: 's,
     {
         self.inner.iter()
     }
+    #[inline]
     fn values_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = &'s mut T>
     where
         T: 's,
     {
         self.inner.iter_mut()
     }
+    #[inline]
     fn iter<'s>(&'s self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s T)>
     where
         T: 's,
@@ -615,6 +671,7 @@ impl<T> HexStore<T> for RectMap<T> {
             (hex, value)
         })
     }
+    #[inline]
     fn iter_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s mut T)>
     where
         T: 's,

@@ -65,10 +65,12 @@ optional = true
 
 [dependencies.bevy_platform]
 version = "0.18"
+default-features = false
 optional = true
 
 [dependencies.bevy_ecs]
 version = "0.18"
+default-features = false
 optional = true
 
 # For lib.rs doctests and examples
@@ -225,6 +227,10 @@ required-features = ["bevy_platform"]
 name = "shapes"
 path = "examples/shapes.rs"
 required-features = ["bevy_reflect"]
+
+[[bench]]
+name = "conversions"
+harness = false
 
 [[bench]]
 name = "length"

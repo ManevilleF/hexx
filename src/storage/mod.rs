@@ -104,14 +104,17 @@ pub trait HexStore<T> {
 }
 
 impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<crate::Hex, T, S> {
+    #[inline]
     fn get(&self, hex: crate::Hex) -> Option<&T> {
         self.get(&hex)
     }
 
+    #[inline]
     fn get_mut(&mut self, hex: crate::Hex) -> Option<&mut T> {
         self.get_mut(&hex)
     }
 
+    #[inline]
     fn values<'s>(&'s self) -> impl ExactSizeIterator<Item = &'s T>
     where
         T: 's,
@@ -119,6 +122,7 @@ impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<cra
         self.values()
     }
 
+    #[inline]
     fn values_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = &'s mut T>
     where
         T: 's,
@@ -126,6 +130,7 @@ impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<cra
         self.values_mut()
     }
 
+    #[inline]
     fn iter<'s>(&'s self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s T)>
     where
         T: 's,
@@ -133,6 +138,7 @@ impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<cra
         self.iter().map(|(k, v)| (*k, v))
     }
 
+    #[inline]
     fn iter_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s mut T)>
     where
         T: 's,
@@ -145,14 +151,17 @@ impl<T, S: std::hash::BuildHasher> HexStore<T> for std::collections::HashMap<cra
 impl<T, S: core::hash::BuildHasher> HexStore<T>
     for bevy_platform::collections::HashMap<crate::Hex, T, S>
 {
+    #[inline]
     fn get(&self, hex: crate::Hex) -> Option<&T> {
         self.get(&hex)
     }
 
+    #[inline]
     fn get_mut(&mut self, hex: crate::Hex) -> Option<&mut T> {
         self.get_mut(&hex)
     }
 
+    #[inline]
     fn values<'s>(&'s self) -> impl ExactSizeIterator<Item = &'s T>
     where
         T: 's,
@@ -160,6 +169,7 @@ impl<T, S: core::hash::BuildHasher> HexStore<T>
         self.values()
     }
 
+    #[inline]
     fn values_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = &'s mut T>
     where
         T: 's,
@@ -167,6 +177,7 @@ impl<T, S: core::hash::BuildHasher> HexStore<T>
         self.values_mut()
     }
 
+    #[inline]
     fn iter<'s>(&'s self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s T)>
     where
         T: 's,
@@ -174,6 +185,7 @@ impl<T, S: core::hash::BuildHasher> HexStore<T>
         self.iter().map(|(k, v)| (*k, v))
     }
 
+    #[inline]
     fn iter_mut<'s>(&'s mut self) -> impl ExactSizeIterator<Item = (crate::Hex, &'s mut T)>
     where
         T: 's,

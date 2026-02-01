@@ -11,6 +11,10 @@
 * Fix `shapes` example (#235 #236)
 * Added feature `bevy_ecs` (`dep:bevy_ecs`)  (#227)
 * Added `RectMap` storage for rectangular dense hex maps (#227)
+* Hex conversion benchmarks (#240)
+* Added parallel construction for `RectMap` (#240)
+* `RectMap` benchmarks (#240)
+* `bevy_platform` and `bevy_ecs` optional dependencies do not use default features (#240)
 
 ## 0.23.0
 

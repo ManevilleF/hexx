@@ -46,7 +46,7 @@
  * `rayon`: Enables [rayon](https://github.com/rayon-rs/rayon) support for
    parallel processing
  * `packed`: Makes [`Hex`](https://docs.rs/hexx/latest/hexx/hex/struct.Hex.html) `repr(C)`, useful to use it
-   accross the FII
+   accross the FFI
  * `grid`: Enables support for Face/Vertex/Edge [grid handling](https://www.redblobgames.com/grids/parts/#hexagon-coordinates)
    using `Hex` as Face, `GridVertex` as vertex and `GridEdge` as edge.
  * `algorithms`: Enables the [algorithms](https://docs.rs/hexx/latest/hexx/algorithms/) module with:
