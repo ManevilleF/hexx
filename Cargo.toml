@@ -65,10 +65,12 @@ optional = true
 
 [dependencies.bevy_platform]
 version = "0.18"
+default-features = false
 optional = true
 
 [dependencies.bevy_ecs]
 version = "0.18"
+default-features = false
 optional = true
 
 # For lib.rs doctests and examples
