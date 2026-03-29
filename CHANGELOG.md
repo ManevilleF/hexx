@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Fix typos in documentation comments (#241)
+
 ## 0.24.0
 
 * Added `RectMap` storage for rectangular dense hex maps (#227)

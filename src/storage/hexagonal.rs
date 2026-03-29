@@ -19,10 +19,10 @@ use super::HexStore;
 ///
 /// If your use case doesn't match all of the above, use a [`HashMap`] instead
 ///
-/// ## Performance agains [`HashMap`]
+/// ## Performance against [`HashMap`]
 ///
 /// This struct is uses less memory and the larger the map, the faster `get`
-/// operations are agains a hashmap, approximately 10x faster
+/// operations are against a hashmap, approximately 10x faster
 ///
 /// But for iterating this storage is *less* performant than a hashmap
 /// approximately 3x slower
