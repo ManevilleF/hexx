@@ -35,10 +35,7 @@ use std::fmt::Debug;
 /// ```
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
-#[cfg_attr(
-    feature = "bevy_ecs",
-    derive(bevy_ecs::resource::Resource, bevy_ecs::component::Component)
-)]
+#[cfg_attr(feature = "bevy_ecs", derive(bevy_ecs::resource::Resource))]
 #[derive(Clone)]
 pub struct RectMap<T> {
     inner: Vec<T>,
@@ -66,10 +63,7 @@ pub struct RectMap<T> {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
-#[cfg_attr(
-    feature = "bevy_ecs",
-    derive(bevy_ecs::resource::Resource, bevy_ecs::component::Component)
-)]
+#[cfg_attr(feature = "bevy_ecs", derive(bevy_ecs::resource::Resource))]
 pub struct RectMetadata {
     /// the hex layout of the map
     orientation: HexOrientation,

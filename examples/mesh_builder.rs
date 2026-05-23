@@ -212,7 +212,7 @@ fn show_ui(world: &mut World) {
                     bevy_inspector::ui_for_resource::<GlobalAmbientLight>(world, ui);
                 });
                 let info = world.resource::<HexInfo>();
-                let mat = materials.get_mut(&info.material_handle).unwrap();
+                let mut mat = materials.get_mut(&info.material_handle).unwrap();
                 ui.collapsing("Material", |ui| {
                     ui.horizontal(|ui| {
                         ui.label("Base Color");
@@ -339,7 +339,7 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     }
     let new_mesh = compute_mesh(new_mesh.build());
     // println!("Mesh has {} vertices", new_mesh.count_vertices());
-    let mesh = meshes.get_mut(&info.mesh_handle).unwrap();
+    let mut mesh = meshes.get_mut(&info.mesh_handle).unwrap();
     *mesh = new_mesh;
 }
 
