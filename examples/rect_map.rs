@@ -1,3 +1,4 @@
+#![allow(clippy::useless_format)]
 use bevy::{color::palettes::css::*, prelude::*, window::PrimaryWindow};
 
 use hexx::{

@@ -81,7 +81,15 @@ fn show_ui(world: &mut World) {
             return;
         };
         let mut egui_context = egui_context.clone();
-        egui::SidePanel::left("Mesh settings").show(egui_context.get_mut(), |ui| {
+        let ctx = egui_context.get_mut();
+        let mut viewport_ui = egui::Ui::new(
+            ctx.clone(),
+            "viewport".into(),
+            egui::UiBuilder::new()
+                .layer_id(egui::LayerId::background())
+                .max_rect(ctx.viewport_rect()),
+        );
+        egui::Panel::left("Mesh settings").show_inside(&mut viewport_ui, |ui| {
             ui.heading("Global");
             egui::Grid::new("Grid").num_columns(2).show(ui, |ui| {
                 ui.label("Column Height");
