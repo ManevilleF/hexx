@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-* Bevy 0.19 support
+* Bevy 0.19 support (#242)
 * Fix typos in documentation comments (#241)
 
 ## 0.24.0
