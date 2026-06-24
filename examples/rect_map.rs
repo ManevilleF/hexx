@@ -1,3 +1,4 @@
+#![allow(clippy::useless_format)]
 use bevy::{color::palettes::css::*, prelude::*, window::PrimaryWindow};
 
 use hexx::{
@@ -60,6 +61,9 @@ pub struct TextInstruction;
 
 #[derive(Message)]
 pub struct RespawnMap;
+
+#[derive(Resource, Deref)]
+pub struct GlobalRectMap(RectMap<Entity>);
 
 /// setup
 fn setup(
@@ -196,8 +200,8 @@ fn respawn_map(
             .id()
     });
 
-    // Insert RectMap<Entity> as an resource
-    commands.insert_resource(map);
+    // Insert the map in a wrapper as a resource
+    commands.insert_resource(GlobalRectMap(map));
 }
 
 fn handle_input(
@@ -326,7 +330,7 @@ fn handle_input(
 
 fn update_material(
     mut gizmos: Gizmos,
-    map: Res<RectMap<Entity>>,
+    map: Res<GlobalRectMap>,
     config: Res<RectMapConfig>,
     default_mat: Res<DefaultMaterial>,
     cursor_pos: ResMut<CursorPos>,

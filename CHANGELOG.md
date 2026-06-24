@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+* Bevy 0.19 support (#242)
+ * Note that in Bevy 0.19 types cannot derive both `Component` and `Resource`,
+   so the types with both have had their derives removed. If you used these you
+   need to make your own wrapper types.
 * Fix typos in documentation comments (#241)
 
 ## 0.24.0

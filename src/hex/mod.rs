@@ -359,7 +359,7 @@ impl Hex {
     ///
     /// Panics if `slice` is less than 2 elements long.
     #[inline]
-    pub fn write_to_slice(self, slice: &mut [i32]) {
+    pub const fn write_to_slice(self, slice: &mut [i32]) {
         slice[0] = self.x;
         slice[1] = self.y;
     }

@@ -171,7 +171,7 @@ fn generate(
                 Text2d(format!("{},{}", coord.x, coord.y)),
                 TextColor(Color::BLACK),
                 TextFont {
-                    font_size: 7.0,
+                    font_size: FontSize::Px(7.0),
                     ..default()
                 },
                 Transform::from_xyz(0.0, 0.0, 10.0),

@@ -95,7 +95,7 @@ fn setup_grid(
                         Text2d(format!("{},{}", hex.x, hex.y)),
                         TextColor(Color::BLACK),
                         TextFont {
-                            font_size: 6.0,
+                            font_size: FontSize::Px(6.0),
                             ..default()
                         },
                         Transform::from_xyz(0.0, 0.0, 10.0),

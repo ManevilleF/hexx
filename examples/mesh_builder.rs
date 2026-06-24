@@ -81,7 +81,15 @@ fn show_ui(world: &mut World) {
             return;
         };
         let mut egui_context = egui_context.clone();
-        egui::SidePanel::left("Mesh settings").show(egui_context.get_mut(), |ui| {
+        let ctx = egui_context.get_mut();
+        let mut viewport_ui = egui::Ui::new(
+            ctx.clone(),
+            "viewport".into(),
+            egui::UiBuilder::new()
+                .layer_id(egui::LayerId::background())
+                .max_rect(ctx.viewport_rect()),
+        );
+        egui::Panel::left("Mesh settings").show_inside(&mut viewport_ui, |ui| {
             ui.heading("Global");
             egui::Grid::new("Grid").num_columns(2).show(ui, |ui| {
                 ui.label("Column Height");
@@ -212,7 +220,7 @@ fn show_ui(world: &mut World) {
                     bevy_inspector::ui_for_resource::<GlobalAmbientLight>(world, ui);
                 });
                 let info = world.resource::<HexInfo>();
-                let mat = materials.get_mut(&info.material_handle).unwrap();
+                let mut mat = materials.get_mut(&info.material_handle).unwrap();
                 ui.collapsing("Material", |ui| {
                     ui.horizontal(|ui| {
                         ui.label("Base Color");
@@ -339,7 +347,7 @@ fn update_mesh(params: Res<BuilderParams>, info: Res<HexInfo>, mut meshes: ResMu
     }
     let new_mesh = compute_mesh(new_mesh.build());
     // println!("Mesh has {} vertices", new_mesh.count_vertices());
-    let mesh = meshes.get_mut(&info.mesh_handle).unwrap();
+    let mut mesh = meshes.get_mut(&info.mesh_handle).unwrap();
     *mesh = new_mesh;
 }
 
