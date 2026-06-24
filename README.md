@@ -59,8 +59,7 @@
      for `HashMap`
    * `bevy_reflect`: Enables [Bevy Reflection](https://docs.rs/bevy_reflect/latest/bevy_reflect)
      for most types
-   * `bevy_ecs`: Enables `Component` and `Resource` derives for common hexx
-     types
+   * `bevy_ecs`: Enables `Component` derives for common hexx types
 
  _Some features are enabled by default, it is recommended to enable only
  what is needed for your usage_

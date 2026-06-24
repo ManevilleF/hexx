@@ -28,7 +28,6 @@ use std::fmt::Debug;
 /// [`HashMap`]: std::collections::HashMap
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy_ecs", derive(bevy_ecs::resource::Resource))]
 pub struct RombusMap<T> {
     inner: Vec<T>,
     meta: RombusMetadata,
