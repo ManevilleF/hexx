@@ -10,7 +10,7 @@ use bevy::{
 use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::{InspectorOptions, quick::ResourceInspectorPlugin};
 use hexx::*;
-use rand::{Rng, rng};
+use rand::{RngExt, rng};
 
 /// Chunk colors
 const COLORS: [Color; 3] = [Color::Srgba(BLUE), Color::Srgba(WHITE), Color::Srgba(RED)];
