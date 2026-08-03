@@ -138,7 +138,7 @@ version = "0.8"
 features = ["html_reports"]
 
 [dev-dependencies]
-rand = "0.9"
+rand = "0.10"
 bevy-inspector-egui = "0.37"
 bevy_egui = "0.40"
 approx = "0.5"

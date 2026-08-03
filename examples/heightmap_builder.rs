@@ -9,7 +9,7 @@ use bevy_egui::{
 };
 use bevy_inspector_egui::bevy_inspector;
 use hexx::*;
-use rand::{Rng, rng};
+use rand::{RngExt, rng};
 use storage::HexagonalMap;
 
 #[derive(Debug, Resource)]
