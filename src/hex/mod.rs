@@ -16,7 +16,7 @@ mod iter;
 /// Hex ring utils
 mod rings;
 /// swizzle utils
-mod siwzzle;
+mod swizzle;
 #[cfg(test)]
 mod tests;
 
