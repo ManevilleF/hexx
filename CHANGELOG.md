@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.25.0
+
 * rename `siwzzle` to `swizzle` (#245)
 * Bump `rand` dev dependency (#244)
 * Bevy 0.19 support (#242)
