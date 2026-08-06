@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* rename `siwzzle` to `swizzle` (#245)
 * Bump `rand` dev dependency (#244)
 * Bevy 0.19 support (#242)
  * Note that in Bevy 0.19 types cannot derive both `Component` and `Resource`,
