@@ -40,7 +40,7 @@ bevy_platform = ["dep:bevy_platform"]
 bevy_ecs = ["dep:bevy_ecs"]
 
 [dependencies]
-glam = "0.32"
+glam = "0.33"
 
 [dependencies.rayon]
 version = "1.11"
@@ -58,24 +58,24 @@ default-features = false
 optional = true
 
 [dependencies.bevy_reflect]
-version = "0.19"
+version = "0.20"
 default-features = false
 features = ["glam"]
 optional = true
 
 [dependencies.bevy_platform]
-version = "0.19"
+version = "0.20"
 default-features = false
 optional = true
 
 [dependencies.bevy_ecs]
-version = "0.19"
+version = "0.20"
 default-features = false
 optional = true
 
 # For lib.rs doctests and examples
 [dev-dependencies.bevy]
-version = "0.19"
+version = "0.20"
 features = [
     "std",
     # "async_executor",
@@ -129,7 +129,7 @@ features = [
     "x11",
     # "wayland",
     # "debug",
-    # "zstd_rust",
+    "zstd_rust",
 ]
 default-features = false
 
@@ -139,8 +139,8 @@ features = ["html_reports"]
 
 [dev-dependencies]
 rand = "0.10"
-bevy-inspector-egui = "0.37"
-bevy_egui = "0.40"
+bevy-inspector-egui = "0.38"
+bevy_egui = "0.43"
 approx = "0.5"
 
 

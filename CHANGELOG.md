@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## [Unreleased]
+* Bevy 0.20 support 
 
 ## 0.25.0
 
